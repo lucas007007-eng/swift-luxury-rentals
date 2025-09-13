@@ -6,22 +6,23 @@ import { motion } from 'framer-motion'
 
 const Footer = () => {
   const footerLinks = {
-    'Stay With Us': [
-      { name: 'See the Properties', href: '/properties' },
-      { name: 'Renting with BerlinLuxe', href: '/renting' },
+    'Company': [
+      { name: 'About us', href: '/about' },
+      { name: 'Careers', href: '/careers' },
+      { name: 'News Release', href: '/news' },
     ],
-    'Information': [
-      { name: 'About BerlinLuxe', href: '/about' },
-      { name: 'Berlin Stays', href: '/stays' },
-      { name: 'Berlin Realty', href: '/realty' },
+    'Legal': [
+      { name: 'Cookie policy', href: '/cookie-policy' },
+      { name: 'Manage cookie settings', href: '/cookie-settings' },
+      { name: 'Privacy policy', href: '/privacy' },
+      { name: 'Site map', href: '/sitemap' },
+      { name: 'Terms and conditions', href: '/terms-conditions' },
     ],
     'Account': [
       { name: 'Account Login', href: '/login' },
       { name: 'Create Account', href: '/register' },
     ],
     'For Guests': [
-      { name: 'Terms', href: '/terms' },
-      { name: 'Privacy', href: '/privacy' },
       { name: 'Rules', href: '/rules' },
       { name: 'Neighbourhood Policy', href: '/neighbourhood' },
       { name: 'Contact Us', href: '/contact' },
@@ -58,9 +59,9 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-2 mb-6">
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">BL</span>
+                <span className="text-white font-bold text-lg">SL</span>
               </div>
-              <span className="font-bold text-xl">BerlinLuxerentals.de</span>
+              <span className="font-bold text-xl">Swift Luxury</span>
             </Link>
             <p className="text-gray-400 mb-6">
               Making Rentals Easy with One Platform for Every Duration.
@@ -103,30 +104,11 @@ const Footer = () => {
           ))}
         </div>
 
-        {/* Newsletter Signup */}
-        <div className="border-t border-gray-800 pt-12 mb-8">
-          <div className="max-w-md">
-            <h3 className="font-semibold text-lg mb-4">Stay Updated</h3>
-            <p className="text-gray-400 mb-4">
-              Get the latest news about new properties and exclusive deals.
-            </p>
-            <div className="flex">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-              <button className="px-6 py-3 bg-primary-600 hover:bg-primary-700 rounded-r-lg font-semibold transition-colors">
-                Subscribe
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center">
           <div className="text-gray-400 text-sm mb-4 sm:mb-0">
-            <p>© 2024 BerlinLuxerentals. All rights reserved.</p>
+            <p>© 2024 Swift Luxury. All rights reserved.</p>
           </div>
           <div className="text-gray-400 text-sm">
             <p>Berlin, renting made easy.</p>
@@ -134,14 +116,6 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Launch Promotion Modal */}
-      <div className="bg-primary-600 py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-white font-semibold">
-            🎉 Website & Content Launch Special - Exclusive perks for our first 20 bookings!
-          </p>
-        </div>
-      </div>
     </footer>
   )
 }

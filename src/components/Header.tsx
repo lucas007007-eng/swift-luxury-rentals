@@ -23,10 +23,8 @@ const Header: React.FC<HeaderProps> = ({ forceBackground = false }) => {
 
   const navigation = [
     { name: 'Properties', href: '/properties' },
-    { name: 'About Berlin Luxe', href: '/about' },
-    { name: 'Berlin Stays', href: '/stays' },
-    { name: 'Berlin Realty', href: '/realty' },
-    { name: 'For Customers', href: '/customers' },
+    { name: 'Corporate Rentals', href: '/corporate-rentals' },
+    { name: 'List Your Property', href: '/list-your-property' },
     { name: 'Contact', href: '/contact' },
   ]
 
@@ -51,10 +49,31 @@ const Header: React.FC<HeaderProps> = ({ forceBackground = false }) => {
             </span>
           </Link>
 
-          {/* Hamburger menu button - visible on all screens */}
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="text-white hover:text-amber-400 font-medium transition-colors"
+              >
+                {item.name}
+              </Link>
+            ))}
+            <div className="flex items-center space-x-4 ml-8">
+              <Link
+                href="/dashboard"
+                className="border border-gray-400/70 text-white font-medium px-6 py-2 rounded-xl transition-colors hover:bg-white/10 hover:border-gray-200"
+              >
+                My Bookings
+              </Link>
+            </div>
+          </nav>
+
+          {/* Hamburger menu button - mobile only */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-white hover:text-primary-300 transition-colors"
+            className="md:hidden p-2 text-white hover:text-amber-400 transition-colors"
           >
             {isMobileMenuOpen ? (
               <XMarkIcon className="w-6 h-6" />
@@ -65,47 +84,62 @@ const Header: React.FC<HeaderProps> = ({ forceBackground = false }) => {
         </div>
       </div>
 
-      {/* Hamburger Navigation Menu */}
-        {isMobileMenuOpen && (
-          <div className="bg-white border-t border-gray-200 shadow-lg">
-            <div className="px-4 py-4 space-y-4">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="block text-gray-700 hover:text-primary-600 font-medium py-2 text-lg"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="pt-4 border-t border-gray-200 space-y-2">
-                <div className="flex items-center space-x-4 py-2">
-                  <button className="p-2 text-gray-700 hover:text-primary-600 transition-colors">
-                    <HeartIcon className="w-6 h-6" />
-                  </button>
-                  <button className="p-2 text-gray-700 hover:text-primary-600 transition-colors">
-                    <UserIcon className="w-6 h-6" />
-                  </button>
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="absolute top-0 right-0 w-80 h-full bg-black shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              {/* Menu Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-800">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
+                    <span className="text-black font-bold text-lg">SL</span>
+                  </div>
+                  <span className="text-white font-bold text-xl">Swift Luxury</span>
                 </div>
-                <Link
-                  href="/login"
-                  className="block text-gray-700 hover:text-primary-600 font-medium py-2 text-lg"
+                <button
                   onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 text-gray-400 hover:text-white transition-colors"
                 >
-                  Log in
-                </Link>
-                <Link
-                  href="/list"
-                  className="block btn-primary text-center"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  List with Us
-                </Link>
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
               </div>
+
+              {/* Navigation Links */}
+              <div className="p-6 space-y-6">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="block text-white hover:text-amber-400 font-medium py-3 text-lg border-b border-gray-800 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+                
+                {/* Action Buttons */}
+                <div className="pt-6 space-y-4">
+                  <Link
+                    href="/login"
+                    className="block w-full text-center bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors border border-gray-700"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="block w-full text-center border border-gray-400/70 text-white font-medium py-3 rounded-xl transition-colors hover:bg-white/10 hover:border-gray-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    My Bookings
+                  </Link>
+                </div>
+
+                {/* Social Links removed */}
             </div>
           </div>
-        )}
+        </div>
+      )}
     </header>
   )
 }

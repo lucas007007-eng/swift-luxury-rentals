@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { HeartIcon, PlayIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import { Property } from '@/types'
@@ -14,6 +15,7 @@ interface PropertyCardProps {
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
+  const router = useRouter()
   const [isLiked, setIsLiked] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
@@ -69,7 +71,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
-            onClick={() => setIsGalleryOpen(true)}
+            onClick={() => router.push(`/property/${property.id}`)}
           >
           </div>
           
@@ -77,18 +79,24 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
           {property.images.length > 1 && (
             <>
               <button
-                onClick={() => handleImageNavigation('prev')}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 bg-white/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleImageNavigation('prev')
+                }}
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 bg-black/60 hover:bg-black/80 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 border border-amber-400"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <button
-                onClick={() => handleImageNavigation('next')}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-white/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleImageNavigation('next')
+                }}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-black/60 hover:bg-black/80 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 border border-amber-400"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -167,13 +175,19 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
           </div>
         )}
 
-        {/* Price */}
+        {/* Price or Inquire Now */}
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-2xl font-bold text-gray-900">
-              {formatPrice(property.price)}
-            </span>
-            <span className="text-gray-600">/ {property.priceUnit}</span>
+            {property.id === 'berlin-real-5' ? (
+              <span className="text-xl font-bold text-gray-900">Inquire Now</span>
+            ) : (
+              <>
+                <span className="text-2xl font-bold text-gray-900">
+                  {formatPrice(property.price)}
+                </span>
+                <span className="text-gray-600">/ {property.priceUnit}</span>
+              </>
+            )}
           </div>
           <Link
             href={`/property/${property.id}`}

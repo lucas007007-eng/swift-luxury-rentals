@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { getProxiedImageUrl } from '@/lib/utils'
 
 interface ImageGalleryModalProps {
   images: string[]
@@ -86,7 +87,7 @@ const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
         <div
           className="max-w-7xl max-h-full w-full h-full bg-gray-900 rounded-lg"
           style={{
-            backgroundImage: `url('${images[currentIndex]}')`,
+            backgroundImage: `url('${getProxiedImageUrl(images[currentIndex])}')`,
             backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
@@ -123,7 +124,7 @@ const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
             <div
               className="w-full h-full bg-gray-800"
               style={{
-                backgroundImage: `url('${image}')`,
+                backgroundImage: `url('${getProxiedImageUrl(image)}')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}

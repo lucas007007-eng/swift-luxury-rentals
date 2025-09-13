@@ -24,6 +24,9 @@ if exist package.json (
     echo ✅ Server started successfully!
     echo 🌐 Access your site at: http://localhost:3002
     echo 📝 Server is running in the separate window
+    echo.
+    echo 🔁 Restore point: See backups folder for latest zip (e.g., site-20250913-020344.zip)
+    echo      To restore, unzip into project root and overwrite files.
 ) else (
     echo ❌ package.json not found!
     echo Make sure this script is in the berlinluxerentals directory

@@ -20,6 +20,18 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'listingimages.wunderflats.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pic.le-cdn.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 }

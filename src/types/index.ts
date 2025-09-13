@@ -4,6 +4,8 @@ export interface Property {
   description: string
   price: number
   priceUnit: 'night' | 'month' | 'year'
+  /** When true, UI should hide price and show Inquire Now; excluded from averages */
+  priceHidden?: boolean
   location: string
   bedrooms: number
   bathrooms: number

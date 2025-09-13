@@ -4,138 +4,156 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Link from 'next/link'
 
 export default function AboutPage() {
-  const team = [
+  const values = [
     {
-      name: 'Alexander Schmidt',
-      role: 'CEO & Founder',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-      bio: 'With over 15 years in Berlin real estate, Alexander founded Swift Luxury to revolutionize the rental experience.'
+      icon: '🏆',
+      title: 'Excellence',
+      description: 'We curate only the finest luxury properties across Europe\'s most prestigious neighborhoods.'
     },
     {
-      name: 'Maria Müller',
-      role: 'Head of Operations',
-      image: 'https://images.unsplash.com/photo-1494790108755-2616c96fce79?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-      bio: 'Maria ensures seamless operations and exceptional guest experiences across all our properties.'
+      icon: '🔒',
+      title: 'Security',
+      description: 'Advanced payment security with cryptocurrency integration and traditional banking compliance.'
     },
     {
-      name: 'Thomas Weber',
-      role: 'Technology Director',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-      bio: 'Thomas leads our tech innovation, developing solutions that make rentals easier for everyone.'
+      icon: '⚡',
+      title: 'Innovation',
+      description: 'Revolutionary crypto payment solutions that make luxury rentals accessible to the digital age.'
+    },
+    {
+      icon: '🤝',
+      title: 'Trust',
+      description: 'Transparent processes and dedicated support ensure a stress-free luxury rental experience.'
     }
   ]
 
-  const values = [
+  const features = [
     {
-      title: 'Transparency',
-      description: 'We believe in clear communication and honest pricing with no hidden fees.',
-      icon: '🔍'
+      title: 'Cryptocurrency Payments',
+      description: 'The first platform to accept Bitcoin, Ethereum, and USDT for luxury rental payments.',
+      icon: '₿'
     },
     {
-      title: 'Quality',
-      description: 'Every property meets our high standards for comfort, cleanliness, and amenities.',
+      title: 'European Expansion',
+      description: 'Luxury properties in Berlin, Paris, Amsterdam, Vienna, Barcelona, and London.',
+      icon: '🌍'
+    },
+    {
+      title: 'Premium Service',
+      description: '24/7 support, tenant protection, and concierge-level customer service.',
       icon: '⭐'
     },
     {
-      title: 'Innovation',
-      description: 'We leverage technology to create seamless rental experiences.',
-      icon: '💡'
-    },
-    {
-      title: 'Community',
-      description: 'We\'re committed to being positive contributors to Berlin\'s neighborhoods.',
-      icon: '🤝'
+      title: 'Verified Properties',
+      description: 'Every property is personally verified and meets our strict luxury standards.',
+      icon: '✅'
     }
   ]
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-black">
       <Header forceBackground={true} />
       
       {/* Hero Section */}
-      <section className="pt-32 md:pt-36 lg:pt-40 pb-16 bg-gradient-to-br from-primary-50 to-secondary-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="pt-32 md:pt-36 lg:pt-40 pb-16 bg-black">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 
+              className="text-4xl md:text-6xl mb-6 text-amber-400 font-semibold"
+            >
               About Swift Luxury
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto">
-              We're revolutionizing the rental experience in Berlin, making it easier for 
-              everyone to find their perfect home, whether it's for a night, a month, or a year.
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto">
+              Revolutionizing luxury rentals across Europe with cryptocurrency payments and premium service
             </p>
           </motion.div>
         </div>
       </section>
 
       {/* Mission Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 bg-black">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Mission</h2>
-              <p className="text-lg text-gray-600 mb-6">
-                Berlin's rental market has long been complex and fragmented. We founded 
-                Swift Luxury to change that, creating a unified platform that serves 
-                every type of rental need with the same level of excellence.
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Our Mission
+              </h2>
+              <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+                Swift Luxury is pioneering the future of luxury rentals by combining premium European properties 
+                with cutting-edge cryptocurrency payment solutions. We believe luxury living should be accessible 
+                and payments should be seamless.
               </p>
-              <p className="text-lg text-gray-600 mb-6">
-                From short-term stays for visitors to long-term homes for residents, 
-                we're committed to making the rental process transparent, efficient, 
-                and enjoyable for both guests and property owners.
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Our platform connects discerning travelers and long-term residents with Europe's finest 
+                rental properties, offering unparalleled convenience through our revolutionary crypto payment system.
               </p>
-              <div className="flex items-center space-x-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary-600">500+</div>
-                  <div className="text-gray-600">Properties</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary-600">10K+</div>
-                  <div className="text-gray-600">Happy Guests</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary-600">4.9</div>
-                  <div className="text-gray-600">Average Rating</div>
-                </div>
-              </div>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
               className="relative"
             >
-              <img
-                src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Berlin apartment interior"
-                className="rounded-2xl shadow-2xl"
-              />
+              <div className="bg-gray-900 rounded-3xl p-8 border border-gray-800">
+                <div className="bg-amber-500/20 rounded-2xl p-6 border border-amber-500/30">
+                  <h3 className="text-2xl font-bold text-white mb-4">Why Swift Luxury?</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-amber-500 rounded-full w-6 h-6 flex items-center justify-center">
+                        <span className="text-black font-bold text-sm">✓</span>
+                      </div>
+                      <span className="text-gray-300">First crypto-enabled luxury rental platform</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-amber-500 rounded-full w-6 h-6 flex items-center justify-center">
+                        <span className="text-black font-bold text-sm">✓</span>
+                      </div>
+                      <span className="text-gray-300">Curated luxury properties €6,500+/month</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-amber-500 rounded-full w-6 h-6 flex items-center justify-center">
+                        <span className="text-black font-bold text-sm">✓</span>
+                      </div>
+                      <span className="text-gray-300">Architect-designed properties available</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Values Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Values</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              These principles guide everything we do, from property selection to guest service.
+      {/* Values Grid */}
+      <section className="py-16 bg-gray-900">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              Our Values
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              The principles that guide everything we do at Swift Luxury
             </p>
-          </div>
-          
+          </motion.div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
               <motion.div
@@ -143,46 +161,69 @@ export default function AboutPage() {
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center bg-white rounded-2xl p-8 shadow-lg"
+                className="text-center bg-black rounded-2xl p-8 border border-gray-800 hover:border-amber-400/50 transition-colors"
               >
                 <div className="text-4xl mb-4">{value.icon}</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
+                <h3 className="text-xl font-bold text-white mb-4">{value.title}</h3>
+                <p className="text-gray-300">{value.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Features Section */}
+      <section className="py-16 bg-black">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Meet Our Team</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              The passionate people behind Swift Luxury, working to make your rental experience exceptional.
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              What Makes Us Different
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Revolutionary features that set Swift Luxury apart from traditional rental platforms
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {team.map((member, index) => (
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {features.map((feature, index) => (
               <motion.div
-                key={member.name}
+                key={feature.title}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center bg-gray-50 rounded-2xl p-8"
+                className="bg-gray-900 rounded-2xl p-8 border border-gray-800"
               >
-                <img
-                  src={member.image}
-                  alt={member.name}
-                  className="w-32 h-32 rounded-full mx-auto mb-6 object-cover"
-                />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
-                <p className="text-primary-600 font-semibold mb-4">{member.role}</p>
-                <p className="text-gray-600">{member.bio}</p>
+                <div className="flex items-start space-x-6">
+                  <div className="bg-amber-500/20 rounded-full w-16 h-16 flex items-center justify-center text-2xl flex-shrink-0">
+                    {feature.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-4">{feature.title}</h3>
+                    <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                  </div>
+                </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-16 bg-gray-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-black rounded-3xl p-12 border border-gray-800">
+            <h2 className="text-3xl font-bold text-white mb-6">Ready to Experience Swift Luxury?</h2>
+            <p className="text-gray-300 mb-8 text-lg">
+              Discover our curated collection of ultra-luxury properties across Europe
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/properties" className="bg-amber-500 hover:bg-amber-600 text-black font-bold px-8 py-4 rounded-xl transition-colors text-center">
+                Browse Properties
+              </Link>
+              <Link href="/contact" className="bg-white/20 hover:bg-white/30 text-white font-bold px-8 py-4 rounded-xl transition-colors backdrop-blur-sm text-center">
+                Contact Us
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -191,8 +232,3 @@ export default function AboutPage() {
     </main>
   )
 }
-
-
-
-
-

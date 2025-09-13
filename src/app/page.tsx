@@ -1,18 +1,19 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import PropertyCard from '@/components/PropertyCard'
 import About from '@/components/About'
 import Locations from '@/components/Locations'
-import ContactForm from '@/components/ContactForm'
 import Footer from '@/components/Footer'
 import { Property } from '@/types'
 import { cityProperties, cityInfo } from '@/data/cityProperties'
 
 
 export default function Home() {
+  const router = useRouter()
   const [selectedCity, setSelectedCity] = useState('Berlin')
   const [displayedProperties, setDisplayedProperties] = useState<Property[]>(cityProperties.Berlin)
 
@@ -31,152 +32,105 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      <Header />
+      <Header forceBackground={true} />
       <Hero onCitySelect={handleCitySelect} selectedCity={selectedCity} />
       
-      {/* Featured Properties Section */}
-      <section className="py-16 bg-gray-50">
+      {/* Featured Properties grid removed per request */}
+
+      
+
+      <About />
+      <Locations />
+
+      {/* Crypto Payment Section moved below Our European Destinations */}
+      <section className="pt-8 pb-16 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">
-              {currentCityInfo?.title || 'Premium Luxury Rentals'}
-            </h2>
-            <p className="text-xl font-semibold text-gray-700 max-w-3xl mx-auto">
-              {currentCityInfo?.description || 'Discover our handpicked selection of luxury rental properties.'}
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 lg:gap-8">
-            {displayedProperties.map((property, index) => (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                index={index}
-              />
-            ))}
-          </div>
-
-          {/* No Properties Message */}
-          {displayedProperties.length === 0 && (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">🏠</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Coming Soon to {selectedCity}</h3>
-              <p className="text-gray-600">We&apos;re expanding to {selectedCity}! Luxury properties will be available soon.</p>
-            </div>
-          )}
-          
-          <div className="text-center mt-12">
-            <button 
-              onClick={() => router.push(`/city/${selectedCity}`)}
-              className="btn-primary"
-            >
-              View All {selectedCity} Properties ({currentCityInfo?.count || 0})
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Crypto Payment Section */}
-      <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-green-500 to-blue-600 rounded-full mb-6">
-              <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+            <h2 className="text-4xl md:text-5xl font-extrabold crypto-shine mb-6">
               Revolutionary Crypto Rent Payments
             </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
               The first platform in Berlin to accept cryptocurrency for rent payments. 
               We handle all the complexity - you just pay and move in.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {/* Crypto Payment */}
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center border-2 border-green-100">
+            <div className="bg-gray-800 rounded-2xl shadow-lg p-8 text-center border-2 border-gray-700">
               <div className="bg-gradient-to-r from-orange-400 to-yellow-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold text-2xl">₿</span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Pay with Crypto</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Crypto & Credit Card</h3>
               <div className="flex justify-center space-x-4 mb-4">
-                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-semibold">BTC</span>
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold">ETH</span>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full font-semibold">USDT</span>
+                <span className="bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-semibold">BTC</span>
+                <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full font-semibold">ETH</span>
+                <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full font-semibold">USDT</span>
               </div>
-              <p className="text-gray-600">
+              <p className="text-gray-300">
                 Use Bitcoin, Ethereum, USDT, or traditional credit card payments
               </p>
             </div>
 
             {/* EU Compliance */}
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center border-2 border-blue-100">
+            <div className="bg-gray-800 rounded-2xl shadow-lg p-8 text-center border-2 border-gray-700">
               <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold text-2xl">🏦</span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">EU Compliant</h3>
-              <div className="bg-blue-50 rounded-lg p-3 mb-4">
-                <span className="text-blue-800 font-semibold">Fully Regulated</span>
+              <h3 className="text-2xl font-bold text-white mb-4">EU Compliant</h3>
+              <div className="bg-blue-500/20 rounded-lg p-3 mb-4">
+                <span className="text-blue-400 font-semibold">Fully Regulated</span>
               </div>
-              <p className="text-gray-600">
+              <p className="text-gray-300">
                 All transactions comply with European banking regulations and anti-money laundering laws
               </p>
             </div>
 
             {/* Seamless Conversion */}
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center border-2 border-purple-100">
+            <div className="bg-gray-800 rounded-2xl shadow-lg p-8 text-center border-2 border-gray-700">
               <div className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <span className="text-white font-bold text-2xl">⚡</span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Instant Conversion</h3>
-              <div className="bg-purple-50 rounded-lg p-3 mb-4">
-                <span className="text-purple-800 font-semibold">Auto Bank Wire</span>
+              <h3 className="text-2xl font-bold text-white mb-4">Instant Booking</h3>
+              <div className="bg-purple-500/20 rounded-lg p-3 mb-4">
+                <span className="text-purple-400 font-semibold">Auto Bank Wire</span>
               </div>
-              <p className="text-gray-600">
+              <p className="text-gray-300">
                 We automatically convert crypto to fiat and wire transfer to landlords
               </p>
             </div>
+
+            {/* Move In! card */}
+            <div className="bg-gray-800 rounded-2xl shadow-lg p-8 text-center border-2 border-gray-700">
+              <div className="bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-2xl">🏠</span>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-3">Move In!</h3>
+              <div className="bg-emerald-500/20 rounded-lg p-3 mb-4">
+                <span className="text-emerald-400 font-semibold">Seamless Check‑in</span>
+              </div>
+              <p className="text-gray-300">Keys, utilities, and Wi‑Fi are live from day one; suites are deep‑cleaned with hotel‑grade linens, and our guided check‑in gets you settled in minutes.</p>
+            </div>
           </div>
 
-          <div className="text-center">
-            <div className="bg-gradient-to-r from-green-500 to-blue-600 rounded-2xl p-8 text-white max-w-4xl mx-auto">
-              <h3 className="text-3xl font-bold mb-4">How It Works</h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="text-center">
-                  <div className="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
-                    <span className="font-bold">1</span>
-                  </div>
-                  <p className="font-semibold">Choose Property</p>
-                </div>
-                <div className="text-center">
-                  <div className="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
-                    <span className="font-bold">2</span>
-                  </div>
-                  <p className="font-semibold">Pay with Crypto/Card</p>
-                </div>
-                <div className="text-center">
-                  <div className="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
-                    <span className="font-bold">3</span>
-                  </div>
-                  <p className="font-semibold">We Convert & Wire</p>
-                </div>
-                <div className="text-center">
-                  <div className="bg-white/20 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-3">
-                    <span className="font-bold">4</span>
-                  </div>
-                  <p className="font-semibold">Move In!</p>
-                </div>
-              </div>
+        </div>
+      </section>
+
+      {/* Spy-themed CTA component (inserted from web-to-mcp reference 8c3d847a-c8c1-43e9-b362-f923d83e1c3b) */}
+      <section className="relative bg-black py-14">
+        <div className="pointer-events-none absolute inset-0 agent-grid opacity-20" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] p-8 md:p-12 text-center shadow-[0_0_28px_rgba(16,185,129,0.18)]">
+            <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text mb-2">Access Granted</div>
+            <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Join the Swift Luxury Network</h3>
+            <p className="text-white/70 max-w-3xl mx-auto mb-6">Create your account to manage bookings, preferences, and secure crypto-enabled payments with our agent-style dashboard.</p>
+            <div className="flex items-center justify-center gap-4">
+              <button onClick={()=>window.location.assign('/register')} className="px-6 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-black font-semibold shadow-lg transition">Register</button>
+              <button onClick={()=>window.location.assign('/login')} className="px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold border border-white/20 transition">Login</button>
             </div>
           </div>
         </div>
       </section>
-
-      <About />
-      <Locations />
-      <ContactForm />
       <Footer />
     </main>
   )

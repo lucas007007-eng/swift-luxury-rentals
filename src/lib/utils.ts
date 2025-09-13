@@ -18,3 +18,13 @@ export function formatDate(date: Date): string {
   }).format(date)
 }
 
+export function getProxiedImageUrl(url: string): string {
+  if (!url) return ''
+  try {
+    const encoded = encodeURIComponent(url)
+    return `/api/img?url=${encoded}`
+  } catch {
+    return `/api/img?url=${encodeURIComponent(url)}`
+  }
+}
+

@@ -59,11 +59,11 @@ export default function ContactPage() {
   ]
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-black">
       <Header forceBackground={true} />
       
       {/* Hero Section */}
-      <section className="pt-32 md:pt-36 lg:pt-40 pb-16 bg-gradient-to-br from-primary-50 to-secondary-50">
+      <section className="pt-32 md:pt-36 lg:pt-40 pb-16 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -71,10 +71,10 @@ export default function ContactPage() {
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl md:text-6xl mb-6 text-amber-400 font-semibold">
               Get in Touch
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto">
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto">
               We're here to help with all your rental needs in Berlin. Whether you have questions 
               about a property or need assistance with your booking, our team is ready to assist.
             </p>
@@ -83,7 +83,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Info Cards */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {contactInfo.map((info, index) => (
@@ -92,18 +92,18 @@ export default function ContactPage() {
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow"
+                className="text-center bg-gray-900 rounded-2xl p-8 border border-gray-800"
               >
-                <div className="text-primary-600 mb-4 flex justify-center">
+                <div className="text-amber-400 mb-4 flex justify-center">
                   {info.icon}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{info.title}</h3>
+                <h3 className="text-xl font-bold text-white mb-4">{info.title}</h3>
                 <div className="space-y-2 mb-4">
                   {info.details.map((detail, idx) => (
-                    <p key={idx} className="text-gray-900 font-medium">{detail}</p>
+                    <p key={idx} className="text-gray-300 font-medium">{detail}</p>
                   ))}
                 </div>
-                <p className="text-gray-600 text-sm">{info.description}</p>
+                <p className="text-gray-400 text-sm">{info.description}</p>
               </motion.div>
             ))}
           </div>
@@ -114,11 +114,11 @@ export default function ContactPage() {
       <ContactForm />
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-            <p className="text-xl text-gray-600">
+            <h2 className="text-4xl font-bold text-white mb-6">Frequently Asked Questions</h2>
+            <p className="text-xl text-gray-300">
               Find quick answers to common questions about our rental services.
             </p>
           </div>
@@ -130,21 +130,21 @@ export default function ContactPage() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-gray-50 rounded-2xl p-8"
+                className="bg-gray-900 rounded-2xl p-8 border border-gray-800"
               >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{faq.question}</h3>
-                <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                <h3 className="text-xl font-bold text-white mb-4">{faq.question}</h3>
+                <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
               </motion.div>
             ))}
           </div>
           
           <div className="text-center mt-12">
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-400 mb-4">
               Still have questions? We're here to help!
             </p>
             <a
               href="mailto:info@swiftluxury.de"
-              className="btn-primary inline-block"
+              className="inline-block bg-amber-500 hover:bg-amber-600 text-black font-bold px-6 py-3 rounded-xl transition-colors"
             >
               Contact Our Support Team
             </a>
@@ -153,32 +153,32 @@ export default function ContactPage() {
       </section>
 
       {/* Map Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Visit Our Office</h2>
-            <p className="text-xl text-gray-600">
+            <h2 className="text-4xl font-bold text-white mb-6">Visit Our Office</h2>
+            <p className="text-xl text-gray-300">
               Located in the heart of Berlin, we're easy to reach by public transport.
             </p>
           </div>
           
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-black rounded-2xl border border-gray-800 overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2">
               <div className="p-8 lg:p-12">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Office Information</h3>
+                <h3 className="text-2xl font-bold text-white mb-6">Office Information</h3>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-4">
-                    <MapPinIcon className="w-6 h-6 text-primary-600 mt-1" />
+                    <MapPinIcon className="w-6 h-6 text-amber-400 mt-1" />
                     <div>
-                      <p className="font-semibold text-gray-900">Address</p>
-                      <p className="text-gray-600">Unter den Linden 77<br />10117 Berlin, Germany</p>
+                      <p className="font-semibold text-white">Address</p>
+                      <p className="text-gray-300">Unter den Linden 77<br />10117 Berlin, Germany</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
-                    <ClockIcon className="w-6 h-6 text-primary-600 mt-1" />
+                    <ClockIcon className="w-6 h-6 text-amber-400 mt-1" />
                     <div>
-                      <p className="font-semibold text-gray-900">Office Hours</p>
-                      <p className="text-gray-600">
+                      <p className="font-semibold text-white">Office Hours</p>
+                      <p className="text-gray-300">
                         Monday - Friday: 9:00 AM - 6:00 PM<br />
                         Saturday: 10:00 AM - 4:00 PM<br />
                         Sunday: Closed
@@ -186,12 +186,12 @@ export default function ContactPage() {
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
-                    <svg className="w-6 h-6 text-primary-600 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6 text-amber-400 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
                     <div>
-                      <p className="font-semibold text-gray-900">Public Transport</p>
-                      <p className="text-gray-600">
+                      <p className="font-semibold text-white">Public Transport</p>
+                      <p className="text-gray-300">
                         U-Bahn: Friedrichstraße (U6)<br />
                         S-Bahn: Friedrichstraße (S1, S2, S25)
                       </p>
@@ -200,8 +200,8 @@ export default function ContactPage() {
                 </div>
               </div>
               
-              <div className="h-96 lg:h-auto bg-gray-200 flex items-center justify-center">
-                <div className="text-center text-gray-500">
+              <div className="h-96 lg:h-auto bg-gray-900 flex items-center justify-center">
+                <div className="text-center text-gray-400">
                   <MapPinIcon className="w-16 h-16 mx-auto mb-4" />
                   <p className="text-lg font-medium">Interactive Map</p>
                   <p className="text-sm">Map integration would be implemented here</p>
