@@ -576,8 +576,88 @@ function CRMTables({ onChange }: { onChange?: () => void }) {
           )))}
         </div>
       </div>
+      {/* CRM Mobile Cards */}
+      <div className="block md:hidden space-y-3">
+        {loading ? (
+          Array.from({length:4}).map((_,i)=>(
+            <div key={i} className="rounded-xl border border-white/10 bg-black/30 p-3 text-white/60">Loading…</div>
+          ))
+        ) : rows.length === 0 ? (
+          <div className="rounded-xl border border-white/10 bg-black/30 p-3 text-white/70">No records yet.</div>
+        ) : (
+          rows.map((r) => (
+            <div key={r.id} className="rounded-xl border border-white/10 bg-black/30 p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="text-white font-semibold">{r.overdue ? (<span className="px-2 py-0.5 rounded bg-red-500/20 text-red-300">{r.clientName}</span>) : r.clientName}</div>
+                <div className="text-xs text-white/50">{r.city}</div>
+              </div>
+              <div className="text-xs text-white/70 mt-0.5">{r.propertyTitle || r.propertyId}</div>
+              {/* Dates */}
+              <div className="mt-2 inline-flex flex-col gap-1 px-2.5 py-1.5 rounded border border-sky-400/30 bg-sky-500/10 shadow-[0_0_12px_rgba(56,189,248,0.25)]">
+                <span className="text-[11px] text-sky-300 whitespace-nowrap">Check-In: {formatShortDate(r.checkIn)}</span>
+                <span className="text-[11px] text-sky-200/80 whitespace-nowrap">Checkout: {formatShortDate(r.checkOut)}</span>
+              </div>
+              {/* Chips row */}
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-amber-400/40 bg-amber-500/10 text-amber-300 whitespace-nowrap">
+                  <span className="font-bold">€</span>
+                  <span className="font-semibold">{Number(r.leaseValue||0).toLocaleString('de-DE')}</span>
+                  <span className="uppercase tracking-wider text-[10px] text-amber-200">Lease Total</span>
+                </div>
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 whitespace-nowrap">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
+                  <span className="font-semibold">€{Number(r.receivedAmount||0).toLocaleString('de-DE')}</span>
+                  <span className="uppercase tracking-wider text-[10px] text-emerald-200">Received</span>
+                </div>
+              </div>
+              {/* Deposit / Next Due */}
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <div className="flex items-center gap-2">
+                  {typeof r.depositAmount === 'number' ? (
+                    (() => {
+                      const isRefunded = r.depositStatus === 'refunded'
+                      const isCompleted = r.paid !== false
+                      const chipClass = isRefunded
+                        ? 'border-sky-400/30 bg-sky-500/10 text-sky-300'
+                        : isCompleted
+                          ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-300'
+                          : 'border-amber-400/30 bg-amber-500/10 text-amber-300'
+                      const label = isRefunded ? 'Deposit Refunded' : (isCompleted ? 'Deposit Active' : 'No deposit')
+                      return (
+                        <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded border ${chipClass} whitespace-nowrap`}>
+                          <span className="font-semibold">€{Number(r.depositAmount||0).toLocaleString('de-DE')}</span>
+                          <span className="uppercase tracking-wider text-[10px] opacity-80">{label}</span>
+                        </div>
+                      )
+                    })()
+                  ) : <span className="text-white/40 text-xs">—</span>}
+                </div>
+                <div className="flex items-center gap-2 justify-end">
+                  {r.nextDue ? (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2 py-0.5 rounded text-xs whitespace-nowrap bg-amber-500/20 text-amber-300 border border-amber-400/30">{r.nextDue}</span>
+                      <span className="text-sm font-semibold text-white whitespace-nowrap">€{Number(r.nextDueAmount||0).toLocaleString('de-DE')}</span>
+                    </div>
+                  ) : <span className="text-white/40 text-xs">—</span>}
+                </div>
+              </div>
+              {/* Status + actions */}
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <span className={`px-2 py-1 text-xs rounded border ${r.paid !== false ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-amber-500/20 text-amber-300 border-amber-400/30'}`}>
+                  {r.paid !== false ? 'Paid' : 'Unpaid'}
+                </span>
+                <div className="flex items-center gap-3">
+                  {r.leasePdf ? <a className="text-amber-400 text-xs" href={r.leasePdf} target="_blank">Lease</a> : <span className="text-white/40 text-xs">Lease</span>}
+                  {r.invoicePdf ? <a className="text-amber-400 text-xs" href={r.invoicePdf} target="_blank">Invoice</a> : <span className="text-white/40 text-xs">Invoice</span>}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
 
-      {/* CRM Table */}
+      {/* CRM Table (desktop) */}
+      <div className="hidden md:block">
       <table className="min-w-full text-sm">
         <thead>
           <tr className="text-left text-white/60">
@@ -714,6 +794,7 @@ function CRMTables({ onChange }: { onChange?: () => void }) {
           )}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }

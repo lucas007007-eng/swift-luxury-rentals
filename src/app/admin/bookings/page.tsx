@@ -156,8 +156,88 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               <div className="text-sm text-emerald-300">€{pageRevenue.toLocaleString('de-DE')} page total</div>
             </div>
           </div>
+          {/* Mobile card list (sm) */}
+          <div className="block md:hidden px-4 pb-4">
+            <div className="space-y-3">
+              {withDeposit.map((b: any) => {
+                const receivedEuros = Math.round(((b.receivedCents||0)/100))
+                const payments = (b.payments || [])
+                const scheduled = payments.filter((p:any)=> p.purpose==='monthly_rent' && p.status==='scheduled').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
+                const nextDue = scheduled[0]
+                const nextDueAmt = nextDue ? Math.round((Number(nextDue.amountCents)||0)/100) : 0
+                const refundedCents = payments.filter((p:any)=> p.purpose==='deposit' && p.status==='refunded').reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
+                const hasDepositPaymentReceived = payments.some((p:any)=> p.purpose==='deposit' && p.status==='received')
+                const depositReceived = hasDepositPaymentReceived || b.status === 'confirmed'
+                const isRefunded = refundedCents > 0
+                const depEuros = Math.round(((isRefunded ? refundedCents : Number(b.depositHeld||0)) / 100))
+                const finished = new Date(b.checkout) <= new Date()
+                return (
+                  <div key={b.id} className="rounded-xl border border-white/10 bg-black/30 p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-white font-semibold">{b.user?.name || '—'}</div>
+                        <div className="text-xs text-white/60">{b.property?.title || '—'}</div>
+                      </div>
+                      <div className="text-xs text-white/50 whitespace-nowrap">{new Date(b.createdAt).toLocaleDateString()}</div>
+                    </div>
+                    <div className="mt-2 text-xs text-white/70">{new Date(b.checkin).toLocaleDateString()} → {new Date(b.checkout).toLocaleDateString()}</div>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <div className="rounded border border-emerald-400/30 bg-emerald-500/10 p-2">
+                        <div className="text-[11px] uppercase tracking-wider text-emerald-200">Received</div>
+                        <div className="text-sm font-semibold text-emerald-300">€{receivedEuros.toLocaleString('de-DE')}</div>
+                      </div>
+                      <div className="rounded border border-amber-400/30 bg-amber-500/10 p-2">
+                        <div className="text-[11px] uppercase tracking-wider text-amber-200">Next Due</div>
+                        <div className="text-sm font-semibold text-white">{nextDue ? `€${nextDueAmt.toLocaleString('de-DE')} • ${formatShortDate(new Date(nextDue.dueAt))}` : '—'}</div>
+                      </div>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <form action="/api/admin/bookings" method="post" className="flex items-center gap-2">
+                        <input type="hidden" name="id" value={b.id} />
+                        <select name="status" defaultValue={b.status} className="bg-black/40 border border-white/10 rounded px-2 py-1 text-sm">
+                          <option value="hold">hold</option>
+                          <option value="confirmed">confirmed</option>
+                          <option value="cancelled">cancelled</option>
+                        </select>
+                        <button className="px-2 py-1 text-xs rounded bg-amber-500 hover:bg-amber-600 text-black font-semibold">Save</button>
+                      </form>
+                      <div className="flex items-center gap-2">
+                        {nextDue && (
+                          <form action="/api/admin/bookings/receive-next" method="post">
+                            <input type="hidden" name="bookingId" value={b.id} />
+                            <button className="px-2 py-1 text-xs rounded bg-emerald-500 hover:bg-emerald-400 text-black font-semibold">Receive</button>
+                          </form>
+                        )}
+                        {depEuros>0 && !isRefunded && depositReceived && finished && (
+                          <form action="/api/admin/bookings/refund" method="post">
+                            <input type="hidden" name="bookingId" value={b.id} />
+                            <button className="px-2 py-1 text-xs rounded bg-sky-500 hover:bg-sky-400 text-black font-semibold">Refund</button>
+                          </form>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            {/* Mobile pagination */}
+            {totalCount > pageSize && (
+              <div className="mt-4 flex items-center justify-between rounded-lg border border-white/10 bg-black/40 px-3 py-2">
+                <a
+                  href={`/admin/bookings?page=${Math.max(1, page-1)}${statusFilter?`&status=${activeStatus}`:''}`}
+                  className={`px-3 py-1.5 rounded text-sm border ${page>1 ? 'border-emerald-400/30 text-emerald-300 hover:text-emerald-200' : 'border-white/10 text-white/30 pointer-events-none'}`}
+                >Prev</a>
+                <div className="text-white/60 text-sm">Page {page} of {Math.max(1, Math.ceil(totalCount / pageSize))}</div>
+                <a
+                  href={`/admin/bookings?page=${page+1}${statusFilter?`&status=${activeStatus}`:''}`}
+                  className={`px-3 py-1.5 rounded text-sm border ${(skip + bookings.length) < totalCount ? 'border-emerald-400/30 text-emerald-300 hover:text-emerald-200' : 'border-white/10 text-white/30 pointer-events-none'}`}
+                >Next</a>
+              </div>
+            )}
+          </div>
+
           {/* Keep table width fixed while expanding card width */}
-          <div className="px-6 md:px-8">
+          <div className="hidden md:block px-6 md:px-8">
             <div className="max-w-[1650px] mx-auto">
           <table className="w-full divide-y divide-white/10">
             <thead className="bg-black/20">
