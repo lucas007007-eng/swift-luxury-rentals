@@ -1,39 +1,23 @@
-'use client'
+// server component (no "use client") to minimize client-side JS on homepage
 
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import React from 'react'
 import Header from '@/components/Header'
+import Link from 'next/link'
 import Hero from '@/components/Hero'
-import PropertyCard from '@/components/PropertyCard'
-import About from '@/components/About'
-import Locations from '@/components/Locations'
-import Footer from '@/components/Footer'
-import { Property } from '@/types'
-import { cityProperties, cityInfo } from '@/data/cityProperties'
+import dynamic from 'next/dynamic'
+
+// Defer below-the-fold components to reduce initial bundle
+const About = dynamic(() => import('@/components/About'), { ssr: false })
+const Locations = dynamic(() => import('@/components/Locations'), { ssr: false })
+const Footer = dynamic(() => import('@/components/Footer'), { ssr: false })
 
 
 export default function Home() {
-  const router = useRouter()
-  const [selectedCity, setSelectedCity] = useState('Berlin')
-  const [displayedProperties, setDisplayedProperties] = useState<Property[]>(cityProperties.Berlin)
-
-  // Update displayed properties when city changes
-  useEffect(() => {
-    const properties = cityProperties[selectedCity] || []
-    setDisplayedProperties(properties)
-  }, [selectedCity])
-
-  // Function to handle city selection
-  const handleCitySelect = (city: string) => {
-    setSelectedCity(city)
-  }
-
-  const currentCityInfo = cityInfo[selectedCity as keyof typeof cityInfo]
 
   return (
     <main className="min-h-screen">
       <Header forceBackground={true} />
-      <Hero onCitySelect={handleCitySelect} selectedCity={selectedCity} />
+      <Hero />
       
       {/* Featured Properties grid removed per request */}
 
@@ -125,8 +109,8 @@ export default function Home() {
             <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Join the Swift Luxury Network</h3>
             <p className="text-white/70 max-w-3xl mx-auto mb-6">Create your account to manage bookings, preferences, and secure crypto-enabled payments with our agent-style dashboard.</p>
             <div className="flex items-center justify-center gap-4">
-              <button onClick={()=>window.location.assign('/register')} className="px-6 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-black font-semibold shadow-lg transition">Register</button>
-              <button onClick={()=>window.location.assign('/login')} className="px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold border border-white/20 transition">Login</button>
+              <Link href="/register" className="px-6 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-black font-semibold shadow-lg transition">Register</Link>
+              <Link href="/login" className="px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold border border-white/20 transition">Login</Link>
             </div>
           </div>
         </div>

@@ -17,17 +17,24 @@ export default function AdminDashboard() {
   const currentMonthLabel = monthNamesFull[new Date().getMonth()]
 
   const reloadAnalytics = async () => {
-    const [analyticsRes, crmRes] = await Promise.all([
-      fetch('/api/admin/analytics', { cache: 'no-store' }),
-      fetch('/api/admin/crm', { cache: 'no-store' }),
-    ])
-    const [analyticsData, crmData] = await Promise.all([
-      analyticsRes.json(),
-      crmRes.json(),
-    ])
-    setMetrics(analyticsData)
-    setCrmRows(crmData?.rows || [])
-    ;(window as any).__depositsHeld = crmData?.depositsHeld || 0
+    // Avoid duplicate fetches if a concurrent call is in-flight
+    if ((window as any).__adminLoading) return
+    ;(window as any).__adminLoading = true
+    try {
+      const [analyticsRes, crmRes] = await Promise.all([
+        fetch('/api/admin/analytics', { cache: 'no-store' }),
+        fetch('/api/admin/crm', { cache: 'no-store' }),
+      ])
+      const [analyticsData, crmData] = await Promise.all([
+        analyticsRes.json(),
+        crmRes.json(),
+      ])
+      setMetrics(analyticsData)
+      setCrmRows(crmData?.rows || [])
+      ;(window as any).__depositsHeld = crmData?.depositsHeld || 0
+    } finally {
+      ;(window as any).__adminLoading = false
+    }
   }
 
   useEffect(() => {
@@ -362,14 +369,14 @@ function TargetCard({ title, value, achieved, paceFrac, extraNote, hint, childre
       <div className="h-3 rounded-full bg-white/10 overflow-hidden">
         <div className="h-full" style={{ width: `${progress*100}%`, transition: 'width 900ms cubic-bezier(.2,.8,.2,1)', background: onPace ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#f59e0b,#f97316)' }} />
       </div>
-      <div className="flex items-center justify-between mt-2 text-xs">
+      <div className="flex items-center justify-between mt-2 text-sm md:text-base">
         <div className={onPace ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
           {onPace ? 'On pace' : 'Behind pace'}
         </div>
-        <div className="text-white/70">€{achieved.toLocaleString('de-DE')} / €{value.toLocaleString('de-DE')}</div>
+        <div className="text-emerald-400 font-semibold">€{achieved.toLocaleString('de-DE')} / €{value.toLocaleString('de-DE')}</div>
       </div>
       {extraNote && <div className="mt-1 text-[11px] text-emerald-300/80">{extraNote}</div>}
-      {hint && <div className="mt-1 text-[11px] text-white/50">{hint}</div>}
+      {hint && <div className="mt-1 text-sm md:text-base text-white/60">{hint}</div>}
       {children}
     </div>
   )
