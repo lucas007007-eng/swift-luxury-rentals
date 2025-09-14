@@ -60,21 +60,25 @@ model CalendarDay {
 }
 
 model Booking {
-  id         String   @id @default(cuid())
-  property   Property @relation(fields: [propertyId], references: [id])
-  propertyId String
-  user       User?    @relation(fields: [userId], references: [id])
-  userId     String?
-  checkin    DateTime
-  checkout   DateTime
-  status     String   @default("hold") // hold, confirmed, cancelled
-  totalCents Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  payments   Payment[]
+  id          String    @id @default(cuid())
+  property    Property  @relation(fields: [propertyId], references: [id])
+  propertyId  String
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      String?
+  checkin     DateTime
+  checkout    DateTime
+  status      String    @default("hold") // hold, confirmed, cancelled
+  totalCents  Int       @default(0)
+  confirmedAt DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  payments    Payment[]
 
   @@index([status])
   @@index([checkin])
+  @@index([confirmedAt])
+  @@index([cancelledAt])
 }
 
 model Payment {

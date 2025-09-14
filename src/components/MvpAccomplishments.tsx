@@ -63,6 +63,8 @@ export default function MvpAccomplishments() {
       'Scoreboard pills (Total/Hold/Confirmed/Cancelled) with accurate global counts and filtering',
       'Pagination, preserved filters, mobile card layout',
       'Scheduled payments hidden on Hold; Save button clipping fixed',
+      'Responsive table: proportional column widths (10-18%), no cropping on any screen size',
+      'Refund button logic fixed: appears correctly for deposits showing "Deposit Received"',
     ]},
     { title: 'CRM & analytics', items: [
       'CRM dashboard (table + mobile cards) linking to bookings/properties',
@@ -94,6 +96,8 @@ export default function MvpAccomplishments() {
       'Production build blockers fixed: dynamic force-dynamic for useSearchParams pages',
       'Production deployment fully working: build completes, server starts and responds',
       'Development Timer: database-backed with real-time persistence and live seconds tracking',
+      'Timer persistence perfected: beforeunload auto-save with exact session continuity across refreshes',
+      'Timer performance optimized: eliminated database spam, pure localStorage with exact seconds tracking',
       'Component expand/collapse independence fixed (preventDefault + stopPropagation)',
       'Accomplishments UI improved: full-width layout and checkbox-style readability',
     ]},

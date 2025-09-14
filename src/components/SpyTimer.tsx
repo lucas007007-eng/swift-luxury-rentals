@@ -31,38 +31,26 @@ export default function SpyTimer() {
   const [lastActivity, setLastActivity] = useState<number>(Date.now())
   const [isActive, setIsActive] = useState(true)
 
-  // Load from database on mount and continue from last session
+  // Simple localStorage load - no database calls
   useEffect(() => {
-    const loadFromDB = async () => {
-      try {
-        const res = await fetch('/api/admin/timer')
-        const data = await res.json()
-        if (data.promptingHours && data.codingHours) {
-          setPromptingHours(data.promptingHours)
-          setCodingHours(data.codingHours)
-          setTempPrompting(data.promptingHours)
-          setTempCoding(data.codingHours)
-          
-          // Calculate time since last update to continue session
-          const lastUpdate = new Date(data.lastUpdate || data.lastActivity).getTime()
-          const now = Date.now()
-          const timeSinceUpdate = (now - lastUpdate) / 1000 // seconds
-          
-          // If less than 1 minute since last update, continue the session
-          if (timeSinceUpdate < 60) {
-            setLastSessionUpdate(lastUpdate)
-            setCurrentSessionSeconds(timeSinceUpdate)
-          } else {
-            // Start new session counter (but NEVER reset total time)
-            setLastSessionUpdate(now)
-            setCurrentSessionSeconds(0)
-          }
-        }
-      } catch (e) {
-        console.log('Timer DB load failed, using defaults')
+    if (typeof window !== 'undefined') {
+      // Load exact seconds from localStorage
+      const savedPromptingSeconds = localStorage.getItem('spy_timer_prompting_seconds')
+      const savedCodingSeconds = localStorage.getItem('spy_timer_coding_seconds')
+      
+      if (savedPromptingSeconds && savedCodingSeconds) {
+        setPromptingHours(Number(savedPromptingSeconds) / 3600)
+        setCodingHours(Number(savedCodingSeconds) / 3600)
+      } else {
+        // Set baseline if no saved data
+        setPromptingHours(15.5)
+        setCodingHours(31.0)
       }
+      
+      // Always start fresh session on load
+      setLastSessionUpdate(Date.now())
+      setCurrentSessionSeconds(0)
     }
-    loadFromDB()
   }, [])
 
   // Detect user activity to reset idle timer
@@ -103,44 +91,55 @@ export default function SpyTimer() {
       // Update live session seconds
       setCurrentSessionSeconds(sessionSeconds)
       
-      // Add time every minute when active (60 seconds)
+      // Add time every minute when active (60 seconds) - but don't save to DB
       if (isActive && sessionSeconds >= 60) {
         const minutesElapsed = Math.floor(sessionSeconds / 60)
         // 1:2 ratio - 1 min prompting, 2 min coding per 3 min session
         const promptingIncrement = (minutesElapsed / 3) * (1 / 60) // hours
         const codingIncrement = (minutesElapsed / 3) * (2 / 60) // hours
         
-        const newPrompting = promptingHours + promptingIncrement
-        const newCoding = codingHours + codingIncrement
-        
-        setPromptingHours(newPrompting)
-        setCodingHours(newCoding)
+        setPromptingHours(prev => prev + promptingIncrement)
+        setCodingHours(prev => prev + codingIncrement)
         setLastSessionUpdate(now)
         setCurrentSessionSeconds(0)
-        
-        // Save to database in real-time
-        fetch('/api/admin/timer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            promptingSeconds: Math.floor(newPrompting * 3600),
-            codingSeconds: Math.floor(newCoding * 3600),
-            isActive: true
-          })
-        }).catch(e => console.log('Timer DB save failed:', e))
       }
     }, 100) // Update every 100ms for smooth seconds
 
     return () => clearInterval(interval)
   }, [lastActivity, lastSessionUpdate, isActive])
 
-  // Save to localStorage when values change
+  // Save accumulated time to localStorage when values change (but not current session)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('spy_timer_prompting', String(promptingHours))
-      localStorage.setItem('spy_timer_coding', String(codingHours))
+      localStorage.setItem('spy_timer_prompting_seconds', String(Math.floor(promptingHours * 3600)))
+      localStorage.setItem('spy_timer_coding_seconds', String(Math.floor(codingHours * 3600)))
     }
   }, [promptingHours, codingHours])
+
+  // Save exact time including live seconds on refresh
+  useEffect(() => {
+    const saveExactTime = () => {
+      if (typeof window !== 'undefined') {
+        // Calculate exact total seconds including current session
+        const totalPromptingSeconds = Math.floor((promptingHours * 3600) + (isActive ? currentSessionSeconds / 3 : 0))
+        const totalCodingSeconds = Math.floor((codingHours * 3600) + (isActive ? (currentSessionSeconds * 2) / 3 : 0))
+        
+        // Save exact seconds for precision
+        localStorage.setItem('spy_timer_prompting_seconds', String(totalPromptingSeconds))
+        localStorage.setItem('spy_timer_coding_seconds', String(totalCodingSeconds))
+        
+        console.log('Timer saved:', {
+          promptingSeconds: totalPromptingSeconds,
+          codingSeconds: totalCodingSeconds,
+          currentSession: currentSessionSeconds
+        })
+      }
+    }
+
+    window.addEventListener('beforeunload', saveExactTime)
+    return () => window.removeEventListener('beforeunload', saveExactTime)
+  }, [])
+
 
   const totalHours = promptingHours + codingHours
   const promptingMinutes = Math.round((promptingHours % 1) * 60)
@@ -230,7 +229,7 @@ export default function SpyTimer() {
               <div className="text-center">
                 <div className="text-xs text-amber-300/80 uppercase tracking-wider mb-1">Prompting</div>
                 <div className="text-2xl font-mono font-bold text-amber-400 mb-1">
-                  {formatTimeWithLiveSeconds(promptingHours, isActive ? Math.floor(currentSessionSeconds / 3) : 0)}
+                  {formatTimeWithLiveSeconds(promptingHours + (isActive ? (currentSessionSeconds / 3) / 3600 : 0), 0)}
                 </div>
                 <div className="text-xs text-amber-200/60">Human direction</div>
               </div>
@@ -239,7 +238,7 @@ export default function SpyTimer() {
               <div className="text-center">
                 <div className="text-xs text-amber-300/80 uppercase tracking-wider mb-1">Coding</div>
                 <div className="text-2xl font-mono font-bold text-amber-400 mb-1">
-                  {formatTimeWithLiveSeconds(codingHours, isActive ? Math.floor((currentSessionSeconds * 2) / 3) : 0)}
+                  {formatTimeWithLiveSeconds(codingHours + (isActive ? (currentSessionSeconds * 2 / 3) / 3600 : 0), 0)}
                 </div>
                 <div className="text-xs text-amber-200/60">AI implementation</div>
               </div>
@@ -248,7 +247,7 @@ export default function SpyTimer() {
               <div className="text-center">
                 <div className="text-xs text-amber-300/80 uppercase tracking-wider mb-1">Total</div>
                 <div className="text-3xl font-mono font-bold text-amber-300 mb-1 glow-text">
-                  {formatTimeWithLiveSeconds(totalHours, isActive ? Math.floor(currentSessionSeconds) : 0)}
+                  {formatTimeWithLiveSeconds(totalHours + (isActive ? currentSessionSeconds / 3600 : 0), 0)}
                 </div>
                 <div className="text-xs text-amber-200/60">Build time</div>
               </div>

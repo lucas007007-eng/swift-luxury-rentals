@@ -75,9 +75,47 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Invalid status' }, { status: 400 })
     }
 
+    // Get current booking to check status transition rules
+    const currentBooking = await prisma.booking.findUnique({
+      where: { id: String(id) },
+      select: { status: true, createdAt: true }
+    })
+    
+    if (!currentBooking) {
+      return NextResponse.json({ message: 'Booking not found' }, { status: 404 })
+    }
+
+    // Enforce status transition rules: Hold → Confirmed/Cancelled only
+    const currentStatus = currentBooking.status
+    const newStatus = String(status)
+    
+    if (currentStatus === 'confirmed' && newStatus !== 'confirmed') {
+      return NextResponse.json({ message: 'Cannot change status from confirmed' }, { status: 400 })
+    }
+    if (currentStatus === 'cancelled' && newStatus !== 'cancelled') {
+      return NextResponse.json({ message: 'Cannot change status from cancelled' }, { status: 400 })
+    }
+    if (currentStatus === 'hold' && !['confirmed', 'cancelled', 'hold'].includes(newStatus)) {
+      return NextResponse.json({ message: 'Invalid status transition from hold' }, { status: 400 })
+    }
+
+    // Log the status change for audit trail
+    console.log(`[AUDIT] Booking ${id} status: ${currentStatus} → ${newStatus} at ${new Date().toISOString()}`)
+
+    // Update booking with status and timestamp
+    const now = new Date()
+    const updateData: any = { status: String(status) }
+    
+    if (newStatus === 'confirmed' && currentStatus !== 'confirmed') {
+      updateData.confirmedAt = now
+    }
+    if (newStatus === 'cancelled' && currentStatus !== 'cancelled') {
+      updateData.cancelledAt = now
+    }
+
     const updated = await prisma.booking.update({
       where: { id: String(id) },
-      data: { status: String(status) as BookingStatus },
+      data: updateData,
     })
     // If confirmed, also mark matching CRM row as paid (JSON storage)
     if (String(status) === 'confirmed') {

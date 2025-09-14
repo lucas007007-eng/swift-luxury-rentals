@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 const SpyEuropeMap = dynamic(() => import('@/components/SpyEuropeMap'), { ssr: false })
 const AdminCalendar = dynamic(() => import('@/components/PublicCalendar'), { ssr: false })
 const MvpAccomplishments = dynamic(() => import('@/components/MvpAccomplishments'), { ssr: false })
-const SpyTimer = dynamic(() => import('@/components/SpyTimer'), { ssr: false })
+const SimpleTimer = dynamic(() => import('@/components/SimpleTimer'), { ssr: false })
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
         {/* MVP Progress and Timer */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           <div key="mvp-progress" className="flex"><MVPProgress /></div>
-          <div key="spy-timer" className="flex"><SpyTimer /></div>
+          <div key="simple-timer" className="flex"><SimpleTimer /></div>
         </div>
         {/* Booking Radar CTA */}
         <div

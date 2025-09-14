@@ -47,7 +47,8 @@ export async function POST(req: NextRequest) {
           promptingSeconds: Math.floor(promptingSeconds),
           codingSeconds: Math.floor(codingSeconds),
           isActive,
-          lastActivity: new Date()
+          lastActivity: new Date(),
+          updatedAt: new Date()
         }
       })
     } else {
