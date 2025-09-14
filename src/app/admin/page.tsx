@@ -13,16 +13,19 @@ export default function AdminDashboard() {
   const [metrics, setMetrics] = useState<any>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [crmRows, setCrmRows] = useState<any[]>([])
-  const [hoverPin, setHoverPin] = useState<{ city: string; left: string; top: string } | null>(null)
   const monthNamesFull = ['January','February','March','April','May','June','July','August','September','October','November','December']
   const currentMonthLabel = monthNamesFull[new Date().getMonth()]
 
   const reloadAnalytics = async () => {
-    const res = await fetch('/api/admin/analytics', { cache: 'no-store' })
-    const data = await res.json()
-    setMetrics(data)
-    const crmRes = await fetch('/api/admin/crm', { cache: 'no-store' })
-    const crmData = await crmRes.json()
+    const [analyticsRes, crmRes] = await Promise.all([
+      fetch('/api/admin/analytics', { cache: 'no-store' }),
+      fetch('/api/admin/crm', { cache: 'no-store' }),
+    ])
+    const [analyticsData, crmData] = await Promise.all([
+      analyticsRes.json(),
+      crmRes.json(),
+    ])
+    setMetrics(analyticsData)
     setCrmRows(crmData?.rows || [])
     ;(window as any).__depositsHeld = crmData?.depositsHeld || 0
   }

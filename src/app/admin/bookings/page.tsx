@@ -1,6 +1,5 @@
 import React from 'react'
 import prisma from '@/lib/prisma'
-import { computeBookingTotals } from '@/lib/bookingTotals'
 import TestBookingBar from './TestBookingBar'
 
 export default async function AdminBookingsPage({ searchParams }: { searchParams?: { page?: string; status?: string } }) {
@@ -37,7 +36,11 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
     prisma.booking.findMany({
       where: where as any,
       orderBy: { createdAt: 'desc' },
-      include: { user: true, property: true, payments: true },
+      include: {
+        user: { select: { name: true, email: true } },
+        property: { select: { title: true, address: true, extId: true, priceMonthly: true } },
+        payments: { select: { id: true, purpose: true, status: true, amountCents: true, dueAt: true, receivedAt: true, createdAt: true } as any },
+      },
       skip,
       take: pageSize,
     })
@@ -50,36 +53,24 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
     let receivedCents = (b.payments || [])
       .filter((p: any) => p.status === 'received' && p.purpose !== 'deposit')
       .reduce((s: number, p: any) => s + (Number(p.amountCents) || 0), 0)
-    try {
-      const extId = (b as any)?.property?.extId || undefined
-      const t = await computeBookingTotals({ propertyExtId: extId, checkIn: b.checkin, checkOut: b.checkout })
-      totalNowCents = Math.round((t.totalNow || 0) * 100)
-      firstPaymentCents = Math.round(((t.firstPeriod || 0) + (t.moveInFee || 0)) * 100)
-      // Fallback-populate depositHeld for legacy test bookings with no deposit payment records
-      if (depositHeld <= 0) {
-        const fallbackDepositCents = Math.round((t.deposit || 0) * 100)
-        if (fallbackDepositCents > 0) {
-          depositHeld = fallbackDepositCents
-        } else {
-          // Secondary fallback using property's stored monthly price
-          try {
-            const monthlyBase = Number((b as any)?.property?.priceMonthly || 0)
-            const s = new Date(b.checkin)
-            const e = new Date(b.checkout)
-            const totalDays = Math.max(0, Math.round((e.getTime() - s.getTime())/86400000))
-            let depositEuros = 0
-            if (totalDays < 15) depositEuros = 500
-            else if (totalDays < 30) depositEuros = 750
-            else if (monthlyBase > 0) {
-              const endOfThirdMonth = new Date(s.getFullYear(), s.getMonth() + 3, s.getDate())
-              const longerOrEqualThree = e > endOfThirdMonth || e.getTime() === endOfThirdMonth.getTime()
-              depositEuros = Math.round(monthlyBase * (longerOrEqualThree ? 1 : 0.5))
-            }
-            if (depositEuros > 0) depositHeld = depositEuros * 100
-          } catch {}
+    // Fallback-populate depositHeld for bookings with no deposit payment records
+    if (depositHeld <= 0) {
+      try {
+        const monthlyBase = Number((b as any)?.property?.priceMonthly || 0)
+        const s = new Date(b.checkin)
+        const e = new Date(b.checkout)
+        const totalDays = Math.max(0, Math.round((e.getTime() - s.getTime())/86400000))
+        let depositEuros = 0
+        if (totalDays < 15) depositEuros = 500
+        else if (totalDays < 30) depositEuros = 750
+        else if (monthlyBase > 0) {
+          const endOfThirdMonth = new Date(s.getFullYear(), s.getMonth() + 3, s.getDate())
+          const longerOrEqualThree = e > endOfThirdMonth || e.getTime() === endOfThirdMonth.getTime()
+          depositEuros = Math.round(monthlyBase * (longerOrEqualThree ? 1 : 0.5))
         }
-      }
-    } catch {}
+        if (depositEuros > 0) depositHeld = depositEuros * 100
+      } catch {}
+    }
     return { ...b, depositHeld, totalNowCents, firstPaymentCents, receivedCents }
   }))
   const [countAll, countHold, countConfirmed, countCancelled] = await Promise.all([
