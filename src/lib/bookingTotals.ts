@@ -30,12 +30,14 @@ function addMonthsKeepDay(date: Date, add: number): Date {
   return new Date(targetYear, monthNormalized, useDay)
 }
 
-function* eachDate(start: Date, endExclusive: Date): Generator<Date> {
+function eachDate(start: Date, endExclusive: Date): Date[] {
+  const dates: Date[] = []
   const d = new Date(start)
   while (d < endExclusive) {
-    yield new Date(d)
+    dates.push(new Date(d))
     d.setDate(d.getDate() + 1)
   }
+  return dates
 }
 
 export async function computeBookingTotals(params: { propertyExtId?: string; checkIn: string | Date; checkOut: string | Date }): Promise<Totals> {

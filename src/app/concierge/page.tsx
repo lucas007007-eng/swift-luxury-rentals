@@ -2,6 +2,8 @@
 
 import React from 'react'
 import { useSearchParams } from 'next/navigation'
+
+export const dynamic = 'force-dynamic'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import SearchInterface from '@/components/SearchInterface'

@@ -3,6 +3,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import QRCode from 'react-qr-code'
 import { useSearchParams } from 'next/navigation'
+
+export const dynamic = 'force-dynamic'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { cityProperties } from '@/data/cityProperties'

@@ -72,6 +72,9 @@ model Booking {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   payments   Payment[]
+
+  @@index([status])
+  @@index([checkin])
 }
 
 model Payment {
@@ -89,6 +92,30 @@ model Payment {
   currency    String   @default("EUR")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([bookingId])
+  @@index([purpose])
+  @@index([status])
+  @@index([dueAt])
+}
+
+model AdminOverride {
+  id             String   @id @default(cuid())
+  propertyExtId  String   @unique
+  data           Json
+  updatedAt      DateTime @updatedAt
+}
+
+model TimerSession {
+  id               String   @id @default(cuid())
+  promptingSeconds Int      @default(0)
+  codingSeconds    Int      @default(0)
+  lastActivity     DateTime @default(now())
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  @@map("timer_sessions")
 }
 
 

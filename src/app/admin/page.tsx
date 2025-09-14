@@ -6,6 +6,8 @@ import { cityProperties } from '@/data/cityProperties'
 import dynamic from 'next/dynamic'
 const SpyEuropeMap = dynamic(() => import('@/components/SpyEuropeMap'), { ssr: false })
 const AdminCalendar = dynamic(() => import('@/components/PublicCalendar'), { ssr: false })
+const MvpAccomplishments = dynamic(() => import('@/components/MvpAccomplishments'), { ssr: false })
+const SpyTimer = dynamic(() => import('@/components/SpyTimer'), { ssr: false })
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -87,13 +89,34 @@ export default function AdminDashboard() {
   return (
     <main className="min-h-screen bg-black text-white">
       <div className="max-w-[1800px] mx-auto px-6 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-white/70">Select a city to manage its listings.</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-white/70">Select a city to manage its listings.</p>
+          </div>
+          <button
+            onClick={async () => {
+              try {
+                await fetch('/api/admin/logout', { method: 'POST' })
+                router.push('/admin/login')
+              } catch (e) {
+                console.error('Logout failed:', e)
+              }
+            }}
+            className="bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            Logout
+          </button>
         </div>
-        {/* MVP Progress above Operations */}
+        {/* Accomplishments (full width for better readability) */}
         <div className="mb-6">
-          <MVPProgress />
+          <MvpAccomplishments />
+        </div>
+        
+        {/* MVP Progress and Timer */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+          <div key="mvp-progress" className="flex"><MVPProgress /></div>
+          <div key="spy-timer" className="flex"><SpyTimer /></div>
         </div>
         {/* Booking Radar CTA */}
         <div
@@ -275,10 +298,14 @@ function MVPProgress() {
     try { if (typeof window !== 'undefined') localStorage.setItem('mvp_checklist', JSON.stringify(next)) } catch {}
   }
   return (
-    <div className="rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+    <div className="rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)] flex-1">
       <button
         type="button"
-        onClick={() => setExpanded(v => !v)}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          setExpanded(v => !v)
+        }}
         className="w-full text-left"
         aria-expanded={expanded}
       >
@@ -363,53 +390,79 @@ function MetricCard({ title, value, prefix = '', suffix = '', loading, moneyBack
 }
 
 function TargetsRow({ metrics, loading }: { metrics: any; loading: boolean }) {
-  const [annualTarget, setAnnualTarget] = useState<number>(() => {
-    try {
-      if (typeof window === 'undefined') return 300000
-      return Number(localStorage.getItem('target_annual') || '300000')
-    } catch { return 300000 }
-  })
+  const [annualTarget, setAnnualTarget] = useState<number>(300000)
   const [annualTargetEditing, setAnnualTargetEditing] = useState<boolean>(false)
-  const [annualDraft, setAnnualDraft] = useState<number>(annualTarget)
+  const [annualDraft, setAnnualDraft] = useState<number>(300000)
+  const [clientCalculations, setClientCalculations] = useState<any>(null)
+
+  // Load annual target from localStorage on client side only
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const saved = Number(localStorage.getItem('target_annual') || '300000')
+        setAnnualTarget(saved)
+        setAnnualDraft(saved)
+      }
+    } catch {}
+  }, [])
+
   useEffect(() => {
     try { if (typeof window !== 'undefined') localStorage.setItem('target_annual', String(annualTarget)) } catch {}
   }, [annualTarget])
 
-  const now = new Date()
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  const monthFrac = (now.getDate()) / monthEnd.getDate()
-  const monthRevenue = Number(metrics?.totals?.monthlyRevenue || 0)
+  // Calculate date-dependent values on client side only to avoid hydration mismatch
+  useEffect(() => {
+    const now = new Date()
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    const monthFrac = (now.getDate()) / monthEnd.getDate()
+    const monthRevenue = Number(metrics?.totals?.monthlyRevenue || 0)
 
-  const qIndex = Math.floor(now.getMonth() / 3)
-  const qStart = new Date(now.getFullYear(), qIndex * 3, 1)
-  const qEnd = new Date(now.getFullYear(), qIndex * 3 + 3, 0)
-  const qFrac = (now.getTime() - qStart.getTime()) / (qEnd.getTime() - qStart.getTime())
-  const monthlySeries: number[] = (metrics?.monthly || []).map((m: any) => Number(m.revenue || 0))
-  const qMonths = [qIndex * 3, qIndex * 3 + 1, qIndex * 3 + 2]
-  const qRevenue = qMonths
-    .filter((m) => m <= now.getMonth())
-    .reduce((s, m) => s + (monthlySeries[m] || 0), 0)
-  const yearStart = new Date(now.getFullYear(), 0, 1)
-  const yearEnd = new Date(now.getFullYear(), 11, 31)
-  const yearFrac = (now.getTime() - yearStart.getTime()) / (yearEnd.getTime() - yearStart.getTime())
-  const yearRevenue = Number(metrics?.totals?.annualRevenue || 0)
-  // Include the current month in remaining months toward annual target
-  const monthsRemaining = Math.max(0, 12 - now.getMonth())
-  const remainingToAnnualTarget = Math.max(0, annualTarget - yearRevenue)
-  // Days-based requirement with month/day breakdown
-  const MS_DAY = 86400000
-  const startNextYear = new Date(now.getFullYear() + 1, 0, 1)
-  const daysRemainingTotal = Math.max(1, Math.ceil((startNextYear.getTime() - now.getTime()) / MS_DAY))
-  const monthlyNeededForAnnual = Math.ceil((remainingToAnnualTarget * 30) / daysRemainingTotal)
-  const endOfThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-  const daysLeftThisMonth = Math.max(0, Math.ceil((endOfThisMonth.getTime() - now.getTime()) / MS_DAY))
-  const monthsAfter = Math.max(0, 11 - now.getMonth())
-  const monthsRemainingQuarter = Math.max(0, (qIndex * 3 + 3) - (now.getMonth() + 1))
-  const quarterMonthsPlanned = 3
-  const quarterPlanTotal = monthlyNeededForAnnual * quarterMonthsPlanned
+    const qIndex = Math.floor(now.getMonth() / 3)
+    const qStart = new Date(now.getFullYear(), qIndex * 3, 1)
+    const qEnd = new Date(now.getFullYear(), qIndex * 3 + 3, 0)
+    const qFrac = (now.getTime() - qStart.getTime()) / (qEnd.getTime() - qStart.getTime())
+    const monthlySeries: number[] = (metrics?.monthly || []).map((m: any) => Number(m.revenue || 0))
+    const qMonths = [qIndex * 3, qIndex * 3 + 1, qIndex * 3 + 2]
+    const qRevenue = qMonths
+      .filter((m) => m <= now.getMonth())
+      .reduce((s, m) => s + (monthlySeries[m] || 0), 0)
+    const yearStart = new Date(now.getFullYear(), 0, 1)
+    const yearEnd = new Date(now.getFullYear(), 11, 31)
+    const yearFrac = (now.getTime() - yearStart.getTime()) / (yearEnd.getTime() - yearStart.getTime())
+    const yearRevenue = Number(metrics?.totals?.annualRevenue || 0)
+    const monthsRemaining = Math.max(0, 12 - now.getMonth())
+    const remainingToAnnualTarget = Math.max(0, annualTarget - yearRevenue)
+    const MS_DAY = 86400000
+    const startNextYear = new Date(now.getFullYear() + 1, 0, 1)
+    const daysRemainingTotal = Math.max(1, Math.ceil((startNextYear.getTime() - now.getTime()) / MS_DAY))
+    const monthlyNeededForAnnual = Math.ceil((remainingToAnnualTarget * 30) / daysRemainingTotal)
+    const endOfThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+    const daysLeftThisMonth = Math.max(0, Math.ceil((endOfThisMonth.getTime() - now.getTime()) / MS_DAY))
+    const monthsAfter = Math.max(0, 11 - now.getMonth())
+    const quarterMonthsPlanned = 3
+    const quarterPlanTotal = monthlyNeededForAnnual * quarterMonthsPlanned
+    const quarterLabel = `Q${qIndex + 1}`
 
-  const quarterLabel = `Q${qIndex + 1}`
+    setClientCalculations({
+      now, monthFrac, monthRevenue, qIndex, qFrac, qRevenue, yearFrac, yearRevenue,
+      monthsRemaining, remainingToAnnualTarget, daysRemainingTotal, monthlyNeededForAnnual,
+      daysLeftThisMonth, monthsAfter, quarterMonthsPlanned, quarterPlanTotal, quarterLabel
+    })
+  }, [metrics, annualTarget])
+
+  // Show loading state until client calculations are ready
+  if (!clientCalculations) {
+    return (
+      <div className="rounded-2xl p-4 md:p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.18)] mb-8">
+        <div className="text-white/50 text-center py-8">Loading targets...</div>
+      </div>
+    )
+  }
+
+  const { now, monthFrac, monthRevenue, qIndex, qFrac, qRevenue, yearFrac, yearRevenue,
+    monthsRemaining, remainingToAnnualTarget, daysRemainingTotal, monthlyNeededForAnnual,
+    daysLeftThisMonth, monthsAfter, quarterMonthsPlanned, quarterPlanTotal, quarterLabel } = clientCalculations
 
   return (
     <div className="rounded-2xl p-4 md:p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.18)] mb-8">

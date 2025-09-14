@@ -177,26 +177,7 @@ export async function GET() {
   }
 }
 
-// Update paid flag
-export async function POST_paid(req: Request) {
-  try {
-    const body = await req.json()
-    const { id, paid } = body || {}
-    if (!id) return NextResponse.json({ message: 'Missing id' }, { status: 400 })
-    // Update Prisma payments to received/created
-    const b = await prisma.booking.findUnique({ where: { id }, include: { payments: true } })
-    if (!b) return NextResponse.json({ message: 'Not found' }, { status: 404 })
-    if (paid) {
-      const now = new Date()
-      await prisma.payment.updateMany({ where: { bookingId: b.id, purpose: { in: ['first_period','move_in_fee'] } }, data: { status: 'received', receivedAt: now } })
-    } else {
-      await prisma.payment.updateMany({ where: { bookingId: b.id, purpose: { in: ['first_period','move_in_fee'] } }, data: { status: 'created', receivedAt: null } })
-    }
-    return NextResponse.json({ ok: true })
-  } catch (e) {
-    return NextResponse.json({ message: 'Failed' }, { status: 500 })
-  }
-}
+// Paid flag update functionality moved to /api/admin/crm/paid/route.ts
 
 export async function POST(req: Request) {
   try {

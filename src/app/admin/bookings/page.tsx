@@ -227,39 +227,39 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
             )}
           </div>
 
-          {/* Keep table width fixed while expanding card width */}
+          {/* Responsive table layout */}
           <div className="hidden md:block px-6 md:px-8">
-            <div className="max-w-[1650px] mx-auto">
-          <table className="w-full divide-y divide-white/10">
+            <div className="w-full">
+          <table className="w-full divide-y divide-white/10 table-auto">
             <thead className="bg-black/20">
               <tr>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Created</th>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Client</th>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Email</th>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Property</th>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Dates</th>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Deposit Held</th>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Payment Received</th>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Scheduled Payments</th>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Overdue</th>
-                <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Status</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[10%]">Created</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[10%]">Client</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Email</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[18%]">Property</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[10%]">Dates</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Deposit</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Payment Received</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Scheduled Payments</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[14%]">Booking Status</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[10%]">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/10">
               {withDeposit.map((b: any) => (
                 <tr key={b.id} className="hover:bg-white/5">
-                  <td className="px-4 py-3 text-sm text-white/80">{new Date(b.createdAt).toLocaleString()}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <div className="text-white/90 font-medium">{b.user?.name || '—'}</div>
-                    <div className="text-white/40 text-xs">{b.userId?.slice?.(0,8) || ''}</div>
+                  <td className="px-2 py-3 text-xs text-white/80">{new Date(b.createdAt).toLocaleDateString()}</td>
+                  <td className="px-2 py-3 text-sm">
+                    <div className="text-white/90 font-medium text-sm">{b.user?.name || '—'}</div>
+                    <div className="text-white/40 text-xs">{b.userId?.slice?.(0,6) || ''}</div>
                   </td>
                   
-                  <td className="px-4 py-3 text-sm text-white/80">{b.user?.email || '—'}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <div className="text-white/90">{b.property?.title || '—'}</div>
+                  <td className="px-2 py-3 text-xs text-white/80 break-all">{b.user?.email || '—'}</td>
+                  <td className="px-2 py-3 text-sm">
+                    <div className="text-white/90 text-sm leading-tight">{b.property?.title || '—'}</div>
                     <div className="text-white/40 text-xs">{b.property?.address || ''}</div>
                   </td>
-                  <td className="px-4 py-3 text-xs text-white/60">{new Date(b.checkin).toLocaleDateString()} → {new Date(b.checkout).toLocaleDateString()}</td>
+                  <td className="px-2 py-3 text-xs text-white/60">{new Date(b.checkin).toLocaleDateString()} → {new Date(b.checkout).toLocaleDateString()}</td>
                   <td className="px-4 py-3 text-sm">
                     {(() => {
                       const depHeldCents = Number(b.depositHeld || 0)
@@ -287,7 +287,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                             <span className="font-semibold">€{amountEuros.toLocaleString('de-DE')}</span>
                             <span className="uppercase tracking-wider text-[10px] opacity-80">{label}</span>
                           </div>
-                          {!isRefunded && finished && hasDepositPaymentReceived && (
+                          {!isRefunded && finished && depositReceived && (
                             <form action="/api/admin/bookings/refund?redirect=1" method="post">
                               <input type="hidden" name="bookingId" value={b.id} />
                               <button className="px-2.5 py-1 rounded border border-sky-400/30 bg-sky-500/10 text-sky-300 hover:text-sky-200 text-xs inline-flex items-center gap-2" title="Refund deposit">
