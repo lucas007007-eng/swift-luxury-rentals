@@ -30,8 +30,8 @@ export default function AdminDashboard() {
         crmRes.json(),
       ])
       setMetrics(analyticsData)
-      setCrmRows(crmData?.rows || [])
-      ;(window as any).__depositsHeld = crmData?.depositsHeld || 0
+    setCrmRows(crmData?.rows || [])
+    ;(window as any).__depositsHeld = crmData?.depositsHeld || 0
     } finally {
       ;(window as any).__adminLoading = false
     }
@@ -90,6 +90,10 @@ export default function AdminDashboard() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <p className="text-white/70">Select a city to manage its listings.</p>
+        </div>
+        {/* MVP Progress above Operations */}
+        <div className="mb-6">
+          <MVPProgress />
         </div>
         {/* Booking Radar CTA */}
         <div
@@ -202,9 +206,105 @@ export default function AdminDashboard() {
           <BarChart title="Growth by Month" labels={monthLabels} series={growthSeries} color="#eab308" loading={loading} />
         </div>
 
+        
+
       </div>
 
     </main>
+  )
+}
+
+function MVPProgress() {
+  const [items, setItems] = React.useState<{ id: string; label: string; done: boolean }[]>([])
+  const [expanded, setExpanded] = React.useState(false)
+  React.useEffect(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('mvp_checklist') : null
+      const versionKey = 'mvp_checklist_version'
+      const currentVersion = '2025-09-14-weekplan-v2'
+      const savedVersion = typeof window !== 'undefined' ? localStorage.getItem(versionKey) : null
+      // Seed from new 4-week MVP guide
+      const seed = [
+        // Week 1 — Database foundation and migration
+        { id: 'w1-db-prisma', label: 'PostgreSQL + Prisma (Docker, client, .env, scripts)', done: false },
+        { id: 'w1-conn-pool', label: 'Connection pooling ready (pgBouncer later)', done: false },
+        { id: 'w1-data-model', label: 'Data model: users, properties, images, calendars, bookings, payments, admin_overrides, amenities, cities', done: false },
+        { id: 'w1-seed-import', label: 'Seed from JSON (properties, images, calendars, users)', done: false },
+        { id: 'w1-backfill', label: 'Backfill slugs, normalized currencies, VAT country mapping', done: false },
+        { id: 'w1-api-refactor', label: 'API read/write routes use DB (compatibility types)', done: false },
+        { id: 'w1-dev-dx', label: 'One-command boot (Docker + migrate + seed) + docs', done: false },
+
+        // Week 2 — Payments, pricing, reservation holds
+        { id: 'w2-stripe', label: 'Stripe PaymentIntents + webhooks + metadata', done: false },
+        { id: 'w2-coinbase', label: 'Coinbase Commerce charges + webhooks', done: false },
+        { id: 'w2-escrow', label: 'Escrow flow: hold TTL, approve/capture, decline/auto-refund', done: false },
+        { id: 'w2-pricing', label: 'Pricing/fees engine (nightly/monthly, pro‑ration, deposit/move-in, VAT)', done: false },
+        { id: 'w2-source-of-truth', label: 'Single source of truth for pricing across app', done: false },
+        { id: 'w2-concurrency', label: 'Availability concurrency (SELECT FOR UPDATE, expiresAt, idempotent webhooks)', done: false },
+
+        // Week 3 — KYC, owners, storage, comms
+        { id: 'w3-kyc', label: 'KYC/ID (Stripe Identity/Persona) + store status', done: false },
+        { id: 'w3-owners', label: 'Owner intake form + minimal owner dashboard', done: false },
+        { id: 'w3-storage', label: 'S3 storage with signed PUT/GET; migrate uploads', done: false },
+        { id: 'w3-emails', label: 'Emails with Postmark/SES: templates for key events', done: false },
+
+        // Week 4 — Hardening, tests, deploy
+        { id: 'w4-observability', label: 'Observability/security: Sentry, PostHog, rate limits, cache headers, RBAC', done: false },
+        { id: 'w4-tests', label: 'Testing: API (pricing/holds), webhook signatures, Playwright E2E', done: false },
+        { id: 'w4-compliance', label: 'Compliance + SEO: Cookie Settings, sitemap/robots, legal, backups schedule', done: false },
+        { id: 'w4-deploy', label: 'Staging/production: Vercel + managed Postgres, webhooks, launch checklist', done: false },
+      ]
+      const shouldReplace = !raw || savedVersion !== currentVersion
+      if (shouldReplace) {
+        setItems(seed)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('mvp_checklist', JSON.stringify(seed))
+          localStorage.setItem(versionKey, currentVersion)
+        }
+      } else {
+        try { setItems(JSON.parse(raw as string)) } catch { setItems(seed) }
+      }
+    } catch {}
+  }, [])
+  const completed = items.filter(i=>i.done).length
+  const total = Math.max(1, items.length)
+  const pct = Math.round((completed/total)*100)
+  const toggle = (id: string) => {
+    const next = items.map(i => i.id===id ? { ...i, done: !i.done } : i)
+    setItems(next)
+    try { if (typeof window !== 'undefined') localStorage.setItem('mvp_checklist', JSON.stringify(next)) } catch {}
+  }
+  return (
+    <div className="rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+      <button
+        type="button"
+        onClick={() => setExpanded(v => !v)}
+        className="w-full text-left"
+        aria-expanded={expanded}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-mono uppercase tracking-wider text-base md:text-lg gold-metallic-text">MVP Progress</div>
+            <div className="text-white/80 text-sm">{completed} of {total} tasks completed</div>
+          </div>
+          <svg className={`w-5 h-5 text-white/70 transition-transform ${expanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div className="h-3 rounded-full bg-white/10 overflow-hidden mt-3">
+          <div className="h-full bg-emerald-500" style={{ width: `${pct}%`, transition: 'width 600ms cubic-bezier(.2,.8,.2,1)' }} />
+        </div>
+        <div className="text-emerald-400 font-bold mt-2">{pct}% to MVP</div>
+      </button>
+      {expanded && (
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2">
+          {items.map(i => (
+            <label key={i.id} className="flex items-center gap-2 text-sm text-white/80">
+              <input type="checkbox" checked={!!i.done} onChange={()=>toggle(i.id)} className="accent-emerald-500" />
+              <span className={i.done ? 'line-through text-white/50' : ''}>{i.label}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
