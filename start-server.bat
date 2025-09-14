@@ -1,129 +1,157 @@
 @echo off
+setlocal
 
 echo.
 echo ====================================
 echo  Berlin Luxe Rentals - Server Start
-echo ====================================
-echo.
 
-:: Determine project directory (this script's folder)
+echo ====================================
+
 set "PROJECT_DIR=%~dp0"
 set "PROJECT_DIR=%PROJECT_DIR:~0,-1%"
-echo 📁 Project Directory: %PROJECT_DIR%
-echo.
+echo Project Directory: %PROJECT_DIR%
 
-:: Prefer desktop launcher if available
-if exist "%PROJECT_DIR%\start-server-desktop.bat" (
-  echo 🖥️  Detected desktop launcher. Delegating to start-server-desktop.bat ...
-  call "%PROJECT_DIR%\start-server-desktop.bat"
-  goto :eof
-)
+if /I "%~1"=="restore" goto restore
 
-:: Ensure Node.js and npm exist
+set "EXISTING_PORT="
+for /f "tokens=*" %%A in ('netstat -ano ^| findstr /c:":3002" ^| findstr LISTENING') do set "EXISTING_PORT=3002"
+if defined EXISTING_PORT goto existing
+for /f "tokens=*" %%A in ('netstat -ano ^| findstr /c:":3003" ^| findstr LISTENING') do set "EXISTING_PORT=3003"
+if defined EXISTING_PORT goto existing
+
 where node >nul 2>nul
 if errorlevel 1 (
-  echo ❌ Node.js not found. Attempting desktop setup if available...
-  if exist "%PROJECT_DIR%\DESKTOP_SETUP.bat" (
-    call "%PROJECT_DIR%\DESKTOP_SETUP.bat"
-  ) else (
-    echo Please install Node.js (v18+) and re-run this script: https://nodejs.org/
-    pause
-    goto :eof
-  )
+  echo ERROR: Node.js not found.
+  pause
+  goto :eof
 )
 where npm >nul 2>nul
 if errorlevel 1 (
-  echo ❌ npm not found. Please install Node.js which includes npm.
+  echo ERROR: npm not found.
   pause
   goto :eof
+)
+
+echo Tool versions:
+for /f %%V in ('node -v') do set NODEVER=%%V
+for /f %%V in ('npm -v') do set NPMVER=%%V
+echo   node %NODEVER%
+echo   npm %NPMVER%
+where docker >nul 2>nul
+if not errorlevel 1 (
+  for /f "tokens=*" %%V in ('docker --version') do echo   %%V
+) else (
+  echo   docker not found (optional)
 )
 
 if not exist package.json (
-  echo ❌ package.json not found!
-  echo Make sure this script is in the berlinluxerentals directory
-  echo Current directory: %PROJECT_DIR%
-  echo.
+  echo ERROR: package.json not found!
   pause
   goto :eof
 )
 
-echo ✅ Found package.json - Starting server...
-echo.
+echo Found package.json - Starting server...
 
-:: Create .env.local from example if missing
 if not exist .env.local (
   if exist env.local.example (
-    echo 🧩 Creating .env.local from env.local.example ...
+    echo Creating .env.local from env.local.example ...
     copy /y env.local.example .env.local >nul
   ) else (
-    echo ⚠️  .env.local missing and no example file found. Ensure DATABASE_URL is set if using Postgres.
+    echo WARNING: .env.local missing and no example file found.
   )
 )
 
-echo 🔎 Pre-start checks...
+echo Pre-start checks...
 echo -------------------------------------------
-:: Install dependencies if missing
 if not exist node_modules (
-  echo 📦 node_modules missing. Running npm install...
+  echo node_modules missing. Running npm install...
   call npm install
 )
 
-:: Prisma client and migrations
 if exist prisma\schema.prisma (
-  echo 🧬 Generating Prisma client...
+  echo Generating Prisma client...
   call npx prisma generate
-  echo 🗄️  Applying database migrations (deploy)...
-  call npx prisma migrate deploy || call npx prisma db push
+  echo Applying database migrations - deploy
+  call npx prisma migrate deploy
+  if errorlevel 1 (
+    echo migrate deploy failed, attempting prisma db push
+    call npx prisma db push
+  )
   if exist prisma\seed.cjs (
-    echo 🌱 Seeding database (safe run)...
-    node prisma\seed.cjs || echo (seed skipped)
+    echo Seeding database - safe run
+    node prisma\seed.cjs
   )
 )
 
-:: Start Docker Postgres (db) if docker-compose exists and Docker is available
 if exist docker-compose.yml (
-  where docker >nul 2>nul && (
-    echo 🐳 Starting Docker services (db) if needed...
+  where docker >nul 2>nul
+  if not errorlevel 1 (
+    echo Starting Docker services: db
     docker compose up -d db >nul 2>nul
   )
 )
 
-:: Clean Next.js cache to avoid RSC client manifest issues
 if exist .next (
-  echo 🧹 Cleaning .next cache to ensure a fresh build...
+  echo Cleaning .next cache to ensure a fresh build...
   rmdir /s /q .next
 )
 
 echo -------------------------------------------
-echo.
 
-:: Pick port (prefer 3002, fallback to 3003 if busy)
 set PORT=3002
-netstat -ano | findstr /c:":3002" | findstr LISTENING >nul 2>nul && set PORT=3003
+for /f "tokens=*" %%A in ('netstat -ano ^| findstr /c:":3002" ^| findstr LISTENING') do set PORT=3003
 if "%PORT%"=="3003" (
-  echo ⚠️  Port 3002 is in use. Using port 3003 instead.
+  echo Port 3002 is in use. Using port 3003 instead.
 )
 
-:: Optional audit/outdated (non-blocking)
-echo 📋 Running quick audit/outdated checks (non-blocking)...
+echo Running quick audit/outdated checks (non-blocking)...
 call npm audit --omit=dev >nul 2>nul
 call npm outdated >nul 2>nul
 
-:: Launch dev server in a new window
 set "TITLE=Berlin Luxe Rentals Server"
-echo 🚀 Starting server in new window on port %PORT%...
-start "%TITLE%" powershell -NoExit -Command "cd '%PROJECT_DIR%'; Write-Host 'Berlin Luxe Rentals Server' -ForegroundColor Cyan; Write-Host ('URL: http://localhost:%PORT%') -ForegroundColor Green; npm run dev -- --port %PORT%"
+echo Starting server in new window on port %PORT% ...
+start "%TITLE%" powershell -NoExit -Command "cd '%PROJECT_DIR%'; Write-Host 'Berlin Luxe Rentals Server' -ForegroundColor Cyan; Write-Host 'URL: http://localhost:%PORT%' -ForegroundColor Green; npm run dev -- --port %PORT%"
 
-echo.
-echo ✅ Server start requested!
-echo 🌐 Access your site at: http://localhost:%PORT%
-echo 📝 Server is running in a separate window
-
-echo.
-echo 🔁 Restore point: See backups folder for latest zip
-
-echo.
+echo Probing health endpoint...
+powershell -NoProfile -Command "Start-Sleep -Seconds 2; try { (Invoke-WebRequest -Uri http://localhost:%PORT%/api/health -UseBasicParsing -TimeoutSec 5).StatusCode } catch { 'ERR' }" >nul 2>nul
+echo Access your site at: http://localhost:%PORT%
 pause
+endlocal
+
+goto :eof
+
+:existing
+echo Detected running server on port %EXISTING_PORT%.
+echo Access your site at: http://localhost:%EXISTING_PORT%
+start "" "http://localhost:%EXISTING_PORT%"
+pause
+endlocal
+
+:restore
+echo Restore requested: locating latest backup zip...
+set "ZIPPATH="
+for /f "usebackq delims=" %%Z in (`powershell -NoProfile -Command "Get-ChildItem -Path '%PROJECT_DIR%\backups' -Filter 'site-*.zip' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName"`) do set "ZIPPATH=%%Z"
+if not defined ZIPPATH (
+  echo No backup zip found in backups\site-*.zip
+  pause
+  goto :eof
+)
+echo Using backup: %ZIPPATH%
+set "TMPRESTORE=%PROJECT_DIR%\backups\_restore_tmp"
+if exist "%TMPRESTORE%" rmdir /s /q "%TMPRESTORE%"
+powershell -NoProfile -Command "Expand-Archive -Path '%ZIPPATH%' -DestinationPath '%TMPRESTORE%' -Force" 1>nul 2>nul
+if errorlevel 1 (
+  echo Failed to expand archive.
+  pause
+  goto :eof
+)
+echo Restoring files from backup (non-destructive)...
+echo Skipping node_modules, .next, .git, backups, and start scripts
+robocopy "%TMPRESTORE%" "%PROJECT_DIR%" /E /XD node_modules .next .git backups /XF start-server.bat start-server-desktop.bat start-prod.bat /NFL /NDL /NJH /NJS 1>nul 2>nul
+rmdir /s /q "%TMPRESTORE%"
+echo Restore complete. You can now run start-server.bat normally.
+pause
+goto :eof
 
 
 

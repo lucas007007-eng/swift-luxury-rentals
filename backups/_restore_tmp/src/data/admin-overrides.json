@@ -1,0 +1,125 @@
+{
+  "berlin-real-1": {
+    "calendar": {
+      "2025-08-31": {
+        "available": true
+      },
+      "2025-09-01": {
+        "available": false
+      },
+      "2025-09-02": {
+        "available": false
+      },
+      "2025-09-03": {
+        "available": false
+      },
+      "2025-09-04": {
+        "available": false
+      },
+      "2025-09-05": {
+        "available": false
+      },
+      "2025-09-12": {
+        "priceNight": 200,
+        "available": true
+      },
+      "2025-09-06": {
+        "available": false
+      },
+      "2025-09-13": {
+        "priceNight": 200,
+        "available": true
+      },
+      "2025-09-11": {
+        "available": false
+      },
+      "2025-09-10": {
+        "available": false
+      },
+      "2025-09-08": {
+        "available": false
+      },
+      "2025-09-09": {
+        "available": false
+      },
+      "2025-09-16": {
+        "priceNight": 200,
+        "available": true
+      },
+      "2025-09-15": {
+        "priceNight": 200,
+        "available": true
+      },
+      "2025-09-07": {
+        "available": false
+      },
+      "2025-09-17": {
+        "priceNight": 300,
+        "available": true
+      },
+      "2025-09-18": {
+        "priceNight": 300,
+        "available": true
+      },
+      "2025-09-19": {
+        "priceNight": 300,
+        "available": true
+      },
+      "2025-09-20": {
+        "priceNight": 300,
+        "available": true
+      },
+      "2025-09-22": {
+        "priceNight": 300,
+        "available": false
+      },
+      "2025-09-23": {
+        "priceNight": 300,
+        "available": false
+      },
+      "2025-09-24": {
+        "priceNight": 300,
+        "available": false
+      },
+      "2025-09-25": {
+        "priceNight": 300,
+        "available": false
+      },
+      "2025-09-26": {
+        "priceNight": 300,
+        "available": false
+      },
+      "2025-09-27": {
+        "priceNight": 300,
+        "available": false
+      },
+      "2025-09-21": {
+        "priceNight": 300,
+        "available": false
+      }
+    },
+    "title": "Substantial and Stylish 2 Bedroom Penthouse in Berlin Mitte",
+    "description": "Ideally situated in the heart of the city, these 230-250sqm fully furnished, brand-new apartments offer luxury, enormous living spaces, daily convenience, and direct access from the building to a gorgeous secret park. Stunning vernacular architectural detailing evidences superb craftsmanship, while the exterior displays subtle and tasteful aspects of modernity. Impressively designed, the apartment features an open floor plan, dedicated living spaces, high ceilings, neutral color scheme, and phenomenal hardwood floors. Carefully laid in a herringbone pattern, the heated flooring is bursting with natural hues of amber, vanilla, and honey. Flooding the space in luminous natural light, the bright windows offer unparalleled serenity. Midcentury modern furniture adds to the panache and gives additional depth and texture with velvet touches and geometric angularity.",
+    "price": 6500,
+    "amenities": [
+      "Private toilet",
+      "Shared garden",
+      "Private kitchen",
+      "Wood flooring",
+      "Electrical heating",
+      "Private kitchenware",
+      "WiFi"
+    ],
+    "houseRules": [],
+    "houseRulesStructured": {
+      "guests": [
+        "Children allowed",
+        "pet allowed"
+      ],
+      "safety": [
+        "No smoking inside",
+        "No parties/events"
+      ]
+    }
+  }
+}

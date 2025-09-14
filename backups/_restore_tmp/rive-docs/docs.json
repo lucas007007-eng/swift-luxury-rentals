@@ -1,0 +1,498 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Rive",
+  "colors": {
+    "primary": "#ffa41c",
+    "light": "#ffa41c",
+    "dark": "#ffa41c"
+  },
+  "favicon": "/favicon_black.png",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Home",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "getting-started/introduction",
+              "getting-started/best-practices",
+              "getting-started/quick-links"
+            ]
+          },
+          {
+            "group": "Community",
+            "pages": [
+              "community/community-overview",
+              "community/marketplace-overview",
+              "community/rive-experts"
+            ]
+          },
+          {
+            "group": "Account Admin",
+            "pages": [
+              {
+                "group": "Account Overview",
+                "pages": [
+                  "account-admin/account-overview/account-overview",
+                  "account-admin/account-overview/creating-an-account",
+                  "account-admin/account-overview/account-management",
+                  "account-admin/account-overview/cancel-my-account",
+                  "account-admin/account-overview/delete-my-account",
+                  "account-admin/account-overview/trouble-logging-in",
+                  "account-admin/account-overview/billing-changes",
+                  "account-admin/account-overview/downloading-my-receipt-or-invoice"
+                ]
+              },
+              {
+                "group": "Workspaces",
+                "pages": [
+                  "account-admin/workspaces/workspaces-overview",
+                  "account-admin/workspaces/creating-a-workspace",
+                  "account-admin/workspaces/inviting-workspace-members",
+                  "account-admin/workspaces/removing-workspace-members",
+                  "account-admin/workspaces/reactivating-a-canceled-workspace",
+                  "account-admin/workspaces/workspace-faqs"
+                ]
+              },
+              "account-admin/pricing",
+              "account-admin/bring-your-own-bucket"
+            ]
+          },
+          {
+            "group": "Legal",
+            "pages": [
+              "legal/terms-of-service",
+              "legal/acceptable-use-policy",
+              "legal/privacy-policy"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Editor",
+        "groups": [
+          {
+            "group": "Editor",
+            "pages": [
+              {
+                "group": "Interface Overview",
+                "pages": [
+                  "editor/interface-overview/overview",
+                  "editor/interface-overview/toolbar",
+                  "editor/interface-overview/hierarchy",
+                  "editor/interface-overview/inspector",
+                  "editor/interface-overview/stage"
+                ]
+              },
+              {
+                "group": "Fundamentals",
+                "pages": [
+                  "editor/fundamentals/overview",
+                  "editor/fundamentals/design-vs-animate-mode",
+                  "editor/fundamentals/artboards",
+                  "editor/fundamentals/components",
+                  "editor/fundamentals/pen-tool-overview",
+                  "editor/fundamentals/pen-tool-tips",
+                  "editor/fundamentals/shapes-and-paths-overview",
+                  "editor/fundamentals/shape-and-path-tips",
+                  "editor/fundamentals/procedural-shapes",
+                  "editor/fundamentals/groups",
+                  "editor/fundamentals/selecting-and-navigating-groups",
+                  "editor/fundamentals/transform-spaces",
+                  "editor/fundamentals/group-tips",
+                  "editor/fundamentals/fill-and-stroke",
+                  "editor/fundamentals/fill-and-stroke-tips",
+                  "editor/fundamentals/edit-vertices",
+                  "editor/fundamentals/edit-vertices-tips",
+                  "editor/fundamentals/freeze-and-origin",
+                  "editor/fundamentals/importing-assets",
+                  "editor/fundamentals/revision-history"
+                ]
+              },
+              {
+                "group": "Manipulating Shapes",
+                "pages": [
+                  "editor/manipulating-shapes/manipulating-shapes",
+                  "editor/manipulating-shapes/bones",
+                  "editor/manipulating-shapes/bone-tips",
+                  "editor/manipulating-shapes/meshes",
+                  "editor/manipulating-shapes/clipping",
+                  "editor/manipulating-shapes/solos",
+                  "editor/manipulating-shapes/trim-path",
+                  "editor/manipulating-shapes/joysticks"
+                ]
+              },
+              {
+                "group": "Text",
+                "pages": [
+                  "editor/text/text-overview",
+                  "editor/text/text-runs",
+                  "editor/text/text-styles",
+                  "editor/text/text-modifiers",
+                  "editor/text/fonts"
+                ]
+              },
+              {
+                "group": "Constraints",
+                "pages": [
+                  "editor/constraints/constraints-overview",
+                  "editor/constraints/ik-constraint",
+                  "editor/constraints/distance-constraint",
+                  "editor/constraints/scale-constraint",
+                  "editor/constraints/rotation-constraint",
+                  "editor/constraints/transform-constraint",
+                  "editor/constraints/translation-constraint",
+                  "editor/constraints/follow-path-constraint",
+                  "editor/constraints/scroll-constraint"
+                ]
+              },
+              {
+                "group": "Animate Mode",
+                "pages": [
+                  "editor/animate-mode/animate-mode-overview",
+                  "editor/animate-mode/timeline",
+                  "editor/animate-mode/keys",
+                  "editor/animate-mode/animation-mixing",
+                  "editor/animate-mode/interpolation-easing",
+                  "editor/animate-mode/animating-draw-order"
+                ]
+              },
+              {
+                "group": "State Machines",
+                "pages": [
+                  "editor/state-machine/state-machine",
+                  "editor/state-machine/states",
+                  "editor/state-machine/inputs",
+                  "editor/state-machine/transitions",
+                  "editor/state-machine/listeners",
+                  "editor/state-machine/layers"
+                ]
+              },
+              {
+                "group": "Events",
+                "pages": [
+                  "editor/events/overview",
+                  "editor/events/audio-events"
+                ]
+              },
+              {
+                "group": "Data Binding",
+                "pages": [
+                  "editor/data-binding/overview",
+                  "editor/data-binding/lists"
+                ]
+              },
+              {
+                "group": "Layouts",
+                "pages": [
+                  "editor/layouts/layouts-overview",
+                  "editor/layouts/layout-tools",
+                  "editor/layouts/layout-parameters",
+                  "editor/layouts/layout-styles",
+                  "editor/layouts/layout-animation",
+                  "editor/layouts/n-slicing",
+                  "editor/layouts/scrolling"
+                ]
+              },
+              "editor/keyboard-shortcuts",
+              {
+                "group": "Exporting",
+                "pages": [
+                  "editor/exporting/exporting-for-runtime",
+                  "editor/exporting/exporting-for-video-and-static-design",
+                  "editor/exporting/exporting-for-backup"
+                ]
+              },
+              {
+                "group": "Share Links",
+                "pages": [
+                  "editor/share-links/overview",
+                  "editor/share-links/framer-and-rive"
+                ]
+              },
+              {
+                "group": "MCP",
+                "pages": [
+                  "editor/mcp/integration"
+                ]
+              },
+              "editor/tagging"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "App Runtimes",
+        "groups": [
+          {
+            "group": "Runtime Fundamentals",
+            "pages": [
+              "runtimes/getting-started",
+              "runtimes/runtime-sizes",
+              "runtimes/artboards",
+              "runtimes/layout",
+              "runtimes/state-machines",
+              "runtimes/data-binding",
+              "runtimes/loading-assets",
+              "runtimes/caching-a-rive-file",
+              "runtimes/playing-audio",
+              "runtimes/logging",
+              {
+                "group": "Choose a Renderer",
+                "pages": [
+                  "runtimes/choose-a-renderer/overview",
+                  "runtimes/choose-a-renderer/faq"
+                ]
+              },
+              {
+                "group": "Advanced Topics",
+                "pages": [
+                  "runtimes/advanced-topic/format"
+                ]
+              },
+              {
+                "group": "Legacy",
+                "pages": [
+                  "runtimes/animation-playback",
+                  "runtimes/inputs",
+                  "runtimes/text",
+                  "runtimes/rive-events"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "App Runtimes",
+            "pages": [
+              {
+                "group": "Web (JS)",
+                "pages": [
+                  "runtimes/web/web-js",
+                  "runtimes/web/rive-parameters",
+                  "runtimes/web/canvas-vs-webgl",
+                  "runtimes/web/migrating-from-rive-js",
+                  "runtimes/web/faq",
+                  "runtimes/web/preloading-wasm",
+                  "runtimes/web/low-level-api-usage",
+                  "runtimes/web/migrating-from-v1-to-v2"
+                ]
+              },
+              {
+                "group": "React",
+                "pages": [
+                  "runtimes/react/react",
+                  "runtimes/react/parameters-and-return-values",
+                  "runtimes/react/migrating-from-v0-to-v1",
+                  "runtimes/react/migrating-from-v1-to-v3",
+                  "runtimes/react/migrating-from-v3-to-v4"
+                ]
+              },
+              {
+                "group": "React Native",
+                "pages": [
+                  "runtimes/react-native/react-native",
+                  "runtimes/react-native/props",
+                  "runtimes/react-native/rive-ref-methods",
+                  "runtimes/react-native/loading-rive-to-expo",
+                  "runtimes/react-native/adding-rive-to-expo",
+                  "runtimes/react-native/migration-guide"
+                ]
+              },
+              {
+                "group": "Flutter",
+                "pages": [
+                  "runtimes/flutter/flutter",
+                  "runtimes/flutter/rive-native",
+                  "runtimes/flutter/migration-guide"
+                ]
+              },
+              {
+                "group": "Apple",
+                "pages": [
+                  "runtimes/apple/apple",
+                  "runtimes/apple/migrating-from-1.x.x-to-2.x.x",
+                  "runtimes/apple/migrating-from-2.x.x-to-3.x.x",
+                  "runtimes/apple/migrating-from-3.x.x-to-4.x.x",
+                  "runtimes/apple/migrating-from-4.x.x-to-5.x.x",
+                  "runtimes/apple/migrating-from-5.x.x-to-6.x.x",
+                  "runtimes/apple/faq",
+                  "runtimes/apple/resource-usage"
+                ]
+              },
+              {
+                "group": "Android",
+                "pages": [
+                  "runtimes/android/android"
+                ]
+              },
+              {
+                "group": "Community Runtimes",
+                "pages": [
+                  "runtimes/community-runtimes/c-sharp",
+                  "runtimes/community-runtimes/qt-quick"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Game Runtimes",
+        "groups": [
+          {
+            "group": "Game Runtimes",
+            "pages": [
+              {
+                "group": "Unreal",
+                "pages": [
+                  "game-runtimes/unreal/unreal",
+                  "game-runtimes/unreal/getting-started",
+                  "game-runtimes/unreal/fundamentals",
+                  "game-runtimes/unreal/state-machines",
+                  "game-runtimes/unreal/rive-events",
+                  "game-runtimes/unreal/data-binding-overview",
+                  "game-runtimes/unreal/data-binding-usage",
+                  "game-runtimes/unreal/text",
+                  "game-runtimes/unreal/audio",
+                  "game-runtimes/unreal/loading-assets",
+                  "game-runtimes/unreal/runtime-asset-swapping",
+                  "game-runtimes/unreal/common-use-cases"
+                ]
+              },
+              {
+                "group": "Unity",
+                "pages": [
+                  "game-runtimes/unity/unity",
+                  "game-runtimes/unity/getting-started",
+                  "game-runtimes/unity/fundamentals",
+                  "game-runtimes/unity/components",
+                  "game-runtimes/unity/layouts",
+                  "game-runtimes/unity/listeners",
+                  "game-runtimes/unity/state-machines",
+                  "game-runtimes/unity/data-binding",
+                  "game-runtimes/unity/rive-events",
+                  "game-runtimes/unity/text",
+                  "game-runtimes/unity/loading-assets",
+                  "game-runtimes/unity/procedural-rendering",
+                  "game-runtimes/unity/runtime-asset-swapping"
+                ]
+              },
+              "game-runtimes/defold"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Feature Support",
+        "pages": [
+          "feature-support"
+        ]
+      },
+      {
+        "tab": "Tutorials",
+        "groups": [
+          {
+            "group": "Tutorials",
+            "pages": [
+              "tutorials/learn-rive",
+              "tutorials/awesome-rive"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Case Studies",
+          "href": "https://rive.app/blog/case-studies",
+          "icon": "books"
+        },
+        {
+          "anchor": "Community",
+          "href": "https://community.rive.app",
+          "icon": "circle"
+        },
+        {
+          "anchor": "Blog",
+          "href": "https://rive.app/blog",
+          "icon": "newspaper"
+        },
+        {
+          "anchor": "Early Access",
+          "href": "https://rive.app/blog/early-access-to-unreleased-features",
+          "icon": "road-barrier"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/rive_top_logo_black.svg",
+    "dark": "/logo/rive_top_logo_white.svg",
+    "href": "https://rive.app/"
+  },
+  "appearance": {
+    "default": "dark"
+  },
+  "background": {
+    "decoration": "grid"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "https://community.rive.app/c/support/"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get Started",
+      "href": "https://editor.rive.app/"
+    }
+  },
+  "footer": {
+    "socials": {
+      "youtube": "https://www.youtube.com/channel/UCPal2R1FxwRTPylhP_7ofEg",
+      "x": "https://twitter.com/rive_app",
+      "instagram": "https://www.instagram.com/rive.app/",
+      "github": "https://github.com/rive-app",
+      "discord": "https://discord.com/invite/FGjmaTr"
+    }
+  },
+  "fonts": {
+    "heading": {
+      "family": "Tomorrow Placeholder",
+      "weight": 500,
+      "format": "woff2",
+      "source": "https://framerusercontent.com/assets/nCpxWS6DaPlPe0lHzStXAPCo3lw.woff2"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/runtimes/features-support",
+      "destination": "/feature-support"
+    },
+    {
+      "source": "/game-runtimes/features-support",
+      "destination": "/feature-support"
+    },
+    {
+      "source": "/runtimes/ios-macos/ios-macos",
+      "destination": "/runtimes/apple/apple"
+    },
+    {
+      "source": "/runtimes/ios-macos/:slug*",
+      "destination": "/runtimes/apple/:slug*"
+    },
+    {
+      "source": "/editor/layouts/layouts-&-constraints",
+      "destination": "/editor/layouts"
+    },
+    {
+      "source": "/editor/fundamentals/nested-artboards",
+      "destination": "/editor/fundamentals/components"
+    }
+  ]
+}

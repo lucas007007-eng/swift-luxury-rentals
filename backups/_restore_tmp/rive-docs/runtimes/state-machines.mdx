@@ -1,0 +1,327 @@
+---
+title: 'State Machine Playback'
+description: 'Playing a state machine'
+---
+
+For more information on designing and building state machines in Rive, please refer to: [State Machine](/editor/state-machine).
+
+Rive's state machines provide a way to combine a set of animation states and manage the transition between them that can be programmatically controlled with [Data Binding](/runtimes/data-binding) (recommended) and [Inputs](/runtimes/inputs).
+
+## Playing state machines
+
+State machines are instantiated by providing a state machine name to the Rive object when instantiated.
+
+<Tabs>
+  <Tab title="Web">
+    #### Web
+
+    To auto-play a state machine by default, simply set `autoPlay` to `true`.
+
+    ```js
+    const r = new rive.Rive({
+        src: 'https://cdn.rive.app/animations/vehicles.riv',
+        canvas: document.getElementById('canvas'),
+        autoplay: true,
+        stateMachines: 'bumpy',
+    });
+    ```
+  </Tab>
+
+  <Tab title="React">
+    #### React
+
+  To auto-play a state machine by default, simply set `autoPlay` to `true`.
+    ```js
+    export default function Simple() {
+      const { RiveComponent } = useRive({
+        src: 'https://cdn.rive.app/animations/vehicles.riv',
+        stateMachines: "bumpy",
+        autoplay: true,
+      });
+
+      return <RiveComponent />;
+    }
+    ```
+  </Tab>
+  <Tab title="React Native">
+    #### React Native
+
+    To auto-play a state machine by default, simply set `autoPlay` to `true`.
+
+    ```jsx
+      <Rive
+        resourceName={'vehicles'}
+        autoplay={true}
+        stateMachineName="bumpy"
+      />
+    ```
+  </Tab>
+
+  <Tab title="Flutter">
+  
+    There are a number of ways to play/select a state machine in Flutter.
+
+    #### When using `RiveWidgetController` (recommended)
+
+    When you create a `RiveWidgetController` it will use the default state machine, or you can specify a state machine by name or index.
+    
+    ```dart
+    // Default state machine
+    var controller = RiveWidgetController(riveFile);
+    // By name
+    controller = RiveWidgetController(
+      riveFile,
+      stateMachineSelector: StateMachineSelector.byName("State Machine 1"),
+    );
+    // By index
+    controller = RiveWidgetController(
+      riveFile,
+      stateMachineSelector: StateMachineSelector.byIndex(0),
+    );
+    ```
+
+    Passing this controller to a `RiveWidget` will automatically play the state machine.
+
+    ```dart
+    @override
+    Widget build(BuildContext context) {
+      return RiveWidget(controller: controller);
+    }
+    ```
+  
+    You can mark the controller as `active` to play/pause the state machine (advancing and drawing):
+
+    ```dart
+    final controller = RiveWidgetController(riveFile);
+    controller.active = false;
+    ```
+
+    The `StateMachineSelector` can also be passed to `RiveWidgetBuilder` to specify which state machine to use:
+    
+    ```dart
+    return RiveWidgetBuilder(
+      fileLoader: fileLoader,
+      stateMachineSelector: StateMachineSelector.byIndex(0),
+      builder: (context, state) => switch (state) {
+        /// ...
+      },
+    );
+    ```
+
+    #### When using `StateMachinePainter`
+
+    When using `StateMachinePainter`, you can specify the state machine to use by passing an optional name.
+    ```dart
+    // Default state machine
+    final painter = rive.StateMachinePainter(withStateMachine: _withStateMachine);
+    // By name
+    painter = rive.StateMachinePainter(
+      withStateMachine: _withStateMachine,
+      stateMachineName: 'State Machine 1  ',
+    );    
+    ```
+
+    #### Creating a state machine directly
+
+    Create the state machine directly from an `Artboard`:
+
+    ```dart
+    final artboard = riveFile.defaultArtboard()!;
+    // Default state machine
+    var stateMachine = artboard.defaultStateMachine();
+    // By name
+    stateMachine = artboard.stateMachine('State Machine 1');
+    // By index
+    stateMachine = artboard.stateMachineAt(0);
+    ```    
+
+  </Tab>
+
+  <Tab title="Apple">
+    #### Apple
+
+    Specify a starting state machine by setting the name of the state machine via `stateMachineName` when instantiating the `RiveViewModel`.
+
+    ### SwiftUI
+
+    ```swift
+    var stateChanger = RiveViewModel(
+        fileName: "skills",
+        stateMachineName: "Designer's Test"
+    )
+    ```
+
+    ```swift
+    class StateMachineViewController: UIViewController {
+        var viewModel = RiveViewModel(
+            fileName: "skills",
+            stateMachineName: "Designer's Test"
+        )
+
+        override public func loadView() {
+            super.loadView()
+
+            guard let stateMachineView = view as? StateMachineView else {
+                fatalError("Could not find StateMachineView")
+            }
+
+            viewModel.setView(stateMachineView.riveView)
+        }
+    }
+    ```
+    </Tab>
+    <Tab title="Android">
+    #### Android
+
+    ### Via XML
+
+    ```kotlin
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/simple_state_machine"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:riveResource="@raw/skills"
+        app:riveStateMachine="Designer's Test" />
+    ```
+
+    ### Via Kotlin
+
+    ```kotlin
+    animationView.setRiveResource(
+        R.raw.simple_state_machine,
+        autoplay = true,
+        stateMachineName = "Designer's Test"
+    )
+    ```
+
+    Additionally, you can use the same APIs from animation playback (i.e `play`, `pause`, and `stop`) to control state machine playback, as long as you set the `isStateMachine` attribute to `true`.
+
+    ```kotlin
+    animationView.play(
+        "Designer's Test",
+        Loop.AUTO,
+        Direction.AUTO,
+        isStateMachine = true
+    )
+
+    animationView.pause(
+        "Designer's Test",
+        isStateMachine = true
+    )
+
+    animationView.stop(
+        "Designer's Test",
+        isStateMachine = true
+    )
+    ```
+  </Tab>
+
+</Tabs>
+
+## State change event callback
+
+<Tabs>
+  <Tab title="Web">
+We can set a callback to determine when the state machine changes state. `onStateChange` provides an `event` parameter that gives us the string name(s) of the current state(s):
+
+```javascript
+const r = new rive.Rive({
+    src: 'https://cdn.rive.app/animations/vehicles.riv',
+    canvas: document.getElementById('canvas'),
+    autoplay: true,
+    stateMachines: 'bumpy',
+    onStateChange: (event) => {
+        stateName.innerHTML = event.data[0];
+    },
+});
+```
+  </Tab>
+  <Tab title="React">
+We can set a callback to determine when the state machine changes.
+
+```javascript
+<Rive
+  resourceName={'skills'}
+  autoplay={true}
+  stateMachineName="Designer's Test"
+  onStateChanged={(stateMachineName, stateName) => {
+    console.log(
+      'onStateChanged: ',
+      'stateMachineName: ',
+      stateMachineName,
+      'stateName: ',
+      stateName
+    );
+  }}
+/>
+```
+  </Tab>
+  <Tab title="Flutter">
+  Not supported. This is a legacy feature and we strongly recommend using [Data Binding](/runtimes/data-binding) or [Events](/runtimes/rive-events) instead.
+  </Tab>
+  <Tab title="Apple">
+This runtime allows for delegates that can be set on the `RiveViewModel`. If provided, these delegate functions will be fired whenever a matching event is triggered to be able to hook into and listen for certain events in the Rive animation cycle.
+
+    Currently, there exist the following delegates:
+
+    - `RivePlayerDelegate` - Hook into animation and state machine lifecycle events
+      - `player`: `(loopedWithModel riveModel: RiveModel?, type: Int) {}`
+      - `player`: `(playedWithModel riveModel: RiveModel?) {}`
+      - `player`: `(pausedWithModel riveModel: RiveModel?) {}`
+      - `player`: `(stoppedWithModel riveModel: RiveModel?) {}`
+    - `RiveStateMachineDelegate` - Hook into state changes on a state machine lifecycle
+      - `stateMachine`: `(_ stateMachine: RiveStateMachineInstance, didStateChange stateName: String) {}`
+
+    You can create your own delegate or mix in with the `RiveViewModel`, implementing as many protocols as are needed. Below is an example of how to customize a RiveViewModel's implementation of the `RivePlayerDelegate`:
+
+    ```swift
+    class SimpleAnimation: RiveViewModel {
+        init() {
+            let model = RiveModel(fileName: "truck_v7", stateMachineName: "Drive")
+            super.init(model)
+        }
+
+        override func setView(rview view: RiveView) {
+            super.setView(view)
+            rview?.playerDelegate = self
+            rview?.stateMachineDelegate = self
+        }
+
+        override func player(playedWithModel riveModel: RiveModel?) {
+            if let stateMachineName = riveModel?.stateMachine?.name() {...}
+        }
+
+        override func player(pausedWithModel riveModel: RiveModel?) {
+            if let stateMachineName = riveModel?.stateMachine?.name() {...}
+        }
+
+        override func player(stoppedWithModel riveModel: RiveModel?) {
+            if let stateMachineName = riveModel?.stateMachine?.name() {...}
+        }
+
+        @objc func stateMachine(_ stateMachine: RiveStateMachineInstance, didChangeState stateName: String) {
+            var stateMachineNames: [String] = []
+            var stateMachineStates: [String] = []
+            stateMachineNames.append(stateMachine.name())
+            stateMachineStates.append(stateName)
+            ...
+        }
+    }
+    ```
+
+  </Tab>
+  <Tab title="Android">
+
+    To listen for state changes, when creating a `Listener` to register on your animation view, you can add the following callback, where you'll receive the name of the state machine, and the state it transitions to:
+
+    ```kotlin
+    val listener = object : Listener {
+        override fun notifyStateChanged(stateMachineName: String, stateName: String) {
+            // Do something
+        }
+    }
+    animationView.registerListener(listener)
+    ```
+
+  </Tab>
+</Tabs>
