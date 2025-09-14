@@ -29,7 +29,10 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   const page = Math.max(1, Number(searchParams?.page || '1'))
   const activeStatus = String(searchParams?.status || '').toLowerCase()
   const statusFilter = ['hold','confirmed','cancelled'].includes(activeStatus) ? activeStatus : null
-  const where = statusFilter ? { status: statusFilter as any } : undefined
+  const where = { 
+    deletedAt: null, // Exclude soft-deleted bookings
+    ...(statusFilter ? { status: statusFilter as any } : {})
+  }
   const skip = (page - 1) * pageSize
   const [totalCount, bookings] = await Promise.all([
     prisma.booking.count({ where } as any),
@@ -130,13 +133,24 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <a
-                href="/api/admin/bookings/backfill-schedule?all=1&redirect=1"
-                className="text-xs px-3 py-1.5 rounded border border-emerald-400/40 bg-emerald-500/10 text-emerald-300 hover:text-emerald-200"
-                title="Recompute monthly schedules and first-period totals for all bookings"
-              >
-                Recompute totals
-              </a>
+              <form action="/api/admin/bookings/recompute?all=1&redirect=1" method="post" className="inline">
+                <button
+                  type="submit"
+                  className="text-xs px-3 py-1.5 rounded border border-emerald-400/40 bg-emerald-500/10 text-emerald-300 hover:text-emerald-200"
+                  title="Safely recompute monthly schedules and totals for all bookings (idempotent). Confirmation required."
+                >
+                  Recompute totals
+                </button>
+              </form>
+              <form action="/api/admin/bookings/cleanup-holds?redirect=1" method="post" className="inline">
+                <button
+                  type="submit"
+                  className="text-xs px-3 py-1.5 rounded border border-red-400/40 bg-red-500/10 text-red-300 hover:text-red-200"
+                  title="Fix hold bookings that incorrectly show payments as received"
+                >
+                  Fix Hold Payments
+                </button>
+              </form>
               <a
                 href="/api/admin/bookings/synthesize-first?all=1&redirect=1"
                 className="text-xs px-3 py-1.5 rounded border border-sky-400/40 bg-sky-500/10 text-sky-300 hover:text-sky-200"
@@ -269,7 +283,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       const hasAnyDeposit = depHeldCents > 0 || refundedCents > 0
                       if (!hasAnyDeposit) return <span className="text-white/40 text-xs">—</span>
                       const hasDepositPaymentReceived = (b.payments || []).some((p:any)=> p.purpose === 'deposit' && p.status === 'received')
-                      const depositReceived = hasDepositPaymentReceived || b.status === 'confirmed'
+                      const depositReceived = hasDepositPaymentReceived // Only show received if actually received, not just confirmed
                       const isRefunded = refundedCents > 0
                       const amountEuros = Math.round(((isRefunded ? refundedCents : depHeldCents) / 100))
                       const colorBox = isRefunded

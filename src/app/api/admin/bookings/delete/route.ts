@@ -6,11 +6,24 @@ export async function POST(req: Request) {
     const body = await req.json().catch(()=>({})) as any
     const id = String(body?.id || '')
     if (!id) return NextResponse.json({ message: 'Missing id' }, { status: 400 })
-    await prisma.payment.deleteMany({ where: { bookingId: id } })
-    await prisma.booking.delete({ where: { id } })
+    
+    // Soft delete: mark as deleted instead of removing from database
+    const now = new Date()
+    await prisma.booking.update({
+      where: { id },
+      data: { 
+        deletedAt: now,
+        status: 'cancelled' // Also mark as cancelled for consistency
+      }
+    })
+    
+    // Log the deletion for audit trail
+    console.log(`[AUDIT] Booking ${id} soft deleted at ${now.toISOString()}`)
+    
     return NextResponse.json({ ok: true })
   } catch (e) {
-    return NextResponse.json({ message: 'Failed' }, { status: 500 })
+    console.error('Booking delete failed:', e)
+    return NextResponse.json({ message: 'Failed to delete' }, { status: 500 })
   }
 }
 

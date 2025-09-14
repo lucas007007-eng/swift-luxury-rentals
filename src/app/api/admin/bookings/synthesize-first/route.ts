@@ -8,6 +8,12 @@ function nightsBetween(a: Date, b: Date) {
 async function processOne(bookingId: string) {
   const b = await prisma.booking.findUnique({ where: { id: bookingId }, include: { property: true, payments: true } })
   if (!b?.property) return { ok: false, firstPeriod: 0, moveInFee: 0 }
+  
+  // Only process confirmed bookings - never mark hold bookings as paid
+  if (b.status !== 'confirmed') {
+    console.log(`[SYNTHESIZE] Skipping booking ${bookingId} - status is ${b.status}, not confirmed`)
+    return { ok: false, firstPeriod: 0, moveInFee: 0, reason: `Skipped: status is ${b.status}` }
+  }
 
   const monthly = Number((b.property as any)?.priceMonthly || 0)
   const nightly = monthly > 0 ? monthly / 30 : 0
@@ -64,7 +70,14 @@ export async function POST(req: NextRequest) {
     const redirect = searchParams.get('redirect') === '1'
 
     if (all) {
-      const list = await prisma.booking.findMany({ select: { id: true } })
+      const list = await prisma.booking.findMany({ 
+        where: { 
+          status: 'confirmed',
+          deletedAt: null 
+        }, 
+        select: { id: true, status: true } 
+      })
+      console.log(`[SYNTHESIZE] Processing ${list.length} confirmed bookings (skipping holds)`)
       let count = 0
       for (const b of list) {
         const r = await processOne(b.id)
@@ -91,7 +104,14 @@ export async function GET(req: NextRequest) {
     const bookingId = String(searchParams.get('bookingId') || '')
 
     if (all) {
-      const list = await prisma.booking.findMany({ select: { id: true } })
+      const list = await prisma.booking.findMany({ 
+        where: { 
+          status: 'confirmed',
+          deletedAt: null 
+        }, 
+        select: { id: true, status: true } 
+      })
+      console.log(`[SYNTHESIZE] Processing ${list.length} confirmed bookings (skipping holds)`)
       let count = 0
       for (const b of list) {
         const r = await processOne(b.id)

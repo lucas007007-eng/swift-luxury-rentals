@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { cityProperties } from '@/data/cityProperties'
 import { computeBookingTotals, computeMonthlySchedule } from '@/lib/bookingTotals'
+import { validateBookingDates, validateBookingData } from '@/lib/bookingValidation'
 
 // Admin helper: Create a booking via query params (GET) or JSON (POST)
 // Accepts: propertyId, checkIn (YYYY-MM-DD), checkOut (YYYY-MM-DD), name, email
@@ -16,6 +17,12 @@ export async function GET(req: NextRequest) {
     const email = searchParams.get('email') || null
     if (!propertyId || !checkIn || !checkOut) {
       return NextResponse.json({ message: 'Missing fields' }, { status: 400 })
+    }
+
+    // Validate booking data
+    const dataErrors = validateBookingData({ propertyId, checkIn, checkOut, email })
+    if (dataErrors.length > 0) {
+      return NextResponse.json({ message: dataErrors[0].message, errors: dataErrors }, { status: 400 })
     }
 
     let property = await prisma.property.findUnique({ where: { id: propertyId } }).catch(()=>null)

@@ -71,6 +71,7 @@ model Booking {
   totalCents  Int       @default(0)
   confirmedAt DateTime?
   cancelledAt DateTime?
+  deletedAt   DateTime? // Soft delete
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   payments    Payment[]
@@ -79,6 +80,7 @@ model Booking {
   @@index([checkin])
   @@index([confirmedAt])
   @@index([cancelledAt])
+  @@index([deletedAt])
 }
 
 model Payment {

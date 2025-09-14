@@ -58,6 +58,9 @@ export default function MvpAccomplishments() {
       'Deposit lifecycle: Held → Received (green) → Refunded (blue, post‑checkout)',
       'Tools: create booking, delete, receive next/selected, refund deposit',
       'Seed/backfill utilities; Test Booking Bar calendar fixed (navigation layering)',
+      'Safer recompute totals: server-only, idempotent, comprehensive logging, dry-run mode',
+      'Synthesize payments fixed: only processes confirmed bookings, never marks holds as paid',
+      'Hold booking payment corruption fixed: cleanup endpoint reverted incorrect received payments',
     ]},
     { title: 'Admin bookings UI', items: [
       'Scoreboard pills (Total/Hold/Confirmed/Cancelled) with accurate global counts and filtering',
@@ -83,6 +86,7 @@ export default function MvpAccomplishments() {
       'Scoreboard counts via direct DB queries (decoupled from filters)',
       'AdminOverride model added to DB with JSON fallback for backward compatibility',
       'Performance indexes added: Booking (status, checkin), Payment (bookingId, purpose, status, dueAt)',
+      'Data model hardening: booking validation (dates, overlaps), soft delete with audit trail',
     ]},
     { title: 'One‑click environment & restore', items: [
       'start‑server.bat: env bootstrap, Prisma generate/migrate (db push fallback), safe seed, Docker Postgres, cache clean, port auto‑select, running‑server reuse, post‑launch health probe',
