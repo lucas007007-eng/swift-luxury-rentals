@@ -92,7 +92,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   const pageRevenue = Math.round(bookings.reduce((s: number, b: any) => s + (Number(b.totalCents || 0) / 100), 0))
   return (
     <main className="min-h-screen bg-black text-white">
-      <div className="max-w-[1800px] mx-auto px-6 py-10">
+      <div className="max-w-[2200px] mx-auto px-6 py-10">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text">Agent Ops</div>
@@ -156,7 +156,10 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               <div className="text-sm text-emerald-300">€{pageRevenue.toLocaleString('de-DE')} page total</div>
             </div>
           </div>
-          <table className="min-w-full divide-y divide-white/10">
+          {/* Keep table width fixed while expanding card width */}
+          <div className="px-6 md:px-8">
+            <div className="max-w-[1650px] mx-auto">
+          <table className="w-full divide-y divide-white/10">
             <thead className="bg-black/20">
               <tr>
                 <th className="px-4 py-3 text-left text-[11px] uppercase tracking-wide text-white/70">Created</th>
@@ -287,11 +290,11 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                   return (
                                     <div key={p.id} className="flex items-center justify-between gap-3">
                                       <div className="flex flex-col">
-                                        <span className="text-[10px] text-emerald-300 whitespace-nowrap">{dateStr}</span>
-                                        <span className="text-[10px] text-emerald-200/80 whitespace-nowrap">{label}</span>
-                                        {daysNote && <span className="text-[10px] text-emerald-200/60 whitespace-nowrap">{daysNote}</span>}
+                                        <span className="text-sm text-emerald-300 whitespace-nowrap">{dateStr}</span>
+                                        <span className="text-sm text-emerald-200/90 whitespace-nowrap font-semibold">{label}</span>
+                                        {daysNote && <span className="text-sm text-emerald-200/70 whitespace-nowrap">{daysNote}</span>}
                                       </div>
-                                      <span className="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                      <span className="px-2 py-0.5 rounded text-sm bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
                                     </div>
                                   )
                                 })}
@@ -357,7 +360,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                     <div className="flex items-center gap-2">
                                       <input type="checkbox" name="paymentId" value={p.id} form={`receive-${b.id}`} className="accent-emerald-500" />
                                       <div className="flex flex-col">
-                                        <span className="px-2 py-0.5 rounded text-[10px] bg-amber-500/20 text-amber-300 border border-amber-400/30 whitespace-nowrap">{formatShortDate(new Date(p.dueAt))}</span>
+                                        <span className="px-2 py-0.5 rounded text-sm bg-amber-500/20 text-amber-300 border border-amber-400/30 whitespace-nowrap">{formatShortDate(new Date(p.dueAt))}</span>
                                         {(() => {
                                           try {
                                             const list = (payments || []).filter((x:any)=> x.purpose === 'monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
@@ -365,7 +368,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                             const n = (idx >= 0 ? idx + 2 : 2)
                                             const j = n % 10, k = n % 100
                                             const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
-                                            return <span className="text-[10px] text-amber-200/80 whitespace-nowrap">({ord} month rent)</span>
+                                            return <span className="text-sm text-amber-200/80 whitespace-nowrap">({ord} month rent)</span>
                                           } catch { return null }
                                         })()}
                                       </div>
@@ -439,6 +442,8 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               <a href={`/admin/bookings?page=${page+1}${statusFilter?`&status=${activeStatus}`:''}`} className={`px-3 py-1.5 rounded text-sm border ${skip + bookings.length < totalCount ? 'border-emerald-400/30 text-emerald-300 hover:text-emerald-200' : 'border-white/10 text-white/30 pointer-events-none'}`}>Next</a>
             </div>
           )}
+            </div>
+          </div>
         </div>
       </div>
     </main>

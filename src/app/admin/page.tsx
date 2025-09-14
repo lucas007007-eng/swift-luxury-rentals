@@ -144,10 +144,28 @@ export default function AdminDashboard() {
             <SpyEuropeMap onPinClick={(city) => router.push(`/admin/city/${encodeURIComponent(city)}`)} />
           </div>
         </div>
-        {/* Upcoming/Overdue placed below */}
-        <div className="grid grid-cols-2 gap-4 mb-10">
+        {/* Upcoming / Overdue / Most Profitable Cities in one row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 items-stretch">
           <MetricCard title="Upcoming Payments within the Next 30 days" value={metrics?.totals?.upcomingReceivables ?? 0} prefix="€" loading={loading} />
           <MetricCard title="Overdue" value={metrics?.totals?.overdueReceivables ?? 0} prefix="€" loading={loading} />
+          {/* Most Profitable Cities */}
+          <div className="relative rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+            <div className="font-mono uppercase tracking-wider text-base md:text-lg gold-metallic-text mb-3">Most Profitable Cities</div>
+            {loading ? (
+              <div className="h-24 flex items-center justify-center text-white/40 text-sm">Loading…</div>
+            ) : topCities.length === 0 ? (
+              <div className="text-white/60 text-sm">No sales yet.</div>
+            ) : (
+              <div className="space-y-2">
+                {topCities.map((c)=> (
+                  <div key={c.city} className="flex items-center justify-between">
+                    <span className="text-white/90 text-base md:text-lg">{c.city}</span>
+                    <span className="text-emerald-400 font-semibold text-lg md:text-xl">€{Number(c.total).toLocaleString('de-DE')}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
@@ -156,7 +174,7 @@ export default function AdminDashboard() {
           <MetricCard title="Conversion Rate" value={metrics?.totals?.conversionRate ?? 0} suffix="%" loading={loading} />
           {/* Deposits Held */}
           <div className="relative rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-            <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text mb-1">Deposits Held</div>
+            <div className="font-mono uppercase tracking-wider text-base md:text-lg gold-metallic-text mb-1">Deposits Held</div>
             <div className="text-3xl font-extrabold text-emerald-400">
               €{(typeof window !== 'undefined' ? ((window as any).__depositsHeld||0) : 0).toLocaleString('de-DE')}
             </div>
@@ -164,26 +182,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          {/* Most Profitable Cities */}
-          <div className="relative rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-            <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text mb-3">Most Profitable Cities</div>
-            {loading ? (
-              <div className="h-24 flex items-center justify-center text-white/40 text-sm">Loading…</div>
-            ) : topCities.length === 0 ? (
-              <div className="text-white/60 text-sm">No sales yet.</div>
-            ) : (
-              <div className="space-y-2">
-                {topCities.map((c)=> (
-                  <div key={c.city} className="flex items-center justify-between text-sm">
-                    <span className="text-white/80">{c.city}</span>
-                    <span className="text-emerald-400 font-semibold">€{Number(c.total).toLocaleString('de-DE')}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        {/* (Removed separate Most Profitable Cities grid; now included above beside Overdue) */}
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
@@ -230,7 +229,7 @@ function MetricCard({ title, value, prefix = '', suffix = '', loading, moneyBack
         </svg>
       )}
       <div className="relative">
-        <div className="font-mono uppercase tracking-wider text-sm md:text-base gold-metallic-text mb-2">{title}</div>
+        <div className="font-mono uppercase tracking-wider text-base md:text-lg gold-metallic-text mb-2">{title}</div>
         <div className="text-3xl font-extrabold text-emerald-400 relative inline-flex items-center">
           {(() => {
             const formatted = loading ? '—' : `${prefix}${Number(value).toLocaleString('de-DE')}${suffix}`
@@ -254,10 +253,17 @@ function MetricCard({ title, value, prefix = '', suffix = '', loading, moneyBack
 }
 
 function TargetsRow({ metrics, loading }: { metrics: any; loading: boolean }) {
-  const [annualTarget, setAnnualTarget] = useState<number>(() => Number(localStorage?.getItem('target_annual') || '300000'))
+  const [annualTarget, setAnnualTarget] = useState<number>(() => {
+    try {
+      if (typeof window === 'undefined') return 300000
+      return Number(localStorage.getItem('target_annual') || '300000')
+    } catch { return 300000 }
+  })
   const [annualTargetEditing, setAnnualTargetEditing] = useState<boolean>(false)
   const [annualDraft, setAnnualDraft] = useState<number>(annualTarget)
-  useEffect(() => { localStorage.setItem('target_annual', String(annualTarget)) }, [annualTarget])
+  useEffect(() => {
+    try { if (typeof window !== 'undefined') localStorage.setItem('target_annual', String(annualTarget)) } catch {}
+  }, [annualTarget])
 
   const now = new Date()
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -348,7 +354,7 @@ function TargetCard({ title, value, achieved, paceFrac, extraNote, hint, childre
   const onPace = achieved >= value * paceFrac
   return (
     <div className="relative rounded-xl p-4 border border-emerald-400/25 bg-gradient-to-br from-[#092017] to-[#08170f]">
-      <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text mb-2">{title}</div>
+      <div className="font-mono uppercase tracking-wider text-base md:text-lg gold-metallic-text mb-2">{title}</div>
       <div className="text-white/80 text-sm mb-2">Target: €{Number(value).toLocaleString('de-DE')}</div>
       <div className="h-3 rounded-full bg-white/10 overflow-hidden">
         <div className="h-full" style={{ width: `${progress*100}%`, transition: 'width 900ms cubic-bezier(.2,.8,.2,1)', background: onPace ? 'linear-gradient(90deg,#16a34a,#22c55e)' : 'linear-gradient(90deg,#f59e0b,#f97316)' }} />
@@ -600,19 +606,19 @@ function CRMTables({ onChange }: { onChange?: () => void }) {
                 <td className="py-3 pr-4">{r.city}</td>
                 <td className="py-3 pr-4">{r.propertyTitle || r.propertyId}</td>
                 <td className="py-3 pr-4">
-                  <div className="inline-flex flex-col gap-1 px-2.5 py-1.5 rounded border border-emerald-400/30 bg-emerald-500/10 shadow-[0_0_12px_rgba(16,185,129,0.25)]">
+                  <div className="inline-flex flex-col gap-1 px-2.5 py-1.5 rounded border border-sky-400/30 bg-sky-500/10 shadow-[0_0_12px_rgba(56,189,248,0.25)]">
                     <div className="flex flex-col">
-                      <span className="text-[11px] text-emerald-300 whitespace-nowrap">Check-In: {formatShortDate(r.checkIn)}</span>
-                      <span className="text-[11px] text-emerald-200/80 whitespace-nowrap">Checkout: {formatShortDate(r.checkOut)}</span>
+                      <span className="text-[11px] text-sky-300 whitespace-nowrap">Check-In: {formatShortDate(r.checkIn)}</span>
+                      <span className="text-[11px] text-sky-200/80 whitespace-nowrap">Checkout: {formatShortDate(r.checkOut)}</span>
                     </div>
                   </div>
                 </td>
                 <td className="py-3 pr-4">
                   {typeof r.leaseValue === 'number' ? (
-                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] whitespace-nowrap" aria-label="Lease agreement total">
-                      <svg className="w-3.5 h-3.5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/></svg>
-                      <span className="font-semibold">€{Number(r.leaseValue||0).toLocaleString('de-DE')}</span>
-                      <span className="uppercase tracking-wider text-[10px] text-emerald-200">Lease Total</span>
+                    <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-amber-400/40 bg-amber-500/10 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.35)] whitespace-nowrap" aria-label="Lease agreement total">
+                      <span className="font-bold">€</span>
+                      <span className="font-semibold">{Number(r.leaseValue||0).toLocaleString('de-DE')}</span>
+                      <span className="uppercase tracking-wider text-[10px] text-amber-200">Lease Total</span>
                     </div>
                   ) : (
                     <span className="text-white/40">—</span>
@@ -653,26 +659,7 @@ function CRMTables({ onChange }: { onChange?: () => void }) {
                           </div>
                         )
                       })()}
-                      {(() => {
-                        try {
-                          const today = new Date()
-                          const co = new Date(r.checkOut)
-                          const finished = co <= today
-                          const isRefunded = r.depositStatus === 'refunded'
-                          if (finished && !isRefunded) {
-                            return (
-                              <form action="/api/admin/bookings/refund" method="post">
-                                <input type="hidden" name="bookingId" value={r.id} />
-                                <button className="px-2.5 py-1 rounded border border-sky-400/30 bg-sky-500/10 text-sky-300 hover:text-sky-200 text-xs inline-flex items-center gap-2" title="Refund deposit">
-                                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10l4-4 4 4"/><path d="M7 6v11a4 4 0 004 4h5"/></svg>
-                                  Refund Deposit
-                                </button>
-                              </form>
-                            )
-                          }
-                        } catch {}
-                        return null
-                      })()}
+                      {/* Refund action removed on CRM dashboard; manage refunds on Bookings page */}
                     </div>
                   ) : <span className="text-white/40">—</span>}
                 </td>
