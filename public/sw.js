@@ -6,16 +6,10 @@ const STATIC_CACHE = 'berlin-luxe-static-v6';
 const DYNAMIC_CACHE = 'berlin-luxe-dynamic-v6';
 const IMAGE_CACHE = 'berlin-luxe-images-v6';
 
-// Critical assets to cache immediately
+// Minimal caching for development - prevent stale content
 const STATIC_ASSETS = [
-  '/',
-  '/properties',
-  '/contact',
-  '/about',
   '/offline',
   '/favicon.ico',
-  '/_next/static/css/',
-  '/_next/static/js/',
 ];
 
 // Property images and external assets
@@ -103,9 +97,9 @@ async function handleFetch(request) {
       return await networkFirst(request, DYNAMIC_CACHE);
     }
     
-    // Strategy 4: Pages - Stale While Revalidate
+    // Strategy 4: Pages - Always Fresh (no stale cache)
     if (isPage(request)) {
-      return await staleWhileRevalidate(request, DYNAMIC_CACHE);
+      return await fetch(request); // Always fresh content, no caching
     }
     
     // Default: Network First
