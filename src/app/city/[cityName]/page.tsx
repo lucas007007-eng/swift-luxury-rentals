@@ -7,6 +7,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import PropertyCard from '@/components/PropertyCard'
 import SearchInterface from '@/components/SearchInterface'
+import CityFilterModal, { CityFilterState } from '@/components/CityFilterModal'
 import PropertyMap from '@/components/PropertyMap'
 import { cityProperties, cityInfo } from '@/data/cityProperties'
 
@@ -14,7 +15,10 @@ export default function CityPage() {
   const params = useParams()
   const cityName = params.cityName as string
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null)
+  const [searchMode, setSearchMode] = useState<'homes' | 'concierge'>('homes')
   const [overrides, setOverrides] = useState<Record<string, any>>({})
+  const [showFilters, setShowFilters] = useState(false)
+  const [filterState, setFilterState] = useState<CityFilterState>({ amenities: [] })
   const searchParams = useSearchParams()
   const checkIn = searchParams.get('checkin') || ''
   const checkOut = searchParams.get('checkout') || ''
@@ -37,17 +41,19 @@ export default function CityPage() {
   const initialDestination = destinationParam || `${cityName}, ${countryMap[cityName] || ''}`
   useEffect(() => {
     // Load admin overrides to get latest availability calendars
-    fetch('/api/admin/overrides')
+    fetch('/api/admin/overrides', { cache: 'no-store' })
       .then(r => r.ok ? r.json() : {})
       .then(setOverrides)
       .catch(() => {})
   }, [])
 
   const filtered = useMemo(() => {
-    if (!checkIn || !checkOut) return properties
-    const start = new Date(checkIn)
-    const end = new Date(checkOut) // treat checkout as exclusive
-    const withinRange = (cal: any) => {
+    // Start from availability filter
+    const base = properties.filter(p => {
+      if (!checkIn || !checkOut) return true
+      const start = new Date(checkIn)
+      const end = new Date(checkOut)
+      const cal = overrides[p.id]?.calendar || (p as any).calendar
       if (!cal) return true
       let d = new Date(start)
       while (d < end) {
@@ -57,9 +63,59 @@ export default function CityPage() {
         d.setDate(d.getDate()+1)
       }
       return true
+    })
+
+    const roomsOk = base.filter(p => {
+      if (filterState.bedrooms && (p.bedrooms || 0) < filterState.bedrooms) return false
+      if (filterState.bathrooms && (p.bathrooms || 0) < filterState.bathrooms) return false
+      return true
+    })
+
+    // Amenity keyword matching (case-insensitive with synonyms)
+    const getVariants = (term: string): string[] => {
+      const t = term.toLowerCase()
+      const variants = new Set<string>([t])
+      const add = (v: string) => variants.add(v.toLowerCase())
+      switch (t) {
+        case 'wifi':
+          ;['wi-fi','wireless','internet'].forEach(add); break
+        case 'air conditioning':
+          ;['ac','a/c','aircon','air-conditioner'].forEach(add); break
+        case 'hot tub':
+          ;['hottub','jacuzzi','whirlpool','spa'].forEach(add); break
+        case 'bbq grill':
+          ;['bbq','barbecue','grill'].forEach(add); break
+        case 'ev charger':
+          ;['electric vehicle charger','ev-charger','charging station','car charger'].forEach(add); break
+        case 'smoke alarm':
+          ;['smoke detector'].forEach(add); break
+        case 'carbon monoxide alarm':
+          ;['co alarm','carbon monoxide detector','co detector'].forEach(add); break
+        case 'king bed':
+          ;['king-bed','king sized bed','king size bed','king'].forEach(add); break
+        case 'tv':
+          ;['television','smart tv'].forEach(add); break
+        case 'washer':
+          ;['washing machine','laundry'].forEach(add); break
+        case 'dryer':
+          ;['tumble dryer','laundry dryer'].forEach(add); break
+        default: break
+      }
+      return Array.from(variants)
     }
-    return properties.filter(p => withinRange(overrides[p.id]?.calendar || (p as any).calendar))
-  }, [properties, checkIn, checkOut, overrides])
+
+    const selected = (filterState.amenities || [])
+    const final = selected.length === 0 ? roomsOk : roomsOk.filter(p => {
+      const mergedAmenities = (overrides[p.id]?.amenities || p.amenities || []) as string[]
+      const amenitiesLower = mergedAmenities.map(x=>String(x).toLowerCase())
+      // every selected amenity keyword must match at least one amenity string
+      return selected.every(sel => {
+        const variants = getVariants(sel)
+        return amenitiesLower.some(am => variants.some(v => am.includes(v)))
+      })
+    })
+    return final
+  }, [properties, checkIn, checkOut, overrides, filterState])
   const currentCityInfo = cityInfo[cityName as keyof typeof cityInfo]
 
   return (
@@ -93,19 +149,43 @@ export default function CityPage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="max-w-4xl mx-auto"
           >
-            <SearchInterface 
-              initialDestination={initialDestination}
-              initialCheckIn={checkIn}
-              initialCheckOut={checkOut}
-              initialGuests={Number(searchParams.get('guests') || '1')}
-              initialAdults={Number(searchParams.get('adults') || '1')}
-              initialChildren={Number(searchParams.get('children') || '0')}
-              initialInfants={Number(searchParams.get('infants') || '0')}
-              initialPets={Number(searchParams.get('pets') || '0')}
-            />
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <SearchInterface 
+                  initialDestination={initialDestination}
+                  initialCheckIn={checkIn}
+                  initialCheckOut={checkOut}
+                  initialGuests={Number(searchParams.get('guests') || '1')}
+                  initialAdults={Number(searchParams.get('adults') || '1')}
+                  initialChildren={Number(searchParams.get('children') || '0')}
+                  initialInfants={Number(searchParams.get('infants') || '0')}
+                  initialPets={Number(searchParams.get('pets') || '0')}
+                  onModeChange={(m)=>setSearchMode(m)}
+                />
+              </div>
+              {searchMode === 'homes' && (
+                <button onClick={()=>setShowFilters(true)} className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 shadow-md hover:shadow-lg transition-all h-[52px] mb-2">
+                  <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M3 6h18M7 12h10m-7 6h4"/>
+                  </svg>
+                  <span>Filters</span>
+                </button>
+              )}
+            </div>
           </motion.div>
         </div>
       </section>
+
+      {/* Filter Modal */}
+      {searchMode === 'homes' && (
+        <CityFilterModal
+          open={showFilters}
+          onClose={()=>setShowFilters(false)}
+          properties={properties}
+          onApply={(s)=>{ setFilterState(s); setShowFilters(false) }}
+          overrides={overrides}
+        />
+      )}
 
       {/* Properties Grid & Map */}
       <section className="py-12 bg-black">

@@ -192,11 +192,11 @@ export default function PropertyPage() {
       ) {
         groups.bathroom.push(a)
       } else if (
-        s.includes('balcony') || s.includes('terrace') || s.includes('garden') || s.includes('patio') || s.includes('pool') || s.includes('swimming') || s.includes('outdoor')
+        s.includes('balcony') || s.includes('terrace') || s.includes('garden') || s.includes('patio') || s.includes('pool') || s.includes('swimming') || s.includes('outdoor') || s.includes('hot tub') || s.includes('bbq')
       ) {
         groups.outdoor.push(a)
       } else if (
-        s.includes('heating') || s.includes('flooring') || s.includes('air') || s.includes('conditioning') || s.includes('ac') || s.includes('elevator') || s.includes('parking')
+        s.includes('heating') || s.includes('flooring') || s.includes('air') || s.includes('conditioning') || s.includes('ac') || s.includes('elevator') || s.includes('parking') || s.includes('washer') || s.includes('dryer') || s.includes('iron') || s.includes('workspace') || s.includes('king bed') || s.includes('gym') || s.includes('breakfast') || s.includes('ev charger') || s.includes('crib')
       ) {
         groups.comfort.push(a)
       } else {

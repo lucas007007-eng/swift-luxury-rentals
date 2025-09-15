@@ -8,6 +8,7 @@ import MiniDateRange from './MiniDateRange'
 
 interface SearchInterfaceProps {
   onSearch?: (searchData: SearchData) => void
+  onModeChange?: (mode: 'homes' | 'concierge') => void
   className?: string
   initialDestination?: string
   initialCheckIn?: string
@@ -28,7 +29,7 @@ interface SearchData {
   guests: number
 }
 
-const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, className = '', initialDestination, initialCheckIn, initialCheckOut, initialGuests, initialAdults, initialChildren, initialInfants, initialPets, initialMode, initialService }) => {
+const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChange, className = '', initialDestination, initialCheckIn, initialCheckOut, initialGuests, initialAdults, initialChildren, initialInfants, initialPets, initialMode, initialService }) => {
   const router = useRouter()
   const [mode, setMode] = useState<'homes' | 'concierge'>('homes')
   const [destination, setDestination] = useState('')
@@ -143,6 +144,11 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, className =
       setAdults(Math.max(1, total))
     }
   }, [initialDestination, initialCheckIn, initialCheckOut, initialGuests, initialAdults, initialChildren, initialInfants, initialPets])
+
+  // Notify parent when mode changes
+  useEffect(() => {
+    onModeChange?.(mode)
+  }, [mode])
 
   // Helpers to change counts safely
   const totalGuests = adults + children
