@@ -1,10 +1,10 @@
 // Berlin Luxe Rentals Service Worker
 // Advanced caching strategy for luxury rental platform
 
-const CACHE_NAME = 'berlin-luxe-v1.5.0';
-const STATIC_CACHE = 'berlin-luxe-static-v6';
-const DYNAMIC_CACHE = 'berlin-luxe-dynamic-v6';
-const IMAGE_CACHE = 'berlin-luxe-images-v6';
+const CACHE_NAME = 'berlin-luxe-v1.0.0';
+const STATIC_CACHE = 'berlin-luxe-static-v1';
+const DYNAMIC_CACHE = 'berlin-luxe-dynamic-v1';
+const IMAGE_CACHE = 'berlin-luxe-images-v1';
 
 // Minimal caching for development - prevent stale content
 const STATIC_ASSETS = [
@@ -97,9 +97,9 @@ async function handleFetch(request) {
       return await networkFirst(request, DYNAMIC_CACHE);
     }
     
-    // Strategy 4: Pages - Always Fresh (no stale cache)
+    // Strategy 4: Pages - Stale While Revalidate
     if (isPage(request)) {
-      return await fetch(request); // Always fresh content, no caching
+      return await staleWhileRevalidate(request, DYNAMIC_CACHE);
     }
     
     // Default: Network First
