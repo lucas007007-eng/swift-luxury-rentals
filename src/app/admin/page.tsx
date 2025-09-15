@@ -151,9 +151,12 @@ export default function AdminDashboard() {
         </div>
         
         {/* MVP Progress and Timer */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           <div key="mvp-progress" className="flex"><MVPProgress /></div>
-          <div key="simple-timer" className="flex"><SimpleTimer /></div>
+          <div key="simple-timer" className="space-y-6">
+            <SimpleTimer />
+            <MVPProgressOverflow />
+          </div>
         </div>
         {/* Booking Radar CTA */}
         <div
@@ -279,46 +282,73 @@ function MVPProgress() {
   const [expanded, setExpanded] = React.useState(false)
   React.useEffect(() => {
     try {
-      const raw = typeof window !== 'undefined' ? localStorage.getItem('mvp_checklist') : null
-      const versionKey = 'mvp_checklist_version'
-      const currentVersion = '2025-09-14-weekplan-v2'
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('mvp_checklist_v2') : null
+      const versionKey = 'mvp_checklist_version_v2'
+      const currentVersion = '2025-09-15-accomplishments-v14'
       const savedVersion = typeof window !== 'undefined' ? localStorage.getItem(versionKey) : null
-      // Seed from new 4-week MVP guide
+      // Seed from accomplishments + MVP roadmap
       const seed = [
-        // Week 1 — Database foundation and migration
-        { id: 'w1-db-prisma', label: 'PostgreSQL + Prisma (Docker, client, .env, scripts)', done: false },
-        { id: 'w1-conn-pool', label: 'Connection pooling ready (pgBouncer later)', done: false },
-        { id: 'w1-data-model', label: 'Data model: users, properties, images, calendars, bookings, payments, admin_overrides, amenities, cities', done: false },
-        { id: 'w1-seed-import', label: 'Seed from JSON (properties, images, calendars, users)', done: false },
-        { id: 'w1-backfill', label: 'Backfill slugs, normalized currencies, VAT country mapping', done: false },
-        { id: 'w1-api-refactor', label: 'API read/write routes use DB (compatibility types)', done: false },
-        { id: 'w1-dev-dx', label: 'One-command boot (Docker + migrate + seed) + docs', done: false },
+        // ✅ COMPLETED - Frontend Foundation
+        { id: 'frontend-pages', label: 'Complete site structure: Homepage, City/Property pages, all legal pages', done: true },
+        { id: 'frontend-search', label: 'Search interface with date pickers and responsive layout', done: true },
+        { id: 'frontend-filters', label: 'Airbnb-style filter modal (beds, baths, amenities, price range)', done: true },
+        { id: 'frontend-performance', label: 'Performance optimization: dynamic imports, Service Worker, RSC-safe navigation', done: true },
+        { id: 'frontend-gallery', label: 'Image galleries with modal viewers and property detail UX', done: true },
+        { id: 'frontend-responsive', label: 'Mobile-responsive design with hamburger menu and touch-friendly controls', done: true },
 
-        // Week 2 — Payments, pricing, reservation holds
+        // ✅ COMPLETED - Admin Foundation  
+        { id: 'admin-auth', label: 'Admin authentication with middleware, rate limiting, secure cookies', done: true },
+        { id: 'admin-dashboard', label: 'CRM dashboard with analytics, metrics, VIP customers, charts', done: true },
+        { id: 'admin-bookings', label: 'Booking operations: status updates, deposit lifecycle, tools', done: true },
+        { id: 'admin-listings', label: 'Property management: edit details, pricing, media, availability calendars', done: true },
+        { id: 'admin-tools', label: 'Productivity toolkit: Operating Manual, Playbooks, Prompts, Repo Map', done: true },
+
+        // ✅ COMPLETED - Data & Infrastructure
+        { id: 'data-prisma', label: 'Prisma schema, migrations, AdminOverride model with performance indexes', done: true },
+        { id: 'data-environment', label: 'One-click environment: start-server.bat, Docker Postgres, health checks', done: true },
+        { id: 'data-backup', label: 'Backup/restore system with zip snapshots and git tagging', done: true },
+        { id: 'data-timer', label: 'Development Timer with localStorage persistence and activity tracking', done: true },
+        { id: 'data-maps', label: 'Google Maps integration with property pins and city coordinates', done: true },
+        { id: 'data-cache', label: 'Service Worker caching with cache invalidation system', done: true },
+
+        // ✅ COMPLETED - Core Features (Left Box)
+        { id: 'core-middleware', label: 'Anti-cache middleware with timestamp ETags and cache busting', done: true },
+        { id: 'core-forms', label: 'Contact forms with React Hook Form validation and success states', done: true },
+        { id: 'core-analytics', label: 'Sales analytics dashboard: revenue tracking, bar charts, growth metrics, conversion rates', done: true },
+        { id: 'core-multicity', label: 'Multi-city property system with 10+ European cities and localized data', done: true },
+        { id: 'core-overrides', label: 'Admin override system for real-time property updates (pricing, amenities, availability)', done: true },
+        { id: 'core-calendar', label: 'Sophisticated booking calendar system with month navigation and availability management', done: true },
+        
+        // ✅ COMPLETED - Core Features (Right Box - Top Priority)
+        { id: 'core-pdf', label: 'PDF generation system for lease agreements and invoices with admin controls', done: true },
+        { id: 'core-radar', label: 'Interactive spy-themed radar map for city navigation with animated sweeps', done: true },
+        { id: 'core-targets', label: 'Sales targets system: monthly/quarterly/annual with pace tracking and editable goals', done: true },
+        { id: 'core-vip', label: 'VIP customer tracking with spend analytics and join date history', done: true },
+        
+        // 🔄 IN PROGRESS - Week 2: Payments & Pricing
         { id: 'w2-stripe', label: 'Stripe PaymentIntents + webhooks + metadata', done: false },
         { id: 'w2-coinbase', label: 'Coinbase Commerce charges + webhooks', done: false },
         { id: 'w2-escrow', label: 'Escrow flow: hold TTL, approve/capture, decline/auto-refund', done: false },
         { id: 'w2-pricing', label: 'Pricing/fees engine (nightly/monthly, pro‑ration, deposit/move-in, VAT)', done: false },
-        { id: 'w2-source-of-truth', label: 'Single source of truth for pricing across app', done: false },
         { id: 'w2-concurrency', label: 'Availability concurrency (SELECT FOR UPDATE, expiresAt, idempotent webhooks)', done: false },
 
-        // Week 3 — KYC, owners, storage, comms
-        { id: 'w3-kyc', label: 'KYC/ID (Stripe Identity/Persona) + store status', done: false },
+        // 📅 PLANNED - Week 3: KYC, owners, storage, comms
+        { id: 'w3-kyc', label: 'KYC/ID verification (Stripe Identity/Persona) + store status', done: false },
         { id: 'w3-owners', label: 'Owner intake form + minimal owner dashboard', done: false },
         { id: 'w3-storage', label: 'S3 storage with signed PUT/GET; migrate uploads', done: false },
-        { id: 'w3-emails', label: 'Emails with Postmark/SES: templates for key events', done: false },
+        { id: 'w3-emails', label: 'Email templates with Postmark/SES for key booking events', done: false },
 
-        // Week 4 — Hardening, tests, deploy
-        { id: 'w4-observability', label: 'Observability/security: Sentry, PostHog, rate limits, cache headers, RBAC', done: false },
-        { id: 'w4-tests', label: 'Testing: API (pricing/holds), webhook signatures, Playwright E2E', done: false },
-        { id: 'w4-compliance', label: 'Compliance + SEO: Cookie Settings, sitemap/robots, legal, backups schedule', done: false },
-        { id: 'w4-deploy', label: 'Staging/production: Vercel + managed Postgres, webhooks, launch checklist', done: false },
+        // 📅 PLANNED - Week 4: Hardening, tests, deploy
+        { id: 'w4-observability', label: 'Observability: Sentry, PostHog, rate limits, cache headers, RBAC', done: false },
+        { id: 'w4-tests', label: 'Testing suite: API tests, webhook signatures, Playwright E2E', done: false },
+        { id: 'w4-compliance', label: 'Compliance + SEO: Cookie Settings, sitemap/robots, legal pages', done: false },
+        { id: 'w4-deploy', label: 'Production deployment: Vercel + managed Postgres, webhooks, launch checklist', done: false },
       ]
       const shouldReplace = !raw || savedVersion !== currentVersion
       if (shouldReplace) {
         setItems(seed)
         if (typeof window !== 'undefined') {
-          localStorage.setItem('mvp_checklist', JSON.stringify(seed))
+          localStorage.setItem('mvp_checklist_v2', JSON.stringify(seed))
           localStorage.setItem(versionKey, currentVersion)
         }
       } else {
@@ -332,42 +362,225 @@ function MVPProgress() {
   const toggle = (id: string) => {
     const next = items.map(i => i.id===id ? { ...i, done: !i.done } : i)
     setItems(next)
-    try { if (typeof window !== 'undefined') localStorage.setItem('mvp_checklist', JSON.stringify(next)) } catch {}
+    try { if (typeof window !== 'undefined') localStorage.setItem('mvp_checklist_v2', JSON.stringify(next)) } catch {}
   }
   return (
-    <div className="rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)] flex-1">
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          setExpanded(v => !v)
-        }}
-        className="w-full text-left"
-        aria-expanded={expanded}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="font-mono uppercase tracking-wider text-base md:text-lg gold-metallic-text">MVP Progress</div>
-            <div className="text-white/80 text-sm">{completed} of {total} tasks completed</div>
+    <div className="relative rounded-2xl p-6 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden flex-1">
+      {/* Animated background grid */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
+      </div>
+      
+      {/* Glowing corner accents */}
+      <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-amber-400/60" />
+      <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-amber-400/60" />
+      <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-amber-400/60" />
+      <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-amber-400/60" />
+
+      <div className="relative">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            setExpanded(v => {
+              const newExpanded = !v
+              // Sync with overflow component
+              if (typeof window !== 'undefined') {
+                (window as any).__mvpExpanded = newExpanded
+              }
+              return newExpanded
+            })
+          }}
+          className="w-full text-left group cursor-pointer"
+          aria-expanded={expanded}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="font-mono uppercase tracking-wider text-lg text-amber-400 font-bold group-hover:text-amber-300 transition-colors">MVP Progress</div>
+              <div className="text-amber-200/80 text-sm">{completed} of {total} tasks completed</div>
+            </div>
+            <div className="relative">
+              {/* Cool animated dropdown arrow */}
+              <div className={`w-8 h-8 rounded-full border border-amber-400/40 bg-amber-400/10 flex items-center justify-center group-hover:border-amber-300 group-hover:bg-amber-400/20 transition-all ${expanded ? 'rotate-180' : ''}`}>
+                <svg className="w-4 h-4 text-amber-400 group-hover:text-amber-300 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </div>
+              {/* Subtle glow effect */}
+              <div className="absolute inset-0 rounded-full bg-amber-400/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
+            </div>
           </div>
-          <svg className={`w-5 h-5 text-white/70 transition-transform ${expanded ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-        <div className="h-3 rounded-full bg-white/10 overflow-hidden mt-3">
-          <div className="h-full bg-emerald-500" style={{ width: `${pct}%`, transition: 'width 600ms cubic-bezier(.2,.8,.2,1)' }} />
-        </div>
-        <div className="text-emerald-400 font-bold mt-2">{pct}% to MVP</div>
-      </button>
-      {expanded && (
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2">
-          {items.map(i => (
-            <label key={i.id} className="flex items-center gap-2 text-sm text-white/80">
-              <input type="checkbox" checked={!!i.done} onChange={()=>toggle(i.id)} className="accent-emerald-500" />
-              <span className={i.done ? 'line-through text-white/50' : ''}>{i.label}</span>
+        </button>
+
+        {!expanded ? (
+          <div className="space-y-4">
+            {/* Progress Overview */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-xs text-amber-300/80 uppercase tracking-wider mb-1">Completed</div>
+                <div className="text-2xl font-mono font-bold text-amber-400 mb-1">
+                  {completed}
+                </div>
+                <div className="text-xs text-amber-200/60">Features done</div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-xs text-amber-300/80 uppercase tracking-wider mb-1">Remaining</div>
+                <div className="text-2xl font-mono font-bold text-amber-400 mb-1">
+                  {total - completed}
+                </div>
+                <div className="text-xs text-amber-200/60">Tasks left</div>
+              </div>
+
+              <div className="text-center">
+                <div className="text-xs text-amber-300/80 uppercase tracking-wider mb-1">Progress</div>
+                <div className="text-3xl font-mono font-bold text-amber-300 mb-1 glow-text">
+                  {pct}%
+                </div>
+                <div className="text-xs text-amber-200/60">To MVP</div>
+              </div>
+            </div>
+
+            {/* Animated progress bar */}
+            <div className="mt-4 h-1 bg-amber-900/30 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full transition-all duration-1000 relative"
+                style={{ width: `${pct}%` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+              </div>
+            </div>
+            
+            <div className="mt-2 text-center text-xs text-amber-200/60">
+              {pct}% complete • {total - completed} tasks remaining • Click to expand details
+            </div>
+          </div>
+        ) : null}
+        {expanded && (
+          <div className="mt-6 grid grid-cols-1 gap-3">
+            {(() => {
+              // Custom split: 22 items in left column, rest in right
+              const splitPoint = 22
+              
+              return items.slice(0, splitPoint).map(i => (
+                <label key={i.id} className="flex items-start gap-3 text-base text-amber-200/90 p-2 rounded-lg hover:bg-amber-400/5 transition-colors cursor-pointer">
+                  <input type="checkbox" checked={!!i.done} onChange={()=>toggle(i.id)} className="accent-amber-500 mt-1 w-4 h-4" />
+                  <span className={i.done ? 'line-through text-amber-200/60' : 'leading-relaxed'}>{i.label}</span>
+                </label>
+              ))
+            })()}
+          </div>
+        )}
+      </div>
+
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .animate-shimmer {
+          animation: shimmer 2s ease-in-out infinite;
+        }
+        .glow-text {
+          text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+      `}</style>
+    </div>
+  )
+}
+
+function MVPProgressOverflow() {
+  const [items, setItems] = React.useState<{ id: string; label: string; done: boolean }[]>([])
+  const [expanded, setExpanded] = React.useState(false)
+  
+  React.useEffect(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('mvp_checklist_v2') : null
+      if (raw) {
+        try { setItems(JSON.parse(raw as string)) } catch { setItems([]) }
+      }
+    } catch {}
+  }, [])
+
+  const toggle = (id: string) => {
+    const next = items.map(i => i.id===id ? { ...i, done: !i.done } : i)
+    setItems(next)
+    try { if (typeof window !== 'undefined') localStorage.setItem('mvp_checklist_v2', JSON.stringify(next)) } catch {}
+  }
+
+  // Listen for MVP Progress expand state
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const raw = typeof window !== 'undefined' ? localStorage.getItem('mvp_checklist_v2') : null
+        if (raw) {
+          try { setItems(JSON.parse(raw as string)) } catch { setItems([]) }
+        }
+      } catch {}
+    }
+    
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
+  // Sync expanded state with main MVP Progress (you'll need to add this)
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const mvpExpanded = (window as any).__mvpExpanded
+      if (mvpExpanded !== expanded) {
+        setExpanded(mvpExpanded || false)
+      }
+    }, 100)
+    return () => clearInterval(interval)
+  }, [expanded])
+
+  const secondHalf = (() => {
+    // Custom split: 22 items in left column, rest in right
+    const splitPoint = 22
+    return items.slice(splitPoint)
+  })()
+
+  if (!expanded || secondHalf.length === 0) return null
+
+  return (
+    <div className="relative rounded-2xl p-6 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden">
+      {/* Animated background grid */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
+      </div>
+      
+      {/* Glowing corner accents */}
+      <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-amber-400/60" />
+      <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-amber-400/60" />
+      <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-amber-400/60" />
+      <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-amber-400/60" />
+
+      <div className="relative">
+        <div className="font-mono uppercase tracking-wider text-lg text-amber-400 font-bold mb-4">MVP Progress (continued)</div>
+        
+        <div className="grid grid-cols-1 gap-3">
+          {secondHalf.map(i => (
+            <label key={i.id} className="flex items-start gap-3 text-base text-amber-200/90 p-2 rounded-lg hover:bg-amber-400/5 transition-colors cursor-pointer">
+              <input type="checkbox" checked={!!i.done} onChange={()=>toggle(i.id)} className="accent-amber-500 mt-1 w-4 h-4" />
+              <span className={i.done ? 'line-through text-amber-200/60' : 'leading-relaxed'}>{i.label}</span>
             </label>
           ))}
         </div>
-      )}
+      </div>
+
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .animate-shimmer {
+          animation: shimmer 2s ease-in-out infinite;
+        }
+        .glow-text {
+          text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+      `}</style>
     </div>
   )
 }
