@@ -110,10 +110,10 @@ call npm outdated >nul 2>nul
 
 set "TITLE=Berlin Luxe Rentals Server"
 echo Starting server in new window on port %PORT% ...
-start "%TITLE%" powershell -NoExit -Command "cd '%PROJECT_DIR%'; Write-Host 'Berlin Luxe Rentals Server' -ForegroundColor Cyan; Write-Host 'URL: http://localhost:%PORT%' -ForegroundColor Green; npm run dev -- --port %PORT%"
+start "%TITLE%" powershell -NoExit -Command "cd \"%PROJECT_DIR%\"; Write-Host 'Berlin Luxe Rentals Server' -ForegroundColor Cyan; Write-Host 'URL: http://localhost:%PORT%' -ForegroundColor Green; npm run dev -- --port %PORT%"
 
 echo Probing health endpoint...
-powershell -NoProfile -Command "Start-Sleep -Seconds 2; try { (Invoke-WebRequest -Uri http://localhost:%PORT%/api/health -UseBasicParsing -TimeoutSec 5).StatusCode } catch { 'ERR' }" >nul 2>nul
+powershell -NoProfile -Command "Start-Sleep -Seconds 2; try { (Invoke-WebRequest -Uri 'http://localhost:%PORT%/api/health' -UseBasicParsing -TimeoutSec 5).StatusCode } catch { 'ERR' }" >nul 2>nul
 echo Access your site at: http://localhost:%PORT%
 pause
 endlocal
@@ -130,7 +130,7 @@ endlocal
 :restore
 echo Restore requested: locating latest backup zip...
 set "ZIPPATH="
-for /f "usebackq delims=" %%Z in (`powershell -NoProfile -Command "Get-ChildItem -Path '%PROJECT_DIR%\backups' -Filter 'site-*.zip' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName"`) do set "ZIPPATH=%%Z"
+for /f "usebackq delims=" %%Z in (`powershell -NoProfile -Command "Get-ChildItem -Path \"%PROJECT_DIR%\backups\" -Filter 'site-*.zip' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName"`) do set "ZIPPATH=%%Z"
 if not defined ZIPPATH (
   echo No backup zip found in backups\site-*.zip
   pause
@@ -139,7 +139,7 @@ if not defined ZIPPATH (
 echo Using backup: %ZIPPATH%
 set "TMPRESTORE=%PROJECT_DIR%\backups\_restore_tmp"
 if exist "%TMPRESTORE%" rmdir /s /q "%TMPRESTORE%"
-powershell -NoProfile -Command "Expand-Archive -Path '%ZIPPATH%' -DestinationPath '%TMPRESTORE%' -Force" 1>nul 2>nul
+powershell -NoProfile -Command "Expand-Archive -Path \"%ZIPPATH%\" -DestinationPath \"%TMPRESTORE%\" -Force" 1>nul 2>nul
 if errorlevel 1 (
   echo Failed to expand archive.
   pause

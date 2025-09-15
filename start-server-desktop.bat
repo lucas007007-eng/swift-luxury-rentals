@@ -36,7 +36,7 @@ if exist start-server.bat (
   call start-server.bat
 ) else (
   echo start-server.bat not found in project. Running fallback: npm run dev on port 3003
-  start "Berlin Luxe Rentals Server" powershell -NoExit -Command "cd '%PROJECT_DIR%'; npm run dev -- --port 3003"
+  start "Berlin Luxe Rentals Server" powershell -NoExit -Command "cd \"%PROJECT_DIR%\"; npm run dev -- --port 3003"
 )
 popd
 
