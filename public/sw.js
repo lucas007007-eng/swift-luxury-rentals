@@ -1,10 +1,10 @@
 // Berlin Luxe Rentals Service Worker
 // Advanced caching strategy for luxury rental platform
 
-const CACHE_NAME = 'berlin-luxe-v1.1.0';
-const STATIC_CACHE = 'berlin-luxe-static-v2';
-const DYNAMIC_CACHE = 'berlin-luxe-dynamic-v2';
-const IMAGE_CACHE = 'berlin-luxe-images-v2';
+const CACHE_NAME = 'berlin-luxe-v1.5.0';
+const STATIC_CACHE = 'berlin-luxe-static-v6';
+const DYNAMIC_CACHE = 'berlin-luxe-dynamic-v6';
+const IMAGE_CACHE = 'berlin-luxe-images-v6';
 
 // Critical assets to cache immediately
 const STATIC_ASSETS = [
