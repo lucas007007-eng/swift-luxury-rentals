@@ -20,10 +20,10 @@ export default function ServiceWorkerRegistration() {
                   // New content is available
                   console.log('[SW] New content available, please refresh')
                   
-                  // Optionally show update notification
-                  if (window.confirm('New version available! Refresh to update?')) {
-                    window.location.reload()
-                  }
+                  // Force update to clear filter cache
+                  console.log('[SW] Forcing cache update to clear old filter version')
+                  newWorker.postMessage({ type: 'SKIP_WAITING' })
+                  window.location.reload()
                 }
               })
             }

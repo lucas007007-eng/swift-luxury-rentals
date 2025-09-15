@@ -19,6 +19,7 @@ interface SearchInterfaceProps {
   initialPets?: number
   initialMode?: 'homes' | 'concierge'
   initialService?: string
+  showFilters?: boolean  // New prop to control filter button visibility
 }
 
 interface SearchData {
@@ -28,7 +29,7 @@ interface SearchData {
   guests: number
 }
 
-const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, className = '', initialDestination, initialCheckIn, initialCheckOut, initialGuests, initialAdults, initialChildren, initialInfants, initialPets, initialMode, initialService }) => {
+const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, className = '', initialDestination, initialCheckIn, initialCheckOut, initialGuests, initialAdults, initialChildren, initialInfants, initialPets, initialMode, initialService, showFilters = false }) => {
   const router = useRouter()
   const [mode, setMode] = useState<'homes' | 'concierge'>('homes')
   const [destination, setDestination] = useState('')
@@ -510,15 +511,28 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, className =
             </div>
           )}
 
-          {/* Search Button */}
-          <div className="px-2 py-2 sm:px-2 sm:py-2 border-t sm:border-t-0 border-gray-200">
+          {/* Search Button & Filter Button */}
+          <div className={`px-2 py-2 sm:px-2 sm:py-2 border-t sm:border-t-0 border-gray-200 ${showFilters ? 'flex items-center space-x-2' : ''}`}>
             <button
               onClick={handleSearch}
-              className="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-xl sm:rounded-full transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+              className={`${showFilters ? '' : 'w-full sm:w-auto'} bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-xl sm:rounded-full transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2`}
             >
               <MagnifyingGlassIcon className="w-5 h-5" />
               <span className="sm:hidden font-semibold">Search</span>
             </button>
+            
+            {/* Airbnb-style Filter Button - Only on city pages */}
+            {showFilters && (
+              <button
+                onClick={() => {/* Filter functionality will be added */}}
+                className="bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 hover:border-gray-900 px-6 py-4 rounded-full transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center space-x-2 font-medium"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m0 0V4.5m0 1.5v1.5m0 0h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0M3.75 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m0 0v1.5m0-1.5V10.5" />
+                </svg>
+                <span className="text-sm font-medium">Filters</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

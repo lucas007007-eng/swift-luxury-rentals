@@ -102,6 +102,7 @@ export default function CityPage() {
               initialChildren={Number(searchParams.get('children') || '0')}
               initialInfants={Number(searchParams.get('infants') || '0')}
               initialPets={Number(searchParams.get('pets') || '0')}
+              showFilters={true}
             />
           </motion.div>
         </div>

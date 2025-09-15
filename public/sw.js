@@ -1,10 +1,10 @@
 // Berlin Luxe Rentals Service Worker
 // Advanced caching strategy for luxury rental platform
 
-const CACHE_NAME = 'berlin-luxe-v1.0.0';
-const STATIC_CACHE = 'berlin-luxe-static-v1';
-const DYNAMIC_CACHE = 'berlin-luxe-dynamic-v1';
-const IMAGE_CACHE = 'berlin-luxe-images-v1';
+const CACHE_NAME = 'berlin-luxe-v1.1.0';
+const STATIC_CACHE = 'berlin-luxe-static-v2';
+const DYNAMIC_CACHE = 'berlin-luxe-dynamic-v2';
+const IMAGE_CACHE = 'berlin-luxe-images-v2';
 
 // Critical assets to cache immediately
 const STATIC_ASSETS = [
@@ -240,4 +240,11 @@ async function syncContactForm() {
   console.log('[SW] Syncing contact form submissions');
 }
 
-console.log('[SW] Berlin Luxe Rentals Service Worker loaded successfully');
+console.log('[SW] Berlin Luxe Rentals Service Worker v1.1.0 loaded successfully - Filter cache cleared');
+
+// Force immediate activation to clear old cache
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
