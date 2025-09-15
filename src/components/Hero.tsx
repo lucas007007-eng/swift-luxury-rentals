@@ -19,12 +19,14 @@ const Hero: React.FC<HeroProps> = ({ onCitySelect, selectedCity = 'Berlin' }) =>
           loop 
           muted 
           playsInline
-          preload="metadata"
+          preload="none"
+          loading="lazy"
           className="w-full h-full object-cover"
           style={{
             filter: 'contrast(1.2) saturate(1.3) brightness(1.4)',
             imageRendering: 'auto'
           }}
+          poster="https://images.unsplash.com/photo-1587564979-6d4b7d0cb2b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60"
         >
           <source src="/videos/swift luxury home.mp4" type="video/mp4" />
           <source src="/videos/swift luxury home.webm" type="video/webm" />
@@ -32,7 +34,7 @@ const Hero: React.FC<HeroProps> = ({ onCitySelect, selectedCity = 'Berlin' }) =>
           <div 
             className="w-full h-full bg-cover bg-center"
             style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1587564979-6d4b7d0cb2b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')`
+              backgroundImage: `url('https://images.unsplash.com/photo-1587564979-6d4b7d0cb2b9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=60')`
             }}
           />
         </video>

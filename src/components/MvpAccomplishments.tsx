@@ -35,6 +35,7 @@ export default function MvpAccomplishments() {
         'RSC‑safe navigation (buttons → Link)',
         'Dynamic imports to reduce initial JS; hero video preload=metadata',
         'Remote image domains configured in Next image settings',
+        'Service Worker implementation with offline caching and fallback pages',
       ],
     },
   ]
