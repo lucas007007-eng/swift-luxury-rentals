@@ -10,20 +10,21 @@ export default function SimpleTimer() {
   const [isEditing, setIsEditing] = useState(false)
   const [editHours, setEditHours] = useState(0)
 
-  // Load total seconds from localStorage on mount
+  // Load total seconds from localStorage on mount - FORCE UPDATE
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('simple_timer_total_seconds')
-      if (saved) {
-        setTotalSeconds(Number(saved))
-        setEditHours(Math.floor(Number(saved) / 3600))
-      } else {
-        // Set baseline: 47h 51m 40s = 172300 seconds
-        const baseline = (47 * 3600) + (51 * 60) + 40
-        setTotalSeconds(baseline)
-        setEditHours(47)
-        localStorage.setItem('simple_timer_total_seconds', String(baseline))
-      }
+      // Force update: Clear old data and set new baseline
+      localStorage.removeItem('simple_timer_total_seconds')
+      
+      // Set new baseline: 47h 51m 40s + today's session (6 hours) = 53h 51m 40s  
+      const todaysWork = 6 * 3600 // Today's intensive work: filters, cache, troubleshooting
+      const baseline = (47 * 3600) + (51 * 60) + 40 + todaysWork
+      
+      setTotalSeconds(baseline)
+      setEditHours(Math.floor(baseline / 3600))
+      localStorage.setItem('simple_timer_total_seconds', String(baseline))
+      
+      console.log(`[TIMER] Forced update to ${Math.floor(baseline / 3600)} hours (${baseline} seconds)`)
       setSessionStart(Date.now())
     }
   }, [])

@@ -52,19 +52,27 @@ const nextConfig = {
   swcMinify: true,
   // Optimize CSS
   optimizeFonts: true,
-  // Service Worker configuration
+  // Aggressive no-cache for development - always fresh content
   async headers() {
     return [
       {
-        source: '/sw.js',
+        source: '/(.*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate',
+            value: 'no-cache, no-store, must-revalidate, max-age=0',
           },
           {
-            key: 'Service-Worker-Allowed',
-            value: '/',
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+          {
+            key: 'Expires',
+            value: '0',
+          },
+          {
+            key: 'X-Accel-Expires',
+            value: '0',
           },
         ],
       },

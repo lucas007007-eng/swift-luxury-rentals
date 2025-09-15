@@ -4,7 +4,8 @@ import { useEffect } from 'react'
 
 export default function ServiceWorkerRegistration() {
   useEffect(() => {
-    if ('serviceWorker' in navigator) {
+    // Service Worker completely disabled to prevent caching issues
+    if (false && 'serviceWorker' in navigator) {
       // Register service worker
       navigator.serviceWorker
         .register('/sw.js')
