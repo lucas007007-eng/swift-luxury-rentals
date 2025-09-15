@@ -89,6 +89,7 @@ export default function MvpAccomplishments() {
       'CRM dashboard (table + mobile cards) linking to bookings/properties',
       'Most Profitable Cities tile; sales metrics (upcoming payments, overdue)',
       'MVP Progress tracker (persisted with versioning)',
+      'Admin productivity toolkit pages (Operating Manual, Playbooks, Prompts, Repo Map, Week Plan)',
     ]},
     { title: 'Listings management (Admin)', items: [
       'Edit details: title, description, address, amenities',

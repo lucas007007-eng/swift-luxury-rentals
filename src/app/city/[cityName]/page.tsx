@@ -66,6 +66,12 @@ export default function CityPage() {
     })
 
     const roomsOk = base.filter(p => {
+      // Price range filter
+      if (filterState.priceRange) {
+        const price = overrides[p.id]?.price || p.price || 0
+        if (price < filterState.priceRange[0] || price > filterState.priceRange[1]) return false
+      }
+      
       if (filterState.bedrooms && (p.bedrooms || 0) < filterState.bedrooms) return false
       if (filterState.bathrooms && (p.bathrooms || 0) < filterState.bathrooms) return false
       return true

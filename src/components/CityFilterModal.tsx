@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
 export type CityFilterState = {
+  priceRange?: [number, number]
   bedrooms?: number
   bathrooms?: number
   amenities: string[]
@@ -17,7 +18,7 @@ export default function CityFilterModal({
 }: {
   open: boolean
   onClose: () => void
-  properties: Array<{ id: string; bedrooms?: number; bathrooms?: number; amenities?: string[] }>
+  properties: Array<{ id: string; price?: number; bedrooms?: number; bathrooms?: number; amenities?: string[] }>
   onApply: (s: CityFilterState) => void
   overrides: Record<string, any>
 }) {
@@ -59,6 +60,12 @@ export default function CityFilterModal({
     }
 
     return properties.filter(p => {
+      // Price range filter
+      if (state.priceRange) {
+        const price = overrides?.[p.id]?.price || p.price || 0
+        if (price < state.priceRange[0] || price > state.priceRange[1]) return false
+      }
+      
       if (state.bedrooms && (p.bedrooms || 0) < state.bedrooms) return false
       if (state.bathrooms && (p.bathrooms || 0) < state.bathrooms) return false
 
@@ -120,6 +127,187 @@ export default function CityFilterModal({
           </button>
         </div>
         <div className="p-6 space-y-8 overflow-y-auto flex-1">
+          {/* Price Range - Airbnb Style */}
+          <div>
+            <div className="font-semibold mb-4 text-gray-900">Price range</div>
+            <div className="text-sm text-gray-600 mb-6">Nightly prices including fees and taxes</div>
+            {(() => {
+              // Calculate price range from properties
+              const prices = properties.map(p => overrides?.[p.id]?.price || p.price || 0).filter(p => p > 0)
+              if (prices.length === 0) return null
+              
+              // Fixed luxury price range (like Airbnb)
+              const minPrice = 2000
+              const maxPrice = 30000
+              const currentMin = state.priceRange?.[0] ?? minPrice
+              const currentMax = state.priceRange?.[1] ?? maxPrice
+              
+              // Create histogram data
+              const bucketCount = 30
+              const bucketSize = (maxPrice - minPrice) / bucketCount
+              const buckets = Array(bucketCount).fill(0)
+              
+              prices.forEach(price => {
+                const bucketIndex = Math.min(Math.floor((price - minPrice) / bucketSize), bucketCount - 1)
+                buckets[bucketIndex]++
+              })
+              
+              const maxBucketValue = Math.max(...buckets)
+              
+              return (
+                <div className="space-y-6">
+                  {/* Histogram */}
+                  <div className="relative h-12 flex items-end justify-between gap-px mb-4">
+                    {buckets.map((count, i) => {
+                      const bucketMin = minPrice + (i * bucketSize)
+                      const bucketMax = minPrice + ((i + 1) * bucketSize)
+                      const isInRange = bucketMax >= currentMin && bucketMin <= currentMax
+                      const height = Math.max(2, (count / maxBucketValue) * 100)
+                      
+                      return (
+                        <div
+                          key={i}
+                          className={`flex-1 transition-colors duration-200 ${
+                            isInRange ? 'bg-gray-800' : 'bg-gray-300'
+                          }`}
+                          style={{ height: `${height}%` }}
+                        />
+                      )
+                    })}
+                  </div>
+                  
+                  {/* Range Slider - Airbnb Style */}
+                  <div className="relative py-4">
+                    {/* Background track */}
+                    <div className="absolute w-full h-0.5 bg-gray-400 top-1/2 transform -translate-y-1/2"></div>
+                    
+                    {/* Active range track */}
+                    <div 
+                      className="absolute h-0.5 bg-gray-800 top-1/2 transform -translate-y-1/2"
+                      style={{
+                        left: `${((currentMin - minPrice) / (maxPrice - minPrice)) * 100}%`,
+                        width: `${((currentMax - currentMin) / (maxPrice - minPrice)) * 100}%`
+                      }}
+                    />
+                    
+                    {/* Min thumb */}
+                    <div
+                      className="absolute w-5 h-5 bg-white border-2 border-gray-600 rounded-full cursor-grab active:cursor-grabbing shadow-md hover:shadow-lg transition-shadow z-30 select-none"
+                      style={{
+                        left: `calc(${((currentMin - minPrice) / (maxPrice - minPrice)) * 100}% - 10px)`,
+                        top: '50%',
+                        transform: 'translateY(-50%)'
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        const slider = e.currentTarget.parentElement
+                        const rect = slider!.getBoundingClientRect()
+                        let isDragging = true
+                        
+                        const handleMouseMove = (e: MouseEvent) => {
+                          if (!isDragging) return
+                          e.preventDefault()
+                          const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left))
+                          const percentage = (x / rect.width) * 100
+                          const newValue = minPrice + (percentage / 100) * (maxPrice - minPrice)
+                          const roundedValue = Math.round(newValue / 100) * 100
+                          const newMin = Math.min(Math.max(minPrice, roundedValue), currentMax - 500)
+                          setState(s => ({ ...s, priceRange: [newMin, currentMax] }))
+                        }
+                        
+                        const handleMouseUp = () => {
+                          isDragging = false
+                          document.removeEventListener('mousemove', handleMouseMove)
+                          document.removeEventListener('mouseup', handleMouseUp)
+                          document.body.style.userSelect = ''
+                        }
+                        
+                        document.body.style.userSelect = 'none'
+                        document.addEventListener('mousemove', handleMouseMove)
+                        document.addEventListener('mouseup', handleMouseUp)
+                      }}
+                    />
+                    
+                    {/* Max thumb */}
+                    <div
+                      className="absolute w-5 h-5 bg-white border-2 border-gray-600 rounded-full cursor-grab active:cursor-grabbing shadow-md hover:shadow-lg transition-shadow z-30 select-none"
+                      style={{
+                        left: `calc(${((currentMax - minPrice) / (maxPrice - minPrice)) * 100}% - 10px)`,
+                        top: '50%',
+                        transform: 'translateY(-50%)'
+                      }}
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        const slider = e.currentTarget.parentElement
+                        const rect = slider!.getBoundingClientRect()
+                        let isDragging = true
+                        
+                        const handleMouseMove = (e: MouseEvent) => {
+                          if (!isDragging) return
+                          e.preventDefault()
+                          const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left))
+                          const percentage = (x / rect.width) * 100
+                          const newValue = minPrice + (percentage / 100) * (maxPrice - minPrice)
+                          const roundedValue = Math.round(newValue / 100) * 100
+                          const newMax = Math.max(Math.min(maxPrice, roundedValue), currentMin + 500)
+                          setState(s => ({ ...s, priceRange: [currentMin, newMax] }))
+                        }
+                        
+                        const handleMouseUp = () => {
+                          isDragging = false
+                          document.removeEventListener('mousemove', handleMouseMove)
+                          document.removeEventListener('mouseup', handleMouseUp)
+                          document.body.style.userSelect = ''
+                        }
+                        
+                        document.body.style.userSelect = 'none'
+                        document.addEventListener('mousemove', handleMouseMove)
+                        document.addEventListener('mouseup', handleMouseUp)
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Min/Max Inputs */}
+                  <div className="flex items-center gap-4 mt-6">
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-gray-700 mb-2">Minimum</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">€</span>
+                        <input
+                          type="number"
+                          value={currentMin}
+                          onChange={(e) => {
+                            const newMin = Math.min(Number(e.target.value) || minPrice, currentMax - 500)
+                            setState(s => ({ ...s, priceRange: [newMin, currentMax] }))
+                          }}
+                          className="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg text-sm text-gray-900 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 focus:outline-none"
+                          placeholder="€2,000"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium text-gray-700 mb-2">Maximum</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">€</span>
+                        <input
+                          type="text"
+                          value={currentMax >= maxPrice ? `${currentMax.toLocaleString()}+` : currentMax.toLocaleString()}
+                          onChange={(e) => {
+                            const cleanValue = e.target.value.replace(/[^\d]/g, '')
+                            const newMax = Math.max(Number(cleanValue) || maxPrice, currentMin + 500)
+                            setState(s => ({ ...s, priceRange: [currentMin, newMax] }))
+                          }}
+                          className="w-full pl-8 pr-3 py-3 border border-gray-300 rounded-lg text-sm text-gray-900 focus:ring-1 focus:ring-gray-400 focus:border-gray-400 focus:outline-none"
+                          placeholder="€30,000+"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+
           {/* Rooms and beds */}
           <div>
             <div className="font-semibold mb-4 text-gray-900">Rooms and beds</div>

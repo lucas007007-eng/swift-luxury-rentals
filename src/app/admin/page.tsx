@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { cityProperties } from '@/data/cityProperties'
 import dynamic from 'next/dynamic'
 const SpyEuropeMap = dynamic(() => import('@/components/SpyEuropeMap'), { ssr: false })
@@ -107,6 +108,42 @@ export default function AdminDashboard() {
           >
             Logout
           </button>
+        </div>
+        {/* Ops Tools — quick access row */}
+        <div className="mb-6">
+          <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text mb-3">Ops Tools</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <Link href="/admin/operating-manual" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-white font-semibold">Operating Manual</span>
+                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+              </div>
+            </Link>
+            <Link href="/admin/playbooks" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-white font-semibold">Engineering Playbooks</span>
+                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+              </div>
+            </Link>
+            <Link href="/admin/prompts" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-white font-semibold">Saved Prompts</span>
+                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+              </div>
+            </Link>
+            <Link href="/admin/repo-map" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-white font-semibold">Repo Map</span>
+                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+              </div>
+            </Link>
+            <Link href="/admin/week-plan" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-white font-semibold">Week Plan</span>
+                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+              </div>
+            </Link>
+          </div>
         </div>
         {/* Accomplishments (full width for better readability) */}
         <div className="mb-6">
