@@ -1,0 +1,10 @@
+[33m15cf739[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;33mtag: [m[1;33mzero-cache-development[m[33m)[m Resolve caching bottleneck - implement zero-cache development mode
+[33m46bce9c[m[33m ([m[1;33mtag: [m[1;33mstable-working-state[m[33m)[m System restoration complete - all issues resolved
+[33m9ac3f71[m[33m ([m[1;33mtag: [m[1;33mno-cache-system[m[33m)[m Implement aggressive no-cache system to prevent stale content
+[33m0e840c5[m[33m ([m[1;33mtag: [m[1;33mclean-state-no-filters[m[33m)[m Complete property filter system removal - clean state restored
+[33m019518a[m[33m ([m[1;33mtag: [m[1;33mfilter-button-implementation[m[33m)[m Add Airbnb-style filter button beside search button
+[33m8d359de[m[33m ([m[1;33mtag: [m[1;33mservice-worker-implementation[m[33m)[m Implement Service Worker with offline caching and fallback pages
+[33mcc5ab6a[m[33m ([m[1;33mtag: [m[1;33mrestore-point-batch-fixes[m[33m)[m Fix PowerShell SessionVariable errors in batch files and validate fresh installation flow
+[33m8673c4b[m[33m ([m[1;33mtag: [m[1;33mrestore-2025-09-14-2153[m[33m)[m chore: final session backup - data model hardening and payment fixes complete
+[33m8104374[m[33m ([m[1;33mtag: [m[1;33mrestore-2025-09-14-2131[m[33m)[m chore(backup): site-20250914-213112 data model hardening + payment corruption fixes + safer recompute
+[33m9d8b91d[m[33m ([m[1;33mtag: [m[1;33mrestore-2025-09-14-2105[m[33m)[m chore(backup): site-20250914-210515 timer optimization + booking lifecycle polish + responsive table

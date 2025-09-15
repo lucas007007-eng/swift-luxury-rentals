@@ -47,7 +47,7 @@ export default function AdminCityPage() {
   return (
     <main className="min-h-screen bg-black text-white">
       <div className="max-w-[1400px] mx-auto px-6 py-10">
-        <button onClick={()=>router.push('/admin')} className="text-amber-400 mb-6">← Back</button>
+        <a href="/admin" className="text-amber-400 mb-6 inline-block">← Back</a>
         <h1 className="text-3xl font-bold mb-6">{city} Listings</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {listings.map(listing => (
@@ -69,7 +69,12 @@ export default function AdminCityPage() {
                     )
                   })()}
                 </div>
-                <button onClick={()=>router.push(`/admin/property/${listing.id}`)} className="mt-2 text-sm bg-amber-500 hover:bg-amber-600 text-black font-semibold px-3 py-1.5 rounded">Edit</button>
+                <a 
+                  href={`/admin/property/${listing.id}`}
+                  className="mt-2 inline-block text-sm bg-amber-500 hover:bg-amber-600 text-black font-semibold px-3 py-1.5 rounded"
+                >
+                  Edit
+                </a>
               </div>
             </div>
           ))}

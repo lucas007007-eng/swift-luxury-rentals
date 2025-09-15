@@ -14,6 +14,15 @@ function getPropertyById(id: string) {
   return { city: '', property: null as any }
 }
 
+// Fixed master amenities catalog used for quick-add suggestions
+// This remains stable even if a listing temporarily removes some amenities
+const DEFAULT_MASTER_AMENITIES = [
+  'WiFi', 'Air conditioning', 'TV', 'Hair Dryer', 'Dryer', 'Heating',
+  'Kitchen', 'Washer', 'Dedicated workspace', 'Iron', 'Pool', 'Hot tub',
+  'Free parking', 'EV charger', 'Crib', 'King Bed', 'Gym', 'BBQ grill',
+  'Breakfast', 'Fireplace', 'smoking allowed', 'smoke alarm', 'Carbon monoxide alarm'
+]
+
 export default function AdminPropertyPage() {
   const router = useRouter()
   const params = useParams()
@@ -27,6 +36,7 @@ export default function AdminPropertyPage() {
 
   const [calendar, setCalendar] = useState<Record<string, {priceNight?: number; priceMonth?: number; available?: boolean}>>({})
   const [amenities, setAmenities] = useState<string[]>(property?.amenities || [])
+  const [templateAmenities, setTemplateAmenities] = useState<string[]>([])
   const [houseRules, setHouseRules] = useState<string[]>([])
   const [houseRulesStructured, setHouseRulesStructured] = useState<{
     checkIn?: string;
@@ -46,6 +56,18 @@ export default function AdminPropertyPage() {
       if (Array.isArray(o.amenities)) setAmenities(o.amenities)
       if (Array.isArray(o.houseRules)) setHouseRules(o.houseRules)
       if (o.houseRulesStructured) setHouseRulesStructured(o.houseRulesStructured)
+
+      // Load master/template amenities from berlin-real-1 (including overrides if present)
+      try {
+        const templateId = 'berlin-real-1'
+        const tpl = getPropertyById(templateId).property
+        const base = Array.isArray(tpl?.amenities) ? tpl!.amenities : []
+        const override = Array.isArray(data?.[templateId]?.amenities) ? data![templateId]!.amenities : []
+        const fromListing = (override && override.length > 0) ? override : base
+        // Combine with default master to ensure core buttons like Pool/Hot tub always exist
+        const finalList = Array.from(new Set([ ...DEFAULT_MASTER_AMENITIES, ...fromListing ]))
+        setTemplateAmenities(finalList)
+      } catch {}
     })()
   }, [id])
 
@@ -132,6 +154,39 @@ export default function AdminPropertyPage() {
               ))}
             </div>
             <AmenityInput onAdd={(val)=>setAmenities(prev=>[...prev, val])} placeholder="Add amenity (e.g., Air conditioning)" />
+            {templateAmenities.length > 0 && (
+              <div className="mt-4">
+                <div className="text-sm text-white/60 mb-3">Quick add available amenities:</div>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const selectedSet = new Set(amenities.map(a => a.trim().toLowerCase()))
+                    const master = Array.from(new Set(templateAmenities.map(a => a.trim()).filter(Boolean)))
+                    const availableAmenities = master.filter(a => !selectedSet.has(a.toLowerCase()))
+                    return availableAmenities.map((amenity) => (
+                      <button
+                        key={amenity}
+                        onClick={() => {
+                          setAmenities(prev => [...prev, amenity])
+                        }}
+                        className="bg-amber-500/20 hover:bg-amber-500/40 border border-amber-400/30 hover:border-amber-400/60 text-amber-300 hover:text-amber-200 px-3 py-1 rounded-full text-sm transition-colors"
+                      >
+                        + {amenity}
+                      </button>
+                    ))
+                  })()}
+                </div>
+                {(() => {
+                  const selectedSet = new Set(amenities.map(a => a.trim().toLowerCase()))
+                  const master = Array.from(new Set(templateAmenities.map(a => a.trim()).filter(Boolean)))
+                  const availableCount = master.filter(a => !selectedSet.has(a.toLowerCase())).length
+                  return availableCount === 0 ? (
+                    <div className="text-xs text-emerald-400 mt-2">✅ All standard amenities applied</div>
+                  ) : (
+                    <div className="text-xs text-white/40 mt-2">{availableCount} amenities available to add</div>
+                  )
+                })()}
+              </div>
+            )}
           </div>
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
             <h2 className="text-xl font-semibold mb-3">House Rules (Public Sections)</h2>
