@@ -20,7 +20,6 @@ const Hero: React.FC<HeroProps> = ({ onCitySelect, selectedCity = 'Berlin' }) =>
           muted 
           playsInline
           preload="none"
-          loading="lazy"
           className="w-full h-full object-cover"
           style={{
             filter: 'contrast(1.2) saturate(1.3) brightness(1.4)',

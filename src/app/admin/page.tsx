@@ -113,34 +113,79 @@ export default function AdminDashboard() {
         <div className="mb-6">
           <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text mb-3">Ops Tools</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            <Link href="/admin/operating-manual" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
-              <div className="flex items-center justify-between">
-                <span className="text-white font-semibold">Operating Manual</span>
-                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+            <Link href="/admin/operating-manual" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
+              {/* Animated background grid */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
+              </div>
+              {/* Glowing corner accents */}
+              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
+              <div className="relative flex items-center justify-between">
+                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Operating Manual</span>
+                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
               </div>
             </Link>
-            <Link href="/admin/playbooks" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
-              <div className="flex items-center justify-between">
-                <span className="text-white font-semibold">Engineering Playbooks</span>
-                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+            <Link href="/admin/playbooks" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
+              {/* Animated background grid */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
+              </div>
+              {/* Glowing corner accents */}
+              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
+              <div className="relative flex items-center justify-between">
+                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Engineering Playbooks</span>
+                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
               </div>
             </Link>
-            <Link href="/admin/prompts" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
-              <div className="flex items-center justify-between">
-                <span className="text-white font-semibold">Saved Prompts</span>
-                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+            <Link href="/admin/prompts" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
+              {/* Animated background grid */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
+              </div>
+              {/* Glowing corner accents */}
+              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
+              <div className="relative flex items-center justify-between">
+                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Saved Prompts</span>
+                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
               </div>
             </Link>
-            <Link href="/admin/repo-map" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
-              <div className="flex items-center justify-between">
-                <span className="text-white font-semibold">Repo Map</span>
-                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+            <Link href="/admin/repo-map" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
+              {/* Animated background grid */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
+              </div>
+              {/* Glowing corner accents */}
+              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
+              <div className="relative flex items-center justify-between">
+                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Repo Map</span>
+                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
               </div>
             </Link>
-            <Link href="/admin/week-plan" className="group rounded-xl p-4 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] hover:from-[#0f281f] hover:to-[#0a1a14] transition-colors">
-              <div className="flex items-center justify-between">
-                <span className="text-white font-semibold">Week Plan</span>
-                <span className="text-emerald-300 group-hover:text-emerald-200">→</span>
+            <Link href="/admin/week-plan" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
+              {/* Animated background grid */}
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
+              </div>
+              {/* Glowing corner accents */}
+              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
+              <div className="relative flex items-center justify-between">
+                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Week Plan</span>
+                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
               </div>
             </Link>
           </div>
@@ -415,6 +460,14 @@ function MVPProgress() {
 
         {!expanded ? (
           <div className="space-y-4">
+            {/* Status indicator to match timer */}
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-xs text-amber-200/80 font-mono">
+                PROGRESS TRACKING
+              </span>
+            </div>
+
             {/* Progress Overview */}
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center">
@@ -452,7 +505,7 @@ function MVPProgress() {
               </div>
             </div>
             
-            <div className="mt-2 text-center text-xs text-amber-200/60">
+            <div className="mt-2 text-center text-xs text-amber-200/60" style={{ marginBottom: '-6px' }}>
               {pct}% complete • {total - completed} tasks remaining • Click to expand details
             </div>
           </div>

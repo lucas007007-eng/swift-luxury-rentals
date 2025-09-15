@@ -30,7 +30,7 @@ export default function EngineeringPlaybooksPage() {
               <li>One concern per edit; PRs under 300 changed lines.</li>
               <li>Introduce tests before reshaping code.</li>
               <li>Prefer extraction over in‑place rewrites.</li>
-              <li>Revert quickly if green fails for > 5 minutes.</li>
+              <li>Revert quickly if green fails for &gt; 5 minutes.</li>
             </ul>
           </section>
 

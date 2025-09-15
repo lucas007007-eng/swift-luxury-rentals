@@ -49,7 +49,7 @@ export default function ServiceWorkerRegistration() {
         // Optionally sync pending data
         if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
           navigator.serviceWorker.ready.then((registration) => {
-            return registration.sync.register('background-sync')
+            return (registration as any).sync?.register('background-sync')
           })
         }
       })
