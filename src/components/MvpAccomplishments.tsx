@@ -15,6 +15,15 @@ export default function MvpAccomplishments() {
       ],
     },
     {
+      title: 'City filters',
+      items: [
+        'Airbnb-style filter modal on city pages (beds, baths, amenities)',
+        'Categorized amenity chips (Popular, Essentials, Features, Safety)',
+        'Filter button aligned with search bar; fully mobile-friendly modal',
+        'Dynamic results count in footer (real-time updates before apply)'
+      ],
+    },
+    {
       title: 'Search & calendars',
       items: [
         'Search interface (destination, service, date range), responsive layout',
@@ -45,6 +54,12 @@ export default function MvpAccomplishments() {
       'Spy‑theme styling across admin surfaces',
       'Mobile‑first cards/grids; consistent spacing & typography on metrics/payment sections',
       'Map interaction polish (smoother hover/zoom, debounced, cleanup)',
+    ]},
+    { title: 'Filters & amenities', items: [
+      'Master amenities derived from berlin-real-1 (overrides + base)',
+      'Case-insensitive amenity matching with synonyms for reliable filtering',
+      'Public property page: expanded amenity categorization and rendering',
+      'Search footer shows accurate live results count',
     ]},
     { title: 'Admin auth & routing', items: [
       'Admin login API sets admin_auth; middleware guard on /admin',
@@ -108,6 +123,20 @@ export default function MvpAccomplishments() {
     ]},
   ]
 
+  // Compute balanced split for Admin sections
+  const frontendWeight = frontend.reduce((sum, sec) => sum + 1 + sec.items.length, 0)
+  const adminWeights = admin.map(sec => 1 + sec.items.length)
+  const totalAdminWeight = adminWeights.reduce((a,b)=>a+b,0)
+  let leftWeight = frontendWeight
+  let rightWeight = totalAdminWeight
+  const adminLeft: typeof admin = []
+  const adminRight: typeof admin = []
+  for (let i = 0; i < admin.length; i++) {
+    const w = adminWeights[i]
+    if (leftWeight < rightWeight) { adminLeft.push(admin[i]); leftWeight += w; rightWeight -= w } else { adminRight.push(admin[i]) }
+  }
+  if (adminRight.length === 0) { const moved = adminLeft.pop(); if (moved) adminRight.push(moved) }
+
   return (
     <div className="rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
       <button
@@ -130,30 +159,52 @@ export default function MvpAccomplishments() {
       </button>
       {open && (
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Frontend */}
-          <div className="rounded-xl p-4 border border-emerald-400/20 bg-gradient-to-br from-[#0b1a12] to-[#08120d]">
-            <div className="font-mono uppercase tracking-wider text-base text-emerald-400 mb-3 font-bold">Frontend (Public)</div>
-            <div className="space-y-3">
-              {frontend.map((sec) => (
-                <div key={sec.title}>
-                  <div className="text-emerald-300 font-semibold text-sm mb-2">{sec.title}</div>
-                  <div className="grid grid-cols-1 gap-1">
-                    {sec.items.map((it, i) => (
-                      <label key={i} className="flex items-center gap-2 text-sm text-white/80">
-                        <input type="checkbox" checked={true} readOnly className="accent-emerald-500" />
-                        <span>{it}</span>
-                      </label>
-                    ))}
+          {/* Left column: Frontend + part of Admin */}
+          <div className="space-y-4">
+            <div className="rounded-xl p-4 border border-emerald-400/20 bg-gradient-to-br from-[#0b1a12] to-[#08120d]">
+              <div className="font-mono uppercase tracking-wider text-base text-emerald-400 mb-3 font-bold">Frontend (Public)</div>
+              <div className="space-y-3">
+                {frontend.map((sec) => (
+                  <div key={sec.title}>
+                    <div className="text-emerald-300 font-semibold text-sm mb-2">{sec.title}</div>
+                    <div className="grid grid-cols-1 gap-1">
+                      {sec.items.map((it, i) => (
+                        <label key={i} className="flex items-center gap-2 text-sm text-white/80">
+                          <input type="checkbox" checked={true} readOnly className="accent-emerald-500" />
+                          <span>{it}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+            {adminLeft.length > 0 && (
+              <div className="rounded-xl p-4 border border-emerald-400/20 bg-gradient-to-br from-[#0b1a12] to-[#08120d]">
+                <div className="font-mono uppercase tracking-wider text-base text-emerald-400 mb-3 font-bold">Admin / Backend</div>
+                <div className="space-y-3">
+                  {adminLeft.map((sec) => (
+                    <div key={sec.title}>
+                      <div className="text-emerald-300 font-semibold text-sm mb-2">{sec.title}</div>
+                      <div className="grid grid-cols-1 gap-1">
+                        {sec.items.map((it, i) => (
+                          <label key={i} className="flex items-center gap-2 text-sm text-white/80">
+                            <input type="checkbox" checked={true} readOnly className="accent-emerald-500" />
+                            <span>{it}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-          {/* Admin/Backend */}
+          {/* Right column: remaining Admin */}
           <div className="rounded-xl p-4 border border-emerald-400/20 bg-gradient-to-br from-[#0b1a12] to-[#08120d]">
             <div className="font-mono uppercase tracking-wider text-base text-emerald-400 mb-3 font-bold">Admin / Backend</div>
             <div className="space-y-3">
-              {admin.map((sec) => (
+              {(adminRight.length ? adminRight : admin).map((sec) => (
                 <div key={sec.title}>
                   <div className="text-emerald-300 font-semibold text-sm mb-2">{sec.title}</div>
                   <div className="grid grid-cols-1 gap-1">
