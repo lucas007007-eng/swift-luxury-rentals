@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 export default function SimpleTimer() {
   const [totalSeconds, setTotalSeconds] = useState(0)
@@ -9,86 +9,90 @@ export default function SimpleTimer() {
   const [isActive, setIsActive] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [editHours, setEditHours] = useState(0)
+  const totalSecondsRef = useRef(0)
 
-  // Load total seconds from localStorage on mount - FORCE UPDATE
+  // Load total seconds from localStorage on mount - PRESERVE EXISTING TIME
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Force update: Clear old data and set new baseline
-      localStorage.removeItem('simple_timer_total_seconds')
+      const saved = localStorage.getItem('simple_timer_total_seconds')
       
-      // Set new baseline: 47h 51m 40s + today's session (6 hours) = 53h 51m 40s  
-      const todaysWork = 6 * 3600 // Today's intensive work: filters, cache, troubleshooting
-      const baseline = (47 * 3600) + (51 * 60) + 40 + todaysWork
+      if (saved && saved !== '0') {
+        // Load existing time - NEVER override if time exists
+        const savedSeconds = parseInt(saved, 10)
+        if (savedSeconds > 0) {
+          setTotalSeconds(savedSeconds)
+          totalSecondsRef.current = savedSeconds
+          setEditHours(Math.floor(savedSeconds / 3600))
+          console.log(`[TIMER] Loaded existing time: ${savedSeconds} seconds (${Math.floor(savedSeconds / 3600)}h ${Math.floor((savedSeconds % 3600) / 60)}m ${savedSeconds % 60}s)`)
+          setSessionStart(Date.now())
+          return
+        }
+      }
+      
+      // Only set baseline if NO valid time exists
+      const todaysWork = 8 * 3600 // Today's work
+      const baseline = (61 * 3600) + (0 * 60) + 0 // Set to 61 hours as you mentioned
       
       setTotalSeconds(baseline)
+      totalSecondsRef.current = baseline
       setEditHours(Math.floor(baseline / 3600))
       localStorage.setItem('simple_timer_total_seconds', String(baseline))
       
-      console.log(`[TIMER] Forced update to ${Math.floor(baseline / 3600)} hours (${baseline} seconds)`)
+      console.log(`[TIMER] First time setup: ${Math.floor(baseline / 3600)} hours total`)
       setSessionStart(Date.now())
     }
   }, [])
 
-  // Track user activity
+  // Continuous timer while admin page is open
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    const handleActivity = () => {
-      setLastActivity(Date.now())
-      setIsActive(true)
-    }
+    // Set active immediately when component mounts
+    setIsActive(true)
+    setLastActivity(Date.now())
 
-    const events = ['mousedown', 'keydown', 'scroll', 'click']
-    events.forEach(event => {
-      window.addEventListener(event, handleActivity, { passive: true })
-    })
+    const interval = setInterval(() => {
+      // Always add 1 second while admin page is open
+      setTotalSeconds(prev => {
+        const newTotal = prev + 1
+        // Update ref immediately for accurate saves
+        totalSecondsRef.current = newTotal
+        return newTotal
+      })
+    }, 1000)
 
     return () => {
-      events.forEach(event => {
-        window.removeEventListener(event, handleActivity)
-      })
+      // Save immediately when component unmounts (page closes)
+      if (typeof window !== 'undefined') {
+        const currentSeconds = totalSecondsRef.current
+        localStorage.setItem('simple_timer_total_seconds', String(currentSeconds))
+        console.log(`[TIMER] Saved on unmount: ${currentSeconds} seconds (${Math.floor(currentSeconds / 3600)}h ${Math.floor((currentSeconds % 3600) / 60)}m ${currentSeconds % 60}s)`)
+      }
+      clearInterval(interval)
     }
   }, [])
 
-  // Timer logic
+  // Save only on page close/refresh
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now()
-      const timeSinceActivity = (now - lastActivity) / 1000
-
-      // Stop if idle for 1+ minute
-      if (timeSinceActivity > 60) {
-        setIsActive(false)
-        return
-      }
-
-      // Add 1 second if active
-      if (isActive) {
-        setTotalSeconds(prev => {
-          const newTotal = prev + 1
-          // Save to localStorage every 10 seconds
-          if (newTotal % 10 === 0) {
-            localStorage.setItem('simple_timer_total_seconds', String(newTotal))
-          }
-          return newTotal
-        })
-      }
-    }, 1000)
-
-    return () => clearInterval(interval)
-  }, [lastActivity, isActive])
-
-  // Save exact time on page unload
-  useEffect(() => {
-    const saveOnUnload = () => {
+    const saveCurrentTime = () => {
       if (typeof window !== 'undefined') {
-        localStorage.setItem('simple_timer_total_seconds', String(totalSeconds))
+        const currentSeconds = totalSecondsRef.current
+        localStorage.setItem('simple_timer_total_seconds', String(currentSeconds))
+        console.log(`[TIMER] Saved on page close/refresh: ${currentSeconds} seconds (${Math.floor(currentSeconds / 3600)}h ${Math.floor((currentSeconds % 3600) / 60)}m ${currentSeconds % 60}s)`)
       }
     }
 
-    window.addEventListener('beforeunload', saveOnUnload)
-    return () => window.removeEventListener('beforeunload', saveOnUnload)
-  }, [totalSeconds])
+    // Only save on page close/refresh events
+    window.addEventListener('beforeunload', saveCurrentTime)
+    window.addEventListener('pagehide', saveCurrentTime)
+    
+    return () => {
+      // Final save when cleaning up
+      saveCurrentTime()
+      window.removeEventListener('beforeunload', saveCurrentTime)
+      window.removeEventListener('pagehide', saveCurrentTime)
+    }
+  }, [])
 
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600)
@@ -153,9 +157,9 @@ export default function SimpleTimer() {
           <div className="space-y-4">
             {/* Status indicator */}
             <div className="flex items-center justify-center gap-2 mb-3">
-              <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-400 animate-pulse' : 'bg-gray-500'}`} />
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-xs text-amber-200/80 font-mono">
-                {isActive ? 'TRACKING ACTIVE' : 'IDLE (1min timeout)'}
+                ADMIN SESSION ACTIVE
               </span>
             </div>
 
