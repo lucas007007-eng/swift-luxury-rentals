@@ -18,8 +18,19 @@ export async function POST(req: Request) {
     }
     if (!ids || ids.length === 0) return NextResponse.json({ message: 'No paymentIds provided' }, { status: 400 })
 
-    const now = new Date()
-    await prisma.payment.updateMany({ where: { id: { in: ids } }, data: { status: 'received', receivedAt: now } })
+    // Get the payments to preserve their original due dates as receivedAt
+    const payments = await prisma.payment.findMany({ where: { id: { in: ids } }, select: { id: true, dueAt: true } })
+    
+    // Update each payment individually to use its dueAt as receivedAt
+    for (const payment of payments) {
+      await prisma.payment.update({ 
+        where: { id: payment.id }, 
+        data: { 
+          status: 'received', 
+          receivedAt: payment.dueAt || new Date() 
+        } 
+      })
+    }
 
     // If submitted via form, redirect back to bookings page
     if (!contentType || contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {

@@ -29,8 +29,14 @@ export async function POST(req: Request) {
     })
     if (!next) return NextResponse.json({ message: 'No scheduled payment' }, { status: 404 })
 
-    const now = new Date()
-    await prisma.payment.update({ where: { id: next.id }, data: { status: 'received', receivedAt: now } })
+    // Use the payment's original due date as the receivedAt date
+    await prisma.payment.update({ 
+      where: { id: next.id }, 
+      data: { 
+        status: 'received', 
+        receivedAt: next.dueAt || new Date() 
+      } 
+    })
     // If form-submitted from the bookings page, redirect back for a fresh view
     if (!contentType || contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
       // We don't have the full URL here, but if called from the browser this will work
