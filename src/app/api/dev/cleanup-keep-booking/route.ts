@@ -3,6 +3,9 @@ import prisma from '@/lib/prisma'
 
 // Danger: deletes all bookings except the one specified by bookingId
 export async function GET(req: NextRequest) {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ ok: false, message: 'Not available in production' }, { status: 403 })
+  }
   try {
     const { searchParams } = new URL(req.url)
     const bookingId = String(searchParams.get('bookingId') || '')

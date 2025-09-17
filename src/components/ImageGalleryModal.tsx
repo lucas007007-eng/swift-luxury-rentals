@@ -45,18 +45,17 @@ const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
   }
 
-  const handleKeyDown = (e: KeyboardEvent) => {
+  const handleKeyDown = React.useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') onClose()
     if (e.key === 'ArrowLeft') handlePrevious()
     if (e.key === 'ArrowRight') handleNext()
-  }
+  }, [onClose])
 
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown)
-      return () => document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isOpen])
+    if (!isOpen) return
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, handleKeyDown])
 
   if (!isOpen) return null
 

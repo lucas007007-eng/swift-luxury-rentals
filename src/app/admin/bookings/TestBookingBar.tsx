@@ -47,7 +47,7 @@ export default function TestBookingBar(_: Props) {
     const useDay = Math.min(day, lastDay)
     return new Date(targetYear, monthNormalized, useDay)
   }
-  const recomputePreview = () => {
+  const recomputePreview = React.useCallback(() => {
     try {
       if (!propertyId || !checkIn || !checkOut) { setPreview(null); return }
       const monthly = monthlyPrice
@@ -117,9 +117,9 @@ export default function TestBookingBar(_: Props) {
       }
       setPreview({ firstPeriod, firstNights: firstNights, moveInFee, deposit, totalNow, schedule })
     } catch { setPreview(null) }
-  }
+  }, [propertyId, checkIn, checkOut, monthlyPrice])
 
-  React.useEffect(() => { recomputePreview() }, [propertyId, checkIn, checkOut, monthlyPrice])
+  React.useEffect(() => { recomputePreview() }, [recomputePreview])
 
   return (
     <div className="relative mx-auto max-w-[720px] rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-[#07140F] to-[#0b1a12] shadow-[0_0_28px_rgba(16,185,129,0.28)] p-4 mb-6 overflow-hidden">

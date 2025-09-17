@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/authOptions'
 import prisma from '@/lib/prisma'
 
 export async function GET() {
-  const session = await getServerSession(authOptions as any)
+  const session: any = await getServerSession(authOptions as any)
   if (!session?.user?.email) return NextResponse.json({ trips: [] }, { status: 401 })
   try {
     const bookings = await prisma.booking.findMany({

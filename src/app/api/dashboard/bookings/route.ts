@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma'
 import { cityProperties } from '@/data/cityProperties'
 
 export async function GET() {
-  const session = await getServerSession(authOptions as any)
+  const session: any = await getServerSession(authOptions as any)
   const email = session?.user?.email || ''
   if (!email) return NextResponse.json({ bookings: [] }, { status: 401 })
   try {

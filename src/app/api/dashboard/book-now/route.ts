@@ -11,8 +11,13 @@ function parseDate(s?: string | null) {
 }
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions as any)
-  if (!session?.user?.email) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ message: 'Not available in production' }, { status: 403 })
+  }
+  const session: any = await getServerSession(authOptions as any)
+  if (!session || !session.user || !session.user.email) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const { searchParams } = new URL(req.url)
     const extId = String(searchParams.get('extId') || '')

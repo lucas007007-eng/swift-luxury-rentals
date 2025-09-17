@@ -22,8 +22,8 @@ export default function PublicCalendar({ availability = {}, monthlyPrice, onChan
   const [range, setRange] = useState<{start: string | null, end: string | null}>({ start: null, end: null })
   const [lastKey, setLastKey] = useState<string | null>(null)
 
-  const today = new Date()
-  const currentMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1)
+  const today = React.useMemo(() => new Date(), [])
+  const currentMonth = React.useMemo(() => new Date(today.getFullYear(), today.getMonth() + monthOffset, 1), [today, monthOffset])
 
   const days = useMemo(() => {
     const res: Date[] = []

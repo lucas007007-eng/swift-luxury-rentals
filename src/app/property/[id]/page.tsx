@@ -78,23 +78,7 @@ export default function PropertyPage() {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isModalOpen, currentImageIndex, property])
 
-  if (!property) {
-    return (
-      <main className="min-h-screen bg-black flex items-center justify-center">
-        <Header forceBackground={true} />
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">Property Not Found</h1>
-          <p className="text-gray-400 mb-8">The property you're looking for doesn't exist.</p>
-          <button 
-            onClick={() => window.history.back()}
-            className="bg-amber-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-amber-600 transition-colors"
-          >
-            Go Back
-          </button>
-        </div>
-      </main>
-    )
-  }
+  // Note: Do NOT early-return before hooks. We'll handle Not Found just before render.
 
   // Merge overrides (title/description/price/amenities/house rules)
   if (property) {
@@ -115,8 +99,9 @@ export default function PropertyPage() {
   // Map feature removed per request
 
   const nightlyFallback = useMemo(() => {
-    return Math.round((property.price / 30) * 100) / 100
-  }, [property.price])
+    const monthly = Number(property?.price || 0)
+    return Math.round((monthly / 30) * 100) / 100
+  }, [property?.price])
 
   function dateKeysBetween(start: string, end: string): string[] {
     const res: string[] = []
@@ -160,14 +145,14 @@ export default function PropertyPage() {
       const s = new Date(selectedStart)
       const e = new Date(selectedEnd)
       const totalDays = Math.max(0, Math.round((e.getTime() - s.getTime())/86400000))
-      const monthly = Number(property.price || 0)
+      const monthly = Number(property?.price || 0)
       const threeMonthsFromStart = addMonthsKeepDay(s, 3)
       const longerOrEqualThree = e > threeMonthsFromStart || e.getTime() === threeMonthsFromStart.getTime()
       if (totalDays < 15) return 500
       if (totalDays < 30) return 750
       return Math.round(monthly * (longerOrEqualThree ? 1 : 0.5))
     } catch { return 0 }
-  }, [selectedStart, selectedEnd, property.price])
+  }, [selectedStart, selectedEnd, property?.price])
 
   // bring back new duration selector (expecting a fresh .riv)
 
@@ -206,6 +191,25 @@ export default function PropertyPage() {
     return groups
   }, [property?.amenities])
 
+  // Safe early return after hooks: render Not Found page and stop
+  if (!property) {
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center">
+        <Header forceBackground={true} />
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">Property Not Found</h1>
+          <p className="text-gray-400 mb-8">The property you're looking for doesn't exist.</p>
+          <button 
+            onClick={() => window.history.back()}
+            className="bg-amber-500 text-black px-6 py-3 rounded-xl font-bold hover:bg-amber-600 transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-screen bg-black">
       <Header forceBackground={true} />
@@ -216,7 +220,7 @@ export default function PropertyPage() {
           {/* Mobile: Swipe slider */}
           <div className="md:hidden -mx-4">
             <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth space-x-4 px-4 touch-pan-x select-none">
-              {property.images.map((src, index) => (
+              {property?.images?.map((src, index) => (
                 <div
                   key={index}
                   className="snap-start shrink-0 w-full min-w-full h-[60vh] rounded-2xl overflow-hidden bg-gray-800 cursor-pointer"
@@ -254,7 +258,7 @@ export default function PropertyPage() {
               }}
             >
               <img
-                src={getProxiedImageUrl(property.images[0])}
+                src={getProxiedImageUrl(property?.images?.[0] || '')}
                 alt={`${property.title} - Image 1`}
                 className="w-full h-full object-cover bg-gray-800 transition-transform duration-500 group-hover:scale-105"
                 referrerPolicy="no-referrer"
@@ -280,7 +284,7 @@ export default function PropertyPage() {
                 }}
               >
                 <img
-                  src={getProxiedImageUrl(property.images[index] || property.images[0])}
+                  src={getProxiedImageUrl(property?.images?.[index] || property?.images?.[0] || '')}
                   alt={`${property.title} - Image ${index + 1}`}
                   className="w-full h-full object-cover bg-gray-800 transition-transform duration-500 group-hover:scale-105"
                   referrerPolicy="no-referrer"
@@ -307,7 +311,7 @@ export default function PropertyPage() {
                 }}
               >
                 <img
-                  src={getProxiedImageUrl(property.images[index] || property.images[0])}
+                  src={getProxiedImageUrl(property?.images?.[index] || property?.images?.[0] || '')}
                   alt={`${property.title} - Image ${index + 1}`}
                   className="w-full h-full object-cover bg-gray-800 transition-transform duration-500 group-hover:scale-105"
                   referrerPolicy="no-referrer"
@@ -334,7 +338,7 @@ export default function PropertyPage() {
                 }}
               >
                 <img
-                  src={getProxiedImageUrl(property.images[index] || property.images[0])}
+                  src={getProxiedImageUrl(property?.images?.[index] || property?.images?.[0] || '')}
                   alt={`${property.title} - Image ${index + 1}`}
                   className="w-full h-full object-cover bg-gray-800 transition-transform duration-500 group-hover:scale-105"
                   referrerPolicy="no-referrer"
@@ -356,7 +360,7 @@ export default function PropertyPage() {
               onClick={() => setCurrentImageIndex(8)}
             >
               <img
-                src={getProxiedImageUrl(property.images[8] || property.images[0])}
+                src={getProxiedImageUrl(property?.images?.[8] || property?.images?.[0] || '')}
                 alt={`${property.title} - Image 9`}
                 className="w-full h-full object-cover bg-gray-800 transition-transform duration-500 group-hover:scale-105"
                 referrerPolicy="no-referrer"
@@ -379,7 +383,7 @@ export default function PropertyPage() {
           </svg>
                   </div>
                   <div className="text-white font-bold text-sm">See All Photos</div>
-                  <div className="text-white/80 text-xs">+{property.images.length - 8} more</div>
+                  <div className="text-white/80 text-xs">+{(property?.images?.length || 0) - 8} more</div>
                 </div>
               </div>
             </div>
@@ -901,7 +905,7 @@ export default function PropertyPage() {
 
           {/* Image Counter */}
           <div className="absolute top-6 left-6 z-60 bg-black/50 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm">
-            {currentImageIndex + 1} / {property.images.length}
+            {currentImageIndex + 1} / {(property?.images?.length || 0)}
           </div>
 
           {/* Main Image */}
@@ -910,15 +914,15 @@ export default function PropertyPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={getProxiedImageUrl(property.images[currentImageIndex])}
+              src={getProxiedImageUrl(property?.images?.[currentImageIndex] || '')}
               alt={`${property.title} - Image ${currentImageIndex + 1}`}
               className="max-w-[90%] max-h-[90%] object-contain rounded-2xl"
               style={{ outline: 'none', border: 'none' }}
               referrerPolicy="no-referrer"
               crossOrigin="anonymous"
               onError={(e) => {
-                const fallback = property.images[0]
-                if (e.currentTarget.src !== fallback) {
+                const fallback = property?.images?.[0] || ''
+                if (fallback && e.currentTarget.src !== fallback) {
                   e.currentTarget.src = getProxiedImageUrl(fallback)
                 }
               }}
@@ -961,7 +965,7 @@ export default function PropertyPage() {
           <div className="absolute bottom-6 left-6 bg-black/70 backdrop-blur-sm text-white p-4 rounded-xl max-w-md">
             <h3 className="font-bold text-lg mb-2">{property.title}</h3>
             <p className="text-gray-300 text-sm">{property.location}</p>
-            <p className="text-amber-400 text-sm mt-2">€{property.price.toLocaleString('de-DE')}/month</p>
+            <p className="text-amber-400 text-sm mt-2">€{(property?.price || 0).toLocaleString('de-DE')}/month</p>
           </div>
         </div>
       )}

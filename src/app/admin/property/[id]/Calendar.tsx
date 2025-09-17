@@ -13,8 +13,8 @@ export default function CalendarEditor({ value = {}, onChange }: CalendarProps) 
   const [priceMonth, setPriceMonth] = useState<number | ''>('')
   const [available, setAvailable] = useState(true)
 
-  const now = new Date()
-  const currentMonth = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1)
+  const now = React.useMemo(() => new Date(), [])
+  const currentMonth = React.useMemo(() => new Date(now.getFullYear(), now.getMonth() + monthOffset, 1), [now, monthOffset])
 
   const days = useMemo(() => {
     const res: Date[] = []
@@ -47,7 +47,7 @@ export default function CalendarEditor({ value = {}, onChange }: CalendarProps) 
       next[key] = { ...prev, priceNight: nightlyFromMonthly }
     }
     onChange(next)
-  }, [priceMonth, currentMonth])
+  }, [priceMonth, currentMonth, onChange, value, days])
 
   return (
     <div className="space-y-3">
