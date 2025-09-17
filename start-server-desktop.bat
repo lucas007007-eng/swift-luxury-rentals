@@ -32,11 +32,11 @@ if "%PROJECT_DIR%"=="" (
 echo Project Directory: %PROJECT_DIR%
 
 pushd "%PROJECT_DIR%"
-if exist start-server.bat (
-  call start-server.bat
+if exist start-server-clean.bat (
+  call start-server-clean.bat
 ) else (
-  echo start-server.bat not found in project. Running fallback: npm run dev on port 3003
-  start "Berlin Luxe Rentals Server" powershell -NoExit -Command "cd \"%PROJECT_DIR%\"; npm run dev -- --port 3003"
+  echo start-server-clean.bat not found, running fallback direct...
+  start "Berlin Luxe Rentals Server" cmd /k "cd /d %PROJECT_DIR% && npm run dev -- --port 3002"
 )
 popd
 

@@ -11,6 +11,12 @@ set "PROJECT_DIR=%~dp0"
 set "PROJECT_DIR=%PROJECT_DIR:~0,-1%"
 echo Project Directory: %PROJECT_DIR%
 
+REM Delegate to clean launcher for reliability
+if exist start-server-clean.bat (
+  call start-server-clean.bat
+  goto :eof
+)
+
 if /I "%~1"=="restore" goto restore
 
 set "EXISTING_PORT="
@@ -83,17 +89,17 @@ if exist prisma\schema.prisma (
   )
 )
 
-if exist docker-compose.yml (
-  where docker >nul 2>nul
-  if not errorlevel 1 (
-    echo Starting Docker services: db
-    docker compose up -d db >nul 2>nul
-  )
-)
+REM Skipping Docker compose auto-start during dev to avoid intermittent batch parsing errors
+REM If you need the database, run `npm run db:up` manually in a separate shell
 
 if exist .next (
   echo Cleaning .next cache to ensure a fresh build...
   rmdir /s /q .next
+)
+
+if exist node_modules\.cache (
+  echo Cleaning node_modules cache (SWC/webpack) to prevent runtime corruption...
+  rmdir /s /q node_modules\.cache
 )
 
 echo -------------------------------------------

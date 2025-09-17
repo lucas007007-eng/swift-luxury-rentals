@@ -37,12 +37,15 @@ A modern, responsive rental property website built with Next.js, TypeScript, and
    ```
 
 3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+```powershell
+# Windows PowerShell v5 compatible
+./start-server.bat
+# or
+powershell -ExecutionPolicy Bypass -File .\start-server.ps1
+```
 
 4. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+Navigate to [http://localhost:3002](http://localhost:3002)
 
 ## 🏗️ Project Structure
 
