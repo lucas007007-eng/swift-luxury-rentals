@@ -13,7 +13,7 @@ export default function RequestToBook() {
   const params = useSearchParams()
   const id = params.get('id') || ''
   const title = params.get('title') || 'Your stay'
-  const img = params.get('img') || ''
+  const img = decodeURIComponent(params.get('img') || '')
   const checkin = params.get('checkin') || ''
   const checkout = params.get('checkout') || ''
   const nightsParam = Number(params.get('nights') || '0')
@@ -22,6 +22,7 @@ export default function RequestToBook() {
   const [subtotalCalc, setSubtotalCalc] = useState<number | null>(null)
   const [paidByCompany, setPaidByCompany] = useState<boolean>(false)
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'crypto'>('card')
+  const [paymentOption, setPaymentOption] = useState<'monthly' | 'full'>('monthly')
   const [cryptoCurrency, setCryptoCurrency] = useState<'ETH' | 'USDT' | 'BTC'>('ETH')
   const [copied, setCopied] = useState<boolean>(false)
   const [calendarState, setCalendarState] = useState<Record<string, any>>({})
@@ -30,6 +31,7 @@ export default function RequestToBook() {
   const [monthlyRent, setMonthlyRent] = useState<number>(0)
   const [damageDeposit, setDamageDeposit] = useState<number>(0)
   const [taxRate, setTaxRate] = useState<number>(0.15)
+  const [moveInFeeDue, setMoveInFeeDue] = useState<number>(250)
 
   // Receiving wallet addresses (replace with environment variables in production)
   const ETH_ERC20_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678'
@@ -151,8 +153,7 @@ export default function RequestToBook() {
       // Enable Next payments only if the stay exceeds two months
       const twoMonthsFromStart = addMonthsKeepDay(s, 2)
       const overTwoMonths = e > twoMonthsFromStart
-      // Waive move-in fee for stays under 30 days
-      setMoveInFeeDue(totalDays < 30 ? 0 : moveInFee)
+      // Waive move-in fee for stays under 30 days (will be handled in component)
       if (overTwoMonths) {
         // Next payments start on the 1st following the first period end
         for (let ms = new Date(firstPeriodEndExclusive.getFullYear(), firstPeriodEndExclusive.getMonth(), 1); ms < e; ms = new Date(ms.getFullYear(), ms.getMonth() + 1, 1)) {
@@ -183,37 +184,140 @@ export default function RequestToBook() {
 
   const subtotal = subtotalCalc ?? subtotalParam
   const moveInFee = 250
-  const [moveInFeeDue, setMoveInFeeDue] = useState<number>(moveInFee)
-  const total = (Math.round(((subtotal + moveInFeeDue)) * 100) / 100)
   const nights = nightsParam || (checkin && checkout ? Math.max(0, Math.round((new Date(checkout).getTime()-new Date(checkin).getTime())/86400000)) : 0)
+  
+  // Calculate move-in fee based on stay duration
+  const actualMoveInFee = nights < 30 ? 0 : moveInFee
+  const total = (Math.round(((subtotal + actualMoveInFee)) * 100) / 100)
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-black">
       <Header forceBackground={true} />
       <section className="pt-28 pb-20">
-        <div className="max-w-7xl xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left: Steps */}
-          <div className="space-y-6 text-gray-900">
-            {/* Booking details */}
-            <div className="rounded-2xl border border-gray-200 shadow-sm p-6 bg-white">
-              <div className="font-semibold mb-4">Booking details</div>
-              <div className="space-y-6">
-                <div>
-                  <div className="mb-2 text-sm">Will you be staying in the apartment?</div>
-                  <div className="flex items-center gap-6 text-sm">
-                    <label className="inline-flex items-center gap-2">
-                      <input type="radio" name="stayer" defaultChecked className="accent-amber-500"/>
-                      <span>Yes</span>
-                    </label>
-                    <label className="inline-flex items-center gap-2">
-                      <input type="radio" name="stayer" className="accent-amber-500"/>
-                      <span>No, I'm booking for someone else</span>
-                    </label>
+        <div className="max-w-7xl xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-bold text-white mb-2">Book Your Stay</h1>
+            <p className="text-gray-400">Complete your reservation details below</p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Left: Property Details & Payment Options */}
+            <div className="space-y-8">
+            {/* Property Overview */}
+            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
+              <div className="flex gap-6 items-start mb-8">
+                <div className="w-32 h-32 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0">
+                  {img ? (
+                    <img 
+                      src={img} 
+                      alt={title} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.log('Image failed to load:', img)
+                        e.currentTarget.style.display = 'none'
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                      }}
+                    />
+                  ) : null}
+                  <div className={`w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center ${img ? 'hidden' : ''}`}>
+                    <svg className="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"/>
+                    </svg>
                   </div>
                 </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
+                  <div className="text-gray-400 mb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-sm">Berlin, Germany</span>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm">
+                      <span>🛏️ 8 guests</span>
+                      <span>🛁 4 bedrooms</span>
+                      <span>🚿 3 bathrooms</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="bg-gray-800 px-3 py-1 rounded-full text-sm text-gray-300">
+                      {checkin} → {checkout}
+                    </div>
+                    <div className="bg-gray-800 px-3 py-1 rounded-full text-sm text-gray-300">
+                      {nights} nights
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Payment Options Toggle */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-white mb-4">Payment Options</h3>
+                <div className="bg-gray-800 p-1 rounded-xl flex">
+                  <button 
+                    onClick={() => setPaymentOption('full')}
+                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
+                      paymentOption === 'full' 
+                        ? 'bg-white text-black' 
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    Pay Now in Full
+                    <div className={`text-xs mt-1 ${paymentOption === 'full' ? 'text-gray-600' : 'text-gray-500'}`}>
+                      €{Math.round(subtotal + actualMoveInFee + damageDeposit).toLocaleString('de-DE')} at booking completion
+                    </div>
+                  </button>
+                  <button 
+                    onClick={() => setPaymentOption('monthly')}
+                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
+                      paymentOption === 'monthly' 
+                        ? 'bg-white text-black' 
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    Pay Monthly
+                    <div className={`text-xs mt-1 ${paymentOption === 'monthly' ? 'text-gray-600' : 'text-gray-500'}`}>
+                      €{(payNowInfo?.amount ?? 0).toLocaleString('de-DE')} now + scheduled payments
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Details */}
+            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
+              <h3 className="text-xl font-semibold text-white mb-6">Contact Details</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm mb-2">Residence country</label>
-                  <select className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white">
+                  <label className="block text-sm text-gray-300 mb-2">First name</label>
+                  <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="John" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-300 mb-2">Last name</label>
+                  <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Doe" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm text-gray-300 mb-2">Email</label>
+                  <input type="email" className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="you@example.com" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm text-gray-300 mb-2">Phone</label>
+                  <div className="flex gap-3">
+                    <select className="w-28 bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors">
+                      <option>+49</option>
+                      <option>+34</option>
+                      <option>+33</option>
+                      <option>+39</option>
+                      <option>+44</option>
+                    </select>
+                    <input className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Phone number" />
+                  </div>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm text-gray-300 mb-2">Residence country</label>
+                  <select className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors">
                     <option value="">Select a country</option>
                     <optgroup label="Europe">
                       <option>Albania</option>
@@ -281,150 +385,50 @@ export default function RequestToBook() {
               </div>
             </div>
 
-            {/* Contact details */}
-            <div className="rounded-2xl border border-gray-200 shadow-sm p-6 bg-white">
-              <div className="font-semibold mb-4">Contact details</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm mb-1">First name</label>
-                  <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" placeholder="John" />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Last name</label>
-                  <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" placeholder="Doe" />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm mb-1">Email</label>
-                  <input type="email" className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" placeholder="you@example.com" />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm mb-1">Phone</label>
-                  <div className="flex gap-2">
-                    <select className="w-28 border border-gray-300 rounded-xl px-2 py-2 bg-white">
-                      <option>+49</option>
-                      <option>+34</option>
-                      <option>+33</option>
-                      <option>+39</option>
-                      <option>+44</option>
-                    </select>
-                    <input className="flex-1 border border-gray-300 rounded-xl px-3 py-2 bg-white" placeholder="Phone number" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Address */}
-            <div className="rounded-2xl border border-gray-200 shadow-sm p-6 bg-white">
-              <div className="font-semibold mb-1">Address</div>
-              <div className="text-sm text-gray-600 mb-4">Add information about your primary residence</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2">
-                  <label className="block text-sm mb-1">Street name</label>
-                  <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Apt. number (optional)</label>
-                  <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Floor (optional)</label>
-                  <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">City</label>
-                  <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Postal code</label>
-                  <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-sm mb-1">What is the purpose of your stay?</label>
-                  <select className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white">
-                    <option value="">Select a reason</option>
-                    <option>Work</option>
-                    <option>Study</option>
-                    <option>Relocation</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="inline-flex items-start gap-2 text-sm">
-                    <input type="checkbox" className="mt-1 accent-amber-500" />
-                    <span className="text-gray-700">By checking this box, I declare that the address provided is my primary residence, and I will reside temporarily for the stated reason. I commit to notifying Swift Luxury about changes in the information provided, and to providing supporting information if required.</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            {/* Billing information */}
-            <div className="rounded-2xl border border-gray-200 shadow-sm p-6 bg-white">
-              <div className="font-semibold mb-4">Billing information</div>
-              <div className="text-sm mb-3">Will your stay be paid for by a company?</div>
-              <div className="flex items-center gap-6 text-sm mb-4">
-                <label className="inline-flex items-center gap-2">
-                  <input type="radio" name="companypayer" className="accent-amber-500" checked={!paidByCompany} onChange={() => setPaidByCompany(false)} />
-                  <span>No, I am paying for the stay</span>
+            {/* Payment Method */}
+            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
+              <h3 className="text-xl font-semibold text-white mb-6">Payment Method</h3>
+              <div className="flex items-center gap-6 mb-6">
+                <label className="inline-flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="paymethod" className="w-4 h-4 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500" checked={paymentMethod==='card'} onChange={() => setPaymentMethod('card')} />
+                  <span className="text-white text-sm font-medium">Card</span>
                 </label>
-                <label className="inline-flex items-center gap-2">
-                  <input type="radio" name="companypayer" className="accent-amber-500" checked={paidByCompany} onChange={() => setPaidByCompany(true)} />
-                  <span>Yes</span>
+                <label className="inline-flex items-center gap-3 cursor-pointer">
+                  <input type="radio" name="paymethod" className="w-4 h-4 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500" checked={paymentMethod==='crypto'} onChange={() => setPaymentMethod('crypto')} />
+                  <span className="text-white text-sm font-medium">Crypto</span>
                 </label>
               </div>
-              {paidByCompany && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm mb-1">Company name</label>
-                    <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" />
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-1">VAT ID (optional)</label>
-                    <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" />
-                  </div>
+              
+              {paymentMethod === 'crypto' && (
+                <div className="mb-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                  <div className="text-xs text-amber-400">Crypto payments are held in escrow for up to 72hrs. If booking is not approved, full refund is issued automatically.</div>
                 </div>
               )}
-            </div>
-
-            {/* Payment method */}
-            <div className="rounded-2xl border border-gray-200 shadow-sm p-6 bg-white">
-              <div className="flex items-center justify-between mb-2">
-                <div className="font-semibold">Payment method</div>
-                {paymentMethod === 'crypto' ? (
-                  <div className="text-xs text-gray-600 ml-3 text-left">Crypto payments are held in escrow for up to 72hrs. If booking is not approved, full refund is issued automatically.</div>
-                ) : paymentMethod === 'card' ? (
-                  <div className="text-xs text-gray-600 ml-3 text-left">Credit Card will not be charge until your booking is Confirmed. You will receive an update within 24hrs!</div>
-                ) : null}
+              
+              {paymentMethod === 'card' && (
+                <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                  <div className="text-xs text-blue-400">Credit Card will not be charged until your booking is Confirmed. You will receive an update within 24hrs!</div>
               </div>
-              <div className="flex items-center gap-6 text-sm mb-4">
-                <label className="inline-flex items-center gap-2">
-                  <input type="radio" name="paymethod" className="accent-amber-500" checked={paymentMethod==='card'} onChange={() => setPaymentMethod('card')} />
-                  <span>Card</span>
-                </label>
-                <label className="inline-flex items-center gap-2">
-                  <input type="radio" name="paymethod" className="accent-amber-500" checked={paymentMethod==='crypto'} onChange={() => setPaymentMethod('crypto')} />
-                  <span>Crypto</span>
-                </label>
-              </div>
+              )}
 
               {paymentMethod === 'card' ? (
-                <div className="space-y-4">
-                  <div className="text-sm text-gray-700">Payment details</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="sm:col-span-2">
-                      <label className="block text-sm mb-1">Cardholder name</label>
-                      <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" placeholder="Name on card" />
+                      <label className="block text-sm text-gray-300 mb-2">Cardholder name</label>
+                      <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Name on card" />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="block text-sm mb-1">Card number</label>
-                      <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" placeholder="1234 5678 9012 3456" />
+                      <label className="block text-sm text-gray-300 mb-2">Card number</label>
+                      <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="1234 5678 9012 3456" />
                     </div>
                     <div>
-                      <label className="block text-sm mb-1">Expiry</label>
-                      <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" placeholder="MM/YY" />
+                      <label className="block text-sm text-gray-300 mb-2">Expiry</label>
+                      <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="MM/YY" />
                     </div>
                     <div>
-                      <label className="block text-sm mb-1">CVC</label>
-                      <input className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white" placeholder="CVC" />
+                      <label className="block text-sm text-gray-300 mb-2">CVC</label>
+                      <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="CVC" />
                     </div>
                   </div>
                 </div>
@@ -470,20 +474,135 @@ export default function RequestToBook() {
               )}
             </div>
 
-            {/* Review */}
-            <div className="rounded-2xl border border-gray-200 shadow-sm p-6 bg-white">
-              <div className="font-semibold mb-4">Review your request</div>
-              <div className="space-y-3 text-sm">
-                <label className="flex items-start gap-2">
-                  <input type="checkbox" className="mt-1 accent-amber-500" />
-                  <span className="text-gray-700">I agree to the Terms of Service, Sublease Agreement and Cancellation Policy and understand that this reservation is contingent on successfully passing tenant screening.</span>
+            {/* Terms & Complete Booking */}
+            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
+              <h3 className="text-xl font-semibold text-white mb-6">Review your request</h3>
+              <div className="space-y-4 mb-8">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" className="w-4 h-4 mt-1 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500 rounded" />
+                  <span className="text-gray-300 text-sm">I agree to the Terms of Service, Sublease Agreement and Cancellation Policy and understand that this reservation is contingent on successfully passing tenant screening.</span>
                 </label>
-                <label className="flex items-start gap-2">
-                  <input type="checkbox" className="mt-1 accent-amber-500" />
-                  <span className="text-gray-700">I agree to the Privacy Policy.</span>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" className="w-4 h-4 mt-1 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500 rounded" />
+                  <span className="text-gray-300 text-sm">I agree to the Privacy Policy.</span>
                 </label>
               </div>
-              <button className="mt-5 w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 rounded-xl" onClick={async()=>{
+            </div>
+          </div>
+
+          {/* Right: Your Stay Summary */}
+          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8 h-max">
+            <h3 className="text-2xl font-bold text-white mb-6">Your Stay</h3>
+            
+            <div className="flex gap-4 items-start mb-8">
+              <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0">
+                {img ? (
+                  <img 
+                    src={img} 
+                    alt={title} 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                      e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                    }}
+                  />
+                ) : null}
+                <div className={`w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center ${img ? 'hidden' : ''}`}>
+                  <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"/>
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-white text-sm mb-1 truncate">{title}</div>
+                <div className="text-gray-400 text-xs mb-2">{checkin} - {checkout}</div>
+                <div className="text-gray-300 text-xs">{nights} nights • 1 Guest</div>
+              </div>
+            </div>
+
+            {/* Pricing Breakdown */}
+            <div className="mb-8">
+              <h4 className="text-lg font-semibold text-white mb-4">Pricing Breakdown</h4>
+              
+              {paymentOption === 'monthly' ? (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">First period rent</span>
+                    <span className="text-white font-medium">€{(payNowInfo?.amount ?? 0).toLocaleString('de-DE')}</span>
+                  </div>
+                  {actualMoveInFee > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-300">Move-in fee</span>
+                      <span className="text-white font-medium">€{actualMoveInFee.toLocaleString('de-DE')}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">Refundable Damage Deposit</span>
+                    <span className="text-white font-medium">€{damageDeposit.toLocaleString('de-DE')}</span>
+                  </div>
+                  
+                  <div className="border-t border-gray-700 pt-3 mt-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-gray-300 text-sm">Due today:</span>
+                      <span className="text-white text-xl font-bold">€{Math.round((payNowInfo?.amount ?? 0) + actualMoveInFee + damageDeposit).toLocaleString('de-DE')}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300 text-sm">Total Stay Price:</span>
+                      <span className="text-white text-lg font-semibold">€{Math.round(subtotal + actualMoveInFee + damageDeposit).toLocaleString('de-DE')}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">Total Stay Rent</span>
+                    <span className="text-white font-medium">€{subtotal.toLocaleString('de-DE')}</span>
+                  </div>
+                  {actualMoveInFee > 0 && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-gray-300">Move-in fee</span>
+                      <span className="text-white font-medium">€{actualMoveInFee.toLocaleString('de-DE')}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-300">Refundable Damage Deposit</span>
+                    <span className="text-white font-medium">€{damageDeposit.toLocaleString('de-DE')}</span>
+                  </div>
+                  
+                  <div className="border-t border-gray-700 pt-3 mt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white text-lg font-semibold">Total now</span>
+                      <span className="text-white text-xl font-bold">€{Math.round(subtotal + actualMoveInFee + damageDeposit).toLocaleString('de-DE')}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Next Payments - Only show for monthly option */}
+            {paymentOption === 'monthly' && nextPayments.length > 0 && (
+              <div className="border-t border-gray-700 pt-6">
+                <h4 className="text-lg font-semibold text-white mb-4">Next Payments</h4>
+                <div className="space-y-4">
+                  {nextPayments.map((p, idx) => (
+                    <div key={idx} className="bg-gray-800 rounded-xl p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-xs text-gray-400 mb-1">Charge date: {p.chargeDate}</div>
+                          <div className="text-white text-sm font-medium">{p.coverage}</div>
+                        </div>
+                        <div className="text-white font-semibold">€{p.amount.toLocaleString('de-DE')}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Complete Booking Button */}
+            <div className="mt-8 pt-6 border-t border-gray-700">
+              <button 
+                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-bold py-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-amber-500/25"
+                onClick={async()=>{
                 try {
                   if (process.env.NEXT_PUBLIC_FEATURE_DB_BOOKINGS === '1' || process.env.FEATURE_DB_BOOKINGS === '1') {
                     const payload = {
@@ -491,7 +610,7 @@ export default function RequestToBook() {
                       user: { name: 'Guest', email: '', phone: '' },
                       checkIn: checkin,
                       checkOut: checkout,
-                      totalCents: Math.round(((payNowInfo?.amount ?? subtotal) + moveInFeeDue + damageDeposit) * 100)
+                        totalCents: Math.round(((payNowInfo?.amount ?? subtotal) + actualMoveInFee + damageDeposit) * 100)
                     }
                     const res = await fetch('/api/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
                     if (res.ok) {
@@ -503,63 +622,16 @@ export default function RequestToBook() {
                 } catch(e) {
                   console.warn('Booking API error; proceeding without DB persistence')
                 }
-              }}>Complete booking</button>
+                }}
+              >
+                Complete Booking
+              </button>
+              <div className="text-center mt-3">
+                <div className="text-xs text-gray-400">Powered by <span className="text-white font-medium">Stripe</span></div>
+              </div>
+            </div>
             </div>
           </div>
-
-          {/* Right: Summary + Next payments */}
-          <div className="rounded-2xl border border-gray-200 shadow-sm p-6 h-max bg-white">
-            <div className="flex gap-4 items-center mb-5">
-              <div className="w-28 h-28 rounded-xl overflow-hidden bg-gray-100">
-                {img ? <img src={img} alt={title} className="w-full h-full object-cover"/> : null}
-              </div>
-              <div>
-                <div className="font-semibold text-gray-900">{title}</div>
-                <div className="text-sm text-gray-600 mt-1">Dates</div>
-                <div className="text-sm text-gray-900">{checkin} → {checkout} ({nights} nights)</div>
-              </div>
-            </div>
-            <div className="mb-3 font-semibold text-gray-900">Pay now</div>
-            {payNowInfo && (
-              <div className="text-sm text-gray-800 mb-3">This payment includes Rent & Service Fees from {payNowInfo.from} to {payNowInfo.to}</div>
-            )}
-            <div className="space-y-2 text-sm text-gray-900">
-              <div className="flex justify-between"><span>First period</span><span>€{(payNowInfo?.amount ?? subtotal).toLocaleString('de-DE', { maximumFractionDigits: 0, minimumFractionDigits: 0 })}</span></div>
-              <div className="flex justify-between"><span>Damage Deposit</span><span>
-                €{damageDeposit.toLocaleString('de-DE', { maximumFractionDigits: 0, minimumFractionDigits: 0 })}
-              </span></div>
-              {moveInFeeDue > 0 && (
-                <div className="flex justify-between"><span>Move‑in fee</span><span>€{moveInFeeDue.toLocaleString('de-DE', { maximumFractionDigits: 0, minimumFractionDigits: 0 })}</span></div>
-              )}
-              {/* VAT removed */}
-              <hr/>
-              <div className="flex justify-between font-semibold text-lg text-gray-900"><span>Total now</span><span>
-                €{(() => { const base = (payNowInfo?.amount ?? subtotal) + moveInFeeDue + damageDeposit; return Math.round(base).toLocaleString('de-DE', { maximumFractionDigits: 0, minimumFractionDigits: 0 }) })()}
-              </span></div>
-            </div>
-            {nextPayments.length > 0 && (
-              <div className="mt-6">
-                <div className="font-semibold mb-3 text-gray-900">Next payments</div>
-                <div className="space-y-4 text-sm text-gray-900">
-                  {nextPayments.map((p, idx) => (
-                    <div key={idx}>
-                      <div className="flex items-baseline justify-between">
-                        <div>
-                          <div className="text-xs text-gray-600">Charge date: {p.chargeDate}</div>
-                          <div className="text-gray-900">{p.coverage}</div>
-                        </div>
-                        <div>€{p.amount.toLocaleString('de-DE', { maximumFractionDigits: 0, minimumFractionDigits: 0 })}</div>
-                      </div>
-                      {/* VAT removed; totals equal amount */}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-          
-
-          
         </div>
       </section>
       <Footer />

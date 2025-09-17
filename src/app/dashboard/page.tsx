@@ -21,15 +21,25 @@ export default function ClientDashboard() {
     const yy = String(d.getFullYear()).slice(2)
     return `${months[d.getMonth()]} ${dd}${suffix}, ${yy}'`
   }
-  const cards = [
-    { key: 'bookings', title: 'Bookings', desc: 'Upcoming, past, and cancelled bookings', href: '#bookings', icon: '🧳' },
-    { key: 'messages', title: 'Messages', desc: 'Conversations with hosts', href: '#messages', icon: '💬' },
-    { key: 'saved', title: 'Saved', desc: 'Your saved listings and wishlists', href: '#saved', icon: '⭐' },
-    { key: 'payments', title: 'Payments', desc: 'Cards, receipts, and refunds', href: '#payments', icon: '💶' },
-    { key: 'profile', title: 'Profile', desc: 'Personal info and preferences', href: '#profile', icon: '🧑' },
-    { key: 'security', title: 'Security', desc: 'Password and account security', href: '#security', icon: '🛡️' },
-  ]
+  const [activeTab, setActiveTab] = React.useState<'bookings' | 'applications' | 'past'>('bookings')
   const [bookings, setBookings] = React.useState<any[] | null>(null)
+  
+  // Calculate counts based on booking data
+  const currentBookings = (bookings || []).filter((b: any) => 
+    b.status === 'confirmed'
+  )
+  const pastBookings = (bookings || []).filter((b: any) => 
+    b.status === 'completed' || b.status === 'cancelled'
+  )
+  const applications = (bookings || []).filter((b: any) => 
+    b.status === 'hold'
+  )
+  
+  const tabs = [
+    { key: 'bookings', title: 'Bookings', desc: 'View your current and upcoming bookings', count: currentBookings.length },
+    { key: 'applications', title: 'Lease Applications', desc: 'View ongoing applications', count: applications.length },
+    { key: 'past', title: 'Past Bookings', desc: 'View properties you\'ve booked in the past', count: pastBookings.length },
+  ]
   React.useEffect(() => {
     ;(async()=>{
       try {
@@ -43,206 +53,431 @@ export default function ClientDashboard() {
   return (
     <main className="min-h-screen bg-black text-white flex flex-col">
       <Header forceBackground={true} />
-      <section className="flex-1 pt-36 md:pt-40 pb-20 flex items-center">
+      <section className="flex-1 pt-28 pb-20">
         <div className="max-w-7xl mx-auto px-6 w-full">
-          <h1 className="text-3xl font-extrabold mb-1 text-center">Account</h1>
-          <p className="text-white/60 mb-8 text-center">Welcome to your Swift Luxury dashboard</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
-          {cards.map((c) => (
-            <Link key={c.title} href={c.href} className="rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition shadow-[0_10px_30px_rgba(0,0,0,0.35)] p-6 block w-full">
-              <div className="text-3xl mb-3">{c.icon}</div>
-              <div className="text-lg font-semibold">{c.title}</div>
-              <div className="text-white/70 text-sm mt-1">{c.desc}</div>
-            </Link>
-          ))}
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-2">Welcome back, {session?.user?.name || 'Lucas Veith'}</h1>
           </div>
-          {/* Sections */}
-          <div id="bookings" className="mt-12">
-            <div className="text-xl font-bold mb-3">Bookings</div>
-            {bookings === null ? (
-              <div className="rounded-2xl p-4 border border-white/10 bg-white/5 text-white/70">Loading…</div>
-            ) : (bookings || []).length === 0 ? (
-              <div className="rounded-2xl p-4 border border-white/10 bg-white/5 text-white/70">No trips yet.</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {bookings.map((b:any)=> (
-                  <div key={b.id} className="rounded-2xl overflow-hidden border border-amber-400/30 bg-gradient-to-br from-[#1a0f0b] to-[#120a08]">
-                    {b.coverImage ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={b.coverImage} alt="cover" className="w-full h-40 object-cover" />
-                    ) : null}
-                    <div className="p-4">
-                      <div className="text-white/90 font-semibold mb-1">{b.propertyTitle || b.propertyId}</div>
-                      <div className="text-white/60 text-xs mb-1">{b.location || '—'}</div>
-                      <div className="text-white/60 text-sm">{new Date(b.checkIn).toLocaleDateString()} → {new Date(b.checkOut).toLocaleDateString()}</div>
-                      {(() => {
-                        const nights = Math.max(1, Math.round((new Date(b.checkOut).getTime() - new Date(b.checkIn).getTime()) / 86400000))
-                        return (
-                          <div className="mt-1 text-xs text-white/60">{nights} night{nights !== 1 ? 's' : ''}</div>
-                        )
-                      })()}
-                      {(b.bedrooms || b.bathrooms) && (
-                        <div className="mt-2 text-xs text-white/70">{b.bedrooms ? `${b.bedrooms} bd` : ''}{b.bedrooms && b.bathrooms ? ' • ' : ''}{b.bathrooms ? `${b.bathrooms} ba` : ''}</div>
-                      )}
-                      {b.description && (
-                        <div className="mt-2 text-xs text-white/70 line-clamp-2">{b.description}</div>
-                      )}
-                      <div className="mt-3 flex items-center justify-between text-sm">
-                        <span className="px-2 py-0.5 rounded border border-amber-400/30 text-amber-300 bg-amber-500/10">{b.status}</span>
-                        <span className="text-amber-300 font-semibold">€{Number((b.totalCents||0)/100).toLocaleString('de-DE')}</span>
-                      </div>
-                      {Array.isArray(b.images) && b.images.length > 1 && (
-                        <div className="mt-3 grid grid-cols-4 gap-1">
-                          {b.images.slice(1,5).map((src:string, idx:number)=> (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img key={idx} src={src} alt="thumb" className="h-14 w-full object-cover rounded" />
-                          ))}
-                        </div>
-                      )}
-                    </div>
+          
+          {/* Tab Navigation */}
+          <div className="flex gap-2 mb-8 border-b border-gray-800">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key as any)}
+                className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === tab.key
+                    ? 'border-white text-white'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                {tab.title}
+                <span className="ml-2 text-xs text-gray-500">{tab.count}</span>
+              </button>
+            ))}
+          </div>
+          {/* Tab Content */}
+          <div className="min-h-[400px]">
+            {activeTab === 'bookings' && (
+              <div>
+                {bookings === null ? (
+                  <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 text-center">
+                    <div className="text-gray-400">Loading your bookings...</div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div id="messages" className="mt-12">
-            <div className="text-xl font-bold mb-3">Messages</div>
-            <div className="rounded-2xl p-4 border border-white/10 bg-white/5 text-white/70">Coming soon.</div>
-          </div>
-
-          <div id="saved" className="mt-12">
-            <div className="text-xl font-bold mb-3">Saved</div>
-            <div className="rounded-2xl p-4 border border-white/10 bg-white/5 text-white/70">Your saved listings will appear here.</div>
-          </div>
-
-          <div id="payments" className="mt-12">
-            <div className="text-xl font-bold mb-3">Payments</div>
-            {bookings === null ? (
-              <div className="rounded-2xl p-4 border border-white/10 bg-white/5 text-white/70">Loading…</div>
-            ) : (bookings || []).length === 0 ? (
-              <div className="rounded-2xl p-4 border border-white/10 bg-white/5 text-white/70">No payment items yet.</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {bookings.map((b:any)=> {
-                  const payments = Array.isArray(b.payments) ? b.payments : []
-                  const depositPayments = payments.filter((p:any)=> p.purpose==='deposit')
-                  let depositReceived = depositPayments.some((p:any)=> p.status === 'received')
-                  const depositRefunded = depositPayments.some((p:any)=> p.status === 'refunded')
-                  const depositAmountCents = depositPayments.reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
-                  const receivedList = payments.filter((p:any)=> p.status==='received' && p.purpose!=='deposit').sort((a:any,b:any)=> new Date(b.receivedAt||0).getTime() - new Date(a.receivedAt||0).getTime())
-                  const receivedTotalCents = receivedList.reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
-                  const labelFor = (purpose:string) => purpose === 'first_period' ? '1st period' : purpose === 'monthly_rent' ? 'Monthly rent' : purpose === 'move_in_fee' ? 'Move‑in fee' : 'Payment'
-                  const now = new Date()
-                  const overdueList = payments.filter((p:any)=> p.purpose==='monthly_rent' && p.status==='scheduled' && p.dueAt && new Date(p.dueAt) < now)
-                    .sort((a:any,b:any)=> new Date(a.dueAt||0).getTime() - new Date(b.dueAt||0).getTime())
-                  const overdueCents = overdueList.reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
-                  const futureList = payments.filter((p:any)=> p.purpose==='monthly_rent' && p.status==='scheduled' && p.dueAt && new Date(p.dueAt) >= now)
-                    .sort((a:any,b:any)=> new Date(a.dueAt||0).getTime() - new Date(b.dueAt||0).getTime())
-                  return (
-                    <div key={b.id} className="rounded-2xl p-4 border border-white/10 bg-white/5">
-                      <div className="text-white/80 font-semibold mb-3">{b.propertyTitle || b.propertyId}</div>
-
-                      {/* Deposit tile */}
-                      {(() => { if (!depositRefunded && b.status === 'confirmed') depositReceived = true; return null })()}
-                      <div className={`mb-3 rounded-lg p-3 border ${depositRefunded ? 'border-sky-400/30 bg-sky-500/10' : (depositReceived ? 'border-emerald-400/30 bg-emerald-500/10' : 'border-amber-400/30 bg-amber-500/10')}`}>
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2 py-0.5 rounded text-[11px] uppercase tracking-wider ${depositRefunded ? 'text-sky-300' : (depositReceived ? 'text-emerald-300' : 'text-amber-300')}`}>{depositRefunded ? 'Deposit Refunded' : (depositReceived ? 'Deposit Received' : 'Deposit')}</span>
-                          </div>
-                          <div className={`${depositRefunded ? 'text-sky-300' : (depositReceived ? 'text-emerald-300' : 'text-amber-300')} font-semibold`}>
-                            €{Math.round((depositAmountCents||0)/100).toLocaleString('de-DE')}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Received breakdown */}
-                      <div className="rounded-lg p-3 border border-emerald-400/20 bg-emerald-500/5">
-                        <div className="flex items-center justify-between">
-                          <div className="text-xs uppercase tracking-wider text-emerald-300">Payments Received</div>
-                          <div className="text-emerald-300 font-semibold text-sm">€{Math.round((receivedTotalCents||0)/100).toLocaleString('de-DE')}</div>
-                        </div>
-                        {receivedList.length === 0 ? (
-                          <div className="mt-2 text-xs text-white/60">—</div>
-                        ) : (
-                          <div className="mt-2 space-y-2">
-                            {receivedList.slice(0,4).map((p:any)=> (
-                              <div key={p.id} className="flex items-center justify-between text-sm">
-                                <div className="text-white/70">
-                                  <span className="text-emerald-200/90 font-semibold mr-2">{labelFor(p.purpose)}</span>
-                                  <span className="text-xs text-white/50">{new Date(p.receivedAt||p.dueAt||p.createdAt).toLocaleDateString()}</span>
-                                </div>
-                                <div className="text-white">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Future Payments */}
-                      <div className="mt-3 rounded-lg p-3 border border-amber-400/30 bg-amber-500/10">
-                        <div className="text-xs uppercase tracking-wider text-amber-300 mb-2">Future Payments</div>
-                        {futureList.length === 0 ? (
-                          <div className="text-xs text-white/60">—</div>
-                        ) : (
-                          <div className="space-y-2">
-                            {futureList.map((p:any)=> (
-                              <div key={p.id} className="flex items-center justify-between text-sm">
-                                <div className="text-white/80">
-                                  <span className="px-2 py-0.5 rounded text-xs bg-amber-500/20 text-amber-300 border border-amber-400/30 mr-2">{formatShortDate(new Date(p.dueAt))}</span>
-                                  {(() => {
-                                    try {
-                                      const list = payments.filter((x:any)=> x.purpose==='monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
-                                      const idx = list.findIndex((x:any)=> x.id === p.id)
-                                      const n = (idx >= 0 ? idx + 2 : 2)
-                                      const j = n % 10, k = n % 100
-                                      const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
-                                      return <span className="text-xs text-amber-200/80">({ord} month rent)</span>
-                                    } catch { return null }
-                                  })()}
-                                </div>
-                                <div className="text-white">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Overdue Payments */}
-                      <div className="mt-3 rounded-lg p-3 border border-red-400/40 bg-red-500/10 text-red-300">
-                        <div className="flex items-center gap-2 text-xs mb-2">
-                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                          <span className="uppercase tracking-wider">Overdue Payments</span>
-                          <span className="ml-auto font-semibold text-white">€{Math.round((overdueCents||0)/100).toLocaleString('de-DE')}</span>
-                        </div>
-                        {overdueList.length === 0 ? (
-                          <div className="text-xs text-red-200/80">—</div>
-                        ) : (
-                          <div className="space-y-2">
-                            {overdueList.map((p:any)=> (
-                              <div key={p.id} className="flex items-center justify-between">
-                                <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-200 border border-red-400/30 whitespace-nowrap">{formatShortDate(new Date(p.dueAt))}</span>
-                                <span className="text-sm font-semibold text-white whitespace-nowrap">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                ) : currentBookings.length === 0 ? (
+                  <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 text-center">
+                    <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl">$</span>
                     </div>
-                  )
-                })}
+                    <h3 className="text-xl font-semibold text-white mb-2">No Property Bookings...</h3>
+                    <p className="text-gray-400 mb-6">Explore a curated selection of properties tailored to your needs. Whether it's a weekend getaway, a month-long transition, or a long-term home, find your perfect rental with just a click.</p>
+                    <button className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors">
+                      View Properties →
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {currentBookings.map((b:any)=> (
+                      <div key={b.id} className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+                        <div className="flex gap-4 items-start">
+                          <Link href={`/property/${b.propertyExtId || b.propertyId}`} className="w-20 h-20 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer">
+                            {b.coverImage ? (
+                              <img 
+                                src={b.coverImage} 
+                                alt="Property" 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none'
+                                  e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                                }}
+                              />
+                            ) : null}
+                            <div className={`w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center ${b.coverImage ? 'hidden' : ''}`}>
+                              <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"/>
+                              </svg>
+                            </div>
+                          </Link>
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-4">
+                              <div>
+                                <Link href={`/property/${b.propertyExtId || b.propertyId}`} className="hover:text-amber-400 transition-colors cursor-pointer">
+                                  <h3 className="text-white font-semibold text-lg">{b.propertyTitle || b.propertyId}</h3>
+                                </Link>
+                                <div className="space-y-3 mt-3">
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+                                    </svg>
+                                    <p className="text-gray-300 text-base font-medium">{b.location || '—'}</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd"/>
+                                    </svg>
+                                    <div className="text-gray-300 text-base font-medium">
+                                      {new Date(b.checkIn).toLocaleDateString()} → {new Date(b.checkOut).toLocaleDateString()}
+                                      <span className="ml-3 bg-gray-700 px-3 py-1 rounded-md text-sm text-white font-medium">
+                                        {Math.max(1, Math.round((new Date(b.checkOut).getTime() - new Date(b.checkIn).getTime()) / 86400000))} nights
+                                      </span>
+                                    </div>
+                                  </div>
+                                  {(b.bedrooms || b.bathrooms) && (
+                                    <div className="flex items-center gap-2">
+                                      <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                                      </svg>
+                                      <div className="text-gray-300 text-base font-medium">
+                                        {b.bedrooms ? `${b.bedrooms} bedrooms` : ''}{b.bedrooms && b.bathrooms ? ' • ' : ''}{b.bathrooms ? `${b.bathrooms} bathrooms` : ''}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                {(() => {
+                                  if (b.status === 'confirmed') {
+                                    // Calculate total lease contract value
+                                    const allPayments = (b.payments || []).filter((p: any) => p.purpose !== 'deposit')
+                                    const receivedCents = allPayments.filter((p: any) => p.status === 'received').reduce((s: number, p: any) => s + (Number(p.amountCents) || 0), 0)
+                                    const scheduledCents = allPayments.filter((p: any) => p.status === 'scheduled').reduce((s: number, p: any) => s + (Number(p.amountCents) || 0), 0)
+                                    const totalLeaseContractCents = receivedCents + scheduledCents
+                                    
+                                    if (scheduledCents === 0 && receivedCents > 0) {
+                                      // Paid in full
+                                      return (
+                                        <>
+                                          <div className="text-white font-semibold">€{Math.round(totalLeaseContractCents/100).toLocaleString('de-DE')}</div>
+                                          <div className="px-2 py-1 rounded text-xs font-medium bg-green-500/20 text-green-400">
+                                            Paid in Full
+                                          </div>
+                                        </>
+                                      )
+                                    } else {
+                                      // Monthly payments
+                                      return (
+                                        <>
+                                          <div className="text-white font-semibold">€{Math.round(totalLeaseContractCents/100).toLocaleString('de-DE')}</div>
+                                          <div className="px-2 py-1 rounded text-xs font-medium bg-green-500/20 text-green-400">
+                                            Lease Contract Total
+                                          </div>
+                                        </>
+                                      )
+                                    }
+                                  } else {
+                                    // Other statuses (hold, etc.)
+                                    return (
+                                      <>
+                                        <div className="text-white font-semibold">€{Number((b.totalCents||0)/100).toLocaleString('de-DE')}</div>
+                                        <div className={`px-2 py-1 rounded text-xs font-medium ${
+                                          b.status === 'hold' ? 'bg-amber-500/20 text-amber-400' :
+                                          'bg-gray-500/20 text-gray-400'
+                                        }`}>
+                                          {b.status}
+                                        </div>
+                                      </>
+                                    )
+                                  }
+                                })()}
+                              </div>
+                            </div>
+                            
+                            {/* Payment Management Section */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                              {/* Payments Received */}
+                              <div className="bg-gray-800 rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h4 className="text-sm font-medium text-emerald-400">Payments Received</h4>
+                                  <div className="text-emerald-400 font-semibold">€{Math.round((b.receivedCents||0)/100).toLocaleString('de-DE')}</div>
+                                </div>
+                                {(() => {
+                                  const receivedPayments = (b.payments || []).filter((p: any) => p.status === 'received' && p.purpose !== 'deposit')
+                                  const labelFor = (purpose: string) => purpose === 'first_period' ? '1st month rent' : purpose === 'monthly_rent' ? 'Monthly rent' : purpose === 'move_in_fee' ? 'Move-in fee' : 'Payment'
+                                  
+                                  if (receivedPayments.length === 0) {
+                                    return <div className="text-xs text-gray-500">No payments received yet</div>
+                                  }
+                                  
+                                  return (
+                                    <div className="space-y-3">
+                                      {receivedPayments.slice(0, 3).map((p: any, idx: number) => (
+                                        <div key={idx} className="flex justify-between items-center">
+                                          <span className="text-gray-300 text-sm font-medium">{labelFor(p.purpose)}</span>
+                                          <span className="text-emerald-300 text-sm font-semibold">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                        </div>
+                                      ))}
+                                      {receivedPayments.length > 3 && (
+                                        <div className="text-xs text-gray-500">+{receivedPayments.length - 3} more</div>
+                                      )}
+                                    </div>
+                                  )
+                                })()}
+                              </div>
+                              
+                              {/* Scheduled Payments */}
+                              <div className="bg-gray-800 rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h4 className="text-sm font-medium text-amber-400">Scheduled Payments</h4>
+                                </div>
+                                {(() => {
+                                  const scheduledPayments = (b.payments || []).filter((p: any) => p.status === 'scheduled' && p.purpose === 'monthly_rent' && p.dueAt && new Date(p.dueAt) >= new Date())
+                                    .sort((a: any, b: any) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())
+                                  
+                                  if (scheduledPayments.length === 0) {
+                                    return <div className="text-xs text-gray-500">No upcoming payments</div>
+                                  }
+                                  
+                                  return (
+                                    <div className="space-y-3">
+                                      {scheduledPayments.slice(0, 3).map((p: any, idx: number) => (
+                                        <div key={idx} className="flex justify-between items-center">
+                                          <span className="text-gray-300 text-sm font-medium">{new Date(p.dueAt).toLocaleDateString()}</span>
+                                          <span className="text-amber-300 text-sm font-semibold">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                        </div>
+                                      ))}
+                                      {scheduledPayments.length > 3 && (
+                                        <div className="text-xs text-gray-500">+{scheduledPayments.length - 3} more</div>
+                                      )}
+                                    </div>
+                                  )
+                                })()}
+                              </div>
+                              
+                              {/* Overdue Payments */}
+                              <div className="bg-gray-800 rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h4 className="text-sm font-medium text-red-400">Overdue Payments</h4>
+                                </div>
+                                {(() => {
+                                  const overduePayments = (b.payments || []).filter((p: any) => p.status === 'scheduled' && p.purpose === 'monthly_rent' && p.dueAt && new Date(p.dueAt) < new Date())
+                                    .sort((a: any, b: any) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())
+                                  const overdueCents = overduePayments.reduce((s: number, p: any) => s + (Number(p.amountCents) || 0), 0)
+                                  
+                                  if (overduePayments.length === 0) {
+                                    return <div className="text-xs text-gray-500">No overdue payments</div>
+                                  }
+                                  
+                                  return (
+                                    <div>
+                                      <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-3">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-red-400 text-sm font-medium">Total Overdue</span>
+                                          <span className="text-red-400 font-bold">€{Math.round(overdueCents/100).toLocaleString('de-DE')}</span>
+                                        </div>
+                                      </div>
+                                      <div className="space-y-3">
+                                        {overduePayments.slice(0, 2).map((p: any, idx: number) => (
+                                          <div key={idx} className="flex justify-between items-center">
+                                            <span className="text-gray-300 text-sm font-medium">{new Date(p.dueAt).toLocaleDateString()}</span>
+                                            <span className="text-red-300 text-sm font-semibold">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                      <button className="w-full mt-3 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg text-xs font-medium transition-colors">
+                                        Pay Overdue
+                                      </button>
+                                    </div>
+                                  )
+                                })()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
-          </div>
 
-          <div id="profile" className="mt-12">
-            <div className="text-xl font-bold mb-3">Profile</div>
-            <div className="rounded-2xl p-4 border border-white/10 bg-white/5 text-white/70">Edit your personal info.</div>
-          </div>
+            {activeTab === 'applications' && (
+              <div>
+                {applications.length === 0 ? (
+                  <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 text-center">
+                    <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl">📄</span>
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">No Ongoing Applications...</h3>
+                    <p className="text-gray-400 mb-6">Your lease applications will appear here when you apply for properties.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {applications.map((b:any)=> (
+                      <div key={b.id} className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+                        <div className="flex gap-4 items-start">
+                          <Link href={`/property/${b.propertyExtId || b.propertyId}`} className="w-20 h-20 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer">
+                            {b.coverImage ? (
+                              <img 
+                                src={b.coverImage} 
+                                alt="Property" 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none'
+                                  e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                                }}
+                              />
+                            ) : null}
+                            <div className={`w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center ${b.coverImage ? 'hidden' : ''}`}>
+                              <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"/>
+                              </svg>
+                            </div>
+                          </Link>
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-4">
+                              <div>
+                                <Link href={`/property/${b.propertyExtId || b.propertyId}`} className="hover:text-amber-400 transition-colors cursor-pointer">
+                                  <h3 className="text-white font-semibold text-lg">{b.propertyTitle || b.propertyId}</h3>
+                                </Link>
+                                <div className="space-y-3 mt-3">
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+                                    </svg>
+                                    <p className="text-gray-300 text-base font-medium">{b.location || '—'}</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd"/>
+                                    </svg>
+                                    <div className="text-gray-300 text-base font-medium">
+                                      {new Date(b.checkIn).toLocaleDateString()} → {new Date(b.checkOut).toLocaleDateString()}
+                                      <span className="ml-3 bg-gray-700 px-3 py-1 rounded-md text-sm text-white font-medium">
+                                        {Math.max(1, Math.round((new Date(b.checkOut).getTime() - new Date(b.checkIn).getTime()) / 86400000))} nights
+                                      </span>
+                                    </div>
+                                  </div>
+                                  {(b.bedrooms || b.bathrooms) && (
+                                    <div className="flex items-center gap-2">
+                                      <svg className="w-4 h-4 text-gray-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                                      </svg>
+                                      <div className="text-gray-300 text-base font-medium">
+                                        {b.bedrooms ? `${b.bedrooms} bedrooms` : ''}{b.bedrooms && b.bathrooms ? ' • ' : ''}{b.bathrooms ? `${b.bathrooms} bathrooms` : ''}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-white font-semibold">€{Number((b.totalCents||0)/100).toLocaleString('de-DE')}</div>
+                                <div className="px-2 py-1 rounded text-xs font-medium bg-amber-500/20 text-amber-400">
+                                  Application Pending
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Application Status */}
+                            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <div className="text-amber-400 font-medium text-sm">Application Status</div>
+                                  <div className="text-gray-300 text-xs mt-1">Awaiting landlord approval</div>
+                                </div>
+                                <div className="text-amber-400 text-sm">Pending</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
-          <div id="security" className="mt-12">
-            <div className="text-xl font-bold mb-3">Security</div>
-            <div className="rounded-2xl p-4 border border-white/10 bg-white/5 text-white/70">Manage password and security.</div>
+            {activeTab === 'past' && (
+              <div>
+                {pastBookings.length === 0 ? (
+                  <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 text-center">
+                    <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl">🏠</span>
+                    </div>
+                    <h3 className="text-xl font-semibold text-white mb-2">No Past Bookings...</h3>
+                    <p className="text-gray-400 mb-6">Properties you've previously booked will appear here.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {pastBookings.map((b:any)=> (
+                      <div key={b.id} className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+                        <div className="flex gap-4 items-start">
+                          <Link href={`/property/${b.propertyExtId || b.propertyId}`} className="w-20 h-20 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0 hover:opacity-80 transition-opacity cursor-pointer">
+                            {b.coverImage ? (
+                              <img 
+                                src={b.coverImage} 
+                                alt="Property" 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none'
+                                  e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                                }}
+                              />
+                            ) : null}
+                            <div className={`w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center ${b.coverImage ? 'hidden' : ''}`}>
+                              <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"/>
+                              </svg>
+                            </div>
+                          </Link>
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <Link href={`/property/${b.propertyExtId || b.propertyId}`} className="hover:text-amber-400 transition-colors cursor-pointer">
+                                  <h3 className="text-white font-semibold text-lg">{b.propertyTitle || b.propertyId}</h3>
+                                </Link>
+                                <p className="text-gray-400 text-sm">{b.location || '—'}</p>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-white font-semibold">€{Number((b.totalCents||0)/100).toLocaleString('de-DE')}</div>
+                                <div className={`px-2 py-1 rounded text-xs font-medium ${
+                                  b.status === 'completed' ? 'bg-gray-500/20 text-gray-400' :
+                                  b.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                                  'bg-gray-500/20 text-gray-400'
+                                }`}>
+                                  {b.status}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-gray-400 text-sm mb-3">
+                              {new Date(b.checkIn).toLocaleDateString()} → {new Date(b.checkOut).toLocaleDateString()}
+                              <span className="ml-2">
+                                {Math.max(1, Math.round((new Date(b.checkOut).getTime() - new Date(b.checkIn).getTime()) / 86400000))} nights
+                              </span>
+                            </div>
+                            {(b.bedrooms || b.bathrooms) && (
+                              <div className="text-gray-400 text-sm">
+                                {b.bedrooms ? `${b.bedrooms} bedrooms` : ''}{b.bedrooms && b.bathrooms ? ' • ' : ''}{b.bathrooms ? `${b.bathrooms} bathrooms` : ''}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>
