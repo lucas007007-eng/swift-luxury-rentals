@@ -52,6 +52,8 @@ const getXPReward = (task: string): string => {
   if (t.includes('safer recompute totals') && t.includes('server-only, idempotent')) return '+500 XP'
   if (t.includes('development timer: database') && t.includes('real-time persistence')) return '+500 XP'
   if (t.includes('start‑server.bat') && t.includes('env bootstrap') && t.includes('prisma')) return '+500 XP'
+  if (t.includes('luxury dark theme payment') && t.includes('pay monthly vs pay full')) return '+500 XP'
+  if (t.includes('professional dashboard with tab') && t.includes('bookings, lease applications')) return '+500 XP'
   
   // 400 XP - Complex multi-day features
   if (t.includes('city pages') && t.includes('property pages')) return '+400 XP'
@@ -67,6 +69,8 @@ const getXPReward = (task: string): string => {
   if (t.includes('prisma schema, migrations')) return '+400 XP'
   if (t.includes('performance indexes') && t.includes('booking, payment')) return '+400 XP'
   if (t.includes('timer persistence perfected') && t.includes('beforeunload')) return '+400 XP'
+  if (t.includes('smart booking categorization') && t.includes('payment management')) return '+400 XP'
+  if (t.includes('user dashboard with airbnb-style') && t.includes('booking display')) return '+400 XP'
   
   // 300 XP - Moderate complexity, 1-2 day features
   if (t.includes('filter button aligned') && t.includes('fully mobile-friendly')) return '+300 XP'
@@ -167,6 +171,15 @@ export default function MvpAccomplishments() {
         'Dynamic imports to reduce initial JS; hero video preload=metadata',
         'Remote image domains configured in Next image settings',
         'Service Worker implementation with offline caching and fallback pages',
+      ],
+    },
+    {
+      title: 'User Experience & Payments',
+      items: [
+        'Luxury dark theme payment page with Pay Monthly vs Pay Full toggle',
+        'Professional dashboard with tab navigation (Bookings, Lease Applications, Past)',
+        'Smart booking categorization and payment management with 3-column layout',
+        'User dashboard with Airbnb-style booking display and payment tracking',
       ],
     },
   ]
@@ -290,7 +303,7 @@ export default function MvpAccomplishments() {
                 {frontend.map((sec) => (
                   <div key={sec.title}>
                     <div className="text-emerald-300 font-semibold text-sm mb-2">{sec.title}</div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
                       {sec.items.map((it, i) => {
                         const getAchievementTitle = (task: string) => {
                           const t = task.toLowerCase()
@@ -311,36 +324,36 @@ export default function MvpAccomplishments() {
                           if (t.includes('dynamic imports')) return 'PERFORMANCE KING'
                           if (t.includes('remote image domains')) return 'IMAGE HANDLER'
                           if (t.includes('service worker')) return 'OFFLINE GUARDIAN'
+                          if (t.includes('luxury dark theme payment')) return 'PAYMENT DESIGNER'
+                          if (t.includes('professional dashboard with tab')) return 'DASHBOARD ARCHITECT'
+                          if (t.includes('smart booking categorization')) return 'UX STRATEGIST'
+                          if (t.includes('user dashboard with airbnb-style')) return 'CLIENT PORTAL MASTER'
                           return 'MISSION COMPLETE'
                         }
                         return (
-                          <div key={i} className="group relative flex items-center gap-2 p-2 rounded border border-amber-400/20 bg-gradient-to-r from-amber-900/10 to-amber-800/5 hover:from-amber-900/20 hover:to-amber-800/10 transition-all duration-200 hover:border-amber-400/40">
-                            {/* Compact Trophy Icon */}
-                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm">
-                              {getAchievementIcon(it)}
-                            </div>
-                            
-                            {/* Compact Achievement Content */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-1">
-                                <span className="text-amber-300 font-bold text-xs truncate">{getAchievementTitle(it)}</span>
-                                <span className="px-1.5 py-0.5 rounded text-xs bg-amber-500/20 text-amber-400 border border-amber-400/30 whitespace-nowrap">{getXPReward(it)}</span>
+                          <div key={i} className="group relative bg-gray-900/80 border border-gray-700 rounded-xl p-3 hover:border-amber-400/40 transition-all duration-200">
+                            {/* Achievement Header */}
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg flex-shrink-0">
+                                {getAchievementIcon(it)}
                               </div>
-                              <div className="text-white/80 text-xs leading-tight mt-0.5 line-clamp-2">{it}</div>
-                              
-                              {/* Compact Progress Bar */}
-                              <div className="mt-1 h-0.5 bg-gray-700 rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full" style={{ width: '100%' }}></div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-amber-300 font-bold text-xs truncate">{getAchievementTitle(it)}</div>
+                                <div className="text-emerald-400 font-medium text-xs">{getXPReward(it)}</div>
                               </div>
-                            </div>
-                            
-                            {/* Compact Completion Badge */}
-                            <div className="flex-shrink-0">
-                              <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
-                                <svg className="w-2 h-2 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                              <div className="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                                <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                   <path d="M20 6L9 17l-5-5"/>
                                 </svg>
                               </div>
+                            </div>
+                            
+                            {/* Achievement Description */}
+                            <div className="text-gray-300 text-xs leading-relaxed line-clamp-2">{it}</div>
+                            
+                            {/* Completion Status */}
+                            <div className="mt-2 px-2 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-lg">
+                              <div className="text-emerald-400 font-medium text-xs text-center">COMPLETED</div>
                             </div>
                           </div>
                         )
@@ -357,7 +370,7 @@ export default function MvpAccomplishments() {
                   {adminLeft.map((sec) => (
                     <div key={sec.title}>
                       <div className="text-emerald-300 font-semibold text-sm mb-2">{sec.title}</div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         {sec.items.map((it, i) => {
                           const getAchievementTitle = (task: string) => {
                             const t = task.toLowerCase()
@@ -417,36 +430,32 @@ export default function MvpAccomplishments() {
                             return 'ELITE OPERATIVE'
                           }
                           return (
-                            <div key={i} className="group relative flex items-center gap-2 p-2 rounded border border-amber-400/20 bg-gradient-to-r from-amber-900/10 to-amber-800/5 hover:from-amber-900/20 hover:to-amber-800/10 transition-all duration-200 hover:border-amber-400/40">
-                              {/* Compact Trophy Icon */}
-                              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm">
-                                <svg className="w-2.5 h-2.5 text-black" viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                </svg>
-                              </div>
-                              
-                              {/* Compact Achievement Content */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-1">
-                                  <span className="text-amber-300 font-bold text-xs truncate">{getAchievementTitle(it)}</span>
-                                  <span className="px-1.5 py-0.5 rounded text-xs bg-amber-500/20 text-amber-400 border border-amber-400/30 whitespace-nowrap">{getXPReward(it)}</span>
+                            <div key={i} className="group relative bg-gray-900/80 border border-gray-700 rounded-lg p-2 hover:border-amber-400/40 transition-all duration-200">
+                              {/* Compact Header */}
+                              <div className="flex items-center gap-1 mb-2">
+                                <div className="w-5 h-5 rounded bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0">
+                                  {getAchievementIcon(it)}
                                 </div>
-                                <div className="text-white/80 text-xs leading-tight mt-0.5 line-clamp-2">{it}</div>
-                                
-                                {/* Compact Progress Bar */}
-                                <div className="mt-1 h-0.5 bg-gray-700 rounded-full overflow-hidden">
-                                  <div className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full" style={{ width: '100%' }}></div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-amber-300 font-bold text-xs truncate">{getAchievementTitle(it)}</div>
                                 </div>
-                              </div>
-                              
-                              {/* Compact Completion Badge */}
-                              <div className="flex-shrink-0">
-                                <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                                <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
                                   <svg className="w-2 h-2 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M20 6L9 17l-5-5"/>
                                   </svg>
                                 </div>
                               </div>
+                              
+                              {/* XP Badge */}
+                              <div className="mb-2">
+                                <span className="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">{getXPReward(it)}</span>
+                              </div>
+                              
+                              {/* Compact Description */}
+                              <div className="text-gray-400 text-xs leading-tight line-clamp-2 mb-2">{it}</div>
+                              
+                              {/* Status */}
+                              <div className="text-emerald-400 font-medium text-xs text-center">COMPLETED</div>
                             </div>
                           )
                         })}
@@ -464,7 +473,7 @@ export default function MvpAccomplishments() {
               {(adminRight.length ? adminRight : admin).map((sec) => (
                 <div key={sec.title}>
                   <div className="text-emerald-300 font-semibold text-sm mb-2">{sec.title}</div>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-3">
                     {sec.items.map((it, i) => {
                       const getAchievementTitle = (task: string) => {
                         const t = task.toLowerCase()
@@ -524,36 +533,32 @@ export default function MvpAccomplishments() {
                         return 'ELITE OPERATIVE'
                       }
                       return (
-                        <div key={i} className="group relative flex items-center gap-2 p-2 rounded border border-amber-400/20 bg-gradient-to-r from-amber-900/10 to-amber-800/5 hover:from-amber-900/20 hover:to-amber-800/10 transition-all duration-200 hover:border-amber-400/40">
-                          {/* Compact Trophy Icon */}
-                          <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-sm">
-                            <svg className="w-2.5 h-2.5 text-black" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                            </svg>
-                          </div>
-                          
-                          {/* Compact Achievement Content */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-amber-300 font-bold text-xs truncate">{getAchievementTitle(it)}</span>
-                              <span className="px-1.5 py-0.5 rounded text-xs bg-amber-500/20 text-amber-400 border border-amber-400/30 whitespace-nowrap">{getXPReward(it)}</span>
+                        <div key={i} className="group relative bg-gray-900/80 border border-gray-700 rounded-lg p-2 hover:border-amber-400/40 transition-all duration-200">
+                          {/* Compact Header */}
+                          <div className="flex items-center gap-1 mb-2">
+                            <div className="w-5 h-5 rounded bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0">
+                              {getAchievementIcon(it)}
                             </div>
-                            <div className="text-white/80 text-xs leading-tight mt-0.5 line-clamp-2">{it}</div>
-                            
-                            {/* Compact Progress Bar */}
-                            <div className="mt-1 h-0.5 bg-gray-700 rounded-full overflow-hidden">
-                              <div className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full" style={{ width: '100%' }}></div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-amber-300 font-bold text-xs truncate">{getAchievementTitle(it)}</div>
                             </div>
-                          </div>
-                          
-                          {/* Compact Completion Badge */}
-                          <div className="flex-shrink-0">
-                            <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                            <div className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
                               <svg className="w-2 h-2 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M20 6L9 17l-5-5"/>
                               </svg>
                             </div>
                           </div>
+                          
+                          {/* XP Badge */}
+                          <div className="mb-2">
+                            <span className="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">{getXPReward(it)}</span>
+                          </div>
+                          
+                          {/* Compact Description */}
+                          <div className="text-gray-400 text-xs leading-tight line-clamp-2 mb-2">{it}</div>
+                          
+                          {/* Status */}
+                          <div className="text-emerald-400 font-medium text-xs text-center">COMPLETED</div>
                         </div>
                       )
                     })}

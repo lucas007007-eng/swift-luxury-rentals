@@ -92,7 +92,7 @@ export default function PublicCalendar({ availability = {}, monthlyPrice, onChan
           const selected = isInRange(key)
           const isStart = range.start === key
           const isEnd = !!range.end && range.end === key
-          const priceDisplay = price !== undefined ? `€${Math.round(price).toLocaleString('de-DE')}` : null
+          const priceDisplay = price !== undefined ? `€${Math.round(price)}` : null
           return (
             <button
               key={key}

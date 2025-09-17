@@ -100,7 +100,7 @@ export default function PropertyPage() {
 
   const nightlyFallback = useMemo(() => {
     const monthly = Number(property?.price || 0)
-    return Math.round((monthly / 30) * 100) / 100
+    return Math.ceil(monthly / 30)
   }, [property?.price])
 
   function dateKeysBetween(start: string, end: string): string[] {
@@ -124,7 +124,7 @@ export default function PropertyPage() {
       const priceNight = day?.priceNight ?? nightlyFallback
       sum += priceNight
     }
-    return { nights: keys.length, total: Math.round(sum * 100) / 100, unavailable: false }
+    return { nights: keys.length, total: Math.round(sum), unavailable: false }
   }, [selectedStart, selectedEnd, availability, nightlyFallback])
 
   // Helper: add months keeping day where possible

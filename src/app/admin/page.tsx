@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { cityProperties } from '@/data/cityProperties'
+import Header from '@/components/Header'
 import dynamic from 'next/dynamic'
 const SpyEuropeMap = dynamic(() => import('@/components/SpyEuropeMap'), { ssr: false })
 const AdminCalendar = dynamic(() => import('@/components/PublicCalendar'), { ssr: false })
@@ -88,8 +89,10 @@ export default function AdminDashboard() {
     } catch { return iso }
   }
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div className="max-w-[1800px] mx-auto px-6 py-10">
+    <main className="min-h-screen bg-black text-white flex flex-col">
+      <Header forceBackground={true} />
+      <div className="flex-1 flex items-center justify-center pt-8 pb-16">
+        <div className="max-w-[1800px] mx-auto px-6 py-8 w-full">
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
@@ -109,227 +112,153 @@ export default function AdminDashboard() {
             Logout
           </button>
         </div>
-        {/* Ops Tools — quick access row */}
-        <div className="mb-6">
-          <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text mb-3">Ops Tools</div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            <Link href="/admin/pages" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
-              </div>
-              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
-              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
-              <div className="relative flex items-center justify-between">
-                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Page Edits</span>
-                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
-              </div>
-            </Link>
-            <Link href="/admin/operating-manual" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
-              {/* Animated background grid */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
-              </div>
-              {/* Glowing corner accents */}
-              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
-              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
-              <div className="relative flex items-center justify-between">
-                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Operating Manual</span>
-                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
-              </div>
-            </Link>
-            <Link href="/admin/playbooks" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
-              {/* Animated background grid */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
-              </div>
-              {/* Glowing corner accents */}
-              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
-              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
-              <div className="relative flex items-center justify-between">
-                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Engineering Playbooks</span>
-                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
-              </div>
-            </Link>
-            <Link href="/admin/prompts" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
-              {/* Animated background grid */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
-              </div>
-              {/* Glowing corner accents */}
-              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
-              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
-              <div className="relative flex items-center justify-between">
-                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Saved Prompts</span>
-                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
-              </div>
-            </Link>
-            <Link href="/admin/repo-map" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
-              {/* Animated background grid */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
-              </div>
-              {/* Glowing corner accents */}
-              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
-              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
-              <div className="relative flex items-center justify-between">
-                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Repo Map</span>
-                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
-              </div>
-            </Link>
-            <Link href="/admin/week-plan" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
-              {/* Animated background grid */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
-              </div>
-              {/* Glowing corner accents */}
-              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
-              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
-              <div className="relative flex items-center justify-between">
-                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Week Plan</span>
-                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
-              </div>
-            </Link>
-          </div>
-        </div>
-        
-        {/* MVP Progress and Timer */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-          <div key="mvp-progress" className="flex"><MVPProgress /></div>
-          <div key="simple-timer" className="space-y-6">
-            <SimpleTimer />
-            <MVPProgressOverflow />
-          </div>
-        </div>
-
-        {/* Accomplishments (full width for better readability) */}
-        <div className="mb-6">
-          <MvpAccomplishments />
-        </div>
-        {/* Booking Radar CTA */}
-        <div
-          className="relative mb-10 rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_22px_rgba(16,185,129,0.22)] cursor-pointer overflow-hidden group"
-          onClick={() => router.push('/admin/bookings')}
-          role="link"
-          aria-label="Click to manage bookings"
-        >
-          <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
-          <div className="flex items-center justify-between gap-6">
-            <div>
-              <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text">Operations</div>
-              <div className="text-2xl md:text-3xl font-extrabold text-white mt-1">Click here to manage bookings</div>
-              <div className="text-white/70 mt-1 text-sm">View, confirm, or cancel reservations in real-time.</div>
-              <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-emerald-500 text-black font-semibold text-sm group-hover:bg-emerald-400 transition-colors">Open Bookings →</div>
-            </div>
-            <div className="relative w-40 h-40 md:w-48 md:h-48 shrink-0">
-              <div className="absolute inset-0 rounded-full bg-[#062018] border border-emerald-400/30 shadow-[0_0_18px_rgba(16,185,129,0.25)] overflow-hidden">
-                <div className="absolute inset-0 radar-sweep" />
-                {/* pings */}
-                <div className="absolute left-1/3 top-1/4 w-2 h-2 bg-emerald-400 rounded-full" />
-                <div className="absolute left-2/3 top-2/3 w-2 h-2 bg-emerald-400 rounded-full radar-ping" />
-                <div className="absolute left-1/4 top-2/3 w-2 h-2 bg-emerald-400/80 rounded-full" />
-                {/* grid rings */}
-                <div className="absolute inset-2 rounded-full border border-emerald-400/10" />
-                <div className="absolute inset-6 rounded-full border border-emerald-400/10" />
-                <div className="absolute inset-10 rounded-full border border-emerald-400/10" />
+        {/* Quick Access CTAs */}
+        <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* CMS Dashboard CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-green-400/30 bg-gradient-to-br from-[#0b1a0b] to-[#08120a] shadow-[0_0_22px_rgba(34,197,94,0.22)] cursor-pointer overflow-hidden group"
+            onClick={() => router.push('/admin/pages')}
+            role="link"
+            aria-label="Click to access CMS dashboard"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-green-400">Content Management</div>
+                <div className="text-xl font-extrabold text-white mt-1">CMS Dashboard</div>
+                <div className="text-white/70 mt-1 text-sm">Edit page content, SEO, and site copy.</div>
+                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-green-500 text-white font-semibold text-sm group-hover:bg-green-400 transition-colors">Open CMS →</div>
               </div>
             </div>
           </div>
-          <style jsx>{`
-            @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-            .radar-sweep {
-              background: conic-gradient(from 0deg, rgba(16,185,129,0.0), rgba(16,185,129,0.15) 8deg, rgba(16,185,129,0.6) 18deg, rgba(16,185,129,0.0) 60deg);
-              animation: spinSlow 6s linear infinite;
-            }
-            @keyframes ping { 0% { transform: scale(0.3); opacity: 0.9; } 80%, 100% { transform: scale(1.6); opacity: 0; } }
-            .radar-ping { box-shadow: 0 0 0 0 rgba(16,185,129,0.6); animation: ping 2.8s cubic-bezier(0,0,0.2,1) infinite; }
-          `}</style>
-        </div>
-        {/* CRM Dashboard at top */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-white/90 font-semibold text-lg">CRM Dashboard</div>
+          
+          {/* CRM Dashboard CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-amber-400/30 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_22px_rgba(245,158,11,0.22)] cursor-pointer overflow-hidden group"
+            onClick={() => router.push('/crm')}
+            role="link"
+            aria-label="Click to access CRM dashboard"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-amber-400">Customer Relations</div>
+                <div className="text-xl font-extrabold text-white mt-1">CRM Dashboard</div>
+                <div className="text-white/70 mt-1 text-sm">Manage customers, VIPs, and lease agreements.</div>
+                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-amber-500 text-black font-semibold text-sm group-hover:bg-amber-400 transition-colors">Open CRM →</div>
+              </div>
+            </div>
           </div>
-          <CRMTables onChange={reloadAnalytics} />
+          
+          {/* Sales Analytics CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-blue-400/30 bg-gradient-to-br from-[#0b0f1a] to-[#08120d] shadow-[0_0_22px_rgba(59,130,246,0.22)] cursor-pointer overflow-hidden group"
+            onClick={() => router.push('/sales-analytics')}
+            role="link"
+            aria-label="Click to access sales analytics"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-blue-400">Analytics</div>
+                <div className="text-xl font-extrabold text-white mt-1">Sales Analytics</div>
+                <div className="text-white/70 mt-1 text-sm">Revenue targets, metrics, and charts.</div>
+                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-blue-500 text-white font-semibold text-sm group-hover:bg-blue-400 transition-colors">Open Analytics →</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Targets Row: Monthly / Quarterly / Annual */}
-        <TargetsRow metrics={metrics} loading={loading} />
-
-        {/* City tiles removed – radar map is now the sole navigation to city pages */}
-
-        {/* Analytics row: Month, Annual, Live Listings map */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 items-stretch">
-          <MetricCard title={`${currentMonthLabel} Revenue`} value={metrics?.totals?.monthlyRevenue ?? 0} prefix="€" loading={loading} trend bgGifSrc="/images/pepe.gif" gifHeight={180} className="min-h-[280px]" />
-          <MetricCard title="Annual Revenue" value={metrics?.totals?.annualRevenue ?? 0} prefix="€" loading={loading} trend className="min-h-[280px]" />
+        {/* Operations, Live Listings, and Accounting Tools */}
+        <div className="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Booking Radar CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_22px_rgba(16,185,129,0.22)] cursor-pointer overflow-hidden group h-[280px] flex flex-col justify-center"
+            onClick={() => router.push('/admin/bookings')}
+            role="link"
+            aria-label="Click to manage bookings"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-amber-400">Operations</div>
+                <div className="text-xl font-extrabold text-white mt-1">Manage Bookings</div>
+                <div className="text-white/70 mt-1 text-sm">View, confirm, or cancel reservations.</div>
+                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-emerald-500 text-black font-semibold text-sm group-hover:bg-emerald-400 transition-colors">Open Bookings →</div>
+              </div>
+            </div>
+          </div>
+          
           <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-[0_15px_50px_rgba(0,0,0,0.5)] h-[280px] bg-[#07140F]">
             <div className="absolute top-3 left-4 z-10">
               <div className="font-mono uppercase tracking-wider text-sm md:text-base gold-metallic-text">Live Listing</div>
             </div>
             <SpyEuropeMap onPinClick={(city) => router.push(`/admin/city/${encodeURIComponent(city)}`)} />
           </div>
-        </div>
-        {/* Upcoming / Overdue / Most Profitable Cities in one row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 items-stretch">
-          <MetricCard title="Upcoming Payments within the Next 30 days" value={metrics?.totals?.upcomingReceivables ?? 0} prefix="€" loading={loading} />
-          <MetricCard title="Overdue" value={metrics?.totals?.overdueReceivables ?? 0} prefix="€" loading={loading} />
-          {/* Most Profitable Cities */}
-          <div className="relative rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-            <div className="font-mono uppercase tracking-wider text-base md:text-lg gold-metallic-text mb-3">Most Profitable Cities</div>
-            {loading ? (
-              <div className="h-24 flex items-center justify-center text-white/40 text-sm">Loading…</div>
-            ) : topCities.length === 0 ? (
-              <div className="text-white/60 text-sm">No sales yet.</div>
-            ) : (
-              <div className="space-y-2">
-                {topCities.map((c)=> (
-                  <div key={c.city} className="flex items-center justify-between">
-                    <span className="text-white/90 text-base md:text-lg">{c.city}</span>
-                    <span className="text-emerald-400 font-semibold text-lg md:text-xl">€{Number(c.total).toLocaleString('de-DE')}</span>
-                  </div>
-                ))}
+          
+          {/* Accounting CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-indigo-400/30 bg-gradient-to-br from-[#0b0f1a] to-[#080a12] shadow-[0_0_22px_rgba(99,102,241,0.22)] cursor-pointer overflow-hidden group h-[280px] flex flex-col justify-center"
+            onClick={() => router.push('/admin/accounting')}
+            role="link"
+            aria-label="Click to access accounting dashboard"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-indigo-400">Financial Management</div>
+                <div className="text-xl font-extrabold text-white mt-1">Accounting</div>
+                <div className="text-white/70 mt-1 text-sm">Track expenses, profits, and financial reports.</div>
+                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-indigo-500 text-white font-semibold text-sm group-hover:bg-indigo-400 transition-colors">Open Accounting →</div>
               </div>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <MetricCard title={`${currentMonthLabel} Commissions`} value={metrics?.totals?.monthlyCommission ?? 0} prefix="€" loading={loading} />
-          <MetricCard title="Annual Commission" value={metrics?.totals?.annualCommission ?? 0} prefix="€" loading={loading} />
-          <MetricCard title="Conversion Rate" value={metrics?.totals?.conversionRate ?? 0} suffix="%" loading={loading} />
-          {/* Deposits Held */}
-          <div className="relative rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-            <div className="font-mono uppercase tracking-wider text-base md:text-lg gold-metallic-text mb-1">Deposits Held</div>
-            <div className="text-3xl font-extrabold text-emerald-400">
-              €{(typeof window !== 'undefined' ? ((window as any).__depositsHeld||0) : 0).toLocaleString('de-DE')}
             </div>
-            <div className="text-white/60 text-sm mt-1">Sum of active deposits (excludes refunded)</div>
           </div>
         </div>
 
-        {/* (Removed separate Most Profitable Cities grid; now included above beside Overdue) */}
-
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          <BarChart title="Revenue by Month" labels={monthLabels} series={revenueSeries} color="#f59e0b" loading={loading} prefix="€" />
-          <BarChart title="Bookings by Month" labels={monthLabels} series={bookingsSeries} color="#22c55e" loading={loading} />
-          <BarChart title="Commission by Month" labels={monthLabels} series={commissionSeries} color="#3b82f6" loading={loading} prefix="€" />
-          <BarChart title="Growth by Month" labels={monthLabels} series={growthSeries} color="#eab308" loading={loading} />
+        {/* Development Tools CTAs */}
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Skill Tree CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-yellow-400/30 bg-gradient-to-br from-[#1a1a0b] to-[#12120a] shadow-[0_0_22px_rgba(234,179,8,0.22)] cursor-pointer overflow-hidden group"
+            onClick={() => router.push('/admin/accomplishments')}
+            role="link"
+            aria-label="Click to view skill tree"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-yellow-400">Development</div>
+                <div className="text-xl font-extrabold text-white mt-1">Skill Tree</div>
+                <div className="text-white/70 mt-1 text-sm">Interactive skill tree with completed achievements and current objectives.</div>
+                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-yellow-500 text-black font-semibold text-sm group-hover:bg-yellow-400 transition-colors">Open Skill Tree →</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* DevOps Tools CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-orange-400/30 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_22px_rgba(249,115,22,0.22)] cursor-pointer overflow-hidden group"
+            onClick={() => router.push('/admin/devops')}
+            role="link"
+            aria-label="Click to access DevOps tools"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-orange-400">Development</div>
+                <div className="text-xl font-extrabold text-white mt-1">DevOps Tools</div>
+                <div className="text-white/70 mt-1 text-sm">Page Edits, Operating Manual, Engineering Playbooks, Saved Prompts, Repo Map, Week Plan.</div>
+                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-orange-500 text-white font-semibold text-sm group-hover:bg-orange-400 transition-colors">Open DevOps →</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Development Timer */}
+          <div className="flex">
+            <SimpleTimer />
+          </div>
         </div>
-
-        
-
+        </div>
       </div>
 
     </main>
