@@ -7,6 +7,17 @@ import Footer from '@/components/Footer'
 import Link from 'next/link'
 
 export default function AboutPage() {
+  const [overrides, setOverrides] = React.useState<Record<string,string>>({})
+  React.useEffect(() => {
+    ;(async()=>{
+      try {
+        const res = await fetch('/api/pages/about', { cache: 'no-store' })
+        const data = await res.json()
+        const o = data?.page?.contentOverrides || {}
+        setOverrides(o)
+      } catch {}
+    })()
+  }, [])
   const values = [
     {
       icon: '🏆',
@@ -72,7 +83,7 @@ export default function AboutPage() {
               About Swift Luxury
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto">
-              Revolutionizing luxury rentals across Europe with cryptocurrency payments and premium service
+              {overrides['hero.subtitle'] || 'Revolutionizing luxury rentals across Europe with cryptocurrency payments and premium service'}
             </p>
           </motion.div>
         </div>
@@ -91,13 +102,10 @@ export default function AboutPage() {
                 Our Mission
               </h2>
               <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                Swift Luxury is pioneering the future of luxury rentals by combining premium European properties 
-                with cutting-edge cryptocurrency payment solutions. We believe luxury living should be accessible 
-                and payments should be seamless.
+                {overrides['mission.body'] || `Swift Luxury is pioneering the future of luxury rentals by combining premium European properties with cutting-edge cryptocurrency payment solutions. We believe luxury living should be accessible and payments should be seamless.`}
               </p>
               <p className="text-lg text-gray-300 leading-relaxed">
-                Our platform connects discerning travelers and long-term residents with Europe's finest 
-                rental properties, offering unparalleled convenience through our revolutionary crypto payment system.
+                {overrides['mission.body.2'] || `Our platform connects discerning travelers and long-term residents with Europe's finest rental properties, offering unparalleled convenience through our revolutionary crypto payment system.`}
               </p>
             </motion.div>
 
@@ -150,7 +158,7 @@ export default function AboutPage() {
               Our Values
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              The principles that guide everything we do at Swift Luxury
+              {overrides['values.intro'] || 'The principles that guide everything we do at Swift Luxury'}
             </p>
           </motion.div>
 
@@ -180,7 +188,7 @@ export default function AboutPage() {
               What Makes Us Different
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Revolutionary features that set Swift Luxury apart from traditional rental platforms
+              {overrides['features.intro'] || 'Revolutionary features that set Swift Luxury apart from traditional rental platforms'}
             </p>
           </div>
 
@@ -214,7 +222,7 @@ export default function AboutPage() {
           <div className="bg-black rounded-3xl p-12 border border-gray-800">
             <h2 className="text-3xl font-bold text-white mb-6">Ready to Experience Swift Luxury?</h2>
             <p className="text-gray-300 mb-8 text-lg">
-              Discover our curated collection of ultra-luxury properties across Europe
+              {overrides['cta.subtitle'] || 'Discover our curated collection of ultra-luxury properties across Europe'}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/properties" className="bg-amber-500 hover:bg-amber-600 text-black font-bold px-8 py-4 rounded-xl transition-colors text-center">

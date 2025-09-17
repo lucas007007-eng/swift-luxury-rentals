@@ -163,6 +163,46 @@ export async function POST(req: Request) {
             }
           }
         } catch {}
+        // Ensure first_period amount matches exact monthly when first period is a full calendar month
+        try {
+          const b = await prisma.booking.findUnique({ where: { id: updated.id }, include: { property: true, payments: true } })
+          if (b?.property) {
+            const s = new Date(b.checkin as any)
+            const e = new Date(b.checkout as any)
+            const endOfCurrentMonth = new Date(s.getFullYear(), s.getMonth() + 1, 0)
+            const dayAfterEndOfCurrentMonth = new Date(endOfCurrentMonth.getFullYear(), endOfCurrentMonth.getMonth(), endOfCurrentMonth.getDate() + 1)
+            const endOfNextMonth = new Date(s.getFullYear(), s.getMonth() + 2, 0)
+            const dayAfterEndOfNextMonth = new Date(endOfNextMonth.getFullYear(), endOfNextMonth.getMonth(), endOfNextMonth.getDate() + 1)
+            const crossesMonthEnd = e > dayAfterEndOfCurrentMonth
+            let firstEndExclusive: Date = e
+            if (s.getDate() >= 25) firstEndExclusive = e < dayAfterEndOfNextMonth ? e : dayAfterEndOfNextMonth
+            else if (crossesMonthEnd) firstEndExclusive = dayAfterEndOfCurrentMonth
+            // full calendar month if starts on 1st and ends on 1st next month
+            const isFull = s.getDate() === 1 && firstEndExclusive.getDate() === 1
+            if (isFull) {
+              const monthly = Number((b.property as any)?.priceMonthly || 0)
+              if (monthly > 0) {
+                const first = (b.payments || []).find(p => p.purpose === 'first_period')
+                if (first && Number(first.amountCents) !== Math.round(monthly * 100)) {
+                  await prisma.payment.update({ where: { id: first.id }, data: { amountCents: Math.round(monthly * 100) } })
+                }
+              }
+            }
+          }
+        } catch {}
+        // Fallback: if no non-deposit payments are marked received yet, mark the earliest scheduled monthly_rent as received so it appears under Payment Received
+        try {
+          const payments = await prisma.payment.findMany({ where: { bookingId: updated.id } })
+          const anyNonDepositReceived = payments.some(p => p.purpose !== 'deposit' && p.status === 'received')
+          if (!anyNonDepositReceived) {
+            const earliestScheduled = payments
+              .filter(p => p.purpose === 'monthly_rent' && p.status === 'scheduled')
+              .sort((a:any,b:any)=> new Date(a.dueAt||0).getTime() - new Date(b.dueAt||0).getTime())[0]
+            if (earliestScheduled) {
+              await prisma.payment.update({ where: { id: earliestScheduled.id }, data: { status: 'received', receivedAt: now } })
+            }
+          }
+        } catch {}
       } catch {}
     }
     // For browser form submissions, redirect back to the bookings page instead of returning JSON

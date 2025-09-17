@@ -113,6 +113,19 @@ export default function AdminDashboard() {
         <div className="mb-6">
           <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text mb-3">Ops Tools</div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <Link href="/admin/pages" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
+              <div className="absolute inset-0 opacity-20">
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(245,158,11,0.1)_1px,transparent_1px),linear-gradient(rgba(245,158,11,0.1)_1px,transparent_1px)] bg-[size:20px_20px] animate-pulse" />
+              </div>
+              <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-amber-400/60" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-amber-400/60" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-amber-400/60" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-amber-400/60" />
+              <div className="relative flex items-center justify-between">
+                <span className="text-amber-100 font-bold group-hover:text-amber-300 transition-colors text-sm">Page Edits</span>
+                <span className="text-amber-400 group-hover:text-amber-300 font-bold text-lg transition-colors">→</span>
+              </div>
+            </Link>
             <Link href="/admin/operating-manual" className="group relative rounded-2xl p-4 border border-amber-400/40 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_25px_rgba(245,158,11,0.3)] overflow-hidden hover:shadow-[0_0_35px_rgba(245,158,11,0.4)] transition-all duration-300">
               {/* Animated background grid */}
               <div className="absolute inset-0 opacity-20">
@@ -190,10 +203,6 @@ export default function AdminDashboard() {
             </Link>
           </div>
         </div>
-        {/* Accomplishments (full width for better readability) */}
-        <div className="mb-6">
-          <MvpAccomplishments />
-        </div>
         
         {/* MVP Progress and Timer */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -202,6 +211,11 @@ export default function AdminDashboard() {
             <SimpleTimer />
             <MVPProgressOverflow />
           </div>
+        </div>
+
+        {/* Accomplishments (full width for better readability) */}
+        <div className="mb-6">
+          <MvpAccomplishments />
         </div>
         {/* Booking Radar CTA */}
         <div

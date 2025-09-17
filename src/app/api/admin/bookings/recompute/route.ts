@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     console.log(`[RECOMPUTE] Starting ${all ? 'all bookings' : `booking ${bookingId}`} ${dryRun ? '(dry run)' : '(live)'} at ${new Date().toISOString()}`)
 
     const processBooking = async (booking: any) => {
-      const extId = booking.property?.extId || undefined
+      const extId = booking.property?.extId || booking.property?.id || booking.propertyId || undefined
       const checkIn = booking.checkin
       const checkOut = booking.checkout
       
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
       const bookings = await prisma.booking.findMany({
         where: { deletedAt: null },
         include: {
-          property: { select: { extId: true, title: true } },
+          property: { select: { extId: true, id: true, title: true } },
           user: { select: { name: true } },
           payments: { select: { id: true, purpose: true, status: true, amountCents: true } }
         }
@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: {
-        property: { select: { extId: true, title: true } },
+        property: { select: { extId: true, id: true, title: true } },
         user: { select: { name: true } },
         payments: { select: { id: true, purpose: true, status: true, amountCents: true } }
       }

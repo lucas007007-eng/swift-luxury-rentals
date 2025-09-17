@@ -36,8 +36,8 @@ export default function TestBookingBar(_: Props) {
     }
   }
 
-  // helpers to mirror booking page calculations (monthly/30 baseline)
-  const nightsBetween = (a: Date, b: Date) => Math.max(0, Math.round((b.getTime() - a.getTime())/86400000))
+  // helpers to mirror booking page/admin rules
+  const nightsBetween = (a: Date, b: Date) => Math.max(0, Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate()))/86400000))
   const addMonthsKeepDay = (date: Date, add: number) => {
     const targetMonth = date.getMonth() + add
     const targetYear = date.getFullYear() + Math.floor(targetMonth / 12)
@@ -51,7 +51,10 @@ export default function TestBookingBar(_: Props) {
     try {
       if (!propertyId || !checkIn || !checkOut) { setPreview(null); return }
       const monthly = monthlyPrice
-      const nightly = monthly > 0 ? monthly / 30 : 0
+      const nightlyForMonth = (y: number, m: number) => {
+        const dim = new Date(y, m + 1, 0).getDate()
+        return Math.ceil((monthly > 0 ? monthly / dim : 0) || 0)
+      }
       const s = new Date(checkIn)
       const e = new Date(checkOut)
       if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime()) || e <= s) { setPreview(null); return }
@@ -68,7 +71,25 @@ export default function TestBookingBar(_: Props) {
         firstPeriodEndExclusive = dayAfterEndOfCurrentMonth
       }
       const firstNights = nightsBetween(s, firstPeriodEndExclusive)
-      const firstPeriod = Math.round(firstNights * nightly)
+      // First period: split across months and apply full-month vs partial rules
+      let firstPeriod = 0
+      {
+        let cursor = new Date(s)
+        while (cursor < firstPeriodEndExclusive) {
+          const ms = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
+          const nm = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1)
+          const segEnd = firstPeriodEndExclusive < nm ? firstPeriodEndExclusive : nm
+          const isFull = cursor.getTime() === ms.getTime() && segEnd.getTime() === nm.getTime()
+          if (isFull) {
+            firstPeriod += Math.round(monthly)
+          } else {
+            const nights = nightsBetween(cursor, segEnd)
+            const nightly = nightlyForMonth(cursor.getFullYear(), cursor.getMonth())
+            firstPeriod += nights * nightly
+          }
+          cursor = segEnd
+        }
+      }
       const totalDays = nightsBetween(s, e)
       const moveInFee = totalDays < 30 ? 0 : 250
       // deposit rules
@@ -86,8 +107,8 @@ export default function TestBookingBar(_: Props) {
         const nextMonthStart = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1)
         const end = e < nextMonthStart ? e : nextMonthStart
         if (monthCursor >= end) break
-        const nights = nightsBetween(monthCursor, end)
-        const amt = Math.round(nightly * nights)
+        const isFull = monthCursor.getDate() === 1 && end.getTime() === nextMonthStart.getTime()
+        const amt = isFull ? Math.round(monthly) : (nightsBetween(monthCursor, end) * nightlyForMonth(monthCursor.getFullYear(), monthCursor.getMonth()))
         const dueAt = new Date(monthCursor.getFullYear(), monthCursor.getMonth(), 1)
         const endLessOne = new Date(end.getTime() - 86400000)
         const coverage = `${monthCursor.toLocaleDateString('en-US', { month: 'short' })} 1 - ${monthCursor.toLocaleDateString('en-US', { month: 'short' })} ${String(endLessOne.getDate()).padStart(2,'0')}`

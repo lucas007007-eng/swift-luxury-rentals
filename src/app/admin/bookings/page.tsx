@@ -255,7 +255,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                 <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Deposit</th>
                 <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Payment Received</th>
                 <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Scheduled Payments</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[14%]">Booking Status</th>
+                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[14%]">Overdue Payments</th>
                 <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[10%]">Status</th>
               </tr>
             </thead>
@@ -283,7 +283,8 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       const hasAnyDeposit = depHeldCents > 0 || refundedCents > 0
                       if (!hasAnyDeposit) return <span className="text-white/40 text-xs">—</span>
                       const hasDepositPaymentReceived = (b.payments || []).some((p:any)=> p.purpose === 'deposit' && p.status === 'received')
-                      const depositReceived = hasDepositPaymentReceived // Only show received if actually received, not just confirmed
+                      // Treat confirmed bookings as having an active deposit (green), like before
+                      const depositReceived = hasDepositPaymentReceived || b.status === 'confirmed'
                       const isRefunded = refundedCents > 0
                       const amountEuros = Math.round(((isRefunded ? refundedCents : depHeldCents) / 100))
                       const colorBox = isRefunded
@@ -440,27 +441,45 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                 <span className="uppercase tracking-wider">Scheduled Payments</span>
                               </div>
                               <div className="space-y-1 mt-2">
-                                {scheduled.map((p:any) => (
-                                  <label key={p.id} className="flex items-center justify-between gap-3 whitespace-nowrap">
-                                    <div className="flex items-center gap-2">
-                                      <input type="checkbox" name="paymentId" value={p.id} form={`receive-${b.id}`} className="accent-emerald-500" />
-                                      <div className="flex flex-col">
-                                        <span className="px-2 py-0.5 rounded text-sm bg-amber-500/20 text-amber-300 border border-amber-400/30 whitespace-nowrap">{formatShortDate(new Date(p.dueAt))}</span>
-                                        {(() => {
-                                          try {
-                                            const list = (payments || []).filter((x:any)=> x.purpose === 'monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
-                                            const idx = list.findIndex((x:any)=> x.id === p.id)
-                                            const n = (idx >= 0 ? idx + 2 : 2)
-                                            const j = n % 10, k = n % 100
-                                            const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
-                                            return <span className="text-sm text-amber-200/80 whitespace-nowrap">({ord} month rent)</span>
-                                          } catch { return null }
-                                        })()}
+                                {scheduled.map((p:any, idx:number) => {
+                                  const due = new Date(p.dueAt)
+                                  const nextMonthStart = new Date(due.getFullYear(), due.getMonth()+1, 1)
+                                  const checkout = new Date(b.checkout)
+                                  const segEnd = checkout < nextMonthStart ? checkout : nextMonthStart
+                                  const isLast = idx === scheduled.length - 1
+                                  const isPartial = segEnd.getTime() !== nextMonthStart.getTime()
+                                  const endLessOne = new Date(segEnd.getTime() - 86400000)
+                                  const fmtShort = (d: Date) => {
+                                    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+                                    const dd = d.getDate(); const j = dd % 10, k = dd % 100
+                                    let sfx = 'th'; if (k!==11 && k!==12 && k!==13) { if (j===1) sfx='st'; else if (j===2) sfx='nd'; else if (j===3) sfx='rd' }
+                                    return `${months[d.getMonth()]} ${dd}${sfx}`
+                                  }
+                                  return (
+                                    <label key={p.id} className="flex items-center justify-between gap-3 whitespace-nowrap">
+                                      <div className="flex items-center gap-2">
+                                        <input type="checkbox" name="paymentId" value={p.id} form={`receive-${b.id}`} className="accent-emerald-500" />
+                                        <div className="flex flex-col">
+                                          <span className="px-2 py-0.5 rounded text-sm bg-amber-500/20 text-amber-300 border border-amber-400/30 whitespace-nowrap">{formatShortDate(due)}</span>
+                                          {(() => {
+                                            try {
+                                              const list = (payments || []).filter((x:any)=> x.purpose === 'monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
+                                              const myIdx = list.findIndex((x:any)=> x.id === p.id)
+                                              const n = (myIdx >= 0 ? myIdx + 2 : 2)
+                                              const j = n % 10, k = n % 100
+                                              const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
+                                              if (isLast && isPartial) {
+                                                return <span className="text-sm text-amber-200/80 whitespace-nowrap">({fmtShort(due)} - {fmtShort(endLessOne)})</span>
+                                              }
+                                              return <span className="text-sm text-amber-200/80 whitespace-nowrap">({ord} month rent)</span>
+                                            } catch { return null }
+                                          })()}
+                                        </div>
                                       </div>
-                                    </div>
-                                    <span className="text-sm font-semibold text-white whitespace-nowrap">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
-                                  </label>
-                                ))}
+                                      <span className="text-sm font-semibold text-white whitespace-nowrap">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                    </label>
+                                  )
+                                })}
                               </div>
                               {/* Payment Received tile */}
                               <form id={`receive-${b.id}`} action="/api/admin/bookings/receive-selected" method="post" className="mt-3">
@@ -480,19 +499,29 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       )
                     })()}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm align-top">
                     {(() => {
                       const now = new Date()
-                      const overdue = (b.payments||[])
+                      const overdueList = (b.payments||[])
                         .filter((p:any)=> p.purpose === 'monthly_rent' && p.status === 'scheduled' && p.dueAt && new Date(p.dueAt) < now)
-                        .reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
-                      if (overdue <= 0) return <span className="text-white/40 text-xs">—</span>
-                      const euros = Math.round(overdue/100)
+                        .sort((a:any,b:any)=> new Date(a.dueAt||0).getTime() - new Date(b.dueAt||0).getTime())
+                      if (overdueList.length === 0) return <span className="text-white/40 text-xs">—</span>
+                      const overdueCents = overdueList.reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
                       return (
-                        <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-red-400/40 bg-red-500/10 text-red-300 shadow-[0_0_14px_rgba(239,68,68,0.35)] animate-pulse whitespace-nowrap" aria-label="Overdue amount">
-                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                          <span className="font-semibold">€{euros.toLocaleString('de-DE')}</span>
-                          <span className="uppercase tracking-wider text-[10px] text-red-200">Overdue</span>
+                        <div className="rounded-md border border-red-400/40 bg-red-500/10 text-red-300 shadow-[0_0_14px_rgba(239,68,68,0.25)] p-3">
+                          <div className="flex items-center gap-2 text-xs mb-2">
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <span className="uppercase tracking-wider">Overdue Payments</span>
+                            <span className="ml-auto font-semibold text-white">€{Math.round(overdueCents/100).toLocaleString('de-DE')}</span>
+                          </div>
+                          <div className="space-y-2">
+                            {overdueList.map((p:any)=> (
+                              <div key={p.id} className="flex items-center justify-between gap-3">
+                                <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-200 border border-red-400/30 whitespace-nowrap">{formatShortDate(new Date(p.dueAt))}</span>
+                                <span className="text-sm font-semibold text-white whitespace-nowrap">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )
                     })()}

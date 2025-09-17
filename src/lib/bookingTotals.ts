@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 import { cityProperties } from '@/data/cityProperties'
+import prisma from '@/lib/prisma'
 
 type Totals = {
   subtotal: number
@@ -32,10 +33,10 @@ function addMonthsKeepDay(date: Date, add: number): Date {
 
 function eachDate(start: Date, endExclusive: Date): Date[] {
   const dates: Date[] = []
-  const d = new Date(start)
-  while (d < endExclusive) {
-    dates.push(new Date(d))
-    d.setDate(d.getDate() + 1)
+  const startTs = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate())
+  const endTs = Date.UTC(endExclusive.getUTCFullYear(), endExclusive.getUTCMonth(), endExclusive.getUTCDate())
+  for (let ts = startTs; ts < endTs; ts += 86400000) {
+    dates.push(new Date(ts))
   }
   return dates
 }
@@ -55,7 +56,14 @@ export async function computeBookingTotals(params: { propertyExtId?: string; che
       if (p) { found = p; break }
     }
   }
-  const monthly = Number(found?.price || 0)
+  let monthly = Number(found?.price || 0)
+  // Fallback: if not found in catalog, try Prisma property by extId or id
+  if ((!monthly || monthly <= 0) && extId) {
+    try {
+      const p = await prisma.property.findFirst({ where: { OR: [ { extId }, { id: extId } ] }, select: { priceMonthly: true } })
+      if (p && typeof p.priceMonthly === 'number') monthly = Number(p.priceMonthly || 0)
+    } catch {}
+  }
   const nightlyDefault = monthly > 0 ? monthly / 30 : 0
 
   // calendar overrides per property id
@@ -63,16 +71,28 @@ export async function computeBookingTotals(params: { propertyExtId?: string; che
 
   const sumRange = (start: Date, endExclusive: Date) => {
     let acc = 0
+    let hadDays = false
     for (const d of eachDate(start, endExclusive)) {
+      hadDays = true
       const k = d.toISOString().slice(0, 10)
       const day = (calendar as any)[k]
       const available = day?.available !== false
-      if (!available) return 0
+      if (!available) {
+        // Skip blocked days but still count others; do not force whole range to zero
+        continue
+      }
       const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
       const baseMonthly = (day?.priceMonth ?? monthly)
       const fallback = nightlyDefault
-      const priceNight = day?.priceNight ?? (baseMonthly > 0 ? baseMonthly / daysInMonth : fallback)
-      acc += Number(priceNight || 0)
+      const nightlyRaw = day?.priceNight ?? (baseMonthly > 0 ? baseMonthly / daysInMonth : fallback)
+      const nightly = Math.ceil(Number(nightlyRaw || 0))
+      acc += nightly
+    }
+    // Fallback: if no nights priced due to missing data, approximate by monthly/30 per night
+    if (hadDays && acc === 0 && (monthly || nightlyDefault)) {
+      const nights = Math.max(0, Math.round((endExclusive.getTime() - start.getTime()) / 86400000))
+      const nightly = monthly > 0 ? (monthly / 30) : nightlyDefault
+      acc = nights * nightly
     }
     return Math.round(acc * 100) / 100
   }
@@ -134,22 +154,39 @@ export async function computeMonthlySchedule(params: { propertyExtId?: string; c
       if (p) { found = p; break }
     }
   }
-  const monthly = Number(found?.price || 0)
+  let monthly = Number(found?.price || 0)
+  // Fallback: if not found in catalog, try Prisma property by extId or id
+  if ((!monthly || monthly <= 0) && extId) {
+    try {
+      const p = await prisma.property.findFirst({ where: { OR: [ { extId }, { id: extId } ] }, select: { priceMonthly: true } })
+      if (p && typeof p.priceMonthly === 'number') monthly = Number(p.priceMonthly || 0)
+    } catch {}
+  }
   const nightlyDefault = monthly > 0 ? monthly / 30 : 0
   const calendar: Record<string, any> = (extId && overrides?.[extId]?.calendar) ? (overrides?.[extId]?.calendar) : {}
 
   const sumRange = (start: Date, endExclusive: Date) => {
     let acc = 0
+    let hadDays = false
     for (const d of eachDate(start, endExclusive)) {
+      hadDays = true
       const k = d.toISOString().slice(0, 10)
       const day = (calendar as any)[k]
       const available = day?.available !== false
-      if (!available) return 0
+      if (!available) {
+        continue
+      }
       const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
       const baseMonthly = (day?.priceMonth ?? monthly)
       const fallback = nightlyDefault
-      const priceNight = day?.priceNight ?? (baseMonthly > 0 ? baseMonthly / daysInMonth : fallback)
-      acc += Number(priceNight || 0)
+      const nightlyRaw = day?.priceNight ?? (baseMonthly > 0 ? baseMonthly / daysInMonth : fallback)
+      const nightly = Math.ceil(Number(nightlyRaw || 0))
+      acc += nightly
+    }
+    if (hadDays && acc === 0 && (monthly || nightlyDefault)) {
+      const nights = Math.max(0, Math.round((endExclusive.getTime() - start.getTime()) / 86400000))
+      const nightly = monthly > 0 ? (monthly / 30) : nightlyDefault
+      acc = nights * nightly
     }
     return Math.round(acc * 100) / 100
   }
@@ -177,7 +214,14 @@ export async function computeMonthlySchedule(params: { propertyExtId?: string; c
     const nextMonthStart = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1)
     const end = e < nextMonthStart ? e : nextMonthStart
     if (monthCursor >= end) break
-    const amt = sumRange(monthCursor, end)
+    // Nights in this month segment
+    const nights = Math.max(0, Math.round((Date.UTC(end.getFullYear(), end.getMonth(), end.getDate()) - Date.UTC(monthCursor.getFullYear(), monthCursor.getMonth(), monthCursor.getDate())) / 86400000))
+    const daysInMonth = new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 0).getDate()
+    const baseMonthly = monthly > 0 ? monthly : (nightlyDefault * 30)
+    const isFullMonth = monthCursor.getDate() === 1 && end.getTime() === nextMonthStart.getTime()
+    const amt = isFullMonth
+      ? Math.round(baseMonthly)
+      : (nights * Math.ceil((baseMonthly > 0 ? baseMonthly / daysInMonth : nightlyDefault) || 0))
     const dueAt = new Date(monthCursor.getFullYear(), monthCursor.getMonth(), 1)
     const endLessOne = new Date(end.getTime() - 86400000)
     const coverage = `${monthCursor.toLocaleDateString('en-US', { month: 'short' })} 1 - ${monthCursor.toLocaleDateString('en-US', { month: 'short' })} ${String(endLessOne.getDate()).padStart(2,'0')}`

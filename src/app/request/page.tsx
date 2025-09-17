@@ -68,16 +68,38 @@ export default function RequestToBook() {
       const s = new Date(checkin)
       const e = new Date(checkout)
       if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime()) || e <= s) { setSubtotalCalc(null); return }
-      let sum = 0
-      for (let d = new Date(s); d < e; d.setDate(d.getDate()+1)) {
-        const k = d.toISOString().slice(0,10)
-        const day = (calendar as any)[k]
-        const available = day?.available !== false
-        if (!available) { setSubtotalCalc(null); return }
-        const priceNight = day?.priceNight ?? nightly
-        sum += priceNight
+      // Helpers that mirror admin pricing rules
+      const daysInMonth = (y: number, m: number) => new Date(y, m + 1, 0).getDate()
+      const toUTC = (d: Date) => new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
+      const nextMonthStart = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1))
+      const monthStart = (d: Date) => new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1))
+      const nightsBetween = (a: Date, b: Date) => Math.max(0, Math.round((b.getTime() - a.getTime()) / 86400000))
+
+      const calcAmountForRange = (start: Date, endExclusive: Date): number => {
+        // Break into month segments; full months = exact monthly, partial = nights * ceil(monthly/daysInMonth)
+        let cursor = toUTC(start)
+        const endUTC = toUTC(endExclusive)
+        let amount = 0
+        while (cursor < endUTC) {
+          const segMonthStart = monthStart(cursor)
+          const segNextMonthStart = nextMonthStart(cursor)
+          const segEnd = endUTC < segNextMonthStart ? endUTC : segNextMonthStart
+          const isFull = cursor.getTime() === segMonthStart.getTime() && segEnd.getTime() === segNextMonthStart.getTime()
+          if (isFull) {
+            amount += Math.round(monthlyFromData)
+          } else {
+            const nights = nightsBetween(cursor, segEnd)
+            const dim = daysInMonth(cursor.getUTCFullYear(), cursor.getUTCMonth())
+            const nightlyRounded = Math.ceil((monthlyFromData / dim) || 0)
+            amount += nights * nightlyRounded
+          }
+          cursor = segEnd
+        }
+        return amount
       }
-      const totalSum = Math.round(sum*100)/100
+
+      // Subtotal across entire stay with the rule set above
+      const totalSum = calcAmountForRange(s, e)
       setSubtotalCalc(totalSum)
 
       // Build UKIO-like schedule: periods anchored to check-in day, each to same day next month
@@ -104,20 +126,7 @@ export default function RequestToBook() {
       } else {
         firstPeriodEndExclusive = e
       }
-      const sumRange = (start: Date, endExclusive: Date) => {
-        let acc = 0
-        const d = new Date(start)
-        for (; d < endExclusive; d.setDate(d.getDate() + 1)) {
-          const k = d.toISOString().slice(0,10)
-          const day = (calendar as any)[k]
-          const available = day?.available !== false
-          if (!available) { return 0 }
-          const priceNight = day?.priceNight ?? nightly
-          acc += priceNight
-        }
-        return Math.round(acc * 100) / 100
-      }
-      const firstAmount = sumRange(s, firstPeriodEndExclusive)
+      const firstAmount = calcAmountForRange(s, firstPeriodEndExclusive)
       const totalDaysForMessage = Math.max(0, Math.round((e.getTime() - s.getTime())/86400000))
       const displayToDate = (totalDaysForMessage < 60)
         ? e
@@ -146,16 +155,26 @@ export default function RequestToBook() {
       setMoveInFeeDue(totalDays < 30 ? 0 : moveInFee)
       if (overTwoMonths) {
         // Next payments start on the 1st following the first period end
-        for (let monthStart = new Date(firstPeriodEndExclusive.getFullYear(), firstPeriodEndExclusive.getMonth(), 1); monthStart < e; monthStart = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1)) {
-          const nextMonthStart = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1)
-          const end = e < nextMonthStart ? e : nextMonthStart
-          if (monthStart >= end) break
-          const amt = sumRange(monthStart, end)
-          const amtRounded = Math.round(amt * 100) / 100
-          const chargeDate = formatDate(monthStart)
+        for (let ms = new Date(firstPeriodEndExclusive.getFullYear(), firstPeriodEndExclusive.getMonth(), 1); ms < e; ms = new Date(ms.getFullYear(), ms.getMonth() + 1, 1)) {
+          const nm = new Date(ms.getFullYear(), ms.getMonth() + 1, 1)
+          const end = e < nm ? e : nm
+          if (ms >= end) break
+          // Full month => exact monthly; else partial => nights * ceil(monthly/dim)
+          const isFull = ms.getDate() === 1 && end.getTime() === nm.getTime()
+          let amt = 0
+          if (isFull) {
+            amt = Math.round(monthlyFromData)
+          } else {
+            const a = toUTC(ms); const b = toUTC(end)
+            const nights = nightsBetween(a, b)
+            const dim = daysInMonth(ms.getFullYear(), ms.getMonth())
+            const nightlyRounded = Math.ceil((monthlyFromData / dim) || 0)
+            amt = nights * nightlyRounded
+          }
+          const chargeDate = formatDate(ms)
           const endLessOne = new Date(end.getTime() - 86400000)
-          const coverage = `${monthStart.toLocaleDateString('en-US', { month: 'short' })} 1 - ${monthStart.toLocaleDateString('en-US', { month: 'short' })} ${String(endLessOne.getDate()).padStart(2,'0')}`
-          payments.push({ chargeDate, coverage, amount: amtRounded })
+          const coverage = `${ms.toLocaleDateString('en-US', { month: 'short' })} 1 - ${ms.toLocaleDateString('en-US', { month: 'short' })} ${String(endLessOne.getDate()).padStart(2,'0')}`
+          payments.push({ chargeDate, coverage, amount: amt })
         }
       }
       setNextPayments(payments)
