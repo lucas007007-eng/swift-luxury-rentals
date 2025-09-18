@@ -106,6 +106,67 @@ export default function CRMPage() {
                 </div>
               </div>
 
+              {/* CRM Mobile Cards */}
+              <div className="block md:hidden space-y-4 mb-8">
+                {loading ? (
+                  Array.from({length:3}).map((_,i)=>(
+                    <div key={i} className="bg-gray-900/60 rounded-xl p-4 border border-gray-700 animate-pulse">
+                      <div className="h-4 bg-gray-700 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-700 rounded mb-1"></div>
+                      <div className="h-3 bg-gray-700 rounded"></div>
+                    </div>
+                  ))
+                ) : rows.length === 0 ? (
+                  <div className="bg-gray-900/60 rounded-xl p-6 border border-gray-700 text-center">
+                    <div className="text-white/60">No customer records yet.</div>
+                  </div>
+                ) : (
+                  rows.map((r) => (
+                    <div key={r.id} className="bg-gray-900/80 rounded-xl p-4 border border-gray-700">
+                      {/* Customer Header */}
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-white font-semibold text-lg">{r.overdue ? (<span className="px-2 py-1 rounded bg-red-500/20 text-red-300">{r.clientName}</span>) : r.clientName}</h3>
+                        <span className="text-gray-400 text-sm">{r.city}</span>
+                      </div>
+                      
+                      {/* Property Info */}
+                      <div className="mb-3">
+                        <div className="text-white/80 text-sm font-medium">{r.propertyTitle || r.propertyId}</div>
+                        <div className="text-gray-400 text-xs mt-1">
+                          Check-in: {formatShortDate(r.checkIn)} → Checkout: {formatShortDate(r.checkOut)}
+                        </div>
+                      </div>
+                      
+                      {/* Financial Info */}
+                      <div className="grid grid-cols-2 gap-3 mb-3">
+                        <div className="bg-amber-500/10 border border-amber-400/30 rounded-lg p-3">
+                          <div className="text-amber-400 text-xs uppercase tracking-wider mb-1">Lease Total</div>
+                          <div className="text-white font-bold">€{Number(r.leaseValue||0).toLocaleString('de-DE')}</div>
+                        </div>
+                        <div className="bg-emerald-500/10 border border-emerald-400/30 rounded-lg p-3">
+                          <div className="text-emerald-400 text-xs uppercase tracking-wider mb-1">Received</div>
+                          <div className="text-white font-bold">€{Number(r.receivedAmount||0).toLocaleString('de-DE')}</div>
+                        </div>
+                      </div>
+                      
+                      {/* Status and Actions */}
+                      <div className="flex items-center justify-between">
+                        <span className={`px-3 py-1 text-xs rounded border ${r.paid !== false ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-amber-500/20 text-amber-300 border-amber-400/30'}`}>
+                          {r.paid !== false ? 'Paid' : 'Unpaid'}
+                        </span>
+                        <div className="flex gap-2">
+                          {r.leasePdf ? (
+                            <a href={r.leasePdf} target="_blank" className="text-amber-400 text-xs hover:text-amber-300">View Lease</a>
+                          ) : (
+                            <span className="text-gray-500 text-xs">No Lease</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
               {/* CRM Table (desktop) */}
               <div className="hidden md:block">
                 <table className="min-w-full text-sm">
