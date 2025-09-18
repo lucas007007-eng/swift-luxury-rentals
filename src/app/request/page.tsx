@@ -238,18 +238,18 @@ export default function RequestToBook() {
       <section className="pt-28 pb-20">
         <div className="max-w-7xl xl:max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold text-white mb-2">Book Your Stay</h1>
-            <p className="text-gray-400">Complete your reservation details below</p>
+          <div className="mb-6 md:mb-8 text-center">
+            <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">Book Your Stay</h1>
+            <p className="text-gray-400 text-sm md:text-base">Complete your reservation details below</p>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-12">
             {/* Left: Property Details & Payment Options */}
             <div className="space-y-8">
             {/* Property Overview */}
-            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
-              <div className="flex gap-6 items-start mb-8">
-                <div className="w-32 h-32 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0">
+            <div className="bg-gray-900 rounded-2xl p-4 md:p-8 border border-gray-800">
+              <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start mb-6 md:mb-8">
+                <div className="w-full md:w-32 h-32 md:h-32 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0">
                   {img ? (
                     <img 
                       src={img} 
@@ -269,18 +269,18 @@ export default function RequestToBook() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-white mb-2">{title}</h2>
+                  <h2 className="text-lg md:text-2xl font-bold text-white mb-2 leading-tight">{title}</h2>
                   <div className="text-gray-400 mb-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
                       </svg>
-                      <span className="text-sm">Berlin, Germany</span>
+                      <span className="text-sm md:text-base">Berlin, Germany</span>
                     </div>
-                    <div className="flex items-center gap-4 text-sm">
-                      <span>🛏️ 8 guests</span>
-                      <span>🛁 4 bedrooms</span>
-                      <span>🚿 3 bathrooms</span>
+                    <div className="grid grid-cols-3 gap-2 md:flex md:items-center md:gap-4 text-xs md:text-sm">
+                      <span className="flex items-center gap-1">🛏️ <span>8 guests</span></span>
+                      <span className="flex items-center gap-1">🛁 <span>4 bedrooms</span></span>
+                      <span className="flex items-center gap-1">🚿 <span>3 bathrooms</span></span>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
