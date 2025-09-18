@@ -363,15 +363,15 @@ export default function RequestToBook() {
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm text-gray-300 mb-2">Phone</label>
-                  <div className="flex gap-3">
-                    <select className="w-28 bg-gray-800 border border-gray-700 rounded-xl px-3 py-3 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors">
+                  <div className="flex gap-2 md:gap-3">
+                    <select className="w-20 md:w-28 bg-gray-800 border border-gray-700 rounded-xl px-2 md:px-3 py-3 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm md:text-base">
                       <option>+49</option>
                       <option>+34</option>
                       <option>+33</option>
                       <option>+39</option>
                       <option>+44</option>
                     </select>
-                    <input value={phoneInput} onChange={(e)=>setPhoneInput(e.target.value)} className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Phone number" />
+                    <input value={phoneInput} onChange={(e)=>setPhoneInput(e.target.value)} className="flex-1 min-w-0 bg-gray-800 border border-gray-700 rounded-xl px-3 md:px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm md:text-base" placeholder="Phone number" />
                   </div>
                 </div>
                 <div className="sm:col-span-2">
