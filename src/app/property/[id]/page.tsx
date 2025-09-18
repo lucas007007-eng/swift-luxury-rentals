@@ -219,7 +219,7 @@ export default function PropertyPage() {
         <div className="max-w-[1800px] 2xl:max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16" id="image-gallery-container">
           {/* Mobile: Swipe slider */}
           <div className="md:hidden -mx-4">
-            <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth space-x-4 px-4 touch-pan-x select-none">
+            <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth space-x-4 px-4 select-none" style={{ touchAction: 'pan-x pan-y' }}>
               {property?.images?.map((src, index) => (
                 <div
                   key={index}
@@ -228,11 +228,12 @@ export default function PropertyPage() {
                     setCurrentImageIndex(index)
                     setIsModalOpen(true)
                   }}
+                  style={{ touchAction: 'manipulation' }}
                 >
                   <img
                     src={getProxiedImageUrl(src)}
                     alt={`${property.title} - Image ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover pointer-events-none"
                     referrerPolicy="no-referrer"
                     crossOrigin="anonymous"
                     onError={(e) => {
@@ -241,6 +242,7 @@ export default function PropertyPage() {
                         e.currentTarget.src = getProxiedImageUrl(fallback)
                       }
                     }}
+                    draggable={false}
                   />
                 </div>
               ))}
