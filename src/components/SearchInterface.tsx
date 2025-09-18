@@ -241,6 +241,10 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
   }
 
   const focusField = (field: 'destination' | 'checkin' | 'checkout' | 'guests') => {
+    // On mobile, don't auto-focus guests after checkout selection
+    if (window.innerWidth < 768 && field === 'guests' && focusedField === 'checkout') {
+      return
+    }
     setFocusedField(field)
     // Ensure layout is ready before measuring. Do two RAFs to avoid first-click race.
     requestAnimationFrame(() => {
