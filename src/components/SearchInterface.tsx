@@ -520,8 +520,8 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
             </div>
           )}
 
-          {/* Search Button */}
-          <div className="px-2 py-2 sm:px-2 sm:py-2 border-t sm:border-t-0 border-gray-200">
+          {/* Search Button - Hidden on mobile when guests dropdown is open */}
+          <div className={`px-2 py-2 sm:px-2 sm:py-2 border-t sm:border-t-0 border-gray-200 ${showGuestSelector ? 'hidden sm:block' : 'block'}`}>
             <button
               onClick={handleSearch}
               className="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-xl sm:rounded-full transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
@@ -613,7 +613,21 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
                 </div>
               </div>
             ))}
-            {/* Optional helper/footer row can go here */}
+            
+            {/* Mobile Search Button inside WHO dropdown */}
+            <div className="pt-4 border-t border-gray-200 sm:hidden">
+              <button
+                onClick={() => {
+                  setShowGuestSelector(false)
+                  setFocusedField(null)
+                  handleSearch()
+                }}
+                className="w-full bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-xl transition-colors duration-200 shadow-lg flex items-center justify-center space-x-2"
+              >
+                <MagnifyingGlassIcon className="w-5 h-5" />
+                <span className="font-semibold">Search</span>
+              </button>
+            </div>
           </div>
         </div>,
         document.body
