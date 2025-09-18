@@ -101,7 +101,7 @@ export default function PublicCalendar({ availability = {}, monthlyPrice, onChan
             >
               <div className="text-sm md:text-xs text-white/70 font-medium mb-1">{d.getDate()}</div>
               {priceDisplay && (
-                <div className={`text-xs font-medium rounded px-2 py-1 ${available ? 'text-amber-300 bg-black/60 border border-amber-400/40' : 'text-white/40 bg-black/40 border border-white/20'}`}>
+                <div className={`text-xs font-medium rounded px-1 py-0.5 max-w-full truncate ${available ? 'text-amber-300 bg-amber-400/20 border border-amber-400/40' : 'text-white/40 bg-black/40 border border-white/20'}`}>
                   {priceDisplay}
                 </div>
               )}
