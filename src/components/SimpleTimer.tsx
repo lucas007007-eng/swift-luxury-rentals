@@ -157,32 +157,32 @@ export default function SimpleTimer() {
               </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-3 md:gap-4">
+              {/* Total Time - Featured on Mobile */}
+              <div className="text-center md:order-3">
+                <div className="text-sm md:text-xs text-amber-300/80 uppercase tracking-wider mb-2 md:mb-1">Total</div>
+                <div className="text-4xl md:text-3xl font-mono font-bold text-amber-300 mb-2 md:mb-1 glow-text">
+                  {formatTime(totalSeconds)}
+                </div>
+                <div className="text-sm md:text-xs text-amber-200/60">Build time</div>
+              </div>
+
               {/* Prompting Time */}
-              <div className="text-center">
-                <div className="text-xs text-amber-300/80 uppercase tracking-wider mb-1">Prompting</div>
-                <div className="text-2xl font-mono font-bold text-amber-400 mb-1">
+              <div className="text-center bg-amber-900/20 rounded-lg p-3 md:p-0 md:bg-transparent md:order-1">
+                <div className="text-sm md:text-xs text-amber-300/80 uppercase tracking-wider mb-1">Prompting</div>
+                <div className="text-xl md:text-2xl font-mono font-bold text-amber-400 mb-1">
                   {formatTime(promptingSeconds)}
                 </div>
                 <div className="text-xs text-amber-200/60">Human direction</div>
               </div>
 
               {/* Coding Time */}
-              <div className="text-center">
-                <div className="text-xs text-amber-300/80 uppercase tracking-wider mb-1">Coding</div>
-                <div className="text-2xl font-mono font-bold text-amber-400 mb-1">
+              <div className="text-center bg-amber-900/20 rounded-lg p-3 md:p-0 md:bg-transparent md:order-2">
+                <div className="text-sm md:text-xs text-amber-300/80 uppercase tracking-wider mb-1">Coding</div>
+                <div className="text-xl md:text-2xl font-mono font-bold text-amber-400 mb-1">
                   {formatTime(codingSeconds)}
                 </div>
                 <div className="text-xs text-amber-200/60">AI implementation</div>
-              </div>
-
-              {/* Total Time */}
-              <div className="text-center">
-                <div className="text-xs text-amber-300/80 uppercase tracking-wider mb-1">Total</div>
-                <div className="text-3xl font-mono font-bold text-amber-300 mb-1 glow-text">
-                  {formatTime(totalSeconds)}
-                </div>
-                <div className="text-xs text-amber-200/60">Build time</div>
               </div>
             </div>
           </div>
