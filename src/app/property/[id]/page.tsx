@@ -410,27 +410,27 @@ export default function PropertyPage() {
                   {property.title}
                 </h1>
                 
-                {/* Property Stats */}
-                <div className="grid grid-cols-4 gap-4 mb-8">
-                  <div className="text-center bg-gray-900 rounded-xl p-4">
-                    <HomeIcon className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-white">{property.bedrooms}</div>
-                    <div className="text-gray-400 text-sm">Bedrooms</div>
+                {/* Property Stats - Mobile Optimized */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
+                  <div className="text-center bg-gray-900 rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center">
+                    <HomeIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
+                    <div className="text-xl md:text-2xl font-bold text-white">{property.bedrooms}</div>
+                    <div className="text-gray-400 text-xs md:text-sm">Bedrooms</div>
                   </div>
-                  <div className="text-center bg-gray-900 rounded-xl p-4">
-                    <ShieldCheckIcon className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-white">{property.bathrooms}</div>
-                    <div className="text-gray-400 text-sm">Bathrooms</div>
+                  <div className="text-center bg-gray-900 rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center">
+                    <ShieldCheckIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
+                    <div className="text-xl md:text-2xl font-bold text-white">{property.bathrooms}</div>
+                    <div className="text-gray-400 text-xs md:text-sm">Bathrooms</div>
                   </div>
-                  <div className="text-center bg-gray-900 rounded-xl p-4">
-                    <UserGroupIcon className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-white">{property.guests}</div>
-                    <div className="text-gray-400 text-sm">max. guests</div>
+                  <div className="text-center bg-gray-900 rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center">
+                    <UserGroupIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
+                    <div className="text-xl md:text-2xl font-bold text-white">{property.guests}</div>
+                    <div className="text-gray-400 text-xs md:text-sm">max. guests</div>
                   </div>
-                  <div className="text-center bg-gray-900 rounded-xl p-4">
-                    <MapPinIcon className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-white">250m²</div>
-                    <div className="text-gray-400 text-sm">Size</div>
+                  <div className="text-center bg-gray-900 rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center">
+                    <MapPinIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
+                    <div className="text-xl md:text-2xl font-bold text-white">250m²</div>
+                    <div className="text-gray-400 text-xs md:text-sm">Size</div>
                   </div>
                 </div>
                 
