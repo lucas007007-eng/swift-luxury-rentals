@@ -19,6 +19,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
   const [isLiked, setIsLiked] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
 
   const handleImageNavigation = (direction: 'prev' | 'next') => {
     if (direction === 'next') {
@@ -29,6 +31,33 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
       setCurrentImageIndex((prev) => 
         prev === 0 ? property.images.length - 1 : prev - 1
       )
+    }
+  }
+
+  // Handle touch events for mobile swiping
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe && property.images.length > 1) {
+      e.stopPropagation()
+      handleImageNavigation('next')
+    }
+    if (isRightSwipe && property.images.length > 1) {
+      e.stopPropagation()
+      handleImageNavigation('prev')
     }
   }
 
@@ -72,6 +101,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
               backgroundPosition: 'center'
             }}
             onClick={() => router.push(`/property/${property.id}`)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
           </div>
           
