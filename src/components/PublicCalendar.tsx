@@ -97,11 +97,11 @@ export default function PublicCalendar({ availability = {}, monthlyPrice, onChan
             <button
               key={key}
               onClick={()=>handleClick(key, available)}
-              className={`h-16 md:h-20 rounded-lg border text-center p-1 md:p-2 transition-colors flex flex-col justify-between ${available ? 'bg-black/50 hover:border-amber-400/60' : 'bg-black/20 opacity-40'} ${selected ? 'border-amber-400 bg-amber-500/20' : 'border-white/10'} ${isStart ? 'bg-amber-500/50 border-amber-400 ring-1 md:ring-2 ring-amber-400' : ''} ${isEnd ? 'bg-amber-500/50 border-amber-400 ring-1 md:ring-2 ring-amber-400' : ''}`}
+              className={`h-16 md:h-20 rounded-lg border transition-colors flex flex-col items-center justify-center p-1 md:p-2 ${available ? 'bg-black/50 hover:border-amber-400/60' : 'bg-black/20 opacity-40'} ${selected ? 'border-amber-400 bg-amber-500/20' : 'border-white/10'} ${isStart ? 'bg-amber-500/50 border-amber-400 ring-1 md:ring-2 ring-amber-400' : ''} ${isEnd ? 'bg-amber-500/50 border-amber-400 ring-1 md:ring-2 ring-amber-400' : ''}`}
             >
-              <div className="text-sm md:text-xs text-white/70 font-medium">{d.getDate()}</div>
+              <div className="text-sm md:text-xs text-white/70 font-medium mb-1">{d.getDate()}</div>
               {priceDisplay && (
-                <div className={`text-xs md:text-[11px] rounded px-1 md:px-1.5 py-0.5 border leading-none ${available ? 'text-amber-300 bg-black/80 border-amber-400/30' : 'text-white/40 bg-black/60 border-white/20'}`}>
+                <div className={`text-xs font-medium rounded px-2 py-1 ${available ? 'text-amber-300 bg-black/60 border border-amber-400/40' : 'text-white/40 bg-black/40 border border-white/20'}`}>
                   {priceDisplay}
                 </div>
               )}
