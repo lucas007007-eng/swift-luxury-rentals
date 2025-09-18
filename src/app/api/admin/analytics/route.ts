@@ -6,15 +6,30 @@ import prisma from '@/lib/prisma'
 
 export async function GET() {
   try {
-    const dataPath = path.join(process.cwd(), 'src', 'data', 'bookings.json')
-    let bookings: any[] = []
-    if (fs.existsSync(dataPath)) {
-      const raw = fs.readFileSync(dataPath, 'utf-8')
-      bookings = JSON.parse(raw)
-    }
+    // Get bookings from database instead of JSON file
+    const bookings = await prisma.booking.findMany({
+      include: {
+        payments: true,
+        property: true
+      },
+      where: {
+        status: {
+          not: 'cancelled'
+        }
+      }
+    })
 
-    // Consider only paid (or implicitly paid) bookings and exclude cancelled
-    const paidConfirmed = bookings.filter(b => b.status !== 'cancelled' && (b.paid !== false))
+    // Convert database bookings to expected format
+    const paidConfirmed = bookings.map(b => ({
+      id: b.id,
+      propertyId: b.property?.extId || b.propertyId,
+      checkIn: b.checkin.toISOString().split('T')[0],
+      checkOut: b.checkout.toISOString().split('T')[0],
+      total: (b.totalCents || 0) / 100,
+      status: b.status,
+      paid: b.payments.some(p => p.status === 'received'),
+      payments: b.payments
+    }))
     // Compute authoritative totals using same calculator used on pay page
     const withTotals = await Promise.all(paidConfirmed.map(async (b) => {
       try {
