@@ -3,23 +3,27 @@ import prisma from '@/lib/prisma'
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json().catch(()=>({})) as any
-    const id = String(body?.id || '')
+    const contentType = (req.headers as any).get?.('content-type') || ''
+    let id = ''
+    if (contentType.includes('application/json')) {
+      const body = await req.json().catch(()=>({})) as any
+      id = String(body?.id || '')
+    } else {
+      const form = await (req as any).formData?.()?.catch?.(()=>null)
+      if (form) id = String(form.get('id') || '')
+    }
     if (!id) return NextResponse.json({ message: 'Missing id' }, { status: 400 })
-    
-    // Soft delete: mark as deleted instead of removing from database
-    const now = new Date()
-    await prisma.booking.update({
-      where: { id },
-      data: { 
-        deletedAt: now,
-        status: 'cancelled' // Also mark as cancelled for consistency
-      }
-    })
-    
-    // Log the deletion for audit trail
-    console.log(`[AUDIT] Booking ${id} soft deleted at ${now.toISOString()}`)
-    
+
+    // Hard delete: remove payments and booking entirely
+    await prisma.payment.deleteMany({ where: { bookingId: id } })
+    await prisma.booking.delete({ where: { id } })
+
+    console.log(`[AUDIT] Booking ${id} hard deleted at ${new Date().toISOString()}`)
+
+    // For browser form submissions, redirect back
+    if (!contentType || contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
+      return NextResponse.redirect(new URL('/admin/bookings', req.url))
+    }
     return NextResponse.json({ ok: true })
   } catch (e) {
     console.error('Booking delete failed:', e)

@@ -10,7 +10,7 @@ export async function GET() {
   if (!email) return NextResponse.json({ bookings: [] }, { status: 401 })
   try {
     const bookings = await prisma.booking.findMany({
-      where: { user: { email: { equals: email, mode: 'insensitive' } } },
+      where: { user: { email: { equals: email, mode: 'insensitive' } }, deletedAt: null as any },
       orderBy: { createdAt: 'desc' },
       include: { property: true, payments: true, user: true }
     })
@@ -65,7 +65,7 @@ export async function GET() {
       }
     })
 
-    return NextResponse.json({ bookings: mapped })
+    return NextResponse.json({ bookings: mapped }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate', 'Pragma': 'no-cache', 'Expires': '0', 'Surrogate-Control': 'no-store' } })
   } catch {
     return NextResponse.json({ bookings: [] }, { status: 500 })
   }

@@ -5,7 +5,8 @@ import { computeBookingTotals, computeMonthlySchedule } from '@/lib/bookingTotal
 
 export async function POST(req: Request) {
   try {
-    if (process.env.FEATURE_DB_BOOKINGS !== '1') {
+    // Enabled by default; set FEATURE_DB_BOOKINGS=0 to disable explicitly
+    if (process.env.FEATURE_DB_BOOKINGS === '0') {
       return NextResponse.json({ message: 'Feature disabled' }, { status: 404 })
     }
 
@@ -73,7 +74,8 @@ export async function POST(req: Request) {
         checkin: new Date(checkIn),
         checkout: new Date(checkOut),
         status: 'hold',
-        totalCents: Math.round((totals.totalNow || 0) * 100),
+        // Store the full total for the entire stay for display in Applications
+        totalCents: Math.round(((totals.totalStay || totals.totalNow || 0)) * 100),
         payments: {
           create: [
             { purpose: 'first_period', provider: 'offline', status: 'created', amountCents: Math.round((totals.firstPeriod || 0) * 100) },

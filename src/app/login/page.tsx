@@ -4,8 +4,10 @@ import React, { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 import Carousel from './Carousel'
+import { useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
+  const params = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -13,9 +15,10 @@ export default function LoginPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    const res = await signIn('credentials', { email, password, redirect: false })
+    const callbackUrl = params.get('callbackUrl') || '/'
+    const res = await signIn('credentials', { email, password, redirect: false, callbackUrl })
     if (res?.ok) {
-      window.location.href = '/'
+      window.location.href = callbackUrl
     } else {
       setError('Invalid credentials')
     }
@@ -41,7 +44,7 @@ export default function LoginPage() {
               </form>
               <button onClick={()=>signIn('google')} className="w-full mt-3 bg-white text-black font-semibold py-2 rounded hover:bg-gray-100 transition">Sign in with Google</button>
               <div className="text-center text-sm text-white/70 mt-4">
-                Don’t have an account? <Link href="/register" className="text-amber-400 hover:text-amber-300">Create account</Link>
+                Don’t have an account? <Link href={`/register?callbackUrl=${encodeURIComponent(params.get('callbackUrl') || '/')}`} className="text-amber-400 hover:text-amber-300">Create account</Link>
               </div>
             </div>
           </div>

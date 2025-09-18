@@ -5,8 +5,6 @@ import React, { useState, useEffect, useRef } from 'react'
 export default function SimpleTimer() {
   const [totalSeconds, setTotalSeconds] = useState(0)
   const [sessionStart, setSessionStart] = useState<number>(Date.now())
-  const [lastActivity, setLastActivity] = useState<number>(Date.now())
-  const [isActive, setIsActive] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [editHours, setEditHours] = useState(0)
   const totalSecondsRef = useRef(0)
@@ -43,16 +41,12 @@ export default function SimpleTimer() {
     }
   }, [])
 
-  // Continuous timer while admin page is open
+  // Continuous timer while admin page is open - NO IDLE RULES
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    // Set active immediately when component mounts
-    setIsActive(true)
-    setLastActivity(Date.now())
-
     const interval = setInterval(() => {
-      // Always add 1 second while admin page is open
+      // Always add 1 second while admin page is open - no idle checks
       setTotalSeconds(prev => {
         const newTotal = prev + 1
         // Update ref immediately for accurate saves
@@ -159,7 +153,7 @@ export default function SimpleTimer() {
             <div className="flex items-center justify-center gap-2 mb-3">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-xs text-amber-200/80 font-mono">
-                ADMIN SESSION ACTIVE
+                CONTINUOUS TRACKING
               </span>
             </div>
 

@@ -3,8 +3,10 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import Carousel from '../login/Carousel'
+import { useSearchParams } from 'next/navigation'
 
 export default function RegisterPage() {
+  const params = useSearchParams()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -20,7 +22,8 @@ export default function RegisterPage() {
     if (res.ok) {
       // Auto-redirect to client dashboard after brief success state
       setMessage('Registered successfully. Redirecting…')
-      setTimeout(()=>{ window.location.href = '/dashboard' }, 800)
+      const cb = params.get('callbackUrl') || '/dashboard'
+      setTimeout(()=>{ window.location.href = cb }, 800)
     } else {
       const data = await res.json().catch(()=>({}))
       setMessage(data?.message || 'Failed to register')
@@ -49,7 +52,7 @@ export default function RegisterPage() {
                 <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-semibold py-2 rounded transition">Create account</button>
               </form>
               <div className="text-center text-sm text-white/70 mt-4">
-                Already have an account? <Link href="/login" className="text-amber-400 hover:text-amber-300">Sign in</Link>
+                Already have an account? <Link href={`/login?callbackUrl=${encodeURIComponent(params.get('callbackUrl') || '/')}`} className="text-amber-400 hover:text-amber-300">Sign in</Link>
               </div>
             </div>
           </div>

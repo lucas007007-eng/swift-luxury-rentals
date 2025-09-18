@@ -169,7 +169,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Operations, Live Listings, and Accounting Tools */}
+        {/* Operations, Edit Live Listings, and Accounting Tools */}
         <div className="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Booking Radar CTA */}
           <div
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
           
           <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-[0_15px_50px_rgba(0,0,0,0.5)] h-[280px] bg-[#07140F]">
             <div className="absolute top-3 left-4 z-10">
-              <div className="font-mono uppercase tracking-wider text-sm md:text-base gold-metallic-text">Live Listing</div>
+              <div className="font-mono uppercase tracking-wider text-sm md:text-base gold-metallic-text">Edit Live Listings</div>
             </div>
             <SpyEuropeMap onPinClick={(city) => router.push(`/admin/city/${encodeURIComponent(city)}`)} />
           </div>

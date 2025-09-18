@@ -6,5 +6,13 @@
     "phone": "",
     "password": "$2b$10$d.wA0s.yy7Kjk4Fptmqj7./PQQXDGJ7zmvypDcBeXwCKH/r.56L2.",
     "createdAt": "2025-09-16T14:25:05.758Z"
+  },
+  {
+    "id": "u-1758195426626",
+    "name": "Lucas Veith",
+    "email": "lucasveith@protonmail.com",
+    "phone": "123235034959345839",
+    "password": "$2b$10$lzHOYpEx7o6szyNJefZRgOCaM.OYM07dEA2FogkXJFHnBut1zmOOe",
+    "createdAt": "2025-09-18T11:37:06.626Z"
   }
 ]

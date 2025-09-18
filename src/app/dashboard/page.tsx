@@ -25,15 +25,13 @@ export default function ClientDashboard() {
   const [bookings, setBookings] = React.useState<any[] | null>(null)
   
   // Calculate counts based on booking data
-  const currentBookings = (bookings || []).filter((b: any) => 
-    b.status === 'confirmed'
-  )
-  const pastBookings = (bookings || []).filter((b: any) => 
-    b.status === 'completed' || b.status === 'cancelled'
-  )
-  const applications = (bookings || []).filter((b: any) => 
-    b.status === 'hold'
-  )
+  const [currentBookings, pastBookings, applications] = React.useMemo(() => {
+    const list = bookings || []
+    const curr = list.filter((b: any) => b?.status === 'confirmed')
+    const past = list.filter((b: any) => b?.status === 'completed' || b?.status === 'cancelled')
+    const apps = list.filter((b: any) => b?.status === 'hold')
+    return [curr, past, apps]
+  }, [bookings])
   
   const tabs = [
     { key: 'bookings', title: 'Bookings', desc: 'View your current and upcoming bookings', count: currentBookings.length },
@@ -41,13 +39,65 @@ export default function ClientDashboard() {
     { key: 'past', title: 'Past Bookings', desc: 'View properties you\'ve booked in the past', count: pastBookings.length },
   ]
   React.useEffect(() => {
+    // After mount, read tab from URL to avoid SSR/CSR mismatch
+    try {
+      const url = new URL(window.location.href)
+      const tab = url.searchParams.get('tab')
+      if (tab === 'applications' || tab === 'bookings' || tab === 'past') {
+        setActiveTab(tab)
+      }
+    } catch {}
+
     ;(async()=>{
+      // Local dev fallback: merge server bookings with localStorage applications
+      let localApps: any[] = []
+      try {
+        if (typeof window !== 'undefined') {
+          const raw = localStorage.getItem('test_applications_v1')
+          localApps = raw ? JSON.parse(raw) : []
+          // Normalize shape to match server mapping
+          localApps = (Array.isArray(localApps) ? localApps : []).map((b: any) => ({
+            id: b.id || `local-${Date.now()}`,
+            propertyTitle: b.propertyTitle || b.propertyId,
+            propertyId: b.propertyId,
+            propertyExtId: b.propertyExtId || b.propertyId,
+            checkIn: b.checkIn,
+            checkOut: b.checkOut,
+            status: b.status || 'hold',
+            totalCents: b.totalCents || 0,
+            payments: b.payments || [],
+            receivedCents: b.receivedCents || 0,
+            location: b.location || '—',
+            bedrooms: b.bedrooms || null,
+            bathrooms: b.bathrooms || null,
+            coverImage: b.coverImage || null,
+            images: b.images || [],
+            description: b.description || null,
+          }))
+          // Filter out local entries that match a recently deleted id list
+          try {
+            const delRaw = localStorage.getItem('deleted_booking_ids_v1')
+            const deletedIds: string[] = delRaw ? JSON.parse(delRaw) : []
+            if (Array.isArray(deletedIds) && deletedIds.length > 0) {
+              localApps = localApps.filter((x:any)=> !deletedIds.includes(x.id))
+            }
+          } catch {}
+        }
+      } catch {}
+
       try {
         const res = await fetch('/api/dashboard/bookings', { cache: 'no-store' })
-        if (res.status === 401) { setBookings([]); return }
+        if (res.status === 401) { setBookings(localApps); return }
         const data = await res.json()
-        setBookings(data.bookings || [])
-      } catch { setBookings([]) }
+        const server = (data.bookings || [])
+        if (Array.isArray(server) && server.length > 0) {
+          // Prefer server truth; clear dev-local cache to avoid duplicates
+          try { localStorage.removeItem('test_applications_v1') } catch {}
+          setBookings(server)
+        } else {
+          setBookings(localApps)
+        }
+      } catch { setBookings(localApps) }
     })()
   }, [session?.user?.email])
   return (
@@ -381,7 +431,7 @@ export default function ClientDashboard() {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="text-white font-semibold">€{Number((b.totalCents||0)/100).toLocaleString('de-DE')}</div>
+                                <div className="text-white font-semibold">€{Number(((b.estimatedTotalCents ?? b.totalCents) || 0)/100).toLocaleString('de-DE')}</div>
                                 <div className="px-2 py-1 rounded text-xs font-medium bg-amber-500/20 text-amber-400">
                                   Application Pending
                                 </div>

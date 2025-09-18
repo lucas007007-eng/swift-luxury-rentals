@@ -1,6 +1,7 @@
 import React from 'react'
 import prisma from '@/lib/prisma'
 import TestBookingBar from './TestBookingBar'
+import DeleteButton from './DeleteButton'
 
 export default async function AdminBookingsPage({ searchParams }: { searchParams?: { page?: string; status?: string } }) {
   const formatShortDate = (d: Date) => {
@@ -203,9 +204,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                           <option value="hold">hold</option>
                           <option value="confirmed">confirmed</option>
                           <option value="cancelled">cancelled</option>
+                          <option value="__delete__">DELETE</option>
                         </select>
                         <button className="px-2 py-1 text-xs rounded bg-amber-500 hover:bg-amber-600 text-black font-semibold">Save</button>
                       </form>
+                      {/* Hard delete action if DELETE chosen */}
+                      <DeleteButton id={b.id} />
                       <div className="flex items-center gap-2">
                         {nextDue && (
                           <form action="/api/admin/bookings/receive-next" method="post">
@@ -539,8 +543,10 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                           <option value="hold">hold</option>
                           <option value="confirmed">confirmed</option>
                           <option value="cancelled">cancelled</option>
+                          <option value="__delete__">DELETE</option>
                         </select>
                         <button className="ml-2 px-2 py-1 text-xs rounded bg-amber-500 hover:bg-amber-600 text-black font-semibold shadow">Save</button>
+                        <span className="ml-2"><DeleteButton id={b.id} /></span>
                       </form>
                     )}
                   </td>

@@ -2,7 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import QRCode from 'react-qr-code'
-import { useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 
 export const dynamic = 'force-dynamic'
 import Header from '@/components/Header'
@@ -11,6 +13,8 @@ import { cityProperties } from '@/data/cityProperties'
 
 export default function RequestToBook() {
   const params = useSearchParams()
+  const pathname = usePathname()
+  const { data: session, status } = useSession()
   const id = params.get('id') || ''
   const title = params.get('title') || 'Your stay'
   const img = decodeURIComponent(params.get('img') || '')
@@ -32,6 +36,44 @@ export default function RequestToBook() {
   const [damageDeposit, setDamageDeposit] = useState<number>(0)
   const [taxRate, setTaxRate] = useState<number>(0.15)
   const [moveInFeeDue, setMoveInFeeDue] = useState<number>(250)
+
+  // Feature flag: disable payment UI for testing/GitHub
+  const paymentsEnabled = (process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === '1' || process.env.NEXT_PUBLIC_ENABLE_PAYMENTS === '1')
+
+  // Contact state (prefilled for signed-in users)
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [emailInput, setEmailInput] = useState('')
+  const [phoneInput, setPhoneInput] = useState('')
+
+  const callbackUrl = useMemo(() => {
+    try {
+      const qs = params?.toString?.() || ''
+      const rel = `${pathname || '/request'}${qs ? `?${qs}` : ''}`
+      if (typeof window !== 'undefined') return window.location.href
+      return rel
+    } catch {
+      return '/request'
+    }
+  }, [params, pathname])
+
+  useEffect(() => {
+    try {
+      const name = session?.user?.name || ''
+      const [fn, ...rest] = name.split(' ')
+      const ln = rest.join(' ')
+      if (name) {
+        setFirstName((v)=> v || fn)
+        setLastName((v)=> v || ln)
+      }
+      const em = session?.user?.email || ''
+      if (em) setEmailInput((v)=> v || em)
+      // phone may not be present in session; leave as-is
+    } catch {}
+  }, [session])
+
+  // Submit UI states for animated modal
+  const [submitStage, setSubmitStage] = useState<'idle'|'progress'|'received'>('idle')
 
   // Receiving wallet addresses (replace with environment variables in production)
   const ETH_ERC20_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678'
@@ -252,55 +294,72 @@ export default function RequestToBook() {
                 </div>
               </div>
               
-              {/* Payment Options Toggle */}
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-white mb-4">Payment Options</h3>
-                <div className="bg-gray-800 p-1 rounded-xl flex">
-                  <button 
-                    onClick={() => setPaymentOption('full')}
-                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
-                      paymentOption === 'full' 
-                        ? 'bg-white text-black' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    Pay Now in Full
-                    <div className={`text-xs mt-1 ${paymentOption === 'full' ? 'text-gray-600' : 'text-gray-500'}`}>
-                      €{Math.round(subtotal + actualMoveInFee + damageDeposit).toLocaleString('de-DE')} at booking completion
-                    </div>
-                  </button>
-                  <button 
-                    onClick={() => setPaymentOption('monthly')}
-                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
-                      paymentOption === 'monthly' 
-                        ? 'bg-white text-black' 
-                        : 'text-gray-400 hover:text-white'
-                    }`}
-                  >
-                    Pay Monthly
-                    <div className={`text-xs mt-1 ${paymentOption === 'monthly' ? 'text-gray-600' : 'text-gray-500'}`}>
-                      €{(payNowInfo?.amount ?? 0).toLocaleString('de-DE')} now + scheduled payments
-                    </div>
-                  </button>
+              {/* Payment Options Toggle (hidden in test mode) */}
+              {paymentsEnabled ? (
+                <div className="mb-8">
+                  <h3 className="text-xl font-semibold text-white mb-4">Payment Options</h3>
+                  <div className="bg-gray-800 p-1 rounded-xl flex">
+                    <button 
+                      onClick={() => setPaymentOption('full')}
+                      className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
+                        paymentOption === 'full' 
+                          ? 'bg-white text-black' 
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      Pay Now in Full
+                      <div className={`text-xs mt-1 ${paymentOption === 'full' ? 'text-gray-600' : 'text-gray-500'}`}>
+                        €{Math.round(subtotal + actualMoveInFee + damageDeposit).toLocaleString('de-DE')} at booking completion
+                      </div>
+                    </button>
+                    <button 
+                      onClick={() => setPaymentOption('monthly')}
+                      className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
+                        paymentOption === 'monthly' 
+                          ? 'bg-white text-black' 
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      Pay Monthly
+                      <div className={`text-xs mt-1 ${paymentOption === 'monthly' ? 'text-gray-600' : 'text-gray-500'}`}>
+                        €{(payNowInfo?.amount ?? 0).toLocaleString('de-DE')} now + scheduled payments
+                      </div>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="mb-2">
+                  <div className="p-4 rounded-xl border border-amber-400/30 bg-amber-500/10 text-amber-200 text-sm">
+                    Payments are disabled in test mode. You can submit booking requests without payment.
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Contact Details */}
             <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
               <h3 className="text-xl font-semibold text-white mb-6">Contact Details</h3>
+              {status === 'unauthenticated' && (
+                <div className="mb-6 p-4 rounded-xl border border-emerald-400/30 bg-emerald-500/10 text-emerald-200 flex items-center justify-between gap-3 flex-wrap">
+                  <div className="text-sm">Have an account? Sign in to auto-fill your details and track your booking.</div>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="px-3 py-1.5 rounded bg-emerald-500 text-black text-sm font-semibold hover:bg-emerald-400 transition">Login</Link>
+                    <Link href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="px-3 py-1.5 rounded border border-emerald-400/40 text-emerald-200 text-sm hover:bg-emerald-400/10 transition">Register</Link>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm text-gray-300 mb-2">First name</label>
-                  <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="John" />
+                  <input value={firstName} onChange={(e)=>setFirstName(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="John" />
                 </div>
                 <div>
                   <label className="block text-sm text-gray-300 mb-2">Last name</label>
-                  <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Doe" />
+                  <input value={lastName} onChange={(e)=>setLastName(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Doe" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm text-gray-300 mb-2">Email</label>
-                  <input type="email" className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="you@example.com" />
+                  <input value={emailInput} onChange={(e)=>setEmailInput(e.target.value)} type="email" className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="you@example.com" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm text-gray-300 mb-2">Phone</label>
@@ -312,7 +371,7 @@ export default function RequestToBook() {
                       <option>+39</option>
                       <option>+44</option>
                     </select>
-                    <input className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Phone number" />
+                    <input value={phoneInput} onChange={(e)=>setPhoneInput(e.target.value)} className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Phone number" />
                   </div>
                 </div>
                 <div className="sm:col-span-2">
@@ -385,7 +444,8 @@ export default function RequestToBook() {
               </div>
             </div>
 
-            {/* Payment Method */}
+            {/* Payment Method (hidden in test mode) */}
+            {paymentsEnabled && (
             <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
               <h3 className="text-xl font-semibold text-white mb-6">Payment Method</h3>
               <div className="flex items-center gap-6 mb-6">
@@ -473,6 +533,7 @@ export default function RequestToBook() {
                 </div>
               )}
             </div>
+            )}
 
             {/* Terms & Complete Booking */}
             <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
@@ -604,10 +665,37 @@ export default function RequestToBook() {
                 className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-bold py-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-amber-500/25"
                 onClick={async()=>{
                 try {
-                  if (process.env.NEXT_PUBLIC_FEATURE_DB_BOOKINGS === '1' || process.env.FEATURE_DB_BOOKINGS === '1') {
+                setSubmitStage('progress')
+                // Always log a local application entry for instant UX in dev
+                try {
+                  const key = 'test_applications_v1'
+                  const raw = typeof window !== 'undefined' ? localStorage.getItem(key) : null
+                  const arr = raw ? JSON.parse(raw) : []
+                  const app = {
+                    id: `local-${Date.now()}`,
+                    propertyTitle: title,
+                    propertyId: id,
+                    propertyExtId: id,
+                    coverImage: img,
+                    checkIn: checkin,
+                    checkOut: checkout,
+                    status: 'hold',
+                    totalCents: Math.round(((payNowInfo?.amount ?? subtotal) + actualMoveInFee + damageDeposit) * 100),
+                    estimatedTotalCents: Math.round(((subtotal) + actualMoveInFee + damageDeposit) * 100),
+                    location: '—',
+                    bedrooms: null,
+                    bathrooms: null,
+                    payments: [],
+                    receivedCents: 0,
+                  }
+                  const next = [app, ...(Array.isArray(arr) ? arr : [])].slice(0, 10)
+                  localStorage.setItem(key, JSON.stringify(next))
+                } catch {}
+                // Always attempt to persist booking with hold status in backend (can be disabled via FEATURE_DB_BOOKINGS=0)
+                {
                     const payload = {
-                      propertyId: id,
-                      user: { name: 'Guest', email: '', phone: '' },
+                    propertyId: id,
+                    user: { name: `${firstName} ${lastName}`.trim() || 'Guest', email: emailInput || session?.user?.email || '', phone: phoneInput || '' },
                       checkIn: checkin,
                       checkOut: checkout,
                         totalCents: Math.round(((payNowInfo?.amount ?? subtotal) + actualMoveInFee + damageDeposit) * 100)
@@ -618,23 +706,57 @@ export default function RequestToBook() {
                     } else {
                       console.warn('DB booking disabled or failed; proceeding without DB persistence')
                     }
-                  }
+                }
+                // (Optional) we could later de-duplicate/replace the local entry once the server booking succeeds
+                // Progress → Received → redirect
+                setTimeout(()=>{
+                  setSubmitStage('received')
+                  setTimeout(()=>{ window.location.href = '/dashboard?tab=applications' }, 1400)
+                }, 2000)
                 } catch(e) {
                   console.warn('Booking API error; proceeding without DB persistence')
+                  setSubmitStage('received')
+                  setTimeout(()=>{ window.location.href = '/dashboard?tab=applications' }, 1000)
                 }
                 }}
               >
-                Complete Booking
+                {paymentsEnabled ? 'Complete Booking' : 'Submit Request'}
               </button>
-              <div className="text-center mt-3">
-                <div className="text-xs text-gray-400">Powered by <span className="text-white font-medium">Stripe</span></div>
-              </div>
+              {paymentsEnabled ? (
+                <div className="text-center mt-3">
+                  <div className="text-xs text-gray-400">Powered by <span className="text-white font-medium">Stripe</span></div>
+                </div>
+              ) : null}
             </div>
             </div>
           </div>
         </div>
       </section>
       <Footer />
+
+      {/* Submit modal animation */}
+      {submitStage !== 'idle' && (
+        <div className="fixed inset-0 z-[10000] bg-black/70 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-black border border-amber-500/40 rounded-2xl px-8 py-10 text-center shadow-2xl w-[360px]">
+            {submitStage === 'progress' ? (
+              <>
+                <div className="mx-auto mb-4 w-12 h-12 rounded-full border-2 border-amber-400 border-t-transparent animate-spin"></div>
+                <div className="text-amber-300 font-semibold">Request progressing…</div>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div className="text-green-300 font-semibold mb-1">Request received</div>
+                <div className="text-white/80 text-sm">You will hear from our team within 24hrs!</div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   )
 }

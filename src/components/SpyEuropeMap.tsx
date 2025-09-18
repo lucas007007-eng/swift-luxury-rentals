@@ -45,6 +45,7 @@ type GeoJSON = any
 export default function SpyEuropeMap({ onPinClick }: { onPinClick?: (city: string) => void }) {
   const [geo, setGeo] = useState<GeoJSON | null>(null)
   const [hoverCity, setHoverCity] = useState<string | null>(null)
+  const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -77,7 +78,25 @@ export default function SpyEuropeMap({ onPinClick }: { onPinClick?: (city: strin
   const centerX = hoverPin ? hoverPin.x : width * 0.5
   const centerY = hoverPin ? hoverPin.y : height * 0.58
   const baseZoom = 1.22
-  const zoom = hoverPin ? 3.2 : baseZoom
+  const maxZoom = 3.2
+  const proximityZoom = useMemo(() => {
+    if (!mouse) return baseZoom
+    // compute distance (in SVG units) to nearest pin
+    let nearest = Infinity
+    for (const p of projectedPins) {
+      const dx = p.x - mouse.x
+      const dy = p.y - mouse.y
+      const d = Math.hypot(dx, dy)
+      if (d < nearest) nearest = d
+    }
+    // tighter threshold in SVG units (pixels of the 320x200 viewBox)
+    const threshold = 18
+    const clamped = Math.max(0, Math.min(1, (threshold - nearest) / threshold))
+    // ease-out cubic for smoother ramp
+    const eased = 1 - Math.pow(1 - clamped, 3)
+    return baseZoom + (maxZoom - baseZoom) * eased
+  }, [mouse, projectedPins])
+  const zoom = hoverPin ? maxZoom : proximityZoom
   const baseOffsetX = 18 // nudge map right to reduce right-side gap
   const offsetX = hoverPin ? 0 : baseOffsetX
 
@@ -114,7 +133,29 @@ export default function SpyEuropeMap({ onPinClick }: { onPinClick?: (city: strin
 
   return (
     <div className="relative w-full h-full">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full block">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="w-full h-full block"
+        onMouseMove={(e) => {
+          const svg = e.currentTarget
+          const rect = svg.getBoundingClientRect()
+          const x = ((e.clientX - rect.left) / rect.width) * width
+          const y = ((e.clientY - rect.top) / rect.height) * height
+          setMouse({ x, y })
+          // proximity hover: snap to nearest pin within threshold
+          let best: { city: string; d: number } | null = null
+          for (const p of projectedPins) {
+            const dx = p.x - x
+            const dy = p.y - y
+            const d = Math.hypot(dx, dy)
+            if (!best || d < best.d) best = { city: p.city, d }
+          }
+          const threshold = 18
+          if (best && best.d <= threshold) setHoverCity(best.city)
+          else setHoverCity(null)
+        }}
+        onMouseLeave={() => { setMouse(null); setHoverCity(null) }}
+      >
         {/* Spy grid background */}
         <defs>
           <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
@@ -130,7 +171,7 @@ export default function SpyEuropeMap({ onPinClick }: { onPinClick?: (city: strin
 
 
         {/* Zooming scene (countries + pins) */}
-        <g style={{ transform: `translateX(${offsetX}px) scale(${zoom})`, transformOrigin: `${centerX}px ${centerY}px`, transition: 'transform 350ms ease' }}>
+        <g style={{ transform: `translateX(${offsetX}px) scale(${zoom})`, transformOrigin: `${centerX}px ${centerY}px`, transition: 'transform 600ms cubic-bezier(0.22, 1, 0.36, 1)' }}>
           {/* Countries */}
           <g clipPath="url(#clipAll)" opacity={0.9}>
             {countryPaths.map((d, i) => (
@@ -143,7 +184,7 @@ export default function SpyEuropeMap({ onPinClick }: { onPinClick?: (city: strin
             <g key={city} transform={`translate(${x}, ${y})`} style={{ opacity: hoverCity && hoverCity !== city ? 0 : 1, transition: 'opacity 200ms ease' }}>
               <circle r={3} fill="#fbbf24" style={{ animation: hoverCity === city ? 'none' : 'pin-pulse 2s ease-in-out infinite' as any }} />
               <text y={-6} x={6} fill="#fbbf24" fontSize={8} style={{ pointerEvents: 'none' }}>{city}</text>
-              <rect x={-8} y={-8} width={16} height={16} fill="transparent" onMouseEnter={()=>setHoverCity(city)} onMouseLeave={()=>setHoverCity(null)} onClick={()=>onPinClick?.(city)} />
+              <rect x={-10} y={-10} width={20} height={20} fill="transparent" onMouseEnter={()=>setHoverCity(city)} onMouseLeave={()=>setHoverCity(null)} onClick={()=>onPinClick?.(city)} />
             </g>
           ))}
 
