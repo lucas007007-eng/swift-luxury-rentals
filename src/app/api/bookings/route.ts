@@ -75,7 +75,7 @@ export async function POST(req: Request) {
         checkout: new Date(checkOut),
         status: 'hold',
         // Store the full total for the entire stay for display in Applications
-        totalCents: Math.round(((totals.totalStay || totals.totalNow || 0)) * 100),
+        totalCents: Math.round(((totals.subtotal || totals.totalNow || 0)) * 100),
         payments: {
           create: [
             { purpose: 'first_period', provider: 'offline', status: 'created', amountCents: Math.round((totals.firstPeriod || 0) * 100) },
