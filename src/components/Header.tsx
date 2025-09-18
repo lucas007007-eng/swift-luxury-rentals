@@ -84,58 +84,38 @@ const Header: React.FC<HeaderProps> = ({ forceBackground = false }) => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 md:hidden" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="absolute top-0 right-0 w-80 h-full bg-black border-l border-gray-800 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-              {/* Menu Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-800">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-                    <span className="text-black font-bold text-lg">SL</span>
-                  </div>
-                  <span className="text-white font-bold text-xl">Swift Luxury</span>
-                </div>
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 text-gray-400 hover:text-white transition-colors"
-                >
-                  <XMarkIcon className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Navigation Links */}
-              <div className="p-6 space-y-6">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className="block text-white hover:text-amber-400 font-medium py-3 text-lg border-b border-gray-800 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-                
-                {/* Action Buttons */}
-                <div className="pt-6 space-y-4">
-                  <Link
-                    href="/login"
-                    className="block w-full text-center bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 rounded-xl transition-colors border border-gray-700"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Log in
-                  </Link>
-                  <Link
-                    href="/dashboard"
-                    className="block w-full text-center border border-gray-400/70 text-white font-medium py-3 rounded-xl transition-colors hover:bg-white/10 hover:border-gray-200"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    My Bookings
-                  </Link>
-                </div>
-
-                {/* Social Links removed */}
+        <div className="md:hidden absolute top-full left-0 right-0 bg-black border-t border-gray-700 shadow-2xl z-[100]">
+          <div className="p-4 space-y-3">
+            {/* Navigation Links */}
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="block text-white hover:text-amber-400 font-medium py-3 px-4 rounded-lg hover:bg-gray-800 transition-all duration-200"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+            
+            {/* Action Buttons */}
+            <div className="pt-3 border-t border-gray-700 space-y-3">
+              <Link
+                href="/login"
+                className="block w-full text-center bg-gray-800 hover:bg-gray-700 text-white font-medium py-3 rounded-lg transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Log in
+              </Link>
+              <Link
+                href="/dashboard"
+                className="block w-full text-center bg-amber-500 hover:bg-amber-600 text-black font-semibold py-3 rounded-lg transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                My Bookings
+              </Link>
             </div>
           </div>
         </div>
