@@ -86,8 +86,8 @@ const Header: React.FC<HeaderProps> = ({ forceBackground = false }) => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="absolute top-0 right-0 w-80 h-full bg-black shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 md:hidden" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="absolute top-0 right-0 w-80 h-full bg-black border-l border-gray-800 shadow-2xl" onClick={(e) => e.stopPropagation()}>
               {/* Menu Header */}
               <div className="flex items-center justify-between p-6 border-b border-gray-800">
                 <div className="flex items-center space-x-2">
