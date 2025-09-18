@@ -155,7 +155,7 @@ export default function CityPage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="max-w-4xl mx-auto"
           >
-            <div className="flex items-end gap-3">
+            <div className="flex flex-col md:flex-row md:items-end gap-3">
               <div className="flex-1">
                 <SearchInterface 
                   initialDestination={initialDestination}
@@ -170,12 +170,20 @@ export default function CityPage() {
                 />
               </div>
               {searchMode === 'homes' && (
-                <button onClick={()=>setShowFilters(true)} className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 shadow-md hover:shadow-lg transition-all h-[52px] mb-2">
-                  <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M3 6h18M7 12h10m-7 6h4"/>
-                  </svg>
-                  <span>Filters</span>
-                </button>
+                <div className="flex justify-center md:justify-start">
+                  <button 
+                    onClick={()=>setShowFilters(true)} 
+                    className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-md hover:shadow-lg transition-all w-full md:w-auto justify-center md:justify-start md:h-[52px] md:mb-2"
+                  >
+                    <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M3 6h18M7 12h10m-7 6h4"/>
+                    </svg>
+                    <span>Filters</span>
+                    <span className="ml-1 bg-primary-600 text-white text-xs px-2 py-1 rounded-full">
+                      {filtered.length}
+                    </span>
+                  </button>
+                </div>
               )}
             </div>
           </motion.div>
