@@ -82,7 +82,7 @@ export default function PublicCalendar({ availability = {}, monthlyPrice, onChan
       <div className="grid grid-cols-7 gap-2 text-center text-white/60 text-xs">
         {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=> <div key={d}>{d}</div>)}
       </div>
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1 md:gap-2">
         {Array.from({length: (new Date(currentMonth).getDay()+6)%7}).map((_,i)=>(<div key={i} />))}
         {days.map((d)=>{
           const key = formatKey(d)
@@ -97,11 +97,11 @@ export default function PublicCalendar({ availability = {}, monthlyPrice, onChan
             <button
               key={key}
               onClick={()=>handleClick(key, available)}
-              className={`h-20 rounded-md border text-left p-2 transition-colors flex flex-col justify-between ${available ? 'bg-black/50 hover:border-amber-400/60' : 'bg-black/20 opacity-40'} ${selected ? 'border-amber-400 bg-amber-500/20' : 'border-white/10'} ${isStart ? 'bg-amber-500/50 border-amber-400 ring-2 ring-amber-400' : ''} ${isEnd ? 'bg-amber-500/50 border-amber-400 ring-2 ring-amber-400' : ''}`}
+              className={`h-16 md:h-20 rounded-lg border text-center p-1 md:p-2 transition-colors flex flex-col justify-between ${available ? 'bg-black/50 hover:border-amber-400/60' : 'bg-black/20 opacity-40'} ${selected ? 'border-amber-400 bg-amber-500/20' : 'border-white/10'} ${isStart ? 'bg-amber-500/50 border-amber-400 ring-1 md:ring-2 ring-amber-400' : ''} ${isEnd ? 'bg-amber-500/50 border-amber-400 ring-1 md:ring-2 ring-amber-400' : ''}`}
             >
-              <div className="text-xs text-white/70">{d.getDate()}</div>
+              <div className="text-sm md:text-xs text-white/70 font-medium">{d.getDate()}</div>
               {priceDisplay && (
-                <div className={`self-end text-[11px] rounded px-1.5 py-0.5 border ${available ? 'text-amber-300 bg-black border-amber-400/30' : 'text-white/40 bg-black/60 border-white/20'}`}>
+                <div className={`text-xs md:text-[11px] rounded px-1 md:px-1.5 py-0.5 border leading-none ${available ? 'text-amber-300 bg-black/80 border-amber-400/30' : 'text-white/40 bg-black/60 border-white/20'}`}>
                   {priceDisplay}
                 </div>
               )}
