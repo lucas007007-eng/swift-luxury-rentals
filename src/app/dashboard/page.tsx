@@ -431,21 +431,106 @@ export default function ClientDashboard() {
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="text-white font-semibold">€{Number(((b.estimatedTotalCents ?? b.totalCents) || 0)/100).toLocaleString('de-DE')}</div>
-                                <div className="px-2 py-1 rounded text-xs font-medium bg-amber-500/20 text-amber-400">
-                                  Application Pending
-                                </div>
+                                {(() => {
+                                  // Calculate total stay price (includes all payments including deposit)
+                                  const allPayments = (b.payments || [])
+                                  const totalStayPriceCents = allPayments.reduce((sum: number, p: any) => sum + (Number(p.amountCents) || 0), 0)
+                                  const totalStayPrice = Math.round(totalStayPriceCents / 100)
+                                  
+                                  return (
+                                    <>
+                                      <div className="text-white font-semibold">€{totalStayPrice.toLocaleString('de-DE')}</div>
+                                      <div className="px-2 py-1 rounded text-xs font-medium bg-amber-500/20 text-amber-400">
+                                        Total Stay Price
+                                      </div>
+                                    </>
+                                  )
+                                })()}
                               </div>
                             </div>
                             
-                            {/* Application Status */}
-                            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <div className="text-amber-400 font-medium text-sm">Application Status</div>
-                                  <div className="text-gray-300 text-xs mt-1">Awaiting landlord approval</div>
+                            {/* Enhanced Application Management Section */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                              {/* Application Details */}
+                              <div className="bg-gray-800 rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h4 className="text-sm font-medium text-amber-400">Application Status</h4>
                                 </div>
-                                <div className="text-amber-400 text-sm">Pending</div>
+                                <div className="space-y-3">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-gray-300 text-sm font-medium">Status</span>
+                                    <span className="text-amber-300 text-sm font-semibold">Awaiting landlord approval</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-gray-300 text-sm font-medium">Submitted</span>
+                                    <span className="text-gray-300 text-sm">{new Date(b.createdAt || Date.now()).toLocaleDateString()}</span>
+                                  </div>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-gray-300 text-sm font-medium">Response time</span>
+                                    <span className="text-gray-300 text-sm">2-3 business days</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Required Payments Upon Approval */}
+                              <div className="bg-gray-800 rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h4 className="text-sm font-medium text-blue-400">Required Upon Approval</h4>
+                                </div>
+                                <div className="space-y-3">
+                                  {(() => {
+                                    // Get exact payment amounts from booking payments (matches request page pricing breakdown)
+                                    const payments = b.payments || []
+                                    const firstPeriodPayment = payments.find((p: any) => p.purpose === 'first_period')
+                                    const moveInFeePayment = payments.find((p: any) => p.purpose === 'move_in_fee')
+                                    const depositPayment = payments.find((p: any) => p.purpose === 'deposit')
+                                    
+                                    // Use exact amounts from stored payments (these match request page pricing breakdown)
+                                    const firstMonthAmount = firstPeriodPayment ? Math.round((Number(firstPeriodPayment.amountCents) || 0) / 100) : 0
+                                    const moveInAmount = moveInFeePayment ? Math.round((Number(moveInFeePayment.amountCents) || 0) / 100) : 0
+                                    const depositAmount = depositPayment ? Math.round((Number(depositPayment.amountCents) || 0) / 100) : 0
+                                    
+                                    return (
+                                      <>
+                                        <div className="flex justify-between items-center">
+                                          <span className="text-gray-300 text-sm font-medium">1st month rent</span>
+                                          <span className="text-blue-300 text-sm font-semibold">€{firstMonthAmount.toLocaleString('de-DE')}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                          <span className="text-gray-300 text-sm font-medium">Move-in fee</span>
+                                          <span className="text-blue-300 text-sm font-semibold">€{moveInAmount.toLocaleString('de-DE')}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                          <span className="text-gray-300 text-sm font-medium">Damage deposit</span>
+                                          <span className="text-blue-300 text-sm font-semibold">€{depositAmount.toLocaleString('de-DE')}</span>
+                                        </div>
+                                        <hr className="border-gray-600 my-3" />
+                                        <div className="flex justify-between items-center">
+                                          <span className="text-white font-semibold">Total Due Upon Approval</span>
+                                          <span className="text-blue-300 font-bold text-lg">€{(firstMonthAmount + moveInAmount + depositAmount).toLocaleString('de-DE')}</span>
+                                        </div>
+                                      </>
+                                    )
+                                  })()}
+                                </div>
+                              </div>
+                              
+                              {/* Next Steps */}
+                              <div className="bg-gray-800 rounded-xl p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h4 className="text-sm font-medium text-purple-400">Next Steps</h4>
+                                </div>
+                                <div className="space-y-3">
+                                  <div className="text-xs text-gray-400 mb-2">Once approved, you'll receive:</div>
+                                  <div className="space-y-2">
+                                    <div className="text-gray-300 text-sm">• Lease agreement to sign</div>
+                                    <div className="text-gray-300 text-sm">• Payment instructions</div>
+                                    <div className="text-gray-300 text-sm">• Move-in coordination</div>
+                                  </div>
+                                  <button className="w-full mt-3 bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-lg text-xs font-medium transition-colors">
+                                    Contact Landlord
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>

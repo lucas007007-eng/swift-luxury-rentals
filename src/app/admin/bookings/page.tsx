@@ -420,11 +420,17 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                             }
                             const nightsFirst = Math.max(0, Math.round((firstPeriodEndExclusive.getTime() - s.getTime())/86400000))
                             const monthlyBase = Number((b as any)?.property?.priceMonthly || 0)
-                            const nightlyBase = monthlyBase > 0 ? monthlyBase / 30 : 0
-                            const firstPeriodEuros = Math.round(nightsFirst * nightlyBase)
                             const totalDays = Math.max(0, Math.round((e.getTime() - s.getTime())/86400000))
-                            const moveInFee = totalDays < 30 ? 0 : 250
-                            const pendingEuros = firstPeriodEuros + moveInFee
+                            
+                            // Use actual first_period payment amount from booking (this matches computeBookingTotals)
+                            const firstPeriodPayment = (b.payments || []).find((p: any) => p.purpose === 'first_period')
+                            const moveInFeePayment = (b.payments || []).find((p: any) => p.purpose === 'move_in_fee')
+                            
+                            const firstPeriodAmount = firstPeriodPayment ? Math.round((Number(firstPeriodPayment.amountCents) || 0) / 100) : 0
+                            const moveInFeeAmount = moveInFeePayment ? Math.round((Number(moveInFeePayment.amountCents) || 0) / 100) : 0
+                            
+                            // Payment pending = actual first period + actual move-in fee (from stored payments)
+                            const pendingEuros = firstPeriodAmount + moveInFeeAmount
                             if (pendingEuros > 0 && b.status !== 'confirmed') {
                               return (
                                 <div className="flex items-center justify-between gap-2 rounded-md border border-amber-400/40 bg-amber-500/10 text-amber-300 px-2 py-1">
@@ -532,10 +538,13 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                   </td>
                   <td className="px-4 py-3 text-sm">
                     {b.status === 'confirmed' ? (
-                      <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] whitespace-nowrap">
-                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                        <span className="uppercase tracking-wider text-[10px]">Confirmed</span>
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] whitespace-nowrap">
+                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                          <span className="uppercase tracking-wider text-[10px]">Confirmed</span>
+                        </span>
+                        <DeleteButton id={b.id} />
+                      </div>
                     ) : (
                       <form action="/api/admin/bookings" method="post" className="inline-flex items-center">
                         <input type="hidden" name="id" value={b.id} />

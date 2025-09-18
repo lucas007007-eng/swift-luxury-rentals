@@ -81,17 +81,17 @@ export async function computeBookingTotals(params: { propertyExtId?: string; che
         // Skip blocked days but still count others; do not force whole range to zero
         continue
       }
-      const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
       const baseMonthly = (day?.priceMonth ?? monthly)
       const fallback = nightlyDefault
-      const nightlyRaw = day?.priceNight ?? (baseMonthly > 0 ? baseMonthly / daysInMonth : fallback)
-      const nightly = Math.ceil(Number(nightlyRaw || 0))
+      // Prioritize calendar nightly rates, fallback to monthly/30 for consistency
+      const nightlyRaw = day?.priceNight ?? (baseMonthly > 0 ? baseMonthly / 30 : fallback)
+      const nightly = Math.round(Number(nightlyRaw || 0))
       acc += nightly
     }
-    // Fallback: if no nights priced due to missing data, approximate by monthly/30 per night
+    // Fallback: if no nights priced due to missing data, use standard monthly/30 calculation
     if (hadDays && acc === 0 && (monthly || nightlyDefault)) {
       const nights = Math.max(0, Math.round((endExclusive.getTime() - start.getTime()) / 86400000))
-      const nightly = monthly > 0 ? (monthly / 30) : nightlyDefault
+      const nightly = monthly > 0 ? Math.round(monthly / 30) : nightlyDefault
       acc = nights * nightly
     }
     return Math.round(acc * 100) / 100
@@ -176,16 +176,16 @@ export async function computeMonthlySchedule(params: { propertyExtId?: string; c
       if (!available) {
         continue
       }
-      const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()
       const baseMonthly = (day?.priceMonth ?? monthly)
       const fallback = nightlyDefault
-      const nightlyRaw = day?.priceNight ?? (baseMonthly > 0 ? baseMonthly / daysInMonth : fallback)
-      const nightly = Math.ceil(Number(nightlyRaw || 0))
+      // Prioritize calendar nightly rates, fallback to monthly/30 for consistency
+      const nightlyRaw = day?.priceNight ?? (baseMonthly > 0 ? baseMonthly / 30 : fallback)
+      const nightly = Math.round(Number(nightlyRaw || 0))
       acc += nightly
     }
     if (hadDays && acc === 0 && (monthly || nightlyDefault)) {
       const nights = Math.max(0, Math.round((endExclusive.getTime() - start.getTime()) / 86400000))
-      const nightly = monthly > 0 ? (monthly / 30) : nightlyDefault
+      const nightly = monthly > 0 ? Math.round(monthly / 30) : nightlyDefault
       acc = nights * nightly
     }
     return Math.round(acc * 100) / 100
@@ -221,7 +221,7 @@ export async function computeMonthlySchedule(params: { propertyExtId?: string; c
     const isFullMonth = monthCursor.getDate() === 1 && end.getTime() === nextMonthStart.getTime()
     const amt = isFullMonth
       ? Math.round(baseMonthly)
-      : (nights * Math.ceil((baseMonthly > 0 ? baseMonthly / daysInMonth : nightlyDefault) || 0))
+      : (nights * Math.round((baseMonthly > 0 ? baseMonthly / 30 : nightlyDefault) || 0))
     const dueAt = new Date(monthCursor.getFullYear(), monthCursor.getMonth(), 1)
     const endLessOne = new Date(end.getTime() - 86400000)
     const coverage = `${monthCursor.toLocaleDateString('en-US', { month: 'short' })} 1 - ${monthCursor.toLocaleDateString('en-US', { month: 'short' })} ${String(endLessOne.getDate()).padStart(2,'0')}`

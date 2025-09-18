@@ -192,9 +192,9 @@ export default function RequestToBook() {
       setDamageDeposit(depositAmount)
 
       const payments: Array<{ chargeDate: string, coverage: string, amount: number }> = []
-      // Enable Next payments only if the stay exceeds two months
-      const twoMonthsFromStart = addMonthsKeepDay(s, 2)
-      const overTwoMonths = e > twoMonthsFromStart
+      // Enable Next payments if the stay crosses month boundaries (more than first period)
+      const crossesMonthBoundary = e > firstPeriodEndExclusive
+      const overTwoMonths = crossesMonthBoundary
       // Waive move-in fee for stays under 30 days (will be handled in component)
       if (overTwoMonths) {
         // Next payments start on the 1st following the first period end
@@ -210,9 +210,9 @@ export default function RequestToBook() {
           } else {
             const a = toUTC(ms); const b = toUTC(end)
             const nights = nightsBetween(a, b)
-            const dim = daysInMonth(ms.getFullYear(), ms.getMonth())
-            const nightlyRounded = Math.ceil((monthlyFromData / dim) || 0)
-            amt = nights * nightlyRounded
+            // Use same logic as listing calendar: monthly rate ÷ 30 days
+            const nightlyRate = Math.round((monthlyFromData / 30) || 0)
+            amt = nights * nightlyRate
           }
           const chargeDate = formatDate(ms)
           const endLessOne = new Date(end.getTime() - 86400000)
@@ -603,7 +603,7 @@ export default function RequestToBook() {
                   </div>
                   
                   <div className="border-t border-gray-700 pt-3 mt-4">
-                    <div className="flex justify-between items-center mb-2">
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-300 text-sm">Due today:</span>
                       <span className="text-white text-xl font-bold">€{Math.round((payNowInfo?.amount ?? 0) + actualMoveInFee + damageDeposit).toLocaleString('de-DE')}</span>
                     </div>
@@ -639,17 +639,17 @@ export default function RequestToBook() {
                 </div>
               )}
             </div>
-            {/* Next Payments - Only show for monthly option */}
+            {/* Next Payments - Clean design matching image */}
             {paymentOption === 'monthly' && nextPayments.length > 0 && (
               <div className="border-t border-gray-700 pt-6">
                 <h4 className="text-lg font-semibold text-white mb-4">Next Payments</h4>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {nextPayments.map((p, idx) => (
-                    <div key={idx} className="bg-gray-800 rounded-xl p-4">
+                    <div key={idx} className="bg-gray-800/50 rounded-lg p-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-xs text-gray-400 mb-1">Charge date: {p.chargeDate}</div>
-                          <div className="text-white text-sm font-medium">{p.coverage}</div>
+                          <div className="text-gray-400 text-xs">Charge date: {p.chargeDate}</div>
+                          <div className="text-white font-medium text-sm">{p.coverage}</div>
                         </div>
                         <div className="text-white font-semibold">€{p.amount.toLocaleString('de-DE')}</div>
                       </div>
@@ -694,7 +694,7 @@ export default function RequestToBook() {
                 // Always attempt to persist booking with hold status in backend (can be disabled via FEATURE_DB_BOOKINGS=0)
                 {
                     const payload = {
-                    propertyId: id,
+                      propertyId: id,
                     user: { name: `${firstName} ${lastName}`.trim() || 'Guest', email: emailInput || session?.user?.email || '', phone: phoneInput || '' },
                       checkIn: checkin,
                       checkOut: checkout,
@@ -706,7 +706,7 @@ export default function RequestToBook() {
                     } else {
                       console.warn('DB booking disabled or failed; proceeding without DB persistence')
                     }
-                }
+                  }
                 // (Optional) we could later de-duplicate/replace the local entry once the server booking succeeds
                 // Progress → Received → redirect
                 setTimeout(()=>{
@@ -725,12 +725,12 @@ export default function RequestToBook() {
               {paymentsEnabled ? (
                 <div className="text-center mt-3">
                   <div className="text-xs text-gray-400">Powered by <span className="text-white font-medium">Stripe</span></div>
-                </div>
+            </div>
               ) : null}
             </div>
             </div>
-          </div>
-        </div>
+                        </div>
+                      </div>
       </section>
       <Footer />
 
