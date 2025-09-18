@@ -110,20 +110,22 @@ export default function ClientDashboard() {
             <h1 className="text-4xl font-bold mb-2">Welcome back, {session?.user?.name || 'Lucas Veith'}</h1>
           </div>
           
-          {/* Tab Navigation */}
-          <div className="flex gap-2 mb-8 border-b border-gray-800">
+          {/* Tab Navigation - Mobile Optimized */}
+          <div className="flex flex-col sm:flex-row gap-2 mb-8 border-b border-gray-800">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors rounded-t-lg ${
                   activeTab === tab.key
-                    ? 'border-white text-white'
-                    : 'border-transparent text-gray-400 hover:text-white'
+                    ? 'border-white text-white bg-gray-800/50'
+                    : 'border-transparent text-gray-400 hover:text-white hover:bg-gray-800/30'
                 }`}
               >
-                {tab.title}
-                <span className="ml-2 text-xs text-gray-500">{tab.count}</span>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+                  <span className="text-center">{tab.title}</span>
+                  <span className="text-xs text-gray-500 bg-gray-700 px-2 py-0.5 rounded-full">{tab.count}</span>
+                </div>
               </button>
             ))}
           </div>
