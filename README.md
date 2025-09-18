@@ -1,6 +1,6 @@
 # BerlinLuxerentals.de
 
-A modern, responsive rental property website built with Next.js, TypeScript, and Tailwind CSS. This is a complete clone and rebrand of the Artin Properties website, customized for the Berlin luxury rental market.
+A modern, responsive rental property website built with Next.js, TypeScript, and Tailwind CSS. This website is customized for the Berlin luxury rental market.
 
 ## 🌟 Features
 
