@@ -14,7 +14,7 @@ import { cityProperties } from '@/data/cityProperties'
 export default function RequestToBook() {
   const params = useSearchParams()
   const pathname = usePathname()
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession()
   const id = params.get('id') || ''
   const title = params.get('title') || 'Your stay'
   const img = decodeURIComponent(params.get('img') || '')
@@ -57,6 +57,13 @@ export default function RequestToBook() {
       return '/request'
     }
   }, [params, pathname])
+
+  // Refresh session when page loads (for users returning from registration)
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      update()
+    }
+  }, [])
 
   useEffect(() => {
     try {

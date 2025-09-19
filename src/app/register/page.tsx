@@ -31,9 +31,12 @@ export default function RegisterPage() {
       })
       
       if (result?.ok) {
-        // Redirect to callback URL after successful auto-login
+        // Force page reload to refresh session state
         const cb = params.get('callbackUrl') || '/dashboard'
-        setTimeout(() => { window.location.href = cb }, 500)
+        setMessage('Success! Redirecting...')
+        setTimeout(() => { 
+          window.location.replace(cb) // Use replace to force reload
+        }, 500)
       } else {
         setMessage('Account created! Please sign in manually.')
         const loginUrl = `/login?callbackUrl=${encodeURIComponent(params.get('callbackUrl') || '/dashboard')}`
