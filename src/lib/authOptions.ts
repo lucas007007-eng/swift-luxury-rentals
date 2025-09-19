@@ -25,6 +25,11 @@ export const authOptions: NextAuthOptions = {
         }
         
         // Check password
+        if (!user.password) {
+          console.log('No password hash for user:', email)
+          return null
+        }
+        
         const passwordMatch = await bcrypt.compare(password, user.password)
         if (!passwordMatch) {
           console.log('Password mismatch for:', email)
