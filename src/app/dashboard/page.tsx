@@ -771,10 +771,28 @@ export default function ClientDashboard() {
                                   expandedTicket?.id === t.id ? 'border-purple-400/60 bg-purple-500/20' : 'border-gray-600 hover:border-gray-500'
                                 }`}
                               >
-                                <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-start justify-between mb-2">
                                   <div className="flex-1 min-w-0">
                                     <h4 className="text-white font-semibold text-sm truncate">{t.subject}</h4>
-                                    <p className="text-gray-400 text-xs">{t.category}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span className="text-gray-400 text-xs">{t.category}</span>
+                                      {(() => {
+                                        const msgs = Array.isArray(t.messages) ? t.messages : []
+                                        const last = msgs.length > 0 ? msgs[msgs.length - 1] : null
+                                        const hasAnyAdmin = msgs.some((m:any) => m.fromType === 'admin')
+                                        if (last && last.fromType === 'admin') {
+                                          return (
+                                            <span className="px-2 py-0.5 rounded text-[10px] font-mono border bg-purple-500/20 text-purple-300 border-purple-400/30">NEW REPLY</span>
+                                          )
+                                        }
+                                        if (hasAnyAdmin) {
+                                          return (
+                                            <span className="px-2 py-0.5 rounded text-[10px] font-mono border bg-gray-700 text-gray-200 border-gray-600">Replied</span>
+                                          )
+                                        }
+                                        return null
+                                      })()}
+                                    </div>
                                   </div>
                                   <div className="px-2 py-1 rounded text-xs font-mono border bg-gray-700 text-gray-200">
                                     {String(t.priority).toUpperCase()}
