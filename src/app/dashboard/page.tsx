@@ -104,10 +104,13 @@ export default function ClientDashboard() {
             }
           } catch {}
         }
-      } catch {}
+       } catch {}
 
-      try {
-        const res = await fetch('/api/dashboard/bookings', { cache: 'no-store' })
+       // Load support tickets
+       loadSupportTickets()
+
+       try {
+         const res = await fetch('/api/dashboard/bookings', { cache: 'no-store' })
         if (res.status === 401) { setBookings(localApps); return }
         const data = await res.json()
         const server = (data.bookings || [])
