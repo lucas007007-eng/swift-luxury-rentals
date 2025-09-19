@@ -25,6 +25,7 @@ export default function ClientDashboard() {
   const [bookings, setBookings] = React.useState<any[] | null>(null)
   const [supportTickets, setSupportTickets] = React.useState<any[]>([])
   const [showTicketModal, setShowTicketModal] = React.useState(false)
+  const [ticketSubmissionStage, setTicketSubmissionStage] = React.useState<'idle' | 'processing' | 'confirmed'>('idle')
   const [ticketForm, setTicketForm] = React.useState({
     category: 'maintenance',
     priority: 'medium',
@@ -627,32 +628,42 @@ export default function ClientDashboard() {
                         rows={4}
                       />
                     </div>
-                    <button 
-                      onClick={async () => {
-                        if (!ticketForm.subject.trim() || !ticketForm.description.trim()) return
-                        
-                        setShowTicketModal(true)
-                        try {
-                          const response = await fetch('/api/support/tickets', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(ticketForm)
-                          })
-                          
-                          if (response.ok) {
-                            // Show success and reload tickets
-                            setTimeout(() => {
-                              setShowTicketModal(false)
-                              setTicketForm({ category: 'maintenance', priority: 'medium', subject: '', description: '' })
-                              // Reload support tickets
-                              loadSupportTickets()
-                            }, 2000)
-                          }
-                        } catch (error) {
-                          console.error('Failed to create ticket:', error)
-                          setShowTicketModal(false)
-                        }
-                      }}
+                     <button 
+                       onClick={async () => {
+                         if (!ticketForm.subject.trim() || !ticketForm.description.trim()) return
+                         
+                         setShowTicketModal(true)
+                         setTicketSubmissionStage('processing')
+                         
+                         try {
+                           const response = await fetch('/api/support/tickets', {
+                             method: 'POST',
+                             headers: { 'Content-Type': 'application/json' },
+                             body: JSON.stringify(ticketForm)
+                           })
+                           
+                           if (response.ok) {
+                             // Show confirmed state after 1 second
+                             setTimeout(() => {
+                               setTicketSubmissionStage('confirmed')
+                               
+                               // Close modal and refresh after confirmation
+                               setTimeout(() => {
+                                 setShowTicketModal(false)
+                                 setTicketSubmissionStage('idle')
+                                 setTicketForm({ category: 'maintenance', priority: 'medium', subject: '', description: '' })
+                                 
+                                 // Reload support tickets to show new ticket
+                                 loadSupportTickets()
+                               }, 1500)
+                             }, 1000)
+                           }
+                         } catch (error) {
+                           console.error('Failed to create ticket:', error)
+                           setShowTicketModal(false)
+                           setTicketSubmissionStage('idle')
+                         }
+                       }}
                       className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors"
                     >
                       Submit Support Request
@@ -768,12 +779,26 @@ export default function ClientDashboard() {
           {showTicketModal && (
             <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
               <div className="bg-gray-900 border border-purple-400/30 rounded-2xl p-8 max-w-md w-full mx-4 text-center">
-                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">Processing Request</h3>
-                <p className="text-gray-400 mb-4">Submitting your support ticket...</p>
-                <div className="text-purple-400 font-mono text-sm">SUPPORT TICKET SENT!</div>
+                {ticketSubmissionStage === 'processing' ? (
+                  <>
+                    <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Processing Request</h3>
+                    <p className="text-gray-400">Submitting your support ticket...</p>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">Ticket Confirmed</h3>
+                    <p className="text-gray-400">Your support request has been submitted successfully!</p>
+                    <div className="text-purple-400 font-mono text-sm mt-2">SUPPORT TICKET SENT!</div>
+                  </>
+                )}
               </div>
             </div>
           )}
