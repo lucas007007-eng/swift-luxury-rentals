@@ -23,6 +23,26 @@ export default function ClientDashboard() {
   }
   const [activeTab, setActiveTab] = React.useState<'bookings' | 'applications' | 'support' | 'past'>('bookings')
   const [bookings, setBookings] = React.useState<any[] | null>(null)
+  const [supportTickets, setSupportTickets] = React.useState<any[]>([])
+  const [showTicketModal, setShowTicketModal] = React.useState(false)
+  const [ticketForm, setTicketForm] = React.useState({
+    category: 'maintenance',
+    priority: 'medium',
+    subject: '',
+    description: ''
+  })
+
+  const loadSupportTickets = async () => {
+    try {
+      const response = await fetch('/api/support/tickets', { cache: 'no-store' })
+      if (response.ok) {
+        const data = await response.json()
+        setSupportTickets(data.tickets || [])
+      }
+    } catch (error) {
+      console.error('Failed to load support tickets:', error)
+    }
+  }
   
   // Calculate counts based on booking data
   const [currentBookings, pastBookings, applications] = React.useMemo(() => {
@@ -559,7 +579,11 @@ export default function ClientDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
                         <label className="block text-sm text-gray-300 mb-2">Category</label>
-                        <select className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white">
+                        <select 
+                          value={ticketForm.category}
+                          onChange={(e) => setTicketForm(prev => ({ ...prev, category: e.target.value }))}
+                          className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                        >
                           <option value="maintenance">🔧 Maintenance</option>
                           <option value="payment">💳 Payment Issue</option>
                           <option value="booking">📅 Booking Question</option>
@@ -568,7 +592,11 @@ export default function ClientDashboard() {
                       </div>
                       <div>
                         <label className="block text-sm text-gray-300 mb-2">Priority</label>
-                        <select className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white">
+                        <select 
+                          value={ticketForm.priority}
+                          onChange={(e) => setTicketForm(prev => ({ ...prev, priority: e.target.value }))}
+                          className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white"
+                        >
                           <option value="low">🟢 Low</option>
                           <option value="medium">🟡 Medium</option>
                           <option value="high">🟠 High</option>
@@ -580,6 +608,8 @@ export default function ClientDashboard() {
                       <label className="block text-sm text-gray-300 mb-2">Subject</label>
                       <input 
                         type="text" 
+                        value={ticketForm.subject}
+                        onChange={(e) => setTicketForm(prev => ({ ...prev, subject: e.target.value }))}
                         placeholder="Brief description of your issue..."
                         className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none"
                       />
@@ -587,12 +617,41 @@ export default function ClientDashboard() {
                     <div className="mb-4">
                       <label className="block text-sm text-gray-300 mb-2">Description</label>
                       <textarea 
+                        value={ticketForm.description}
+                        onChange={(e) => setTicketForm(prev => ({ ...prev, description: e.target.value }))}
                         placeholder="Please provide detailed information about your request..."
                         className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none"
                         rows={4}
                       />
                     </div>
-                    <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors">
+                    <button 
+                      onClick={async () => {
+                        if (!ticketForm.subject.trim() || !ticketForm.description.trim()) return
+                        
+                        setShowTicketModal(true)
+                        try {
+                          const response = await fetch('/api/support/tickets', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(ticketForm)
+                          })
+                          
+                          if (response.ok) {
+                            // Show success and reload tickets
+                            setTimeout(() => {
+                              setShowTicketModal(false)
+                              setTicketForm({ category: 'maintenance', priority: 'medium', subject: '', description: '' })
+                              // Reload support tickets
+                              loadSupportTickets()
+                            }, 2000)
+                          }
+                        } catch (error) {
+                          console.error('Failed to create ticket:', error)
+                          setShowTicketModal(false)
+                        }
+                      }}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                    >
                       Submit Support Request
                     </button>
                   </div>
@@ -701,6 +760,20 @@ export default function ClientDashboard() {
               </div>
             )}
           </div>
+
+          {/* Support Ticket Submission Modal */}
+          {showTicketModal && (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="bg-gray-900 border border-purple-400/30 rounded-2xl p-8 max-w-md w-full mx-4 text-center">
+                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Processing Request</h3>
+                <p className="text-gray-400 mb-4">Submitting your support ticket...</p>
+                <div className="text-purple-400 font-mono text-sm">SUPPORT TICKET SENT!</div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
       <Footer />

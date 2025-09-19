@@ -61,60 +61,35 @@ export default function SupportDashboard() {
     return () => clearInterval(interval)
   }, [])
 
-  // Mock data fallback for demo
-  const mockTickets: SupportTicket[] = [
-      {
-        id: 'ticket-001',
-        userId: 'user-123',
-        userName: 'John Lenon',
-        userEmail: 'john.lenon@example.com',
-        subject: 'Heating issue in apartment',
-        description: 'The heating system in my apartment is not working properly. It\'s been cold for the past two days.',
-        status: 'open',
-        priority: 'high',
-        category: 'maintenance',
-        createdAt: '2025-09-18T10:30:00Z',
-        updatedAt: '2025-09-18T10:30:00Z',
-        messages: [
-          {
-            id: 'msg-001',
-            from: 'tenant',
-            message: 'The heating system in my apartment is not working properly. It\'s been cold for the past two days.',
-            timestamp: '2025-09-18T10:30:00Z'
-          }
-        ]
-      },
-      {
-        id: 'ticket-002',
-        userId: 'user-456',
-        userName: 'Lucas Veith',
-        userEmail: 'lucasveith@protonmail.com',
-        subject: 'Payment confirmation needed',
-        description: 'I made a payment yesterday but haven\'t received confirmation. Can you please verify?',
-        status: 'in_progress',
-        priority: 'medium',
-        category: 'payment',
-        createdAt: '2025-09-17T14:20:00Z',
-        updatedAt: '2025-09-18T09:15:00Z',
-        messages: [
-          {
-            id: 'msg-002',
-            from: 'tenant',
-            message: 'I made a payment yesterday but haven\'t received confirmation. Can you please verify?',
-            timestamp: '2025-09-17T14:20:00Z'
-          },
-          {
-            id: 'msg-003',
-            from: 'admin',
-            message: 'Thank you for contacting us. I\'m checking your payment status now and will update you shortly.',
-            timestamp: '2025-09-18T09:15:00Z'
-          }
-        ]
-      }
-    ]
-    setTickets(mockTickets)
-    setLoading(false)
-  }, [])
+  // Use API data if available, fallback to mock data for demo
+  useEffect(() => {
+    if (tickets.length === 0) {
+      const mockTickets: SupportTicket[] = [
+        {
+          id: 'ticket-001',
+          userId: 'user-123',
+          userName: 'John Lenon',
+          userEmail: 'john.lenon@example.com',
+          subject: 'Heating issue in apartment',
+          description: 'The heating system in my apartment is not working properly.',
+          status: 'open',
+          priority: 'high',
+          category: 'maintenance',
+          createdAt: '2025-09-18T10:30:00Z',
+          updatedAt: '2025-09-18T10:30:00Z',
+          messages: [
+            {
+              id: 'msg-001',
+              from: 'tenant',
+              message: 'The heating system in my apartment is not working properly.',
+              timestamp: '2025-09-18T10:30:00Z'
+            }
+          ]
+        }
+      ]
+      setTickets(mockTickets)
+    }
+  }, [tickets])
 
   const filteredTickets = tickets.filter(ticket => 
     filterStatus === 'all' || ticket.status === filterStatus
