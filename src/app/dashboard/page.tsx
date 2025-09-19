@@ -111,10 +111,19 @@ export default function ClientDashboard() {
     return [curr, past, apps]
   }, [bookings])
   
+  const supportUnreadCount = React.useMemo(() => {
+    return (supportTickets || []).filter((t: any) => {
+      const msgs = Array.isArray(t.messages) ? t.messages : []
+      if (msgs.length === 0) return false
+      const last = msgs[msgs.length - 1]
+      return last && last.fromType === 'admin'
+    }).length
+  }, [supportTickets])
+
   const tabs = [
     { key: 'bookings', title: 'Bookings', desc: 'View your current and upcoming bookings', count: currentBookings.length },
     { key: 'applications', title: 'Lease Applications', desc: 'View ongoing applications', count: applications.length },
-    { key: 'support', title: 'Support', desc: 'Submit and track support tickets', count: supportTickets.length },
+    { key: 'support', title: 'Support', desc: 'Submit and track support tickets', count: supportUnreadCount > 0 ? supportUnreadCount : supportTickets.length },
     { key: 'past', title: 'Past Bookings', desc: 'View properties you\'ve booked in the past', count: pastBookings.length },
   ]
   React.useEffect(() => {
@@ -206,7 +215,9 @@ export default function ClientDashboard() {
               >
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
                   <span className="text-center">{tab.title}</span>
-                  <span className="text-xs text-gray-500 bg-gray-700 px-2 py-0.5 rounded-full">{tab.count}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${tab.key==='support' && supportUnreadCount>0 ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-500'}`}>
+                    {tab.count}
+                  </span>
                 </div>
               </button>
             ))}
