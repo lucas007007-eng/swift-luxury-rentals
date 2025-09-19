@@ -21,7 +21,7 @@ export default function ClientDashboard() {
     const yy = String(d.getFullYear()).slice(2)
     return `${months[d.getMonth()]} ${dd}${suffix}, ${yy}'`
   }
-  const [activeTab, setActiveTab] = React.useState<'bookings' | 'applications' | 'past'>('bookings')
+  const [activeTab, setActiveTab] = React.useState<'bookings' | 'applications' | 'support' | 'past'>('bookings')
   const [bookings, setBookings] = React.useState<any[] | null>(null)
   
   // Calculate counts based on booking data
@@ -44,7 +44,7 @@ export default function ClientDashboard() {
     try {
       const url = new URL(window.location.href)
       const tab = url.searchParams.get('tab')
-      if (tab === 'applications' || tab === 'bookings' || tab === 'past') {
+      if (tab === 'applications' || tab === 'bookings' || tab === 'support' || tab === 'past') {
         setActiveTab(tab)
       }
     } catch {}
