@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { useSession } from 'next-auth/react'
 
 interface SupportTicket {
   id: string
@@ -28,20 +29,50 @@ interface SupportTicket {
 
 export default function SupportDashboard() {
   const router = useRouter()
+  const { status } = useSession()
   const [tickets, setTickets] = useState<SupportTicket[]>([])
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null)
   const [newMessage, setNewMessage] = useState('')
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [loading, setLoading] = useState(true)
 
+  // Map API ticket shape to UI shape
+  function mapTicketsFromApi(apiTickets: any[]): SupportTicket[] {
+    return (apiTickets || []).map((t: any) => ({
+      id: String(t.id),
+      userId: String(t.userId ?? t.user?.id ?? ''),
+      userName: String(t.user?.name ?? 'Tenant'),
+      userEmail: String(t.user?.email ?? ''),
+      subject: String(t.subject ?? ''),
+      description: String(t.description ?? ''),
+      status: (t.status ?? 'open') as any,
+      priority: (t.priority ?? 'medium') as any,
+      category: (t.category ?? 'general') as any,
+      createdAt: String(t.createdAt ?? new Date().toISOString()),
+      updatedAt: String(t.updatedAt ?? new Date().toISOString()),
+      messages: (t.messages || []).map((m: any) => ({
+        id: String(m.id),
+        from: (m.fromType === 'admin' ? 'admin' : 'tenant') as 'tenant' | 'admin',
+        message: String(m.message ?? ''),
+        timestamp: String(m.createdAt ?? new Date().toISOString()),
+      })),
+    }))
+  }
+
   // Load tickets from API
   const loadTickets = async () => {
     try {
       setLoading(true)
       const response = await fetch('/api/support/tickets?admin=true', { cache: 'no-store' })
+      if (response.status === 401) {
+        router.push(`/login?callbackUrl=${encodeURIComponent('/support-dashboard')}`)
+        return
+      }
       if (response.ok) {
         const data = await response.json()
-        setTickets(data.tickets || [])
+        setTickets(mapTicketsFromApi(data.tickets))
+      } else {
+        setTickets([])
       }
     } catch (error) {
       console.error('Failed to load tickets:', error)
@@ -52,7 +83,8 @@ export default function SupportDashboard() {
   }
 
   useEffect(() => {
-    loadTickets()
+    // If not logged in, let the auth flow handle redirect
+    if (status === 'authenticated') loadTickets()
   }, [])
 
   // Auto-refresh every 30 seconds for real-time updates
@@ -61,35 +93,7 @@ export default function SupportDashboard() {
     return () => clearInterval(interval)
   }, [])
 
-  // Use API data if available, fallback to mock data for demo
-  useEffect(() => {
-    if (tickets.length === 0) {
-      const mockTickets: SupportTicket[] = [
-        {
-          id: 'ticket-001',
-          userId: 'user-123',
-          userName: 'John Lenon',
-          userEmail: 'john.lenon@example.com',
-          subject: 'Heating issue in apartment',
-          description: 'The heating system in my apartment is not working properly.',
-          status: 'open',
-          priority: 'high',
-          category: 'maintenance',
-          createdAt: '2025-09-18T10:30:00Z',
-          updatedAt: '2025-09-18T10:30:00Z',
-          messages: [
-            {
-              id: 'msg-001',
-              from: 'tenant',
-              message: 'The heating system in my apartment is not working properly.',
-              timestamp: '2025-09-18T10:30:00Z'
-            }
-          ]
-        }
-      ]
-      setTickets(mockTickets)
-    }
-  }, [tickets])
+  // Remove mock fallback in production to avoid confusion
 
   const filteredTickets = tickets.filter(ticket => 
     filterStatus === 'all' || ticket.status === filterStatus
@@ -129,7 +133,20 @@ export default function SupportDashboard() {
         })
       })
       
+      if (response.status === 401) {
+        router.push(`/login?callbackUrl=${encodeURIComponent('/support-dashboard')}`)
+        return
+      }
       if (response.ok) {
+        // Optimistically append to UI
+        const optimistic = {
+          id: `optimistic-${Date.now()}`,
+          from: 'admin' as const,
+          message: newMessage.trim(),
+          timestamp: new Date().toISOString(),
+        }
+        setTickets(prev => prev.map(t => t.id === selectedTicket.id ? { ...t, messages: [...t.messages, optimistic], updatedAt: new Date().toISOString() } : t))
+        setSelectedTicket(prev => prev ? { ...prev, messages: [...prev.messages, optimistic], updatedAt: new Date().toISOString() } : null)
         // Reload tickets to get fresh data
         loadTickets()
         setNewMessage('')
