@@ -8,6 +8,7 @@ import Footer from '@/components/Footer'
 
 export default function ClientDashboard() {
   const { data: session } = useSession()
+  const [showLoginPrompt, setShowLoginPrompt] = React.useState(false)
   const formatShortDate = (d: Date) => {
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     const dd = d.getDate()
@@ -24,6 +25,7 @@ export default function ClientDashboard() {
   const [activeTab, setActiveTab] = React.useState<'bookings' | 'applications' | 'support' | 'past'>('bookings')
   const [bookings, setBookings] = React.useState<any[] | null>(null)
   const [supportTickets, setSupportTickets] = React.useState<any[]>([])
+  const [expandedTicket, setExpandedTicket] = React.useState<any | null>(null)
   const [showTicketModal, setShowTicketModal] = React.useState(false)
   const [ticketSubmissionStage, setTicketSubmissionStage] = React.useState<'idle' | 'processing' | 'confirmed'>('idle')
   const [ticketForm, setTicketForm] = React.useState({
@@ -33,12 +35,67 @@ export default function ClientDashboard() {
     description: ''
   })
 
+  type TicketReplyBoxProps = { onSend: (msg: string) => void | Promise<void> }
+  const TicketReplyBox: React.FC<TicketReplyBoxProps> = ({ onSend }) => {
+    const [value, setValue] = React.useState('')
+    const [sending, setSending] = React.useState(false)
+    return (
+      <div className="bg-gray-900 border border-gray-700 rounded-lg p-3">
+        <div className="flex gap-3">
+          <textarea
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Type your message to support..."
+            className="flex-1 bg-gray-950 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:border-purple-400 focus:outline-none resize-none"
+            rows={3}
+          />
+          <button
+            onClick={async () => {
+              if (!value.trim() || sending) return
+              setSending(true)
+              await onSend(value)
+              setValue('')
+              setSending(false)
+            }}
+            disabled={!value.trim() || sending}
+            className={`px-5 py-3 rounded-lg font-mono text-sm transition-all ${
+              value.trim() && !sending ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            {sending ? 'Sending…' : 'Send'}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  const mapTicketsFromApi = (apiTickets: any[]) => {
+    return (apiTickets || []).map((t: any) => ({
+      id: String(t.id),
+      userId: String(t.userId ?? t.user?.id ?? ''),
+      subject: String(t.subject ?? ''),
+      description: String(t.description ?? ''),
+      status: String(t.status ?? 'open'),
+      priority: String(t.priority ?? 'medium'),
+      category: String(t.category ?? 'general'),
+      createdAt: String(t.createdAt ?? new Date().toISOString()),
+      updatedAt: String(t.updatedAt ?? new Date().toISOString()),
+      user: t.user ? { id: t.user.id, name: t.user.name, email: t.user.email } : undefined,
+      messages: (t.messages || []).map((m: any) => ({
+        id: String(m.id),
+        fromType: String(m.fromType ?? 'tenant'),
+        message: String(m.message ?? ''),
+        createdAt: String(m.createdAt ?? new Date().toISOString()),
+      })),
+    }))
+  }
+
   const loadSupportTickets = async () => {
     try {
       const response = await fetch('/api/support/tickets', { cache: 'no-store' })
       if (response.ok) {
         const data = await response.json()
-        setSupportTickets(data.tickets || [])
+        setSupportTickets(mapTicketsFromApi(data.tickets))
       }
     } catch (error) {
       console.error('Failed to load support tickets:', error)
@@ -57,7 +114,7 @@ export default function ClientDashboard() {
   const tabs = [
     { key: 'bookings', title: 'Bookings', desc: 'View your current and upcoming bookings', count: currentBookings.length },
     { key: 'applications', title: 'Lease Applications', desc: 'View ongoing applications', count: applications.length },
-    { key: 'support', title: 'Support', desc: 'Submit and track support tickets', count: 0 },
+    { key: 'support', title: 'Support', desc: 'Submit and track support tickets', count: supportTickets.length },
     { key: 'past', title: 'Past Bookings', desc: 'View properties you\'ve booked in the past', count: pastBookings.length },
   ]
   React.useEffect(() => {
@@ -629,7 +686,8 @@ export default function ClientDashboard() {
                       />
                     </div>
                      <button 
-                       onClick={async () => {
+                        onClick={async () => {
+                         if (!session?.user?.email) { setShowLoginPrompt(true); return }
                          if (!ticketForm.subject.trim() || !ticketForm.description.trim()) return
                          
                          setShowTicketModal(true)
@@ -643,6 +701,28 @@ export default function ClientDashboard() {
                            })
                            
                            if (response.ok) {
+                             const { ticket } = await response.json()
+                             // Immediately reflect new ticket in UI and expand
+                             const mapped = {
+                               id: String(ticket.id),
+                               userId: String(ticket.userId ?? ticket.user?.id ?? ''),
+                               subject: String(ticket.subject ?? ''),
+                               description: String(ticket.description ?? ''),
+                               status: String(ticket.status ?? 'open'),
+                               priority: String(ticket.priority ?? 'medium'),
+                               category: String(ticket.category ?? 'general'),
+                               createdAt: String(ticket.createdAt ?? new Date().toISOString()),
+                               updatedAt: String(ticket.updatedAt ?? new Date().toISOString()),
+                               user: ticket.user ? { id: ticket.user.id, name: ticket.user.name, email: ticket.user.email } : undefined,
+                               messages: (ticket.messages || []).map((m: any) => ({
+                                 id: String(m.id),
+                                 fromType: String(m.fromType ?? 'tenant'),
+                                 message: String(m.message ?? ''),
+                                 createdAt: String(m.createdAt ?? new Date().toISOString()),
+                               })),
+                             }
+                             setSupportTickets(prev => [mapped, ...prev])
+                             setExpandedTicket(mapped)
                              // Show confirmed state after 1 second
                              setTimeout(() => {
                                setTicketSubmissionStage('confirmed')
@@ -673,28 +753,101 @@ export default function ClientDashboard() {
                   {/* My Tickets */}
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-4">My Support Tickets</h3>
-                    <div className="space-y-4">
-                      <div className="bg-gray-800 rounded-xl p-4 border border-gray-600">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <h4 className="text-white font-medium">Heating issue in apartment</h4>
-                            <p className="text-gray-400 text-sm">Submitted 2 days ago</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <span className="px-2 py-1 rounded text-xs font-mono bg-orange-500/20 text-orange-400 border border-orange-400/30">HIGH</span>
-                            <span className="px-2 py-1 rounded text-xs font-mono bg-amber-500/20 text-amber-400 border border-amber-400/30">IN PROGRESS</span>
-                          </div>
-                        </div>
-                        <p className="text-gray-300 text-sm mb-3">The heating system in my apartment is not working properly...</p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-500">Last updated: 1 hour ago</span>
-                          <button className="text-purple-400 hover:text-purple-300 text-sm font-medium">View Details</button>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                      {/* Ticket list */}
+                      <div className="lg:col-span-1">
+                        <div className="space-y-3 max-h-[480px] overflow-y-auto">
+                          {supportTickets.length === 0 ? (
+                            <div className="text-center py-8 text-gray-500">
+                              <div className="text-xl mb-2">📋</div>
+                              <div>No support tickets yet</div>
+                            </div>
+                          ) : (
+                            supportTickets.map((t) => (
+                              <div
+                                key={t.id}
+                                onClick={() => setExpandedTicket(t)}
+                                className={`bg-gray-800/80 border rounded-lg p-4 cursor-pointer transition-all hover:bg-gray-700/80 ${
+                                  expandedTicket?.id === t.id ? 'border-purple-400/60 bg-purple-500/20' : 'border-gray-600 hover:border-gray-500'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="text-white font-semibold text-sm truncate">{t.subject}</h4>
+                                    <p className="text-gray-400 text-xs">{t.category}</p>
+                                  </div>
+                                  <div className="px-2 py-1 rounded text-xs font-mono border bg-gray-700 text-gray-200">
+                                    {String(t.priority).toUpperCase()}
+                                  </div>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <span className="px-2 py-1 rounded text-xs font-mono border bg-gray-700 text-gray-200">
+                                    {String(t.status).replace('_', ' ').toUpperCase()}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(t.updatedAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+                            ))
+                          )}
                         </div>
                       </div>
-                      
-                      <div className="text-center py-8 text-gray-500">
-                        <div className="text-xl mb-2">📋</div>
-                        <div>No other support tickets</div>
+
+                      {/* Chat area */}
+                      <div className="lg:col-span-2">
+                        {expandedTicket ? (
+                          <div className="bg-gray-800/50 border border-purple-400/30 rounded-lg p-4">
+                            <div className="mb-4">
+                              <h4 className="text-white font-semibold text-lg">{expandedTicket.subject}</h4>
+                              <p className="text-gray-400 text-sm">{expandedTicket.description}</p>
+                            </div>
+                            <div className="space-y-4 max-h-[360px] overflow-y-auto mb-4">
+                              {expandedTicket.messages.map((m: any) => (
+                                <div key={m.id} className={`p-3 rounded-lg border ${m.fromType === 'tenant' ? 'bg-cyan-500/10 border-cyan-400/30 ml-0 mr-8' : 'bg-purple-500/10 border-purple-400/30 ml-8 mr-0'}`}>
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className={`font-mono text-xs uppercase tracking-wider ${m.fromType === 'tenant' ? 'text-cyan-400' : 'text-purple-400'}`}>
+                                      {m.fromType === 'tenant' ? 'YOU' : 'ADMIN'}
+                                    </span>
+                                    <span className="text-xs text-gray-500">{new Date(m.createdAt).toLocaleString()}</span>
+                                  </div>
+                                  <div className="text-white text-sm leading-relaxed">{m.message}</div>
+                                </div>
+                              ))}
+                            </div>
+                            <TicketReplyBox
+                              onSend={async (msg) => {
+                                if (!msg.trim()) return
+                                const optimistic = { id: `tmp-${Date.now()}`, fromType: 'tenant', message: msg.trim(), createdAt: new Date().toISOString() }
+                                setSupportTickets((prev: any[]) => prev.map((t: any) => t.id === expandedTicket.id ? { ...t, messages: [...t.messages, optimistic], updatedAt: new Date().toISOString() } : t))
+                                setExpandedTicket((prev: any) => prev ? { ...prev, messages: [...prev.messages, optimistic], updatedAt: new Date().toISOString() } : prev)
+                                try {
+                                  const resp = await fetch('/api/support/messages', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ ticketId: expandedTicket.id, message: msg.trim(), fromType: 'tenant' })
+                                  })
+                                  if (!resp.ok) {
+                                    // rollback optimistic on failure
+                                    setSupportTickets((prev: any[]) => prev.map((t: any) => t.id === expandedTicket.id ? { ...t, messages: t.messages.filter((m:any)=> m.id !== optimistic.id) } : t))
+                                    setExpandedTicket((prev: any) => prev ? { ...prev, messages: prev.messages.filter((m:any)=> m.id !== optimistic.id) } : prev)
+                                  } else {
+                                    // refresh from server
+                                    loadSupportTickets()
+                                  }
+                                } catch (e) {
+                                  setSupportTickets((prev: any[]) => prev.map((t: any) => t.id === expandedTicket.id ? { ...t, messages: t.messages.filter((m:any)=> m.id !== optimistic.id) } : t))
+                                  setExpandedTicket((prev: any) => prev ? { ...prev, messages: prev.messages.filter((m:any)=> m.id !== optimistic.id) } : prev)
+                                }
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="bg-black/40 border border-gray-700 rounded-xl p-8 text-center">
+                            <div className="text-2xl mb-2">💬</div>
+                            <div className="text-gray-400">Select a ticket to view and reply</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -797,8 +950,28 @@ export default function ClientDashboard() {
                     <h3 className="text-xl font-bold text-white mb-2">Ticket Confirmed</h3>
                     <p className="text-gray-400">Your support request has been submitted successfully!</p>
                     <div className="text-purple-400 font-mono text-sm mt-2">SUPPORT TICKET SENT!</div>
+                    <button
+                      onClick={() => { setShowTicketModal(false); setTicketSubmissionStage('idle') }}
+                      className="mt-4 px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white hover:bg-gray-700"
+                    >
+                      Close
+                    </button>
                   </>
                 )}
+              </div>
+            </div>
+          )}
+          {/* Login Prompt Modal */}
+          {showLoginPrompt && (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 max-w-md w-full mx-4 text-center">
+                <h3 className="text-xl font-bold text-white mb-2">Sign in to continue</h3>
+                <p className="text-gray-400 mb-4">Have an account? Sign in to auto-fill your details and track your booking.</p>
+                <div className="flex gap-3 justify-center">
+                  <Link href={`/login?callbackUrl=${encodeURIComponent('/dashboard?tab=support')}`} className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white">Login</Link>
+                  <Link href={`/register?callbackUrl=${encodeURIComponent('/dashboard?tab=support')}`} className="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-white hover:bg-gray-700">Register</Link>
+                </div>
+                <button onClick={()=>setShowLoginPrompt(false)} className="mt-4 text-gray-400 hover:text-gray-200">Close</button>
               </div>
             </div>
           )}
