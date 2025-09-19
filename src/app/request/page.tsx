@@ -45,6 +45,7 @@ export default function RequestToBook() {
   const [lastName, setLastName] = useState('')
   const [emailInput, setEmailInput] = useState('')
   const [phoneInput, setPhoneInput] = useState('')
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
   const callbackUrl = useMemo(() => {
     try {
@@ -339,16 +340,35 @@ export default function RequestToBook() {
             {/* Contact Details */}
             <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
               <h3 className="text-xl font-semibold text-white mb-6">Contact Details</h3>
-              {status === 'unauthenticated' && (
-                <div className="mb-6 p-4 rounded-xl border border-emerald-400/30 bg-emerald-500/10 text-emerald-200 flex items-center justify-between gap-3 flex-wrap">
-                  <div className="text-sm">Have an account? Sign in to auto-fill your details and track your booking.</div>
-                  <div className="flex items-center gap-2">
-                    <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="px-3 py-1.5 rounded bg-emerald-500 text-black text-sm font-semibold hover:bg-emerald-400 transition">Login</Link>
-                    <Link href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="px-3 py-1.5 rounded border border-emerald-400/40 text-emerald-200 text-sm hover:bg-emerald-400/10 transition">Register</Link>
+              
+              {status === 'unauthenticated' ? (
+                <div className="text-center py-12">
+                  <div className="mb-6">
+                    <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <h4 className="text-xl font-semibold text-white mb-2">Sign in to continue</h4>
+                    <p className="text-gray-400 mb-6">Have an account? Sign in to auto-fill your details and track your booking.</p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <Link 
+                      href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} 
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-amber-500 text-black font-semibold hover:bg-amber-400 transition-colors text-center"
+                    >
+                      Login
+                    </Link>
+                    <Link 
+                      href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} 
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl border border-amber-400/40 text-amber-200 font-semibold hover:bg-amber-400/10 transition-colors text-center"
+                    >
+                      Register
+                    </Link>
                   </div>
                 </div>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm text-gray-300 mb-2">First name</label>
                   <input value={firstName} onChange={(e)=>setFirstName(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="John" />
@@ -442,6 +462,7 @@ export default function RequestToBook() {
                   </select>
                 </div>
               </div>
+              )}
             </div>
 
             {/* Payment Method (hidden in test mode) */}
@@ -661,9 +682,17 @@ export default function RequestToBook() {
             
             {/* Complete Booking Button */}
             <div className="mt-8 pt-6 border-t border-gray-700">
-              <button 
-                className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-bold py-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-amber-500/25"
-                onClick={async()=>{
+              {status === 'unauthenticated' ? (
+                <button 
+                  onClick={() => setShowLoginPrompt(true)}
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-bold py-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-amber-500/25"
+                >
+                  Sign in to Complete Booking
+                </button>
+              ) : (
+                <button 
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-bold py-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-amber-500/25"
+                  onClick={async()=>{
                 try {
                 setSubmitStage('progress')
                 // Always log a local application entry for instant UX in dev
@@ -722,12 +751,48 @@ export default function RequestToBook() {
               >
                 {paymentsEnabled ? 'Complete Booking' : 'Submit Request'}
               </button>
-              {paymentsEnabled ? (
+              )}
+              {paymentsEnabled && status === 'authenticated' ? (
                 <div className="text-center mt-3">
                   <div className="text-xs text-gray-400">Powered by <span className="text-white font-medium">Stripe</span></div>
-            </div>
+                </div>
               ) : null}
             </div>
+
+            {/* Login Prompt Modal */}
+            {showLoginPrompt && (
+              <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="bg-gray-900 border border-amber-400/30 rounded-2xl p-8 max-w-md w-full text-center">
+                  <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Account Required</h3>
+                  <p className="text-gray-400 mb-6">Please sign in or create an account to complete your booking and track your reservation.</p>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link 
+                      href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                      className="flex-1 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-xl transition-colors text-center"
+                    >
+                      Sign In
+                    </Link>
+                    <Link 
+                      href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                      className="flex-1 px-6 py-3 border border-amber-400/40 text-amber-200 font-semibold rounded-xl hover:bg-amber-400/10 transition-colors text-center"
+                    >
+                      Create Account
+                    </Link>
+          </div>
+                  <button 
+                    onClick={() => setShowLoginPrompt(false)}
+                    className="mt-4 text-gray-400 hover:text-white text-sm transition-colors"
+                  >
+                    Cancel
+                  </button>
+              </div>
+              </div>
+            )}
             </div>
                         </div>
                       </div>
