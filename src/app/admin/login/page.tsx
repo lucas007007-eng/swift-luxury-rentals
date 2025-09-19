@@ -10,7 +10,7 @@ export default function AdminLoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { status } = useSession()
-  const next = searchParams.get('next') || '/support-dashboard'
+  const next = searchParams.get('next') || '/admin'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
