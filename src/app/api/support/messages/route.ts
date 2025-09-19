@@ -18,18 +18,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Temporary: Return success without database operations until Prisma client is updated
-    console.log('Support message received:', { ticketId, message, fromType })
-    
-    const newMessage = {
-      id: `msg-${Date.now()}`,
-      ticketId,
-      fromType,
-      message,
-      createdAt: new Date().toISOString()
+    // Ensure ticket exists
+    const ticket = await prisma.supportTicket.findUnique({ where: { id: ticketId } })
+    if (!ticket) {
+      return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ message: newMessage }, { status: 201 })
+    const created = await prisma.supportMessage.create({
+      data: {
+        ticketId,
+        fromType,
+        message,
+      },
+    })
+
+    return NextResponse.json({ message: created }, { status: 201 })
   } catch (error) {
     console.error('Support message creation error:', error)
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
