@@ -34,9 +34,35 @@ export default function SupportDashboard() {
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [loading, setLoading] = useState(true)
 
-  // Mock data for now - will be replaced with API calls
+  // Load tickets from API
+  const loadTickets = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/support/tickets?admin=true', { cache: 'no-store' })
+      if (response.ok) {
+        const data = await response.json()
+        setTickets(data.tickets || [])
+      }
+    } catch (error) {
+      console.error('Failed to load tickets:', error)
+      setTickets([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    const mockTickets: SupportTicket[] = [
+    loadTickets()
+  }, [])
+
+  // Auto-refresh every 30 seconds for real-time updates
+  useEffect(() => {
+    const interval = setInterval(loadTickets, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Mock data fallback for demo
+  const mockTickets: SupportTicket[] = [
       {
         id: 'ticket-001',
         userId: 'user-123',
@@ -114,24 +140,39 @@ export default function SupportDashboard() {
     }
   }
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedTicket) return
     
-    const message = {
-      id: `msg-${Date.now()}`,
-      from: 'admin' as const,
-      message: newMessage.trim(),
-      timestamp: new Date().toISOString()
+    try {
+      const response = await fetch('/api/support/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticketId: selectedTicket.id,
+          message: newMessage.trim(),
+          fromType: 'admin'
+        })
+      })
+      
+      if (response.ok) {
+        // Reload tickets to get fresh data
+        loadTickets()
+        setNewMessage('')
+        
+        // Trigger cache invalidation for tenant dashboard
+        try {
+          await fetch('/api/cache/invalidate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'support_message', ticketId: selectedTicket.id })
+          })
+        } catch (e) {
+          console.log('Cache invalidation failed:', e)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error)
     }
-    
-    setTickets(prev => prev.map(ticket => 
-      ticket.id === selectedTicket.id 
-        ? { ...ticket, messages: [...ticket.messages, message], updatedAt: new Date().toISOString() }
-        : ticket
-    ))
-    
-    setSelectedTicket(prev => prev ? { ...prev, messages: [...prev.messages, message] } : null)
-    setNewMessage('')
   }
 
   return (
@@ -266,12 +307,23 @@ export default function SupportDashboard() {
                     <div className="flex gap-2">
                       <select 
                         value={selectedTicket.status}
-                        onChange={(e) => {
+                        onChange={async (e) => {
                           const newStatus = e.target.value as any
-                          setTickets(prev => prev.map(t => 
-                            t.id === selectedTicket.id ? { ...t, status: newStatus, updatedAt: new Date().toISOString() } : t
-                          ))
-                          setSelectedTicket(prev => prev ? { ...prev, status: newStatus } : null)
+                          try {
+                            const response = await fetch(`/api/support/tickets/${selectedTicket.id}`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ status: newStatus })
+                            })
+                            if (response.ok) {
+                              // Reload tickets to get fresh data
+                              loadTickets()
+                              // Update selected ticket
+                              setSelectedTicket(prev => prev ? { ...prev, status: newStatus } : null)
+                            }
+                          } catch (error) {
+                            console.error('Failed to update ticket status:', error)
+                          }
                         }}
                         className="bg-gray-800 border border-purple-400/30 rounded-lg px-3 py-2 text-white text-sm font-mono"
                       >
