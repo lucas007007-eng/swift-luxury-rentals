@@ -253,9 +253,22 @@ export default function AdminDashboard() {
             </div>
           </div>
           
-          {/* Development Timer */}
-          <div className="flex">
-            <SimpleTimer />
+          {/* Support Tickets CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-purple-400/30 bg-gradient-to-br from-[#1a0b1a] to-[#120a12] shadow-[0_0_22px_rgba(168,85,247,0.22)] cursor-pointer overflow-hidden group"
+            onClick={() => router.push('/support-dashboard')}
+            role="link"
+            aria-label="Click to access support tickets"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-purple-400">Support</div>
+                <div className="text-xl font-extrabold text-white mt-1">Support Tickets</div>
+                <div className="text-white/70 mt-1 text-sm">Manage tenant communications and support requests.</div>
+                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-purple-500 text-white font-semibold text-sm group-hover:bg-purple-400 transition-colors">Open Support →</div>
+              </div>
+            </div>
           </div>
         </div>
         </div>

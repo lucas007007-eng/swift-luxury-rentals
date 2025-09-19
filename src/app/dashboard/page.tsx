@@ -36,6 +36,7 @@ export default function ClientDashboard() {
   const tabs = [
     { key: 'bookings', title: 'Bookings', desc: 'View your current and upcoming bookings', count: currentBookings.length },
     { key: 'applications', title: 'Lease Applications', desc: 'View ongoing applications', count: applications.length },
+    { key: 'support', title: 'Support', desc: 'Submit and track support tickets', count: 0 },
     { key: 'past', title: 'Past Bookings', desc: 'View properties you\'ve booked in the past', count: pastBookings.length },
   ]
   React.useEffect(() => {
@@ -541,6 +542,90 @@ export default function ClientDashboard() {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === 'support' && (
+              <div>
+                <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-white">Support Center</h2>
+                    <div className="text-purple-400 font-mono text-sm">TENANT SUPPORT</div>
+                  </div>
+                  
+                  {/* Create New Ticket */}
+                  <div className="bg-gray-800 rounded-xl p-6 mb-6 border border-purple-400/30">
+                    <h3 className="text-lg font-semibold text-white mb-4">Submit New Support Request</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm text-gray-300 mb-2">Category</label>
+                        <select className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white">
+                          <option value="maintenance">🔧 Maintenance</option>
+                          <option value="payment">💳 Payment Issue</option>
+                          <option value="booking">📅 Booking Question</option>
+                          <option value="general">💬 General Inquiry</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-300 mb-2">Priority</label>
+                        <select className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white">
+                          <option value="low">🟢 Low</option>
+                          <option value="medium">🟡 Medium</option>
+                          <option value="high">🟠 High</option>
+                          <option value="urgent">🔴 Urgent</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-sm text-gray-300 mb-2">Subject</label>
+                      <input 
+                        type="text" 
+                        placeholder="Brief description of your issue..."
+                        className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-sm text-gray-300 mb-2">Description</label>
+                      <textarea 
+                        placeholder="Please provide detailed information about your request..."
+                        className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none"
+                        rows={4}
+                      />
+                    </div>
+                    <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors">
+                      Submit Support Request
+                    </button>
+                  </div>
+
+                  {/* My Tickets */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-4">My Support Tickets</h3>
+                    <div className="space-y-4">
+                      <div className="bg-gray-800 rounded-xl p-4 border border-gray-600">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="text-white font-medium">Heating issue in apartment</h4>
+                            <p className="text-gray-400 text-sm">Submitted 2 days ago</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <span className="px-2 py-1 rounded text-xs font-mono bg-orange-500/20 text-orange-400 border border-orange-400/30">HIGH</span>
+                            <span className="px-2 py-1 rounded text-xs font-mono bg-amber-500/20 text-amber-400 border border-amber-400/30">IN PROGRESS</span>
+                          </div>
+                        </div>
+                        <p className="text-gray-300 text-sm mb-3">The heating system in my apartment is not working properly...</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">Last updated: 1 hour ago</span>
+                          <button className="text-purple-400 hover:text-purple-300 text-sm font-medium">View Details</button>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center py-8 text-gray-500">
+                        <div className="text-xl mb-2">📋</div>
+                        <div>No other support tickets</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
