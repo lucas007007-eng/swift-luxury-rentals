@@ -56,12 +56,23 @@ export async function POST(req: Request) {
 
     let userId: string | null = null
     if (user?.email) {
+      console.log('Creating/updating user:', { name: user.name, email: user.email, phone: user.phone })
       const u = await prisma.user.upsert({
         where: { email: user.email },
-        update: { name: user.name ?? undefined, phone: user.phone ?? undefined },
-        create: { email: user.email, name: user.name ?? null, phone: user.phone ?? null },
+        update: { 
+          name: user.name || 'Guest', 
+          phone: user.phone || null 
+        },
+        create: { 
+          email: user.email, 
+          name: user.name || 'Guest', 
+          phone: user.phone || null 
+        },
       })
       userId = u.id
+      console.log('User created/updated:', u.id, u.name, u.email)
+    } else {
+      console.log('No user email provided in booking request')
     }
 
     // Compute authoritative totals from calendar + pricing
