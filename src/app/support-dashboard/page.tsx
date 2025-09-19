@@ -261,7 +261,7 @@ export default function SupportDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className={`px-2 py-1 rounded text-xs font-mono border ${getStatusColor(ticket.status)}`}>
+                          <span className={`px-2.5 py-1.5 rounded-md text-xs font-mono border ${getStatusColor(ticket.status)}`}>
                             {ticket.status.replace('_', ' ').toUpperCase()}
                           </span>
                           <span className="text-xs text-gray-500">
@@ -290,17 +290,17 @@ export default function SupportDashboard() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <span className={`px-3 py-1 rounded-lg text-xs font-mono border ${getPriorityColor(selectedTicket.priority)}`}>
+                        <span className={`px-3.5 py-1.5 rounded-lg text-xs font-mono border ${getPriorityColor(selectedTicket.priority)}`}>
                           {selectedTicket.priority.toUpperCase()}
                         </span>
-                        <span className={`px-3 py-1 rounded-lg text-xs font-mono border ${getStatusColor(selectedTicket.status)}`}>
+                        <span className={`px-3.5 py-1.5 rounded-lg text-xs font-mono border ${getStatusColor(selectedTicket.status)}`}>
                           {selectedTicket.status.replace('_', ' ').toUpperCase()}
                         </span>
                       </div>
                     </div>
                     
                     {/* Ticket Actions */}
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <select 
                         value={selectedTicket.status}
                         onChange={async (e) => {
@@ -321,7 +321,7 @@ export default function SupportDashboard() {
                             console.error('Failed to update ticket status:', error)
                           }
                         }}
-                        className="bg-gray-800 border border-purple-400/30 rounded-lg px-3 py-2 text-white text-sm font-mono"
+                        className="bg-gray-800 border border-purple-400/30 rounded-lg px-3.5 py-2.5 text-white text-sm font-mono"
                       >
                         <option value="open">OPEN</option>
                         <option value="in_progress">IN PROGRESS</option>
@@ -337,7 +337,7 @@ export default function SupportDashboard() {
                           ))
                           setSelectedTicket(prev => prev ? { ...prev, priority: newPriority } : null)
                         }}
-                        className="bg-gray-800 border border-purple-400/30 rounded-lg px-3 py-2 text-white text-sm font-mono"
+                        className="bg-gray-800 border border-purple-400/30 rounded-lg px-3.5 py-2.5 text-white text-sm font-mono"
                       >
                         <option value="low">LOW</option>
                         <option value="medium">MEDIUM</option>

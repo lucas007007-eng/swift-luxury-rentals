@@ -781,7 +781,9 @@ export default function ClientDashboard() {
                                   </div>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                  <span className="px-2 py-1 rounded text-xs font-mono border bg-gray-700 text-gray-200">
+                                  <span className={`px-2.5 py-1.5 rounded-md text-xs font-mono border ${
+                                    String(t.status) === 'in_progress' ? 'bg-amber-500/20 text-amber-400 border-amber-400/30' : 'bg-gray-700 text-gray-200 border-gray-600'
+                                  }`}>
                                     {String(t.status).replace('_', ' ').toUpperCase()}
                                   </span>
                                   <span className="text-xs text-gray-500">
@@ -796,8 +798,8 @@ export default function ClientDashboard() {
 
                       {/* Chat area */}
                       <div className="lg:col-span-2">
-                        {expandedTicket ? (
-                          <div className="bg-gray-800/50 border border-purple-400/30 rounded-lg p-4">
+                          {expandedTicket ? (
+                          <div className="bg-gray-800/60 border border-purple-400/40 rounded-xl p-5 shadow-[0_0_20px_rgba(168,85,247,0.1)]">
                             <div className="mb-4">
                               <h4 className="text-white font-semibold text-lg">{expandedTicket.subject}</h4>
                               <p className="text-gray-400 text-sm">{expandedTicket.description}</p>
@@ -842,7 +844,7 @@ export default function ClientDashboard() {
                               }}
                             />
                           </div>
-                        ) : (
+                          ) : (
                           <div className="bg-black/40 border border-gray-700 rounded-xl p-8 text-center">
                             <div className="text-2xl mb-2">💬</div>
                             <div className="text-gray-400">Select a ticket to view and reply</div>

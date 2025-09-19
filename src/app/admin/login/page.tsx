@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm text-white/80 mb-1">Username or Email</label>
-              <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="adminboss or your email" className="w-full bg-black/60 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-400" />
+              <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter username or email" className="w-full bg-black/60 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-amber-400" />
             </div>
             <div>
               <label className="block text-sm text-white/80 mb-1">Password</label>
