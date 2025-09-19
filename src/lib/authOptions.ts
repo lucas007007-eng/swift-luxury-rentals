@@ -1,15 +1,8 @@
 import type { NextAuthOptions } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import Google from 'next-auth/providers/google'
-import fs from 'fs'
-import path from 'path'
 import bcrypt from 'bcryptjs'
-
-function loadUsers() {
-  const dataPath = path.join(process.cwd(), 'src', 'data', 'users.json')
-  if (!fs.existsSync(dataPath)) return [] as any[]
-  try { return JSON.parse(fs.readFileSync(dataPath, 'utf-8') || '[]') } catch { return [] }
-}
+import prisma from '@/lib/prisma'
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
@@ -20,12 +13,30 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const email = String(credentials?.email || '')
         const password = String(credentials?.password || '')
-        const users = loadUsers()
-        const u = users.find((x:any)=> x.email?.toLowerCase() === email.toLowerCase())
-        if (!u) return null
-        const ok = await bcrypt.compare(password, String(u.password || ''))
-        if (!ok) return null
-        return { id: u.id, name: u.name || '', email: u.email }
+        
+        // Find user in database
+        const user = await prisma.user.findUnique({
+          where: { email: email.toLowerCase() }
+        })
+        
+        if (!user) {
+          console.log('User not found:', email)
+          return null
+        }
+        
+        // Check password
+        const passwordMatch = await bcrypt.compare(password, user.password)
+        if (!passwordMatch) {
+          console.log('Password mismatch for:', email)
+          return null
+        }
+        
+        console.log('Login successful for:', user.email)
+        return { 
+          id: user.id, 
+          name: user.name || '', 
+          email: user.email 
+        }
       }
     }),
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? [Google({ clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET })] : [])
