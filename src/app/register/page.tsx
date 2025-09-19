@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { signIn } from 'next-auth/react'
 import Carousel from '../login/Carousel'
 import { useSearchParams } from 'next/navigation'
 
@@ -20,10 +21,24 @@ export default function RegisterPage() {
     if (password !== confirm) { setMessage('Passwords do not match'); return }
     const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, phone, password }) })
     if (res.ok) {
-      // Auto-redirect to client dashboard after brief success state
-      setMessage('Registered successfully. Redirecting…')
-      const cb = params.get('callbackUrl') || '/dashboard'
-      setTimeout(()=>{ window.location.href = cb }, 800)
+      setMessage('Account created! Signing you in...')
+      
+      // Automatically sign in the user after registration
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false
+      })
+      
+      if (result?.ok) {
+        // Redirect to callback URL after successful auto-login
+        const cb = params.get('callbackUrl') || '/dashboard'
+        setTimeout(() => { window.location.href = cb }, 500)
+      } else {
+        setMessage('Account created! Please sign in manually.')
+        const loginUrl = `/login?callbackUrl=${encodeURIComponent(params.get('callbackUrl') || '/dashboard')}`
+        setTimeout(() => { window.location.href = loginUrl }, 1500)
+      }
     } else {
       const data = await res.json().catch(()=>({}))
       setMessage(data?.message || 'Failed to register')
