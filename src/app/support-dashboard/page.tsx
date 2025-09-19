@@ -83,15 +83,19 @@ export default function SupportDashboard() {
   }
 
   useEffect(() => {
-    // If not logged in, let the auth flow handle redirect
-    if (status === 'authenticated') loadTickets()
-  }, [])
+    if (status === 'authenticated') {
+      loadTickets()
+    } else if (status === 'unauthenticated') {
+      router.push(`/login?callbackUrl=${encodeURIComponent('/support-dashboard')}`)
+    }
+  }, [status])
 
   // Auto-refresh every 30 seconds for real-time updates
   useEffect(() => {
+    if (status !== 'authenticated') return
     const interval = setInterval(loadTickets, 30000)
     return () => clearInterval(interval)
-  }, [])
+  }, [status])
 
   // Remove mock fallback in production to avoid confusion
 
