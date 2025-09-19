@@ -9,39 +9,31 @@ export const authOptions: NextAuthOptions = {
   providers: [
     Credentials({
       name: 'Credentials',
-      credentials: { email: { label: 'Email', type: 'text' }, password: { label: 'Password', type: 'password' } },
+      credentials: { username: { label: 'Username', type: 'text' }, email: { label: 'Email', type: 'text' }, password: { label: 'Password', type: 'password' } },
       async authorize(credentials) {
-        const email = String(credentials?.email || '')
+        const username = String(credentials?.username || '')
+        const emailInput = String(credentials?.email || '')
         const password = String(credentials?.password || '')
-        
-        // Find user in database
+
+        // 1) Allow hardcoded admin login via username/password
+        if (username === 'adminboss' && password === 'Admin420!@') {
+          return {
+            id: 'adminboss',
+            name: 'Admin',
+            email: 'admin@swiftluxury.local',
+          }
+        }
+
+        // 2) Fallback to email/password using Prisma user table
+        const email = emailInput.toLowerCase()
+        if (!email) return null
         const user = await prisma.user.findUnique({
-          where: { email: email.toLowerCase() }
+          where: { email }
         })
-        
-        if (!user) {
-          console.log('User not found:', email)
-          return null
-        }
-        
-        // Check password
-        if (!user.password) {
-          console.log('No password hash for user:', email)
-          return null
-        }
-        
+        if (!user || !user.password) return null
         const passwordMatch = await bcrypt.compare(password, user.password)
-        if (!passwordMatch) {
-          console.log('Password mismatch for:', email)
-          return null
-        }
-        
-        console.log('Login successful for:', user.email)
-        return { 
-          id: user.id, 
-          name: user.name || '', 
-          email: user.email 
-        }
+        if (!passwordMatch) return null
+        return { id: user.id, name: user.name || '', email: user.email }
       }
     }),
     ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? [Google({ clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET })] : [])
