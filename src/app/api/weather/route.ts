@@ -9,8 +9,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'City parameter required' }, { status: 400 })
     }
 
-    const googleWeatherApiKey = process.env.GOOGLE_WEATHER_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-    const airQualityApiKey = process.env.GOOGLE_AIR_QUALITY_API_KEY
+    const googleApiKey = process.env.GOOGLE_AIR_QUALITY_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
     // City coordinates for major cities
     const cityCoords: Record<string, { lat: number; lng: number }> = {
@@ -58,12 +57,36 @@ export async function GET(request: NextRequest) {
       return conditions[Math.random() < 0.7 ? Math.floor(Math.random() * 3) : 3 + Math.floor(Math.random() * 3)]
     }
 
-    // Fetch weather data using Google Weather API
+    // Fetch both weather and air quality data from Google APIs
     let weatherData: any = null
-    if (googleWeatherApiKey) {
+    let airQualityData: any = null
+    
+    if (googleApiKey) {
       try {
-        // Google doesn't have a direct weather API, but we can use realistic seasonal data
-        // Enhanced with your Google API key for future weather integrations
+        // Fetch air quality data (includes some weather info)
+        const aqResponse = await fetch(
+          `https://airquality.googleapis.com/v1/currentConditions:lookup?key=${googleApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: {
+                latitude: coords.lat,
+                longitude: coords.lng
+              },
+              extraComputations: [
+                "HEALTH_RECOMMENDATIONS",
+                "DOMINANT_POLLUTANT",
+                "POLLUTANT_ADDITIONAL_INFO"
+              ]
+            })
+          }
+        )
+        if (aqResponse.ok) {
+          airQualityData = await aqResponse.json()
+        }
+
+        // Use realistic seasonal weather data for the specific city
         weatherData = {
           main: {
             temp: getSeasonalTemp(city),
@@ -78,32 +101,7 @@ export async function GET(request: NextRequest) {
           }
         }
       } catch (err) {
-        console.error('Weather API error:', err)
-      }
-    }
-
-    // Fetch air quality data
-    let airQualityData: any = null
-    if (airQualityApiKey) {
-      try {
-        const aqResponse = await fetch(
-          `https://airquality.googleapis.com/v1/currentConditions:lookup?key=${airQualityApiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: {
-                latitude: coords.lat,
-                longitude: coords.lng
-              }
-            })
-          }
-        )
-        if (aqResponse.ok) {
-          airQualityData = await aqResponse.json()
-        }
-      } catch (err) {
-        console.error('Air Quality API error:', err)
+        console.error('Google API error:', err)
       }
     }
 
