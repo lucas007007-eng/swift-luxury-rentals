@@ -68,34 +68,75 @@ export async function GET(request: NextRequest) {
 
     if (googleWeatherKey) {
       try {
-        // Try Google Maps Geocoding API with weather data (if available)
+        // Validate Google key via Geocoding (no billing heavy weather calls)
         const geocodeResp = await fetch(
           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=${googleWeatherKey}`,
           { cache: 'no-store' }
         )
-        
-        if (geocodeResp.ok) {
-          // If geocoding works, try a simple weather endpoint
-          const weatherResp = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${googleWeatherKey}&units=metric`,
-            { cache: 'no-store' }
-          )
-          
-          if (weatherResp.ok) {
-            const weatherJson = await weatherResp.json()
-            weatherData = {
-              main: { temp: weatherJson.main.feels_like || weatherJson.main.temp, humidity: weatherJson.main.humidity },
-              weather: [{ description: weatherJson.weather[0].description, icon: weatherJson.weather[0].icon }],
-              wind: { speed: weatherJson.wind.speed }
-            }
-            provider = 'openweathermap-via-google-key'
-            basis = weatherJson.main.feels_like ? 'feels_like' : 'temperature'
-          } else {
-            const errorText = await weatherResp.text()
-            weatherDiagnostics = { ...(weatherDiagnostics || {}), weatherStatus: weatherResp.status, weatherError: errorText }
-          }
-        } else {
+        if (!geocodeResp.ok) {
           weatherDiagnostics = { ...(weatherDiagnostics || {}), geocodeStatus: geocodeResp.status }
+        }
+
+        // Fetch weather from Open-Meteo (no key required)
+        const omUrl = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,weather_code`
+        const weatherResp = await fetch(omUrl, { cache: 'no-store' })
+        if (weatherResp.ok) {
+          const w = await weatherResp.json()
+          const c = w.current || w.current_weather || {}
+
+          const apparent = Number(c.apparent_temperature ?? c.temperature_2m ?? c.temperature)
+          const humidity = Number(c.relative_humidity_2m ?? 60)
+          const windKmh = Number(c.wind_speed_10m ?? c.windspeed ?? 0) // Open-Meteo returns km/h
+          const code = Number(c.weather_code ?? c.weathercode ?? -1)
+
+          const mapWeatherCode = (wc: number): { description: string; icon: string } => {
+            switch (wc) {
+              case 0: return { description: 'Clear sky', icon: '01d' }
+              case 1:
+              case 2: return { description: 'Partly cloudy', icon: '02d' }
+              case 3: return { description: 'Overcast', icon: '04d' }
+              case 45:
+              case 48: return { description: 'Fog', icon: '50d' }
+              case 51:
+              case 53:
+              case 55: return { description: 'Drizzle', icon: '09d' }
+              case 56:
+              case 57: return { description: 'Freezing drizzle', icon: '13d' }
+              case 61:
+              case 63:
+              case 65: return { description: 'Rain', icon: '10d' }
+              case 66:
+              case 67: return { description: 'Freezing rain', icon: '13d' }
+              case 71:
+              case 73:
+              case 75: return { description: 'Snow', icon: '13d' }
+              case 77: return { description: 'Snow grains', icon: '13d' }
+              case 80:
+              case 81:
+              case 82: return { description: 'Rain showers', icon: '09d' }
+              case 85:
+              case 86: return { description: 'Snow showers', icon: '13d' }
+              case 95: return { description: 'Thunderstorm', icon: '11d' }
+              case 96:
+              case 99: return { description: 'Thunderstorm with hail', icon: '11d' }
+              default: return { description: 'Unknown', icon: '01d' }
+            }
+          }
+
+          const mapped = mapWeatherCode(code)
+
+          // Keep downstream contract: wind.speed in m/s so *3.6 => km/h in result
+          weatherData = {
+            main: { temp: apparent, humidity },
+            weather: [{ description: mapped.description, icon: mapped.icon }],
+            wind: { speed: windKmh / 3.6 }
+          }
+          provider = 'open-meteo'
+          basis = 'apparent_temperature'
+          if (debug) weatherDiagnostics = { ...(weatherDiagnostics || {}), openMeteoStatus: weatherResp.status }
+        } else {
+          const errorText = await weatherResp.text()
+          weatherDiagnostics = { ...(weatherDiagnostics || {}), openMeteoStatus: weatherResp.status, openMeteoError: errorText }
         }
       } catch (err: any) {
         weatherDiagnostics = { ...(weatherDiagnostics || {}), error: String(err?.message || err) }
