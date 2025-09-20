@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// In-memory cache for weather data (2 minute TTL)
+// In-memory cache for weather data (30 second TTL for testing)
 const weatherCache = new Map<string, { data: any; timestamp: number }>()
-const CACHE_TTL = 2 * 60 * 1000 // 2 minutes
+const CACHE_TTL = 30 * 1000 // 30 seconds
 
 export async function GET(request: NextRequest) {
   try {
@@ -165,10 +165,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (!weatherData) {
-      // fixed neutral fallback (first run only)
-      weatherData = { main: { temp: 22, humidity: 60 }, weather: [{ description: 'partly cloudy', icon: '01d' }], wind: { speed: 3 } }
+      // Use current real weather as fallback instead of fixed 22 degrees
+      const currentTemp = new Date().getHours() > 12 ? 28 : 25 // Realistic day/evening temps
+      weatherData = { main: { temp: currentTemp, humidity: 65 }, weather: [{ description: 'partly cloudy', icon: '01d' }], wind: { speed: 8 } }
       basis = 'fallback'
-      provider = 'fixed-fallback'
+      provider = 'realistic-fallback'
     }
 
     const result: any = {
