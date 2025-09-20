@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     const forceBypass = searchParams.get('force') === 'true'
+    const debug = searchParams.get('debug') === 'true'
 
     // Use single normalized cache key per city
     const cacheKey = city.toLowerCase()
@@ -22,8 +23,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cached.data)
     }
 
-    const googleApiKey = process.env.GOOGLE_AIR_QUALITY_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-    const googleWeatherKey = process.env.GOOGLE_WEATHER_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    // Use a single unified key preference order (server-side safe)
+    const googleWeatherKey =
+      process.env.GOOGLE_WEATHER_API_KEY ||
+      process.env.GOOGLE_AIR_QUALITY_API_KEY ||
+      process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    const googleApiKey =
+      process.env.GOOGLE_AIR_QUALITY_API_KEY ||
+      process.env.GOOGLE_WEATHER_API_KEY ||
+      process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
     const cityCoords: Record<string, { lat: number; lng: number }> = {
       berlin: { lat: 52.52, lng: 13.405 },
@@ -40,36 +48,72 @@ export async function GET(request: NextRequest) {
 
     const coords = cityCoords[cacheKey] || cityCoords.berlin
 
-    // Try Google Weather (GET first, then POST)
+    // Try Google Weather (POST weather:lookup first, then GET/POST currentConditions:lookup)
     let weatherData: any = null
     let basis = 'temperature'
     let provider = 'google-weather'
+    let weatherDiagnostics: any = undefined
 
     if (googleWeatherKey) {
       try {
-        const getResp = await fetch(
-          `https://weather.googleapis.com/v1/currentConditions:lookup?location=${coords.lat},${coords.lng}&units=METRIC&key=${googleWeatherKey}`,
-          { cache: 'no-store' }
-        )
-        if (getResp.ok) {
-          const gw = await getResp.json()
-          const cc = gw?.currentConditions || gw
-          const tempFeel = cc?.temperatureApparent ?? cc?.temperatureApparent?.value
-          const tempPrim = cc?.temperature ?? cc?.temperature?.value
-          const temp = (tempFeel ?? tempPrim) ?? null
-          if (temp !== null) {
-            const humidity = cc?.humidity ?? 60
-            let wind = cc?.windSpeed ?? 3
-            wind = Number(wind)
-            const windMs = wind > 40 ? wind / 3.6 : wind
-            basis = tempFeel != null ? 'apparent' : 'temperature'
-            weatherData = {
-              main: { temp: Number(temp), humidity: Number(humidity) },
-              weather: [{ description: String(cc?.phrase || cc?.summary || 'clear sky'), icon: '01d' }],
-              wind: { speed: windMs }
-            }
+        // Helper to normalize Google Weather shapes
+        const parseGoogleWeather = (gw: any) => {
+          const cc =
+            gw?.currentConditions ||
+            gw?.currentWeather ||
+            gw?.data?.currentConditions ||
+            gw?.data?.currentWeather ||
+            gw
+          if (!cc) return null
+          const tempFeel =
+            cc?.temperatureApparent?.value ?? cc?.temperatureApparent ??
+            cc?.apparentTemperature?.value ?? cc?.apparentTemperature
+          const tempPrim = cc?.temperature?.value ?? cc?.temperature
+          const temperature = (tempFeel ?? tempPrim)
+          if (temperature == null) return null
+          const humidityVal = cc?.humidity?.value ?? cc?.humidity
+          const windVal = cc?.windSpeed?.value ?? cc?.windSpeed
+          const description = cc?.phrase || cc?.summary || cc?.conditions || 'clear sky'
+          const wind = Number(windVal ?? 3)
+          const windMs = wind > 40 ? wind / 3.6 : wind
+          basis = tempFeel != null ? 'apparent' : 'temperature'
+          return {
+            main: { temp: Number(temperature), humidity: Number(humidityVal ?? 60) },
+            weather: [{ description: String(description), icon: '01d' }],
+            wind: { speed: windMs }
           }
         }
+
+        // 1) Preferred: POST weather:lookup
+        const postWeather = await fetch(`https://weather.googleapis.com/v1/weather:lookup?key=${googleWeatherKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ location: { latitude: coords.lat, longitude: coords.lng }, units: 'METRIC', languageCode: 'en-US' })
+          }
+        )
+        if (postWeather.ok) {
+          const gw = await postWeather.json()
+          weatherData = parseGoogleWeather(gw)
+        } else {
+          weatherDiagnostics = { ...(weatherDiagnostics || {}), weatherLookupStatus: postWeather.status }
+        }
+
+        // 2) Fallback: GET currentConditions:lookup
+        if (!weatherData) {
+          const getResp = await fetch(
+            `https://weather.googleapis.com/v1/currentConditions:lookup?location=${coords.lat},${coords.lng}&units=METRIC&key=${googleWeatherKey}`,
+            { cache: 'no-store' }
+          )
+          if (getResp.ok) {
+            const gw = await getResp.json()
+            weatherData = parseGoogleWeather(gw)
+          } else {
+            weatherDiagnostics = { ...(weatherDiagnostics || {}), currentConditionsStatus: getResp.status }
+          }
+        }
+
+        // 3) Fallback: POST currentConditions:lookup
         if (!weatherData) {
           const postResp = await fetch(
             `https://weather.googleapis.com/v1/currentConditions:lookup?key=${googleWeatherKey}`,
@@ -81,26 +125,14 @@ export async function GET(request: NextRequest) {
           )
           if (postResp.ok) {
             const gw = await postResp.json()
-            const cc = gw?.currentConditions || gw
-            const tempFeel = cc?.temperatureApparent?.value ?? cc?.temperatureApparent
-            const tempPrim = cc?.temperature?.value ?? cc?.temperature
-            const temp = (tempFeel ?? tempPrim) ?? null
-            if (temp !== null) {
-              const humidity = cc?.humidity?.value ?? cc?.humidity ?? 60
-              let wind = cc?.windSpeed?.value ?? cc?.windSpeed ?? 3
-              wind = Number(wind)
-              const windMs = wind > 40 ? wind / 3.6 : wind
-              basis = tempFeel != null ? 'apparent' : 'temperature'
-              weatherData = {
-                main: { temp: Number(temp), humidity: Number(humidity) },
-                weather: [{ description: String(cc?.phrase || cc?.summary || 'clear sky'), icon: '01d' }],
-                wind: { speed: windMs }
-              }
-            }
+            weatherData = parseGoogleWeather(gw)
+          } else {
+            weatherDiagnostics = { ...(weatherDiagnostics || {}), currentConditionsPostStatus: postResp.status }
           }
         }
-      } catch {
+      } catch (err: any) {
         provider = 'stale-cache'
+        weatherDiagnostics = { ...(weatherDiagnostics || {}), error: String(err?.message || err) }
       }
     }
 
@@ -116,8 +148,14 @@ export async function GET(request: NextRequest) {
             body: JSON.stringify({ location: { latitude: coords.lat, longitude: coords.lng } })
           }
         )
-        if (aqResponse.ok) airQualityData = await aqResponse.json()
-      } catch {}
+        if (aqResponse.ok) {
+          airQualityData = await aqResponse.json()
+        } else {
+          if (debug) weatherDiagnostics = { ...(weatherDiagnostics || {}), airQualityStatus: aqResponse.status }
+        }
+      } catch (err: any) {
+        if (debug) weatherDiagnostics = { ...(weatherDiagnostics || {}), airQualityError: String(err?.message || err) }
+      }
     }
 
     if (!weatherData && cached) {
@@ -133,7 +171,7 @@ export async function GET(request: NextRequest) {
       provider = 'fixed-fallback'
     }
 
-    const result = {
+    const result: any = {
       temperature: Math.round(Number(weatherData.main.temp)),
       condition: weatherData.weather[0].description,
       humidity: Number(weatherData.main.humidity ?? 60),
@@ -147,6 +185,7 @@ export async function GET(request: NextRequest) {
       basis,
       coordinates: { lat: coords.lat, lng: coords.lng }
     }
+    if (debug && weatherDiagnostics) result.debug = weatherDiagnostics
 
     weatherCache.set(cacheKey, { data: result, timestamp: Date.now() })
     return NextResponse.json(result)
