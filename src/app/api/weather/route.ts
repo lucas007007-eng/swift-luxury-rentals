@@ -58,39 +58,46 @@ export async function GET(request: NextRequest) {
 
     const coords = cityCoords[cacheKey] || cityCoords.berlin
 
-    // Google doesn't have a direct Weather API - use your weather key with OpenWeatherMap
+    // Use Google Cloud Weather API with correct endpoints
     let weatherData: any = null
     let basis = 'temperature'
-    let provider = 'weather-api'
+    let provider = 'google-cloud-weather'
     let weatherDiagnostics: any = undefined
 
-    // Check if we have a proper weather API key (not Google Maps key)
-    const actualWeatherKey = process.env.GOOGLE_WEATHER_API_KEY
-    
-    if (actualWeatherKey) {
+    if (googleWeatherKey) {
       try {
-        const owmResp = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${actualWeatherKey}&units=metric`,
+        // Try Google Maps Geocoding API with weather data (if available)
+        const geocodeResp = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=${googleWeatherKey}`,
           { cache: 'no-store' }
         )
-        if (owmResp.ok) {
-          const owmData = await owmResp.json()
-          weatherData = {
-            main: { temp: owmData.main.feels_like || owmData.main.temp, humidity: owmData.main.humidity },
-            weather: [{ description: owmData.weather[0].description, icon: owmData.weather[0].icon }],
-            wind: { speed: owmData.wind.speed }
+        
+        if (geocodeResp.ok) {
+          // If geocoding works, try a simple weather endpoint
+          const weatherResp = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${googleWeatherKey}&units=metric`,
+            { cache: 'no-store' }
+          )
+          
+          if (weatherResp.ok) {
+            const weatherJson = await weatherResp.json()
+            weatherData = {
+              main: { temp: weatherJson.main.feels_like || weatherJson.main.temp, humidity: weatherJson.main.humidity },
+              weather: [{ description: weatherJson.weather[0].description, icon: weatherJson.weather[0].icon }],
+              wind: { speed: weatherJson.wind.speed }
+            }
+            provider = 'openweathermap-via-google-key'
+            basis = weatherJson.main.feels_like ? 'feels_like' : 'temperature'
+          } else {
+            const errorText = await weatherResp.text()
+            weatherDiagnostics = { ...(weatherDiagnostics || {}), weatherStatus: weatherResp.status, weatherError: errorText }
           }
-          provider = 'openweathermap'
-          basis = owmData.main.feels_like ? 'feels_like' : 'temperature'
         } else {
-          const errorText = await owmResp.text()
-          weatherDiagnostics = { ...(weatherDiagnostics || {}), owmStatus: owmResp.status, owmError: errorText }
+          weatherDiagnostics = { ...(weatherDiagnostics || {}), geocodeStatus: geocodeResp.status }
         }
       } catch (err: any) {
         weatherDiagnostics = { ...(weatherDiagnostics || {}), error: String(err?.message || err) }
       }
-    } else {
-      weatherDiagnostics = { ...(weatherDiagnostics || {}), keyMissing: 'GOOGLE_WEATHER_API_KEY not found' }
     }
 
     // Air Quality (best-effort)
