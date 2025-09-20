@@ -58,16 +58,19 @@ export async function GET(request: NextRequest) {
 
     const coords = cityCoords[cacheKey] || cityCoords.berlin
 
-    // Use OpenWeatherMap API (reliable weather service)
+    // Google doesn't have a direct Weather API - use your weather key with OpenWeatherMap
     let weatherData: any = null
     let basis = 'temperature'
-    let provider = 'openweathermap'
+    let provider = 'weather-api'
     let weatherDiagnostics: any = undefined
 
-    if (googleWeatherKey) {
+    // Check if we have a proper weather API key (not Google Maps key)
+    const actualWeatherKey = process.env.GOOGLE_WEATHER_API_KEY
+    
+    if (actualWeatherKey) {
       try {
         const owmResp = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${googleWeatherKey}&units=metric`,
+          `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${actualWeatherKey}&units=metric`,
           { cache: 'no-store' }
         )
         if (owmResp.ok) {
@@ -81,12 +84,13 @@ export async function GET(request: NextRequest) {
           basis = owmData.main.feels_like ? 'feels_like' : 'temperature'
         } else {
           const errorText = await owmResp.text()
-          weatherDiagnostics = { ...(weatherDiagnostics || {}), openWeatherStatus: owmResp.status, openWeatherError: errorText }
+          weatherDiagnostics = { ...(weatherDiagnostics || {}), owmStatus: owmResp.status, owmError: errorText }
         }
       } catch (err: any) {
-        provider = 'api-error'
         weatherDiagnostics = { ...(weatherDiagnostics || {}), error: String(err?.message || err) }
       }
+    } else {
+      weatherDiagnostics = { ...(weatherDiagnostics || {}), keyMissing: 'GOOGLE_WEATHER_API_KEY not found' }
     }
 
     // Air Quality (best-effort)
