@@ -54,15 +54,15 @@ export async function GET(request: NextRequest) {
         if (getResp.ok) {
           const gw = await getResp.json()
           const cc = gw?.currentConditions || gw
-          const tempPrim = cc?.temperature ?? cc?.temperature?.value
           const tempFeel = cc?.temperatureApparent ?? cc?.temperatureApparent?.value
-          const temp = (tempPrim ?? tempFeel) ?? null
+          const tempPrim = cc?.temperature ?? cc?.temperature?.value
+          const temp = (tempFeel ?? tempPrim) ?? null
           if (temp !== null) {
             const humidity = cc?.humidity ?? 60
             let wind = cc?.windSpeed ?? 3
             wind = Number(wind)
             const windMs = wind > 40 ? wind / 3.6 : wind
-            basis = tempPrim != null ? 'temperature' : 'apparent'
+            basis = tempFeel != null ? 'apparent' : 'temperature'
             weatherData = {
               main: { temp: Number(temp), humidity: Number(humidity) },
               weather: [{ description: String(cc?.phrase || cc?.summary || 'clear sky'), icon: '01d' }],
@@ -82,15 +82,15 @@ export async function GET(request: NextRequest) {
           if (postResp.ok) {
             const gw = await postResp.json()
             const cc = gw?.currentConditions || gw
-            const tempPrim = cc?.temperature?.value ?? cc?.temperature
             const tempFeel = cc?.temperatureApparent?.value ?? cc?.temperatureApparent
-            const temp = (tempPrim ?? tempFeel) ?? null
+            const tempPrim = cc?.temperature?.value ?? cc?.temperature
+            const temp = (tempFeel ?? tempPrim) ?? null
             if (temp !== null) {
               const humidity = cc?.humidity?.value ?? cc?.humidity ?? 60
               let wind = cc?.windSpeed?.value ?? cc?.windSpeed ?? 3
               wind = Number(wind)
               const windMs = wind > 40 ? wind / 3.6 : wind
-              basis = tempPrim != null ? 'temperature' : 'apparent'
+              basis = tempFeel != null ? 'apparent' : 'temperature'
               weatherData = {
                 main: { temp: Number(temp), humidity: Number(humidity) },
                 weather: [{ description: String(cc?.phrase || cc?.summary || 'clear sky'), icon: '01d' }],
