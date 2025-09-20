@@ -94,51 +94,27 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        // 1) Preferred: POST weather:lookup
-        const postWeather = await fetch(`https://weather.googleapis.com/v1/weather:lookup?key=${googleWeatherKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ location: { latitude: coords.lat, longitude: coords.lng }, units: 'METRIC', languageCode: 'en-US' })
-          }
-        )
-        if (postWeather.ok) {
-          const gw = await postWeather.json()
-          weatherData = parseGoogleWeather(gw)
-        } else {
-          const errorText = await postWeather.text()
-          weatherDiagnostics = { ...(weatherDiagnostics || {}), weatherLookupStatus: postWeather.status, weatherLookupError: errorText }
-        }
-
-        // 2) Fallback: GET currentConditions:lookup
-        if (!weatherData) {
-          const getResp = await fetch(
-            `https://weather.googleapis.com/v1/currentConditions:lookup?location=${coords.lat},${coords.lng}&units=METRIC&key=${googleWeatherKey}`,
-            { cache: 'no-store' }
-          )
-          if (getResp.ok) {
-            const gw = await getResp.json()
-            weatherData = parseGoogleWeather(gw)
-          } else {
-            weatherDiagnostics = { ...(weatherDiagnostics || {}), currentConditionsStatus: getResp.status }
-          }
-        }
-
-        // 3) Fallback: POST currentConditions:lookup
-        if (!weatherData) {
-          const postResp = await fetch(
-            `https://weather.googleapis.com/v1/currentConditions:lookup?key=${googleWeatherKey}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ location: { latitude: coords.lat, longitude: coords.lng }, units: 'METRIC' })
+        // Try OpenWeatherMap as reliable alternative (if Google fails)
+        if (!weatherData && googleWeatherKey) {
+          try {
+            const owmResp = await fetch(
+              `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${googleWeatherKey}&units=metric`,
+              { cache: 'no-store' }
+            )
+            if (owmResp.ok) {
+              const owmData = await owmResp.json()
+              weatherData = {
+                main: { temp: owmData.main.feels_like || owmData.main.temp, humidity: owmData.main.humidity },
+                weather: [{ description: owmData.weather[0].description, icon: owmData.weather[0].icon }],
+                wind: { speed: owmData.wind.speed }
+              }
+              provider = 'openweathermap'
+              basis = owmData.main.feels_like ? 'feels_like' : 'temperature'
+            } else {
+              weatherDiagnostics = { ...(weatherDiagnostics || {}), openWeatherStatus: owmResp.status }
             }
-          )
-          if (postResp.ok) {
-            const gw = await postResp.json()
-            weatherData = parseGoogleWeather(gw)
-          } else {
-            weatherDiagnostics = { ...(weatherDiagnostics || {}), currentConditionsPostStatus: postResp.status }
+          } catch (err: any) {
+            weatherDiagnostics = { ...(weatherDiagnostics || {}), openWeatherError: String(err?.message || err) }
           }
         }
       } catch (err: any) {
