@@ -725,7 +725,11 @@ html {
 
 .glass-btn > span {
   position: relative;
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  white-space: nowrap;
   user-select: none;
   letter-spacing: -0.02em;
   font-weight: 600;
@@ -738,7 +742,7 @@ html {
 }
 
 @media (max-width: 640px) {
-  .glass-btn--wide > span { padding-inline: 2.55em; }
+  .glass-btn--wide > span { padding-inline: 2.55em; padding-block: 0.525em; }
 }
 
 .glass-btn > span::after {
