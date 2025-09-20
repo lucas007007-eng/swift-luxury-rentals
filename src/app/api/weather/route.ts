@@ -58,67 +58,33 @@ export async function GET(request: NextRequest) {
 
     const coords = cityCoords[cacheKey] || cityCoords.berlin
 
-    // Try Google Weather (POST weather:lookup first, then GET/POST currentConditions:lookup)
+    // Use OpenWeatherMap API (reliable weather service)
     let weatherData: any = null
     let basis = 'temperature'
-    let provider = 'google-weather'
+    let provider = 'openweathermap'
     let weatherDiagnostics: any = undefined
 
     if (googleWeatherKey) {
       try {
-        // Helper to normalize Google Weather shapes
-        const parseGoogleWeather = (gw: any) => {
-          const cc =
-            gw?.currentConditions ||
-            gw?.currentWeather ||
-            gw?.data?.currentConditions ||
-            gw?.data?.currentWeather ||
-            gw
-          if (!cc) return null
-          const tempFeel =
-            cc?.temperatureApparent?.value ?? cc?.temperatureApparent ??
-            cc?.apparentTemperature?.value ?? cc?.apparentTemperature
-          const tempPrim = cc?.temperature?.value ?? cc?.temperature
-          const temperature = (tempFeel ?? tempPrim)
-          if (temperature == null) return null
-          const humidityVal = cc?.humidity?.value ?? cc?.humidity
-          const windVal = cc?.windSpeed?.value ?? cc?.windSpeed
-          const description = cc?.phrase || cc?.summary || cc?.conditions || 'clear sky'
-          const wind = Number(windVal ?? 3)
-          const windMs = wind > 40 ? wind / 3.6 : wind
-          basis = tempFeel != null ? 'apparent' : 'temperature'
-          return {
-            main: { temp: Number(temperature), humidity: Number(humidityVal ?? 60) },
-            weather: [{ description: String(description), icon: '01d' }],
-            wind: { speed: windMs }
+        const owmResp = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${googleWeatherKey}&units=metric`,
+          { cache: 'no-store' }
+        )
+        if (owmResp.ok) {
+          const owmData = await owmResp.json()
+          weatherData = {
+            main: { temp: owmData.main.feels_like || owmData.main.temp, humidity: owmData.main.humidity },
+            weather: [{ description: owmData.weather[0].description, icon: owmData.weather[0].icon }],
+            wind: { speed: owmData.wind.speed }
           }
-        }
-
-        // Try OpenWeatherMap as reliable alternative (if Google fails)
-        if (!weatherData && googleWeatherKey) {
-          try {
-            const owmResp = await fetch(
-              `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${googleWeatherKey}&units=metric`,
-              { cache: 'no-store' }
-            )
-            if (owmResp.ok) {
-              const owmData = await owmResp.json()
-              weatherData = {
-                main: { temp: owmData.main.feels_like || owmData.main.temp, humidity: owmData.main.humidity },
-                weather: [{ description: owmData.weather[0].description, icon: owmData.weather[0].icon }],
-                wind: { speed: owmData.wind.speed }
-              }
-              provider = 'openweathermap'
-              basis = owmData.main.feels_like ? 'feels_like' : 'temperature'
-            } else {
-              weatherDiagnostics = { ...(weatherDiagnostics || {}), openWeatherStatus: owmResp.status }
-            }
-          } catch (err: any) {
-            weatherDiagnostics = { ...(weatherDiagnostics || {}), openWeatherError: String(err?.message || err) }
-          }
+          provider = 'openweathermap'
+          basis = owmData.main.feels_like ? 'feels_like' : 'temperature'
+        } else {
+          const errorText = await owmResp.text()
+          weatherDiagnostics = { ...(weatherDiagnostics || {}), openWeatherStatus: owmResp.status, openWeatherError: errorText }
         }
       } catch (err: any) {
-        provider = 'stale-cache'
+        provider = 'api-error'
         weatherDiagnostics = { ...(weatherDiagnostics || {}), error: String(err?.message || err) }
       }
     }
