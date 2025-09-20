@@ -157,10 +157,10 @@ export default function CityPage() {
               transition={{ duration: 0.8 }}
               className="text-center md:text-left flex-1"
             >
-              <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight mb-4" style={{ fontFamily: 'Sora, ui-sans-serif, system-ui' }}>
+              <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight mb-4">
                 {cityName}
               </h1>
-              <p className="text-xl md:text-2xl text-gray-300 max-w-3xl md:max-w-4xl mb-4 md:mb-6 mx-auto md:mx-0" style={{ fontFamily: 'Inter, ui-sans-serif, system-ui' }}>
+              <p className="text-xl md:text-2xl text-gray-300 max-w-3xl md:max-w-4xl mb-4 md:mb-6 mx-auto md:mx-0">
                 {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
               </p>
               <div className="text-lg text-gray-400">
