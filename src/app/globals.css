@@ -346,8 +346,11 @@ html {
   background: 
     radial-gradient(circle at 20% 20%, #FFD700 0%, rgba(255,215,0,0.8) 20%, transparent 60%),
     radial-gradient(circle at 80% 30%, #FFA500 0%, rgba(255,165,0,0.6) 25%, transparent 50%),
-    linear-gradient(135deg, rgba(255,223,0,0.4), rgba(255,140,0,0.3));
+    linear-gradient(135deg, rgba(255,223,0,0.4), rgba(255,140,0,0.3)),
+    rgba(255,215,0,0.2);
   position: relative; overflow: hidden;
+  min-height: 100vh;
+  width: 100%;
 }
 .weather-bg-sunny::before {
   content: '';
@@ -395,11 +398,15 @@ html {
   background: 
     linear-gradient(180deg, rgba(30,60,120,0.9), rgba(20,40,80,0.7)),
     radial-gradient(ellipse at 50% 0%, rgba(60,100,160,0.6), transparent 70%);
-  position: relative; overflow: hidden; 
+  position: relative; overflow: hidden;
+  min-height: 100vh;
+  width: 100%;
 }
 .weather-bg-rain::before {
   content: '';
-  position: absolute; inset: 0;
+  position: absolute; 
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 2;
   background-image: 
     repeating-linear-gradient(75deg, 
       rgba(173,216,230,0.8) 0px, rgba(173,216,230,0.8) 2px, 
@@ -411,6 +418,7 @@ html {
       rgba(100,149,237,0.4) 0px, rgba(100,149,237,0.4) 1px, 
       transparent 1px, transparent 3px);
   animation: rain-fall-heavy 0.4s linear infinite;
+  pointer-events: none;
 }
 .weather-bg-rain::after {
   content: '';
