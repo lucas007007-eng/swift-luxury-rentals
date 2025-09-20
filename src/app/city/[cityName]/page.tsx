@@ -333,8 +333,7 @@ function WeatherBackgroundSetter({ cityName, onClass, onDebug, forceWeather }: {
               d.style.animationDuration = `${duration}s`
               d.style.transform = `translateY(-120px) translateX(0) scale(${scale})`
               container.appendChild(d)
-              const splashTime = (duration + delay) * 1000
-              const timer = setTimeout(() => {
+              const addSplash = () => {
                 const s = document.createElement('div')
                 s.className = 'splash'
                 s.style.left = `calc(${left}% + 25px)`
@@ -342,8 +341,12 @@ function WeatherBackgroundSetter({ cityName, onClass, onDebug, forceWeather }: {
                 s.style.opacity = '0.9'
                 container.appendChild(s)
                 setTimeout(() => s.remove(), 600)
-              }, splashTime)
-              splashTimers.push(timer)
+              }
+              // Repeat on every fall cycle end
+              d.addEventListener('animationiteration', addSplash)
+              // Also add one for the first cycle end using a single timer
+              const firstTimer = setTimeout(addSplash, (duration + delay) * 1000)
+              splashTimers.push(firstTimer)
             }
           }
         }
