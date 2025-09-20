@@ -169,8 +169,8 @@ export default function CityPage() {
             </motion.div>
 
             {/* Weather card integrated into hero; right on desktop, below on mobile */}
-            <div className="md:mt-2 md:self-start md:shrink-0 flex md:block justify-center">
-              <WeatherWidget city={cityName} className="w-[260px] md:w-[280px] shadow-xl" />
+            <div className="md:mt-2 md:self-start md:shrink-0 flex md:block justify-center mb-6 md:mb-0">
+              <WeatherWidget city={cityName} className="w-[260px] md:w-[280px] shadow-xl mb-4 md:mb-0" />
             </div>
           </div>
 
