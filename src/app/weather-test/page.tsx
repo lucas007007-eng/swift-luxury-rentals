@@ -33,11 +33,9 @@ export default function WeatherTestPage() {
       const leftPos = Math.random() * 100
       raindrop.style.left = `${leftPos}vw`
       
-      // Random size variation - much larger raindrops
-      const width = Math.random() * 4 + 6 // Between 6px and 10px width
-      const height = Math.random() * 8 + 15 // Between 15px and 23px height
-      raindrop.style.width = `${width}px`
-      raindrop.style.height = `${height}px`
+      // Random size variation - water drop emoji style
+      const scale = Math.random() * 0.8 + 0.7 // Between 0.7x and 1.5x scale
+      raindrop.style.transform = `scale(${scale})`
       
       // Random opacity for depth
       const opacity = Math.random() * 0.4 + 0.6 // Between 0.6 and 1.0
