@@ -21,6 +21,7 @@ export default function CityPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [filterState, setFilterState] = useState<CityFilterState>({ amenities: [] })
   const [weatherBgClass, setWeatherBgClass] = useState<string>('weather-bg-clear')
+  const [debugWeather, setDebugWeather] = useState<any>(null)
   const searchParams = useSearchParams()
   const checkIn = searchParams.get('checkin') || ''
   const checkOut = searchParams.get('checkout') || ''
@@ -134,6 +135,15 @@ export default function CityPage() {
       <section className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-primary-50 to-secondary-50 overflow-hidden min-h-[360px]">
         {/* Weather Animation Background */}
         <div className={`absolute left-0 right-0 top-0 bottom-0 pointer-events-none opacity-55 z-20 ${weatherBgClass}`} />
+        
+        {/* Debug Weather Info (remove in production) */}
+        {debugWeather && (
+          <div className="absolute top-4 left-4 z-40 bg-black/80 text-white p-2 rounded text-xs">
+            <div>Class: {weatherBgClass}</div>
+            <div>Condition: {debugWeather.condition}</div>
+            <div>Temp: {debugWeather.temperature}°C</div>
+          </div>
+        )}
         <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Weather Widget */}
           <div className="absolute top-32 right-4 md:right-8 z-10">
@@ -200,7 +210,7 @@ export default function CityPage() {
       </section>
 
       {/* Set background class based on Google Weather */}
-      <WeatherBackgroundSetter cityName={cityName} onClass={setWeatherBgClass} />
+      <WeatherBackgroundSetter cityName={cityName} onClass={setWeatherBgClass} onDebug={setDebugWeather} />
 
       {/* Filter Modal */}
       {searchMode === 'homes' && (
@@ -267,7 +277,7 @@ export default function CityPage() {
   )
 }
 
-function WeatherBackgroundSetter({ cityName, onClass }: { cityName: string, onClass: (c: string)=>void }) {
+function WeatherBackgroundSetter({ cityName, onClass, onDebug }: { cityName: string, onClass: (c: string)=>void, onDebug: (d: any)=>void }) {
   useEffect(() => {
     let cancelled = false
     const load = async () => {
@@ -283,12 +293,17 @@ function WeatherBackgroundSetter({ cityName, onClass }: { cityName: string, onCl
         else if (c.includes('snow')) cls = `${base}-snow`
         else if (c.includes('cloud')) cls = `${base}-cloudy`
         else if (c.includes('clear') || c.includes('sunny')) cls = `${base}-sunny`
-        if (!cancelled) onClass(cls)
-      } catch {}
+        if (!cancelled) {
+          onClass(cls)
+          onDebug(data)
+        }
+      } catch (err) {
+        if (!cancelled) onDebug({ error: String(err) })
+      }
     }
     load()
     const id = setInterval(load, 5 * 60 * 1000)
     return () => { cancelled = true; clearInterval(id) }
-  }, [cityName, onClass])
+  }, [cityName, onClass, onDebug])
   return null
 }
