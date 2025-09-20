@@ -133,7 +133,7 @@ export default function CityPage() {
       {/* Hero Section with Search */}
       <section className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-primary-50 to-secondary-50 overflow-hidden">
         {/* Weather Animation Background */}
-        <div className={`absolute inset-0 pointer-events-none opacity-25 ${weatherBgClass}`} />
+        <div className={`absolute inset-0 pointer-events-none opacity-40 ${weatherBgClass}`} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Weather Widget */}
           <div className="absolute top-32 right-4 md:right-8 z-10">
