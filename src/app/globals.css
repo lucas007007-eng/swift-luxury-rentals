@@ -387,16 +387,22 @@ html {
   position: relative; overflow: hidden; 
 }
 
-/* Clean Rain Animation Only */
-@keyframes individual-raindrops {
-  0% { transform: translateY(-20px) translateX(0px); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 0.8; }
-  100% { transform: translateY(100vh) translateX(15px); opacity: 0; }
+/* JavaScript-Generated Rain Animation (CodePen Style) */
+.raindrop {
+  position: absolute;
+  top: -10px;
+  width: 2px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.6);
+  animation: fall linear infinite;
+  pointer-events: none;
 }
-@keyframes raindrop-sway {
-  0%, 100% { transform: translateX(0px); }
-  25% { transform: translateX(2px); }
-  50% { transform: translateX(-1px); }
-  75% { transform: translateX(3px); }
+
+@keyframes fall {
+  from {
+    transform: translateY(-100px);
+  }
+  to {
+    transform: translateY(100vh);
+  }
 }

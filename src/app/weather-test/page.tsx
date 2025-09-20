@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export default function WeatherTestPage() {
   const [activeWeather, setActiveWeather] = useState<string>('rain')
@@ -13,6 +13,34 @@ export default function WeatherTestPage() {
     { key: 'snow', label: 'Snow' },
     { key: 'thunder', label: 'Thunder' }
   ]
+
+  // Generate raindrops for rain animation
+  useEffect(() => {
+    if (activeWeather !== 'rain') return
+
+    const rainContainer = document.getElementById('rain-container')
+    if (!rainContainer) return
+
+    // Clear existing raindrops
+    rainContainer.innerHTML = ''
+
+    // Create 100 raindrops
+    for (let i = 0; i < 100; i++) {
+      const raindrop = document.createElement('div')
+      raindrop.className = 'raindrop'
+      
+      // Random horizontal position
+      raindrop.style.left = `${Math.random() * 100}vw`
+      
+      // Random animation duration and delay
+      const duration = Math.random() * 2 + 1 // Between 1s and 3s
+      const delay = Math.random() * 2 // Between 0s and 2s
+      raindrop.style.animationDuration = `${duration}s`
+      raindrop.style.animationDelay = `-${delay}s`
+      
+      rainContainer.appendChild(raindrop)
+    }
+  }, [activeWeather])
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -41,7 +69,15 @@ export default function WeatherTestPage() {
 
       {/* Weather Animation Demo Area */}
       <div className="relative w-full h-screen overflow-hidden">
-        <div className={`absolute inset-0 weather-bg-${activeWeather}`} />
+        {/* Rain Container for JavaScript-generated raindrops */}
+        {activeWeather === 'rain' && (
+          <div id="rain-container" className="absolute inset-0 pointer-events-none z-10" />
+        )}
+        
+        {/* Other weather backgrounds */}
+        {activeWeather !== 'rain' && (
+          <div className={`absolute inset-0 weather-bg-${activeWeather}`} />
+        )}
         
         {/* Content to show overlay effect */}
         <div className="relative flex items-center justify-center h-full" style={{zIndex: 5}}>
