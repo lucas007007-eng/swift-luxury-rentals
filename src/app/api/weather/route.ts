@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     const googleApiKey = process.env.GOOGLE_AIR_QUALITY_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    const googleWeatherKey = process.env.GOOGLE_WEATHER_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     const openWeatherApiKey = process.env.OPENWEATHER_API_KEY
 
     // City coordinates for major cities
@@ -76,9 +77,43 @@ export async function GET(request: NextRequest) {
       return conditions[seed < 3 ? seed : (seed % 3)]
     }
 
-    // Fetch real weather data from OpenWeatherMap
+    // Weather via Google Weather API, else OpenWeather, else seasonal
     let weatherData: any = null
-    if (openWeatherApiKey) {
+
+    if (googleWeatherKey) {
+      try {
+        const googleWeatherResp = await fetch(
+          `https://weather.googleapis.com/v1/currentConditions:lookup?key=${googleWeatherKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: { latitude: coords.lat, longitude: coords.lng }
+            })
+          }
+        )
+        if (googleWeatherResp.ok) {
+          const gw = await googleWeatherResp.json()
+          const cc = gw?.currentConditions || gw // tolerate both shapes
+          const temp = cc?.temperature?.value ?? cc?.temperature ?? null
+          const humidity = cc?.humidity?.value ?? cc?.humidity ?? null
+          const windKph = cc?.windSpeed?.value ?? cc?.windSpeed ?? null
+          const desc = cc?.phrase || cc?.summary || cc?.condition || 'clear sky'
+
+          if (temp !== null) {
+            weatherData = {
+              main: { temp, humidity: humidity ?? 60 },
+              weather: [{ description: String(desc), icon: '01d' }],
+              wind: { speed: windKph ? Number(windKph) / 3.6 : 3 } // kph->m/s
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Google Weather API error:', e)
+      }
+    }
+
+    if (!weatherData && openWeatherApiKey) {
       try {
         const weatherResponse = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${openWeatherApiKey}&units=metric`
@@ -106,9 +141,9 @@ export async function GET(request: NextRequest) {
                 longitude: coords.lng
               },
               extraComputations: [
-                "HEALTH_RECOMMENDATIONS",
-                "DOMINANT_POLLUTANT",
-                "POLLUTANT_ADDITIONAL_INFO"
+                'HEALTH_RECOMMENDATIONS',
+                'DOMINANT_POLLUTANT',
+                'POLLUTANT_ADDITIONAL_INFO'
               ]
             })
           }
@@ -122,7 +157,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fallback to seasonal data if no real weather API
-    if (!weatherData && !openWeatherApiKey) {
+    if (!weatherData && !googleWeatherKey && !openWeatherApiKey) {
       weatherData = {
         main: {
           temp: getSeasonalTemp(city),
@@ -153,10 +188,10 @@ export async function GET(request: NextRequest) {
 
     // Use real data if available, otherwise mock
     const result = weatherData ? {
-      temperature: Math.round(weatherData.main.temp),
+      temperature: Math.round(Number(weatherData.main.temp)),
       condition: weatherData.weather[0].description,
-      humidity: weatherData.main.humidity,
-      windSpeed: Math.round(weatherData.wind.speed * 3.6), // m/s to km/h
+      humidity: Number(weatherData.main.humidity ?? 60),
+      windSpeed: Math.round(Number(weatherData.wind.speed) * 3.6), // m/s to km/h
       airQuality: airQualityData ? {
         aqi: airQualityData.indexes?.[0]?.aqi || 50,
         level: airQualityData.indexes?.[0]?.category || 'Good'
