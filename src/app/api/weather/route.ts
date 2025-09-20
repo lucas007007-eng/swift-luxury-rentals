@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// In-memory cache for weather data (5 minute TTL)
+const weatherCache = new Map<string, { data: any; timestamp: number }>()
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -7,6 +11,13 @@ export async function GET(request: NextRequest) {
 
     if (!city) {
       return NextResponse.json({ error: 'City parameter required' }, { status: 400 })
+    }
+
+    // Check cache first
+    const cacheKey = city.toLowerCase()
+    const cached = weatherCache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return NextResponse.json(cached.data)
     }
 
     const googleApiKey = process.env.GOOGLE_AIR_QUALITY_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
@@ -135,8 +146,18 @@ export async function GET(request: NextRequest) {
         aqi: airQualityData.indexes?.[0]?.aqi || 50,
         level: airQualityData.indexes?.[0]?.category || 'Good'
       } : mockWeatherData.airQuality,
-      icon: weatherData.weather[0].icon
-    } : mockWeatherData
+      icon: weatherData.weather[0].icon,
+      lastUpdated: new Date().toISOString()
+    } : {
+      ...mockWeatherData,
+      lastUpdated: new Date().toISOString()
+    }
+
+    // Cache the result
+    weatherCache.set(cacheKey, {
+      data: result,
+      timestamp: Date.now()
+    })
 
     return NextResponse.json(result)
   } catch (error) {

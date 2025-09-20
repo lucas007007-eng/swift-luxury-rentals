@@ -12,6 +12,7 @@ interface WeatherData {
     level: string
   }
   icon: string
+  lastUpdated?: string
 }
 
 interface WeatherWidgetProps {
@@ -28,7 +29,9 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
     const fetchWeather = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`)
+        const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`, {
+          cache: 'no-store' // Always fetch fresh data
+        })
         if (response.ok) {
           const data = await response.json()
           setWeather(data)
@@ -45,6 +48,10 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
 
     if (city) {
       fetchWeather()
+      
+      // Auto-refresh every 5 minutes for real-time data
+      const interval = setInterval(fetchWeather, 5 * 60 * 1000)
+      return () => clearInterval(interval)
     }
   }, [city])
 
@@ -169,6 +176,11 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
               </span>
             </div>
           </div>
+          {weather.lastUpdated && (
+            <div className="text-[10px] text-gray-500 mt-1">
+              Updated: {new Date(weather.lastUpdated).toLocaleTimeString()}
+            </div>
+          )}
         </div>
       </div>
 
