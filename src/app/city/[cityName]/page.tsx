@@ -135,19 +135,8 @@ export default function CityPage() {
       
       {/* Hero Section with Search */}
       <section ref={heroRef} className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-black overflow-hidden min-h-[360px]">
-        {/* Weather Animation Background */}
-        <div className={`absolute inset-0 pointer-events-none z-20 ${weatherBgClass}`} style={{opacity: 0.9}} />
-        {/* Rain FX container (only used when raining) */}
-        <div ref={rainContainerRef} id="rain-container" className="absolute inset-0 pointer-events-none z-20" />
-        
-        {/* Debug Weather Info (remove in production) */}
-        {debugWeather && (
-          <div className="absolute top-4 left-4 z-40 bg-black/80 text-white p-2 rounded text-xs">
-            <div>Class: {weatherBgClass}</div>
-            <div>Condition: {debugWeather.condition}</div>
-            <div>Temp: {debugWeather.temperature}°C</div>
-          </div>
-        )}
+        {/* Rain FX container (only used when raining); behind content */}
+        <div ref={rainContainerRef} id="rain-container" className="absolute inset-0 pointer-events-none z-10" />
         <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Weather Widget */}
           <div className="absolute top-32 right-4 md:right-8 z-10">
@@ -213,7 +202,7 @@ export default function CityPage() {
         </div>
       </section>
 
-      {/* Set background class based on Google Weather */}
+      {/* Weather-driven effects (generates rain when needed) */}
       <WeatherBackgroundSetter cityName={cityName} onClass={setWeatherBgClass} onDebug={setDebugWeather} />
 
       {/* Filter Modal */}
@@ -309,7 +298,7 @@ function WeatherBackgroundSetter({ cityName, onClass, onDebug }: { cityName: str
           container.innerHTML = ''
           splashTimers.forEach(t => clearTimeout(t))
           splashTimers = []
-          if (cls.endsWith('-rain') || cls.endsWith('-thunder')) {
+          if (c.includes('rain') || c.includes('drizzle') || c.includes('thunder') || c.includes('storm')) {
             const dropCount = 100
             for (let i = 0; i < dropCount; i++) {
               const d = document.createElement('div')
