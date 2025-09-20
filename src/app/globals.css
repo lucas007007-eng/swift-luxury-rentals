@@ -353,29 +353,6 @@ html {
   min-height: 100vh;
   width: 100%;
 }
-.weather-bg-rain::after {
-  content: '';
-  position: absolute; 
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 3;
-  background-image: 
-    radial-gradient(ellipse 1px 8px at 10% 0%, rgba(255,255,255,0.8), transparent),
-    radial-gradient(ellipse 1px 6px at 25% 0%, rgba(200,220,255,0.7), transparent),
-    radial-gradient(ellipse 1px 10px at 40% 0%, rgba(255,255,255,0.9), transparent),
-    radial-gradient(ellipse 1px 7px at 55% 0%, rgba(180,200,240,0.6), transparent),
-    radial-gradient(ellipse 1px 9px at 70% 0%, rgba(255,255,255,0.8), transparent),
-    radial-gradient(ellipse 1px 5px at 85% 0%, rgba(160,180,220,0.7), transparent),
-    radial-gradient(ellipse 1px 8px at 15% 0%, rgba(255,255,255,0.7), transparent),
-    radial-gradient(ellipse 1px 6px at 30% 0%, rgba(200,220,255,0.8), transparent),
-    radial-gradient(ellipse 1px 9px at 45% 0%, rgba(255,255,255,0.9), transparent),
-    radial-gradient(ellipse 1px 7px at 60% 0%, rgba(180,200,240,0.6), transparent),
-    radial-gradient(ellipse 1px 8px at 75% 0%, rgba(255,255,255,0.8), transparent),
-    radial-gradient(ellipse 1px 6px at 90% 0%, rgba(160,180,220,0.7), transparent);
-  background-size: 100px 100vh, 80px 100vh, 120px 100vh, 90px 100vh, 110px 100vh, 70px 100vh, 
-                   95px 100vh, 85px 100vh, 115px 100vh, 75px 100vh, 105px 100vh, 65px 100vh;
-  animation: individual-raindrops 1.2s linear infinite, raindrop-sway 3s ease-in-out infinite;
-  pointer-events: none;
-}
 
 .weather-bg-snow { 
   background: transparent;
@@ -393,16 +370,25 @@ html {
   top: -10px;
   width: 2px;
   height: 10px;
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.8);
   animation: fall linear infinite;
   pointer-events: none;
+  z-index: 999;
 }
 
 @keyframes fall {
   from {
     transform: translateY(-100px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
   }
   to {
     transform: translateY(100vh);
+    opacity: 0;
   }
 }

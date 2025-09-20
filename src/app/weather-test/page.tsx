@@ -71,7 +71,7 @@ export default function WeatherTestPage() {
       <div className="relative w-full h-screen overflow-hidden">
         {/* Rain Container for JavaScript-generated raindrops */}
         {activeWeather === 'rain' && (
-          <div id="rain-container" className="absolute inset-0 pointer-events-none z-10" />
+          <div id="rain-container" className="fixed inset-0 pointer-events-none z-50" />
         )}
         
         {/* Other weather backgrounds */}
