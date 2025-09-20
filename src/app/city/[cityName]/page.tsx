@@ -150,27 +150,29 @@ export default function CityPage() {
           />
         </div>
         <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Weather Widget */}
-          <div className="absolute top-32 right-4 md:right-8 z-10">
-            <WeatherWidget city={cityName} className="w-48" />
-          </div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-12"
-          >
-            <h1 className="text-4xl md:text-6xl font-extrabold text-white font-serif tracking-tight leading-tight mb-6">
-              {currentCityInfo?.title || `${cityName} Luxury Rentals`}
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-8">
-              {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
-            </p>
-            <div className="text-lg text-gray-400">
-              {filtered.length} luxury properties available
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center md:text-left flex-1"
+            >
+              <h1 className="text-4xl md:text-6xl font-extrabold text-white font-serif tracking-tight leading-tight mb-4">
+                {currentCityInfo?.title || `${cityName} Luxury Rentals`}
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-300 max-w-3xl md:max-w-4xl mb-4 md:mb-6 mx-auto md:mx-0">
+                {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
+              </p>
+              <div className="text-lg text-gray-400">
+                {filtered.length} luxury properties available
+              </div>
+            </motion.div>
+
+            {/* Weather card integrated into hero; right on desktop, below on mobile */}
+            <div className="md:mt-2 md:self-start md:shrink-0 flex md:block justify-center">
+              <WeatherWidget city={cityName} className="w-[260px] md:w-[280px] shadow-xl" />
             </div>
-          </motion.div>
+          </div>
 
           {/* Search Interface */}
           <motion.div
