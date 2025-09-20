@@ -20,7 +20,7 @@ export default function CityPage() {
   const [overrides, setOverrides] = useState<Record<string, any>>({})
   const [showFilters, setShowFilters] = useState(false)
   const [filterState, setFilterState] = useState<CityFilterState>({ amenities: [] })
-  const [weatherBgClass, setWeatherBgClass] = useState<string>('weather-bg-rain')
+  const [weatherBgClass, setWeatherBgClass] = useState<string>('weather-bg-clear')
   const [debugWeather, setDebugWeather] = useState<any>(null)
   const searchParams = useSearchParams()
   const checkIn = searchParams.get('checkin') || ''
@@ -134,7 +134,7 @@ export default function CityPage() {
       {/* Hero Section with Search */}
       <section className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-primary-50 to-secondary-50 overflow-hidden min-h-[360px]">
         {/* Weather Animation Background */}
-        <div className={`absolute inset-0 pointer-events-none opacity-60 z-20 ${weatherBgClass}`} />
+        <div className={`absolute inset-0 pointer-events-none z-20 ${weatherBgClass}`} style={{opacity: 0.7}} />
         
         {/* Debug Weather Info (remove in production) */}
         {debugWeather && (

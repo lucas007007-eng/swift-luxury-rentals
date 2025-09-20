@@ -332,6 +332,8 @@ html {
     radial-gradient(circle at 70% 80%, rgba(255,255,255,0.2), transparent 50%),
     linear-gradient(45deg, rgba(255,255,255,0.1), transparent 30%, rgba(255,255,255,0.05));
   position: relative; overflow: hidden;
+  min-height: 100%;
+  width: 100%;
 }
 .weather-bg-clear::before {
   content: '';
@@ -374,6 +376,8 @@ html {
     linear-gradient(180deg, rgba(100,110,130,0.8), rgba(70,80,100,0.6)),
     radial-gradient(ellipse at 30% 30%, rgba(200,200,220,0.5), transparent 60%);
   position: relative; overflow: hidden;
+  min-height: 100%;
+  width: 100%;
 }
 .weather-bg-cloudy::before {
   content: '';
