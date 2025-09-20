@@ -22,11 +22,14 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   const [viewMode, setViewMode] = useState<'map' | 'grid'>('map')
   const router = useRouter()
 
-  // Load Google Maps script
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
-  })
+  // Load Google Maps script (only if API key present)
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''
+  const { isLoaded } = useJsApiLoader(
+    apiKey
+      ? { id: 'google-map-script', googleMapsApiKey: apiKey }
+      : // If no API key, avoid initializing loader to prevent infinite loading
+        { id: 'google-map-script', googleMapsApiKey: 'disabled-no-key' }
+  )
 
   const mapRef = useRef<google.maps.Map | null>(null)
   const onLoad = (map: google.maps.Map) => {
@@ -209,7 +212,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         /* Map View */
         <div className="relative">
           <div className={`bg-gray-800 rounded-xl border border-gray-700 ${heightClassName || 'h-96'} relative overflow-hidden`}>
-            {isLoaded ? (
+            {apiKey && isLoaded ? (
               <GoogleMap
                 mapContainerClassName={`w-full ${heightClassName || 'h-96'}`}
                 onLoad={onLoad}
@@ -267,8 +270,15 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
                 })}
               </GoogleMap>
             ) : (
-              <div className="w-full h-96 flex items-center justify-center text-gray-300">
-                Loading map...
+              <div className="w-full h-96 flex items-center justify-center text-gray-300 text-center px-6">
+                {!apiKey ? (
+                  <div>
+                    <div className="text-amber-400 font-semibold mb-1">Map unavailable</div>
+                    <div className="text-sm text-gray-400">Google Maps API key is not configured for this environment.</div>
+                  </div>
+                ) : (
+                  <div>Loading map...</div>
+                )}
               </div>
             )}
           </div>
