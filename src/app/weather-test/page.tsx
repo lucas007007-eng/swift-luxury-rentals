@@ -16,13 +16,19 @@ export default function WeatherTestPage() {
 
   // Generate raindrops for rain animation
   useEffect(() => {
-    if (activeWeather !== 'rain') return
+    if (activeWeather !== 'rain') {
+      // Clear rain container when not rain
+      const rainContainer = document.getElementById('rain-container')
+      if (rainContainer) rainContainer.innerHTML = ''
+      return
+    }
 
     const rainContainer = document.getElementById('rain-container')
     if (!rainContainer) return
 
-    // Clear existing raindrops
+    // Force clear existing raindrops and any cached elements
     rainContainer.innerHTML = ''
+    rainContainer.style.display = 'block'
 
     // Create 80 raindrops with size variation
     for (let i = 0; i < 80; i++) {
