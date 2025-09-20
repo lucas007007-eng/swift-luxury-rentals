@@ -165,6 +165,53 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Compute US AQI from PM2.5 when possible, and include standard + timestamp
+    const computeUsAqiFromPm25 = (pm25UgM3: number) => {
+      const ranges = [
+        { concLo: 0.0, concHi: 12.0, aqiLo: 0, aqiHi: 50 },
+        { concLo: 12.1, concHi: 35.4, aqiLo: 51, aqiHi: 100 },
+        { concLo: 35.5, concHi: 55.4, aqiLo: 101, aqiHi: 150 },
+        { concLo: 55.5, concHi: 150.4, aqiLo: 151, aqiHi: 200 },
+        { concLo: 150.5, concHi: 250.4, aqiLo: 201, aqiHi: 300 },
+        { concLo: 250.5, concHi: 350.4, aqiLo: 301, aqiHi: 400 },
+        { concLo: 350.5, concHi: 500.4, aqiLo: 401, aqiHi: 500 }
+      ]
+      for (const r of ranges) {
+        if (pm25UgM3 >= r.concLo && pm25UgM3 <= r.concHi) {
+          const aqi = ((r.aqiHi - r.aqiLo) / (r.concHi - r.concLo)) * (pm25UgM3 - r.concLo) + r.aqiLo
+          return Math.round(aqi)
+        }
+      }
+      return 500
+    }
+
+    const classifyUsAqi = (aqi: number) => {
+      if (aqi <= 50) return 'Good'
+      if (aqi <= 100) return 'Moderate'
+      if (aqi <= 150) return 'Unhealthy for Sensitive Groups'
+      if (aqi <= 200) return 'Unhealthy'
+      if (aqi <= 300) return 'Very Unhealthy'
+      return 'Hazardous'
+    }
+
+    let usAqi: number | null = null
+    let usAqiLevel: string | null = null
+    let aqiTimestamp: string | undefined
+    let aqiStandard: string | undefined
+
+    try {
+      const pollutants = airQualityData?.pollutants as any[] | undefined
+      const pmEntry = pollutants?.find(p => (p.code?.toLowerCase?.() === 'pm2p5' || p.code?.toLowerCase?.() === 'pm25'))
+      const pmVal = Number(pmEntry?.concentration?.value)
+      if (!Number.isNaN(pmVal) && pmVal >= 0) {
+        const aqi = computeUsAqiFromPm25(pmVal)
+        usAqi = aqi
+        usAqiLevel = classifyUsAqi(aqi)
+        aqiStandard = 'US AQI'
+      }
+      aqiTimestamp = airQualityData?.dateTime || airQualityData?.date || (airQualityData?.asOf ?? undefined)
+    } catch {}
+
     if (!weatherData && cached) {
       const stale = { ...cached.data, lastUpdated: new Date().toISOString(), provider }
       weatherCache.set(cacheKey, { data: stale, timestamp: Date.now() })
@@ -187,8 +234,13 @@ export async function GET(request: NextRequest) {
       humidity: Number(weatherData.main.humidity ?? 60),
       windSpeed: Math.round(Number(weatherData.wind.speed) * 3.6),
       airQuality: airQualityData
-        ? { aqi: airQualityData.indexes?.[0]?.aqi || 50, level: airQualityData.indexes?.[0]?.category || 'Good' }
-        : (cached ? cached.data.airQuality : { aqi: 50, level: 'Good' }),
+        ? {
+            aqi: (usAqi ?? airQualityData.indexes?.[0]?.aqi ?? 50),
+            level: (usAqiLevel ?? airQualityData.indexes?.[0]?.category ?? 'Good'),
+            standard: (aqiStandard ?? (airQualityData.indexes?.[0]?.code || 'UAQI')),
+            timestamp: aqiTimestamp
+          }
+        : (cached ? cached.data.airQuality : { aqi: 50, level: 'Good', standard: 'US AQI', timestamp: new Date().toISOString() }),
       icon: weatherData.weather[0].icon,
       lastUpdated: new Date().toISOString(),
       provider,
