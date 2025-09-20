@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// In-memory cache for weather data (5 minute TTL)
+// In-memory cache for weather data (2 minute TTL)
 const weatherCache = new Map<string, { data: any; timestamp: number }>()
-const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+const CACHE_TTL = 2 * 60 * 1000 // 2 minutes
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
 
     // Try Google Weather (GET first, then POST)
     let weatherData: any = null
+    let basis = 'temperature'
     let provider = 'google-weather'
 
     if (googleWeatherKey) {
@@ -53,12 +54,15 @@ export async function GET(request: NextRequest) {
         if (getResp.ok) {
           const gw = await getResp.json()
           const cc = gw?.currentConditions || gw
-          const temp = cc?.temperatureApparent ?? cc?.temperature ?? null
+          const tempPrim = cc?.temperature ?? cc?.temperature?.value
+          const tempFeel = cc?.temperatureApparent ?? cc?.temperatureApparent?.value
+          const temp = (tempPrim ?? tempFeel) ?? null
           if (temp !== null) {
             const humidity = cc?.humidity ?? 60
             let wind = cc?.windSpeed ?? 3
             wind = Number(wind)
             const windMs = wind > 40 ? wind / 3.6 : wind
+            basis = tempPrim != null ? 'temperature' : 'apparent'
             weatherData = {
               main: { temp: Number(temp), humidity: Number(humidity) },
               weather: [{ description: String(cc?.phrase || cc?.summary || 'clear sky'), icon: '01d' }],
@@ -78,12 +82,15 @@ export async function GET(request: NextRequest) {
           if (postResp.ok) {
             const gw = await postResp.json()
             const cc = gw?.currentConditions || gw
-            const temp = cc?.temperatureApparent?.value ?? cc?.temperatureApparent ?? cc?.temperature?.value ?? cc?.temperature ?? null
+            const tempPrim = cc?.temperature?.value ?? cc?.temperature
+            const tempFeel = cc?.temperatureApparent?.value ?? cc?.temperatureApparent
+            const temp = (tempPrim ?? tempFeel) ?? null
             if (temp !== null) {
               const humidity = cc?.humidity?.value ?? cc?.humidity ?? 60
               let wind = cc?.windSpeed?.value ?? cc?.windSpeed ?? 3
               wind = Number(wind)
               const windMs = wind > 40 ? wind / 3.6 : wind
+              basis = tempPrim != null ? 'temperature' : 'apparent'
               weatherData = {
                 main: { temp: Number(temp), humidity: Number(humidity) },
                 weather: [{ description: String(cc?.phrase || cc?.summary || 'clear sky'), icon: '01d' }],
@@ -97,7 +104,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Air Quality (best-effort). If it fails, keep previous AQI if cached.
+    // Air Quality (best-effort)
     let airQualityData: any = null
     if (googleApiKey) {
       try {
@@ -113,21 +120,16 @@ export async function GET(request: NextRequest) {
       } catch {}
     }
 
-    // If live weather failed, use stale cache instead of generating new values
     if (!weatherData && cached) {
       const stale = { ...cached.data, lastUpdated: new Date().toISOString(), provider }
-      // refresh cache timestamp so we don't thrash
       weatherCache.set(cacheKey, { data: stale, timestamp: Date.now() })
       return NextResponse.json(stale)
     }
 
-    // If still no data (first-ever call and provider unavailable), return a fixed neutral fallback for Berlin
     if (!weatherData) {
-      weatherData = {
-        main: { temp: 21, humidity: 60 },
-        weather: [{ description: 'partly cloudy', icon: '01d' }],
-        wind: { speed: 3 }
-      }
+      // fixed neutral fallback (first run only)
+      weatherData = { main: { temp: 22, humidity: 60 }, weather: [{ description: 'partly cloudy', icon: '01d' }], wind: { speed: 3 } }
+      basis = 'fallback'
       provider = 'fixed-fallback'
     }
 
@@ -142,13 +144,13 @@ export async function GET(request: NextRequest) {
       icon: weatherData.weather[0].icon,
       lastUpdated: new Date().toISOString(),
       provider,
+      basis,
       coordinates: { lat: coords.lat, lng: coords.lng }
     }
 
     weatherCache.set(cacheKey, { data: result, timestamp: Date.now() })
     return NextResponse.json(result)
   } catch (error) {
-    // Last-resort: return cached if available
     const city = new URL(request.url).searchParams.get('city')?.toLowerCase() || 'berlin'
     const cached = weatherCache.get(city)
     if (cached) return NextResponse.json(cached.data)
