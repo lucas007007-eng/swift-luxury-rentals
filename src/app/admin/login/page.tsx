@@ -40,6 +40,8 @@ export default function AdminLoginPage() {
       return
     }
     setGranted(true)
+    // Set legacy cookie so middleware passes during transition
+    try { document.cookie = `admin_auth=true; path=/; max-age=86400` } catch {}
     setTimeout(() => {
       try { router.replace(next) } catch {}
       try { window.location.assign(next) } catch {}
