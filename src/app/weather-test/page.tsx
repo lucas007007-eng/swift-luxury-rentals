@@ -49,12 +49,15 @@ export default function WeatherTestPage() {
 
     // Function to create splash effect
     function createSplash(leftPosition: number) {
+      const container = document.getElementById('rain-container')
+      if (!container) return
+      
       const splash = document.createElement('div')
       splash.className = 'splash'
       splash.style.left = `${leftPosition}vw`
       splash.style.transform = 'translateX(-50%)'
       
-      rainContainer.appendChild(splash)
+      container.appendChild(splash)
       
       // Remove splash after animation completes
       setTimeout(() => {
