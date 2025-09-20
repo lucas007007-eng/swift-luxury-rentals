@@ -41,13 +41,10 @@ export default function WeatherTestPage() {
 
       {/* Weather Animation Demo Area */}
       <div className="relative w-full h-screen overflow-hidden">
-        <div className={`absolute inset-0 weather-bg-${activeWeather}`} style={{zIndex: 1}} />
-        
-        {/* Test overlay to ensure layering works */}
-        <div className="absolute inset-0 bg-red-500 opacity-20" style={{zIndex: 0}} />
+        <div className={`absolute inset-0 weather-bg-${activeWeather}`} />
         
         {/* Content to show overlay effect */}
-        <div className="relative flex items-center justify-center h-full" style={{zIndex: 10}}>
+        <div className="relative flex items-center justify-center h-full" style={{zIndex: 5}}>
           <div className="text-center">
             <h1 className="text-6xl font-bold mb-4">Weather Animation Demo</h1>
             <p className="text-2xl text-gray-300">Current: {activeWeather.toUpperCase()}</p>
