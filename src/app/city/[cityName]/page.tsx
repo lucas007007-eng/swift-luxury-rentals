@@ -137,7 +137,18 @@ export default function CityPage() {
       {/* Hero Section with Search */}
       <section ref={heroRef} className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-black overflow-hidden min-h-[360px]">
         {/* Rain FX container (only used when raining); behind content */}
-        <div ref={rainContainerRef} id="rain-container" className="absolute inset-0 pointer-events-none z-10" />
+        <div
+          ref={rainContainerRef}
+          id="rain-container"
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            // ensure splash at hero bottom
+            // provide fall height to reach container bottom
+            // fallback keeps previous behavior
+            // @ts-ignore css var
+            ['--rain-height' as any]: (heroRef.current?.clientHeight || 0) > 0 ? `${heroRef.current!.clientHeight + 40}px` : undefined
+          }}
+        />
         <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Weather Widget */}
           <div className="absolute top-32 right-4 md:right-8 z-10">
@@ -314,7 +325,8 @@ function WeatherBackgroundSetter({ cityName, onClass, onDebug, forceWeather }: {
               d.className = 'raindrop'
               const left = Math.random() * 100
               const delay = Math.random() * 2
-              const duration = 0.9 + Math.random() * 0.9
+              // Slow down ~30%
+              const duration = (0.9 + Math.random() * 0.9) * 1.3
               const scale = 0.8 + Math.random() * 0.6
               d.style.left = `${left}%`
               d.style.animationDelay = `${delay}s`
