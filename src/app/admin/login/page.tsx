@@ -26,19 +26,24 @@ export default function AdminLoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    // Prefer a server-driven redirect to ensure navigation completes on mobile
     const result = await signIn('credentials', {
       username: email,
       email,
       password,
-      redirect: false,
+      redirect: true,
       callbackUrl: next,
     })
-    if (result && !result.error) {
-      setGranted(true)
-      router.replace(result.url || next)
-    } else {
+    // If NextAuth didn't navigate for any reason, perform a hard redirect
+    if (result && (result as any).error) {
       setError('Invalid credentials')
+      return
     }
+    setGranted(true)
+    setTimeout(() => {
+      try { router.replace(next) } catch {}
+      try { window.location.assign(next) } catch {}
+    }, 150)
   }
 
   return (
