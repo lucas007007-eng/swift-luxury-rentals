@@ -99,13 +99,11 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
             {Array.from({ length: 20 }).map((_, i) => (
               <div
                 key={i}
-                className="absolute w-0.5 h-8 bg-blue-300/30 rounded-full animate-pulse"
+                className="absolute w-0.5 h-8 bg-blue-300/30 rounded-full rainDrop"
                 style={{
-                  left: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  animationDuration: `${1 + Math.random()}s`,
-                  transform: `translateY(-100px)`,
-                  animation: `rainDrop ${1 + Math.random()}s linear infinite ${Math.random() * 2}s`
+                  left: `${(i * 5) % 100}%`,
+                  animationDelay: `${(i * 0.1) % 2}s`,
+                  animationDuration: `${1 + (i % 3) * 0.5}s`
                 }}
               />
             ))}
@@ -116,10 +114,11 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
             {Array.from({ length: 15 }).map((_, i) => (
               <div
                 key={i}
-                className="absolute w-2 h-2 bg-white/40 rounded-full"
+                className="absolute w-2 h-2 bg-white/40 rounded-full snowFlake"
                 style={{
-                  left: `${Math.random() * 100}%`,
-                  animation: `snowFall ${3 + Math.random() * 2}s linear infinite ${Math.random() * 3}s`
+                  left: `${(i * 7) % 100}%`,
+                  animationDelay: `${(i * 0.2) % 3}s`,
+                  animationDuration: `${3 + (i % 2)}s`
                 }}
               />
             ))}
@@ -173,7 +172,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
         </div>
       </div>
 
-      <style jsx>{`
+      <style jsx global>{`
         @keyframes rainDrop {
           0% { transform: translateY(-100px) translateX(0px); opacity: 0; }
           10% { opacity: 1; }
@@ -185,6 +184,12 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
           10% { opacity: 1; }
           90% { opacity: 1; }
           100% { transform: translateY(200px) translateX(30px); opacity: 0; }
+        }
+        .rain-animation .rainDrop {
+          animation: rainDrop 1s linear infinite;
+        }
+        .snow-animation .snowFlake {
+          animation: snowFall 3s linear infinite;
         }
       `}</style>
     </div>

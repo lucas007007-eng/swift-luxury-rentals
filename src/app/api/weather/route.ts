@@ -27,9 +27,10 @@ export async function GET(request: NextRequest) {
 
     const coords = cityCoords[city] || cityCoords['Berlin']
 
-    // Helper functions for realistic weather simulation
+    // Helper functions for consistent weather data
     const getSeasonalTemp = (cityName: string): number => {
       const month = new Date().getMonth() // 0-11
+      const day = new Date().getDate()
       const baseTemps: Record<string, number[]> = {
         'Berlin': [2, 4, 8, 13, 18, 21, 23, 23, 19, 13, 7, 3],
         'Paris': [6, 7, 11, 14, 18, 21, 24, 24, 20, 15, 10, 7],
@@ -43,18 +44,24 @@ export async function GET(request: NextRequest) {
         'Zurich': [2, 4, 8, 12, 17, 20, 22, 22, 18, 13, 7, 3]
       }
       const temps = baseTemps[cityName] || baseTemps['Berlin']
-      return temps[month] + (Math.random() - 0.5) * 6
+      // Use day of month for consistent daily variation
+      const dailyVariation = Math.sin(day / 31 * Math.PI * 2) * 3
+      return temps[month] + dailyVariation
     }
 
     const getSeasonalWeather = (cityName: string): string => {
       const month = new Date().getMonth()
+      const day = new Date().getDate()
+      // Use day for consistent weather pattern
+      const seed = (day + month * 31) % 6
       const conditions = ['clear sky', 'few clouds', 'scattered clouds', 'broken clouds', 'light rain', 'overcast clouds']
+      
       // Winter months more likely to be cloudy/rainy
       if (month >= 10 || month <= 2) {
-        return conditions[Math.random() < 0.6 ? 2 + Math.floor(Math.random() * 4) : Math.floor(Math.random() * 2)]
+        return conditions[seed < 2 ? seed : 2 + (seed % 4)]
       }
       // Summer months more likely to be clear
-      return conditions[Math.random() < 0.7 ? Math.floor(Math.random() * 3) : 3 + Math.floor(Math.random() * 3)]
+      return conditions[seed < 3 ? seed : (seed % 3)]
     }
 
     // Fetch both weather and air quality data from Google APIs
