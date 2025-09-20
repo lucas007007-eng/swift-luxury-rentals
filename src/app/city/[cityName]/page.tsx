@@ -325,8 +325,8 @@ function WeatherBackgroundSetter({ cityName, onClass, onDebug, forceWeather }: {
               d.className = 'raindrop'
               const left = Math.random() * 100
               const delay = Math.random() * 2
-              // Slow down ~30%
-              const duration = (0.9 + Math.random() * 0.9) * 1.3
+              // Slow down by ~50% (half speed)
+              const duration = (0.9 + Math.random() * 0.9) * 2
               const scale = 0.8 + Math.random() * 0.6
               d.style.left = `${left}%`
               d.style.animationDelay = `${delay}s`
