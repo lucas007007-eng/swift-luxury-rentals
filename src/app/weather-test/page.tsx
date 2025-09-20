@@ -41,8 +41,8 @@ export default function WeatherTestPage() {
       const opacity = Math.random() * 0.4 + 0.6 // Between 0.6 and 1.0
       raindrop.style.opacity = `${opacity}`
       
-      // Random animation duration and delay
-      const duration = Math.random() * 1.5 + 1 // Between 1s and 2.5s
+      // Match CodePen fall speed and timing
+      const duration = Math.random() * 1 + 1.5 // Between 1.5s and 2.5s (faster)
       const delay = Math.random() * 2 // Between 0s and 2s
       raindrop.style.animationDuration = `${duration}s`
       raindrop.style.animationDelay = `-${delay}s`
