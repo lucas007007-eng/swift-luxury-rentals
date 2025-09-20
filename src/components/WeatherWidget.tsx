@@ -61,6 +61,8 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
       return 'rain'
     } else if (cond.includes('snow')) {
       return 'snow'
+    } else if (cond.includes('thunder') || cond.includes('storm') || cond.includes('lightning')) {
+      return 'thunder'
     } else if (cond.includes('cloud')) {
       return 'cloudy'
     } else if (cond.includes('clear') || cond.includes('sunny')) {
@@ -137,6 +139,22 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
         {animationType === 'cloudy' && (
           <div className="absolute top-1 right-1 w-6 h-4 bg-gray-300/20 rounded-full" />
         )}
+        {animationType === 'thunder' && (
+          <>
+            <div className="absolute inset-0 bg-black/20 animate-pulse"></div>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute h-10 w-0.5 bg-white/80 shadow-[0_0_10px_rgba(255,255,255,0.8)] lightningBolt"
+                style={{
+                  left: `${15 + i * 30}%`,
+                  top: `${10 + i * 20}%`,
+                  animationDelay: `${i * 1.2}s`
+                }}
+              />
+            ))}
+          </>
+        )}
       </div>
 
       {/* Weather Content */}
@@ -203,6 +221,12 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
         .snow-animation .snowFlake {
           animation: snowFall 3s linear infinite;
         }
+        @keyframes lightning {
+          0%, 100% { opacity: 0; transform: scaleY(0.6) rotate(10deg); }
+          5% { opacity: 1; transform: scaleY(1) rotate(10deg); }
+          10%, 90% { opacity: 0; }
+        }
+        .lightningBolt { animation: lightning 3s ease-in-out infinite; }
       `}</style>
     </div>
   )
