@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     const googleApiKey = process.env.GOOGLE_AIR_QUALITY_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    const openWeatherApiKey = process.env.OPENWEATHER_API_KEY
 
     // City coordinates for major cities
     const cityCoords: Record<string, { lat: number; lng: number }> = {
@@ -75,13 +76,25 @@ export async function GET(request: NextRequest) {
       return conditions[seed < 3 ? seed : (seed % 3)]
     }
 
-    // Fetch both weather and air quality data from Google APIs
+    // Fetch real weather data from OpenWeatherMap
     let weatherData: any = null
+    if (openWeatherApiKey) {
+      try {
+        const weatherResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${openWeatherApiKey}&units=metric`
+        )
+        if (weatherResponse.ok) {
+          weatherData = await weatherResponse.json()
+        }
+      } catch (err) {
+        console.error('OpenWeather API error:', err)
+      }
+    }
+
+    // Fetch air quality data from Google
     let airQualityData: any = null
-    
     if (googleApiKey) {
       try {
-        // Fetch air quality data (includes some weather info)
         const aqResponse = await fetch(
           `https://airquality.googleapis.com/v1/currentConditions:lookup?key=${googleApiKey}`,
           {
@@ -103,23 +116,25 @@ export async function GET(request: NextRequest) {
         if (aqResponse.ok) {
           airQualityData = await aqResponse.json()
         }
-
-        // Use realistic seasonal weather data for the specific city
-        weatherData = {
-          main: {
-            temp: getSeasonalTemp(city),
-            humidity: Math.round(60 + Math.random() * 30)
-          },
-          weather: [{
-            description: getSeasonalWeather(city),
-            icon: '01d'
-          }],
-          wind: {
-            speed: 2 + Math.random() * 8 // m/s
-          }
-        }
       } catch (err) {
-        console.error('Google API error:', err)
+        console.error('Air Quality API error:', err)
+      }
+    }
+
+    // Fallback to seasonal data if no real weather API
+    if (!weatherData && !openWeatherApiKey) {
+      weatherData = {
+        main: {
+          temp: getSeasonalTemp(city),
+          humidity: Math.round(60 + (new Date().getHours() % 20))
+        },
+        weather: [{
+          description: getSeasonalWeather(city),
+          icon: '01d'
+        }],
+        wind: {
+          speed: 2 + (new Date().getHours() % 8)
+        }
       }
     }
 
