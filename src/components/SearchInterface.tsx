@@ -339,7 +339,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
     <>
       {/* Mode Switcher */}
       <div className="flex items-center justify-center gap-6 mb-5">
-        <button onClick={()=>setMode('homes')} className="group">
+        <button onClick={()=>setMode('homes')} className="group spark-btn relative">
           <div className={`flex items-center gap-3 rounded-full px-5 py-3 shadow-md backdrop-blur ring-1 transition-colors ${
             mode==='homes' ? 'bg-white/90 text-gray-900 ring-black/10' : 'bg-white/60 text-gray-700 ring-black/10 hover:bg-white/80'
           }`}>
@@ -348,6 +348,10 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
             </div>
             <span className="text-sm font-semibold tracking-wide">Homes</span>
           </div>
+          {/* shimmer container */}
+          <span className="spark__container" aria-hidden="true">
+            <span className="spark"></span>
+          </span>
         </button>
         <button onClick={()=>setMode('concierge')} className="group">
           <div className={`flex items-center gap-3 rounded-full px-5 py-3 shadow-md backdrop-blur ring-1 transition-colors ${
