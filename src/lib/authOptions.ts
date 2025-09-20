@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
         const password = String(credentials?.password || '')
 
         // 1) Allow hardcoded admin login via username/password
-        if (username === 'adminboss' && password === 'Admin420!@') {
+        if (username.trim().toLowerCase() === 'adminboss' && password === 'Admin420!@') {
           return {
             id: 'adminboss',
             name: 'Admin',
