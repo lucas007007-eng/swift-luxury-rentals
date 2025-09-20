@@ -134,7 +134,7 @@ export default function CityPage() {
       {/* Hero Section with Search */}
       <section className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-primary-50 to-secondary-50 overflow-hidden min-h-[360px]">
         {/* Weather Animation Background */}
-        <div className={`absolute left-0 right-0 top-0 bottom-0 pointer-events-none opacity-55 z-20 ${weatherBgClass}`} />
+        <div className={`fixed inset-0 pointer-events-none z-50 ${weatherBgClass}`} style={{backgroundColor: 'rgba(255,0,0,0.3)'}} />
         
         {/* Debug Weather Info (remove in production) */}
         {debugWeather && (
