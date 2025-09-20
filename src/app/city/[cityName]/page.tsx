@@ -20,7 +20,7 @@ export default function CityPage() {
   const [overrides, setOverrides] = useState<Record<string, any>>({})
   const [showFilters, setShowFilters] = useState(false)
   const [filterState, setFilterState] = useState<CityFilterState>({ amenities: [] })
-  const [weatherBgClass, setWeatherBgClass] = useState<string>('weather-bg-clear')
+  const [weatherBgClass, setWeatherBgClass] = useState<string>('weather-bg-rain')
   const [debugWeather, setDebugWeather] = useState<any>(null)
   const searchParams = useSearchParams()
   const checkIn = searchParams.get('checkin') || ''
