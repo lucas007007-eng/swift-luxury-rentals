@@ -83,10 +83,10 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
 
   if (loading) {
     return (
-      <div className={`bg-black/40 backdrop-blur-sm border border-white/20 rounded-xl p-4 ${className}`}>
+      <div className={`bond-card backdrop-blur-md p-4 ${className}`}>
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-600 rounded mb-2"></div>
-          <div className="h-6 bg-gray-600 rounded"></div>
+          <div className="h-4 bg-gray-600/60 rounded mb-2"></div>
+          <div className="h-6 bg-gray-600/60 rounded"></div>
         </div>
       </div>
     )
@@ -99,7 +99,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
   const animationType = getWeatherAnimation(weather.condition)
 
   return (
-    <div className={`relative bg-black/40 backdrop-blur-sm border border-white/20 rounded-xl p-4 overflow-hidden ${className}`}>
+    <div className={`relative bond-card backdrop-blur-md p-4 overflow-hidden ${className}`}>
       {/* Weather Animation Background */}
       <div className="absolute inset-0 pointer-events-none">
         {animationType === 'rain' && (
@@ -158,16 +158,16 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
 
       {/* Weather Content */}
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-white font-semibold text-lg">
+        <div className="flex items-start justify-between mb-2">
+          <div className="text-white font-semibold text-2xl md:text-3xl bond-temp">
             {Math.round(weather.temperature)}°C
           </div>
-          <div className="text-xs text-gray-300 capitalize">
+          <div className="text-[11px] md:text-xs text-gray-300/90 uppercase tracking-wide">
             {weather.condition}
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-2 text-xs text-gray-300">
+        <div className="grid grid-cols-2 gap-2 text-xs text-gray-300/90">
           <div className="flex items-center gap-1">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
@@ -185,7 +185,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
         {/* Air Quality */}
         <div className="mt-2 pt-2 border-t border-white/10">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-300">Air Quality</span>
+            <span className="text-gray-300/90">Air Quality</span>
             <div className="flex items-center gap-1">
               <div className={`w-2 h-2 rounded-full ${getAQIColor(weather.airQuality.aqi).replace('text-', 'bg-')}`} />
               <span className={getAQIColor(weather.airQuality.aqi)}>

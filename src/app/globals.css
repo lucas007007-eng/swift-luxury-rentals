@@ -455,3 +455,61 @@ html {
     opacity: 0;
   }
 }
+
+/* Bond-style sleek HUD card */
+@keyframes bond-glow {
+  0% { filter: hue-rotate(0deg); opacity: .6; }
+  50% { filter: hue-rotate(90deg); opacity: .95; }
+  100% { filter: hue-rotate(180deg); opacity: .6; }
+}
+
+@keyframes bond-sweep {
+  0% { transform: translateX(-100%); opacity: 0; }
+  20% { opacity: .25; }
+  50% { opacity: .15; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes number-fade {
+  0% { opacity: .7; filter: blur(0.2px); }
+  50% { opacity: 1; filter: blur(0); }
+  100% { opacity: .7; filter: blur(0.2px); }
+}
+
+.bond-card {
+  position: relative;
+  border-radius: 14px;
+  background: rgba(8, 10, 12, 0.55);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.bond-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  padding: 2px;
+  border-radius: 16px;
+  background: conic-gradient(from 90deg, rgba(99,102,241,0.6), rgba(168,85,247,0.6), rgba(236,72,153,0.6), rgba(99,102,241,0.6));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: bond-glow 6s linear infinite;
+  pointer-events: none;
+}
+
+.bond-card::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transform: translateX(-100%);
+  animation: bond-sweep 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.bond-temp {
+  animation: number-fade 3.6s ease-in-out infinite;
+}
