@@ -25,9 +25,8 @@ export async function GET(request: NextRequest) {
 
     const googleApiKey = process.env.GOOGLE_AIR_QUALITY_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
     const googleWeatherKey = process.env.GOOGLE_WEATHER_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-    const openWeatherApiKey = process.env.OPENWEATHER_API_KEY
 
-    // City coordinates for major cities
+    // City coordinates
     const cityCoords: Record<string, { lat: number; lng: number }> = {
       'berlin': { lat: 52.5200, lng: 13.4050 },
       'paris': { lat: 48.8566, lng: 2.3522 },
@@ -64,54 +63,62 @@ export async function GET(request: NextRequest) {
       return conditions[seed < 3 ? seed : (seed % 3)]
     }
 
-    // Weather via Google Weather API, else OpenWeather, else seasonal
+    // Weather via Google Weather (GET first, then POST)
     let weatherData: any = null
+    let provider = 'google-weather'
 
     if (googleWeatherKey) {
       try {
-        const googleWeatherResp = await fetch(
-          `https://weather.googleapis.com/v1/currentConditions:lookup?key=${googleWeatherKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: { latitude: coords.lat, longitude: coords.lng },
-              units: 'METRIC'
-            })
-          }
+        // GET form
+        const getResp = await fetch(
+          `https://weather.googleapis.com/v1/currentConditions:lookup?location=${coords.lat},${coords.lng}&units=METRIC&key=${googleWeatherKey}`,
+          { cache: 'no-store' }
         )
-        if (googleWeatherResp.ok) {
-          const gw = await googleWeatherResp.json()
+        if (getResp.ok) {
+          const gw = await getResp.json()
           const cc = gw?.currentConditions || gw
-          const temp = cc?.temperatureApparent?.value ?? cc?.temperatureApparent ?? cc?.temperature?.value ?? cc?.temperature ?? null
-          const humidity = cc?.humidity?.value ?? cc?.humidity ?? null
-          // Google Weather wind can be kph or m/s depending on source; if >40 treat as kph and convert
-          let wind = cc?.windSpeed?.value ?? cc?.windSpeed ?? 3
-          wind = Number(wind)
-          const windMs = wind > 40 ? wind / 3.6 : wind
-          const desc = cc?.phrase || cc?.summary || cc?.condition || 'clear sky'
-
+          const temp = cc?.temperatureApparent ?? cc?.temperature ?? null
           if (temp !== null) {
+            const humidity = cc?.humidity ?? 60
+            let wind = cc?.windSpeed ?? 3
+            wind = Number(wind)
+            const windMs = wind > 40 ? wind / 3.6 : wind
             weatherData = {
-              main: { temp, humidity: humidity ?? 60 },
-              weather: [{ description: String(desc), icon: '01d' }],
+              main: { temp: Number(temp), humidity: Number(humidity) },
+              weather: [{ description: String(cc?.phrase || cc?.summary || 'clear sky'), icon: '01d' }],
               wind: { speed: windMs }
             }
           }
         }
+        // POST fallback if GET missing fields
+        if (!weatherData) {
+          const postResp = await fetch(
+            `https://weather.googleapis.com/v1/currentConditions:lookup?key=${googleWeatherKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ location: { latitude: coords.lat, longitude: coords.lng }, units: 'METRIC' })
+            }
+          )
+          if (postResp.ok) {
+            const gw = await postResp.json()
+            const cc = gw?.currentConditions || gw
+            const temp = cc?.temperatureApparent?.value ?? cc?.temperatureApparent ?? cc?.temperature?.value ?? cc?.temperature ?? null
+            if (temp !== null) {
+              const humidity = cc?.humidity?.value ?? cc?.humidity ?? 60
+              let wind = cc?.windSpeed?.value ?? cc?.windSpeed ?? 3
+              wind = Number(wind)
+              const windMs = wind > 40 ? wind / 3.6 : wind
+              weatherData = {
+                main: { temp: Number(temp), humidity: Number(humidity) },
+                weather: [{ description: String(cc?.phrase || cc?.summary || 'clear sky'), icon: '01d' }],
+                wind: { speed: windMs }
+              }
+            }
+          }
+        }
       } catch (e) {
-        console.error('Google Weather API error:', e)
-      }
-    }
-
-    if (!weatherData && openWeatherApiKey) {
-      try {
-        const weatherResponse = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${openWeatherApiKey}&units=metric`
-        )
-        if (weatherResponse.ok) weatherData = await weatherResponse.json()
-      } catch (err) {
-        console.error('OpenWeather API error:', err)
+        provider = 'fallback-seasonal'
       }
     }
 
@@ -131,29 +138,21 @@ export async function GET(request: NextRequest) {
           }
         )
         if (aqResponse.ok) airQualityData = await aqResponse.json()
-      } catch (err) {
-        console.error('Air Quality API error:', err)
-      }
+      } catch {}
     }
 
-    if (!weatherData && !googleWeatherKey && !openWeatherApiKey) {
+    // Seasonal fallback only if Google Weather key missing or both calls failed
+    if (!weatherData) {
+      provider = provider === 'google-weather' ? 'fallback-seasonal' : provider
+      const temp = getSeasonalTemp(city)
       weatherData = {
-        main: { temp: getSeasonalTemp(city), humidity: 60 },
-        weather: [{ description: getSeasonalWeather(), icon: '01d' }],
+        main: { temp, humidity: 60 },
+        weather: [{ description: 'partly cloudy', icon: '01d' }],
         wind: { speed: 3 }
       }
     }
 
-    const mockWeatherData = {
-      temperature: Math.round(15 + Math.random() * 10),
-      condition: ['Clear', 'Partly Cloudy', 'Cloudy', 'Light Rain'][Math.floor(Math.random() * 4)],
-      humidity: Math.round(40 + Math.random() * 40),
-      windSpeed: Math.round(5 + Math.random() * 15),
-      airQuality: { aqi: Math.round(20 + Math.random() * 80), level: 'Good' },
-      icon: '01d'
-    }
-
-    const result = weatherData ? {
+    const result = {
       temperature: Math.round(Number(weatherData.main.temp)),
       condition: weatherData.weather[0].description,
       humidity: Number(weatherData.main.humidity ?? 60),
@@ -161,16 +160,18 @@ export async function GET(request: NextRequest) {
       airQuality: airQualityData ? {
         aqi: airQualityData.indexes?.[0]?.aqi || 50,
         level: airQualityData.indexes?.[0]?.category || 'Good'
-      } : mockWeatherData.airQuality,
+      } : { aqi: 50, level: 'Good' },
       icon: weatherData.weather[0].icon,
-      lastUpdated: new Date().toISOString()
-    } : { ...mockWeatherData, lastUpdated: new Date().toISOString() }
+      lastUpdated: new Date().toISOString(),
+      provider,
+      coordinates: { lat: coords.lat, lng: coords.lng }
+    }
 
+    // Cache
     weatherCache.set(cacheKey, { data: result, timestamp: Date.now() })
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error('Weather API error:', error)
     return NextResponse.json({ error: 'Failed to fetch weather data' }, { status: 500 })
   }
 }
