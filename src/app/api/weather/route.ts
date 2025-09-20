@@ -33,6 +33,16 @@ export async function GET(request: NextRequest) {
       process.env.GOOGLE_WEATHER_API_KEY ||
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
+    // Debug API key availability
+    if (debug) {
+      weatherDiagnostics = {
+        hasWeatherKey: !!googleWeatherKey,
+        hasAirQualityKey: !!googleApiKey,
+        weatherKeySource: googleWeatherKey ? 'available' : 'missing',
+        airQualityKeySource: googleApiKey ? 'available' : 'missing'
+      }
+    }
+
     const cityCoords: Record<string, { lat: number; lng: number }> = {
       berlin: { lat: 52.52, lng: 13.405 },
       paris: { lat: 48.8566, lng: 2.3522 },
@@ -96,7 +106,8 @@ export async function GET(request: NextRequest) {
           const gw = await postWeather.json()
           weatherData = parseGoogleWeather(gw)
         } else {
-          weatherDiagnostics = { ...(weatherDiagnostics || {}), weatherLookupStatus: postWeather.status }
+          const errorText = await postWeather.text()
+          weatherDiagnostics = { ...(weatherDiagnostics || {}), weatherLookupStatus: postWeather.status, weatherLookupError: errorText }
         }
 
         // 2) Fallback: GET currentConditions:lookup
