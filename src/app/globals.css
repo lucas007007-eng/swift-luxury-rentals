@@ -368,25 +368,27 @@ html {
 .raindrop {
   position: absolute;
   top: -20px;
-  width: 3px;
-  height: 15px;
-  background: linear-gradient(to bottom, rgba(173, 216, 230, 0.9), rgba(135, 206, 250, 0.8));
-  border-radius: 0 0 50% 50%;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(173,216,230,0.8));
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
   animation: fall linear infinite;
   pointer-events: none;
   z-index: 999;
+  filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
 }
 
-.raindrop::before {
+.raindrop::after {
   content: '';
   position: absolute;
-  top: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  background: rgba(173, 216, 230, 0.9);
+  top: 3px;
+  left: 1px;
+  width: 2px;
+  height: 8px;
+  background: linear-gradient(to bottom, rgba(173,216,230,0.8), rgba(135,206,250,0.6));
   border-radius: 50%;
+  transform: rotate(45deg);
 }
 
 .splash {
