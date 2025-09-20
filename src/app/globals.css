@@ -491,12 +491,17 @@ html {
   inset: -2px;
   padding: 2px;
   border-radius: 16px;
-  background: conic-gradient(from 90deg, rgba(99,102,241,0.6), rgba(168,85,247,0.6), rgba(236,72,153,0.6), rgba(99,102,241,0.6));
+  background: conic-gradient(from 0deg,
+    rgba(0,229,255,0.75) 0%,
+    rgba(124,77,255,0.75) 32%,
+    rgba(255,46,121,0.75) 64%,
+    rgba(0,229,255,0.75) 100%
+  );
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: bond-glow 6s linear infinite;
+  animation: bond-glow 5s linear infinite;
   pointer-events: none;
 }
 
@@ -542,12 +547,17 @@ html {
   inset: -1px;
   padding: 1px;
   border-radius: 9999px;
-  background: conic-gradient(from 90deg, rgba(99,102,241,0.6), rgba(168,85,247,0.6), rgba(236,72,153,0.6), rgba(99,102,241,0.6));
+  background: conic-gradient(from 0deg,
+    rgba(0,229,255,0.9) 0%,
+    rgba(124,77,255,0.9) 30%,
+    rgba(255,46,121,0.9) 60%,
+    rgba(0,229,255,0.9) 100%
+  );
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: bond-glow 6s linear infinite;
+  animation: bond-glow 5s linear infinite;
   pointer-events: none;
 }
 
@@ -558,6 +568,6 @@ html {
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
   transform: translateX(-100%);
-  animation: bond-sweep 4.2s ease-in-out infinite;
+  animation: bond-sweep 3.2s ease-in-out infinite;
   pointer-events: none;
 }
