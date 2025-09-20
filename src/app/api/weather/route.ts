@@ -13,10 +13,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'City parameter required' }, { status: 400 })
     }
 
+    // Optional cache bypass for testing: /api/weather?city=Berlin&force=true
+    const forceBypass = searchParams.get('force') === 'true'
+
     // Check cache first
     const cacheKey = city.toLowerCase()
     const cached = weatherCache.get(cacheKey)
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    if (!forceBypass && cached && Date.now() - cached.timestamp < CACHE_TTL) {
       return NextResponse.json(cached.data)
     }
 
@@ -26,54 +29,38 @@ export async function GET(request: NextRequest) {
 
     // City coordinates for major cities
     const cityCoords: Record<string, { lat: number; lng: number }> = {
-      'Berlin': { lat: 52.5200, lng: 13.4050 },
-      'Paris': { lat: 48.8566, lng: 2.3522 },
-      'Amsterdam': { lat: 52.3676, lng: 4.9041 },
-      'Vienna': { lat: 48.2082, lng: 16.3738 },
-      'Barcelona': { lat: 41.3851, lng: 2.1734 },
-      'London': { lat: 51.5074, lng: -0.1278 },
-      'Rome': { lat: 41.9028, lng: 12.4964 },
-      'Prague': { lat: 50.0755, lng: 14.4378 },
-      'Copenhagen': { lat: 55.6761, lng: 12.5683 },
-      'Zurich': { lat: 47.3769, lng: 8.5417 }
+      'berlin': { lat: 52.5200, lng: 13.4050 },
+      'paris': { lat: 48.8566, lng: 2.3522 },
+      'amsterdam': { lat: 52.3676, lng: 4.9041 },
+      'vienna': { lat: 48.2082, lng: 16.3738 },
+      'barcelona': { lat: 41.3851, lng: 2.1734 },
+      'london': { lat: 51.5074, lng: -0.1278 },
+      'rome': { lat: 41.9028, lng: 12.4964 },
+      'prague': { lat: 50.0755, lng: 14.4378 },
+      'copenhagen': { lat: 55.6761, lng: 12.5683 },
+      'zurich': { lat: 47.3769, lng: 8.5417 }
     }
 
-    const coords = cityCoords[city] || cityCoords['Berlin']
+    const coords = cityCoords[city.toLowerCase()] || cityCoords['berlin']
 
     // Helper functions for consistent weather data
     const getSeasonalTemp = (cityName: string): number => {
       const month = new Date().getMonth() // 0-11
       const day = new Date().getDate()
       const baseTemps: Record<string, number[]> = {
-        'Berlin': [2, 4, 8, 13, 18, 21, 23, 23, 19, 13, 7, 3],
-        'Paris': [6, 7, 11, 14, 18, 21, 24, 24, 20, 15, 10, 7],
-        'London': [7, 7, 10, 13, 17, 20, 22, 22, 19, 15, 10, 8],
-        'Barcelona': [13, 14, 16, 18, 22, 25, 28, 28, 25, 20, 16, 14],
-        'Amsterdam': [5, 6, 9, 12, 16, 19, 21, 21, 18, 14, 9, 6],
-        'Vienna': [2, 4, 9, 14, 19, 22, 24, 24, 20, 14, 8, 3],
-        'Rome': [12, 13, 15, 18, 23, 27, 30, 30, 26, 21, 16, 13],
-        'Prague': [0, 2, 7, 12, 17, 20, 22, 22, 18, 12, 6, 2],
-        'Copenhagen': [2, 2, 5, 10, 15, 18, 20, 20, 16, 11, 6, 3],
-        'Zurich': [2, 4, 8, 12, 17, 20, 22, 22, 18, 13, 7, 3]
+        'berlin': [2, 4, 8, 13, 18, 21, 23, 23, 19, 13, 7, 3]
       }
-      const temps = baseTemps[cityName] || baseTemps['Berlin']
-      // Use day of month for consistent daily variation
+      const temps = baseTemps[cityName.toLowerCase()] || baseTemps['berlin']
       const dailyVariation = Math.sin(day / 31 * Math.PI * 2) * 3
       return temps[month] + dailyVariation
     }
 
-    const getSeasonalWeather = (cityName: string): string => {
+    const getSeasonalWeather = (): string => {
       const month = new Date().getMonth()
       const day = new Date().getDate()
-      // Use day for consistent weather pattern
       const seed = (day + month * 31) % 6
       const conditions = ['clear sky', 'few clouds', 'scattered clouds', 'broken clouds', 'light rain', 'overcast clouds']
-      
-      // Winter months more likely to be cloudy/rainy
-      if (month >= 10 || month <= 2) {
-        return conditions[seed < 2 ? seed : 2 + (seed % 4)]
-      }
-      // Summer months more likely to be clear
+      if (month >= 10 || month <= 2) return conditions[seed < 2 ? seed : 2 + (seed % 4)]
       return conditions[seed < 3 ? seed : (seed % 3)]
     }
 
@@ -88,23 +75,27 @@ export async function GET(request: NextRequest) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              location: { latitude: coords.lat, longitude: coords.lng }
+              location: { latitude: coords.lat, longitude: coords.lng },
+              units: 'METRIC'
             })
           }
         )
         if (googleWeatherResp.ok) {
           const gw = await googleWeatherResp.json()
-          const cc = gw?.currentConditions || gw // tolerate both shapes
-          const temp = cc?.temperature?.value ?? cc?.temperature ?? null
+          const cc = gw?.currentConditions || gw
+          const temp = cc?.temperatureApparent?.value ?? cc?.temperatureApparent ?? cc?.temperature?.value ?? cc?.temperature ?? null
           const humidity = cc?.humidity?.value ?? cc?.humidity ?? null
-          const windKph = cc?.windSpeed?.value ?? cc?.windSpeed ?? null
+          // Google Weather wind can be kph or m/s depending on source; if >40 treat as kph and convert
+          let wind = cc?.windSpeed?.value ?? cc?.windSpeed ?? 3
+          wind = Number(wind)
+          const windMs = wind > 40 ? wind / 3.6 : wind
           const desc = cc?.phrase || cc?.summary || cc?.condition || 'clear sky'
 
           if (temp !== null) {
             weatherData = {
               main: { temp, humidity: humidity ?? 60 },
               weather: [{ description: String(desc), icon: '01d' }],
-              wind: { speed: windKph ? Number(windKph) / 3.6 : 3 } // kph->m/s
+              wind: { speed: windMs }
             }
           }
         }
@@ -118,9 +109,7 @@ export async function GET(request: NextRequest) {
         const weatherResponse = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lng}&appid=${openWeatherApiKey}&units=metric`
         )
-        if (weatherResponse.ok) {
-          weatherData = await weatherResponse.json()
-        }
+        if (weatherResponse.ok) weatherData = await weatherResponse.json()
       } catch (err) {
         console.error('OpenWeather API error:', err)
       }
@@ -136,78 +125,48 @@ export async function GET(request: NextRequest) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              location: {
-                latitude: coords.lat,
-                longitude: coords.lng
-              },
-              extraComputations: [
-                'HEALTH_RECOMMENDATIONS',
-                'DOMINANT_POLLUTANT',
-                'POLLUTANT_ADDITIONAL_INFO'
-              ]
+              location: { latitude: coords.lat, longitude: coords.lng },
+              extraComputations: ['HEALTH_RECOMMENDATIONS','DOMINANT_POLLUTANT','POLLUTANT_ADDITIONAL_INFO']
             })
           }
         )
-        if (aqResponse.ok) {
-          airQualityData = await aqResponse.json()
-        }
+        if (aqResponse.ok) airQualityData = await aqResponse.json()
       } catch (err) {
         console.error('Air Quality API error:', err)
       }
     }
 
-    // Fallback to seasonal data if no real weather API
     if (!weatherData && !googleWeatherKey && !openWeatherApiKey) {
       weatherData = {
-        main: {
-          temp: getSeasonalTemp(city),
-          humidity: Math.round(60 + (new Date().getHours() % 20))
-        },
-        weather: [{
-          description: getSeasonalWeather(city),
-          icon: '01d'
-        }],
-        wind: {
-          speed: 2 + (new Date().getHours() % 8)
-        }
+        main: { temp: getSeasonalTemp(city), humidity: 60 },
+        weather: [{ description: getSeasonalWeather(), icon: '01d' }],
+        wind: { speed: 3 }
       }
     }
 
-    // Mock data fallback for development
     const mockWeatherData = {
       temperature: Math.round(15 + Math.random() * 10),
       condition: ['Clear', 'Partly Cloudy', 'Cloudy', 'Light Rain'][Math.floor(Math.random() * 4)],
       humidity: Math.round(40 + Math.random() * 40),
       windSpeed: Math.round(5 + Math.random() * 15),
-      airQuality: {
-        aqi: Math.round(20 + Math.random() * 80),
-        level: 'Good'
-      },
+      airQuality: { aqi: Math.round(20 + Math.random() * 80), level: 'Good' },
       icon: '01d'
     }
 
-    // Use real data if available, otherwise mock
     const result = weatherData ? {
       temperature: Math.round(Number(weatherData.main.temp)),
       condition: weatherData.weather[0].description,
       humidity: Number(weatherData.main.humidity ?? 60),
-      windSpeed: Math.round(Number(weatherData.wind.speed) * 3.6), // m/s to km/h
+      windSpeed: Math.round(Number(weatherData.wind.speed) * 3.6),
       airQuality: airQualityData ? {
         aqi: airQualityData.indexes?.[0]?.aqi || 50,
         level: airQualityData.indexes?.[0]?.category || 'Good'
       } : mockWeatherData.airQuality,
       icon: weatherData.weather[0].icon,
       lastUpdated: new Date().toISOString()
-    } : {
-      ...mockWeatherData,
-      lastUpdated: new Date().toISOString()
-    }
+    } : { ...mockWeatherData, lastUpdated: new Date().toISOString() }
 
-    // Cache the result
-    weatherCache.set(cacheKey, {
-      data: result,
-      timestamp: Date.now()
-    })
+    weatherCache.set(cacheKey, { data: result, timestamp: Date.now() })
 
     return NextResponse.json(result)
   } catch (error) {
