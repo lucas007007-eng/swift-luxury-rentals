@@ -33,6 +33,9 @@ export async function GET(request: NextRequest) {
       process.env.GOOGLE_WEATHER_API_KEY ||
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
+    // Diagnostics holder, must be declared before any use
+    let weatherDiagnostics: any = undefined
+
     // Debug API key availability
     if (debug) {
       weatherDiagnostics = {
@@ -62,7 +65,6 @@ export async function GET(request: NextRequest) {
     let weatherData: any = null
     let basis = 'temperature'
     let provider = 'google-cloud-weather'
-    let weatherDiagnostics: any = undefined
 
     if (googleWeatherKey) {
       try {
