@@ -326,22 +326,22 @@ html {
 .twinkle-slow { animation: twinkle 1.8s ease-in-out infinite; }
 
 /* Weather background animations (city hero) */
-.weather-bg-clear { background: radial-gradient(ellipse at top, rgba(255,255,255,0.15), transparent 60%), linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0)); }
-.weather-bg-sunny { background: radial-gradient(circle at 80% 10%, rgba(255,223,0,0.25), transparent 40%), linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0)); }
+.weather-bg-clear { background: radial-gradient(ellipse at top, rgba(255,255,255,0.18), transparent 60%), linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0)); }
+.weather-bg-sunny { background: radial-gradient(circle at 80% 10%, rgba(255,223,0,0.35), transparent 40%), linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0)); }
 .weather-bg-cloudy {
-  background: linear-gradient(180deg, rgba(180,184,195,0.28), rgba(0,0,0,0));
+  background: linear-gradient(180deg, rgba(170,176,190,0.45), rgba(0,0,0,0));
   position: relative;
 }
 .weather-bg-cloudy::before, .weather-bg-cloudy::after {
   content: '';
   position: absolute;
   top: 10%; left: 10%;
-  width: 200px; height: 80px;
+  width: 260px; height: 100px;
   background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.2), transparent 60%), radial-gradient(circle at 60% 60%, rgba(255,255,255,0.15), transparent 60%);
   filter: blur(6px);
   animation: cloud-drift 30s linear infinite;
 }
-.weather-bg-cloudy::after { top: 25%; left: 50%; width: 260px; animation-duration: 36s; }
+.weather-bg-cloudy::after { top: 25%; left: 50%; width: 320px; height: 110px; animation-duration: 36s; }
 
 .weather-bg-rain { background: linear-gradient(180deg, rgba(110,140,210,0.28), rgba(0,0,0,0)); position: relative; overflow: hidden; }
 .weather-bg-rain::before {
