@@ -28,6 +28,7 @@ export default function CityPage() {
   const checkIn = searchParams.get('checkin') || ''
   const checkOut = searchParams.get('checkout') || ''
   const destinationParam = searchParams.get('destination') || ''
+  const forceWeather = (searchParams.get('weather') || searchParams.get('wx') || (searchParams.get('forceRain') === 'true' ? 'rain' : '') || '').toLowerCase()
   
   // Get properties for the selected city
   const properties = cityProperties[cityName] || []
@@ -203,7 +204,7 @@ export default function CityPage() {
       </section>
 
       {/* Weather-driven effects (generates rain when needed) */}
-      <WeatherBackgroundSetter cityName={cityName} onClass={setWeatherBgClass} onDebug={setDebugWeather} />
+      <WeatherBackgroundSetter cityName={cityName} onClass={setWeatherBgClass} onDebug={setDebugWeather} forceWeather={forceWeather} />
 
       {/* Filter Modal */}
       {searchMode === 'homes' && (
@@ -270,16 +271,24 @@ export default function CityPage() {
   )
 }
 
-function WeatherBackgroundSetter({ cityName, onClass, onDebug }: { cityName: string, onClass: (c: string)=>void, onDebug: (d: any)=>void }) {
+function WeatherBackgroundSetter({ cityName, onClass, onDebug, forceWeather }: { cityName: string, onClass: (c: string)=>void, onDebug: (d: any)=>void, forceWeather?: string }) {
   useEffect(() => {
     let cancelled = false
     let splashTimers: any[] = []
     const load = async () => {
       try {
-        const res = await fetch(`/api/weather?city=${encodeURIComponent(cityName)}`, { cache: 'no-store' })
-        if (!res.ok) return
-        const data = await res.json()
-        const c: string = String(data?.condition || '').toLowerCase()
+        let data: any = null
+        let c = ''
+        if (forceWeather) {
+          // synthetic weather for preview
+          data = { condition: forceWeather, temperature: 20 }
+          c = forceWeather
+        } else {
+          const res = await fetch(`/api/weather?city=${encodeURIComponent(cityName)}`, { cache: 'no-store' })
+          if (!res.ok) return
+          data = await res.json()
+          c = String(data?.condition || '').toLowerCase()
+        }
         const base = 'weather-bg'
         let cls = `${base}-clear`
         if (c.includes('thunder') || c.includes('storm') || c.includes('lightning')) cls = `${base}-thunder`
@@ -333,6 +342,6 @@ function WeatherBackgroundSetter({ cityName, onClass, onDebug }: { cityName: str
     load()
     const id = setInterval(load, 5 * 60 * 1000)
     return () => { cancelled = true; clearInterval(id); splashTimers.forEach(t => clearTimeout(t)) }
-  }, [cityName, onClass, onDebug])
+  }, [cityName, onClass, onDebug, forceWeather])
   return null
 }
