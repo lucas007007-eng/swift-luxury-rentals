@@ -24,21 +24,44 @@ export default function WeatherTestPage() {
     // Clear existing raindrops
     rainContainer.innerHTML = ''
 
-    // Create 100 raindrops
-    for (let i = 0; i < 100; i++) {
+    // Create 80 raindrops
+    for (let i = 0; i < 80; i++) {
       const raindrop = document.createElement('div')
       raindrop.className = 'raindrop'
       
       // Random horizontal position
-      raindrop.style.left = `${Math.random() * 100}vw`
+      const leftPos = Math.random() * 100
+      raindrop.style.left = `${leftPos}vw`
       
       // Random animation duration and delay
-      const duration = Math.random() * 2 + 1 // Between 1s and 3s
+      const duration = Math.random() * 1.5 + 1 // Between 1s and 2.5s
       const delay = Math.random() * 2 // Between 0s and 2s
       raindrop.style.animationDuration = `${duration}s`
       raindrop.style.animationDelay = `-${delay}s`
       
+      // Create splash effect when raindrop completes
+      raindrop.addEventListener('animationiteration', () => {
+        createSplash(leftPos)
+      })
+      
       rainContainer.appendChild(raindrop)
+    }
+
+    // Function to create splash effect
+    function createSplash(leftPosition: number) {
+      const splash = document.createElement('div')
+      splash.className = 'splash'
+      splash.style.left = `${leftPosition}vw`
+      splash.style.transform = 'translateX(-50%)'
+      
+      rainContainer.appendChild(splash)
+      
+      // Remove splash after animation completes
+      setTimeout(() => {
+        if (splash.parentNode) {
+          splash.parentNode.removeChild(splash)
+        }
+      }, 300)
     }
   }, [activeWeather])
 
