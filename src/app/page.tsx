@@ -23,7 +23,7 @@ export default function Home() {
 
       
 
-      <About />
+      {/* About section removed per request */}
       <Locations />
 
       {/* Crypto Payment Section moved below Our European Destinations */}
