@@ -157,6 +157,9 @@ export default function CityPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
+            <div className="fixed top-0 left-0 w-full h-20 bg-red-500 z-50 opacity-80">
+              <div className="text-white p-4">WEATHER TEST OVERLAY VISIBLE</div>
+            </div>
             <h1 className="text-4xl md:text-6xl font-extrabold text-black font-serif tracking-tight leading-tight mb-6">
               {currentCityInfo?.title || `${cityName} Luxury Rentals`}
             </h1>
