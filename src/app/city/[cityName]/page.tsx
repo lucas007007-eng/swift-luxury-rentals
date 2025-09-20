@@ -134,7 +134,7 @@ export default function CityPage() {
       <Header forceBackground={true} />
       
       {/* Hero Section with Search */}
-      <section ref={heroRef} className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-transparent overflow-hidden min-h-[360px]">
+      <section ref={heroRef} className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-900 dark:to-gray-800 overflow-hidden min-h-[360px]">
         {/* Weather Animation Background */}
         <div className={`absolute inset-0 pointer-events-none z-20 ${weatherBgClass}`} style={{opacity: 0.9}} />
         {/* Rain FX container (only used when raining) */}
