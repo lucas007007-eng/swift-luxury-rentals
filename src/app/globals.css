@@ -687,9 +687,20 @@ html {
   opacity: 1;
 }
 
-/* On mobile, hide the large outer shadow to avoid pill background halo when full-width */
+/* On mobile, show a full oval dark-silver backdrop around the button */
 @media (max-width: 640px) {
-  .glass-btn-shadow, .glass-btn-shadow::after { display: none; }
+  .glass-btn-shadow, .glass-btn-shadow::after { display: block; }
+  .glass-btn-shadow { filter: none; }
+  .glass-btn-shadow::after {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.28), rgba(0,0,0,0.14));
+    padding: 0; /* make it a full backdrop */
+    mask: none;
+    box-shadow: inset 0 2px 8px rgba(255,255,255,0.28), 0 10px 20px rgba(0,0,0,0.25);
+  }
 }
 
 .glass-btn {
