@@ -421,18 +421,18 @@ html {
 }
 
 @keyframes fall {
-  from {
+  0% {
     transform: translateY(-100px) translateX(0px);
     opacity: 0;
   }
-  10% {
+  5% {
     opacity: 1;
   }
-  90% {
+  95% {
     opacity: 1;
   }
-  to {
-    transform: translateY(calc(100vh + 40px)) translateX(30px);
+  100% {
+    transform: translateY(calc(100vh + 40px)) translateX(25px);
     opacity: 0;
   }
 }

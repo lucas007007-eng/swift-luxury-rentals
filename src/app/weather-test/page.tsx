@@ -47,10 +47,10 @@ export default function WeatherTestPage() {
       raindrop.style.animationDuration = `${duration}s`
       raindrop.style.animationDelay = `-${delay}s`
       
-      // Create splash effect when raindrop completes
-      raindrop.addEventListener('animationiteration', () => {
-        createSplash(leftPos)
-      })
+      // Create splash effect when raindrop hits bottom
+      setTimeout(() => {
+        createSplash(leftPos + (30 * (duration / 2))) // Account for diagonal movement
+      }, duration * 1000)
       
       rainContainer.appendChild(raindrop)
     }
