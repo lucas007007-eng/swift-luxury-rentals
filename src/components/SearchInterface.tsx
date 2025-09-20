@@ -524,10 +524,10 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
           <div className={`px-2 py-2 sm:px-2 sm:py-2 border-t sm:border-t-0 border-gray-200 ${showGuestSelector ? 'hidden sm:block' : 'block'}`}>
             <button
               onClick={handleSearch}
-              className="w-full sm:w-auto bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-xl sm:rounded-full transition-colors duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+              className="w-full sm:w-auto bond-btn text-white px-5 py-4 sm:px-6 sm:py-3 rounded-full shadow-xl flex items-center justify-center space-x-2"
             >
               <MagnifyingGlassIcon className="w-5 h-5" />
-              <span className="sm:hidden font-semibold">Search</span>
+              <span className="sm:hidden font-semibold tracking-wide">Search</span>
             </button>
           </div>
         </div>
@@ -622,7 +622,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
                   setFocusedField(null)
                   handleSearch()
                 }}
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-xl transition-colors duration-200 shadow-lg flex items-center justify-center space-x-2"
+                className="w-full bond-btn text-white p-4 rounded-full flex items-center justify-center space-x-2"
               >
                 <MagnifyingGlassIcon className="w-5 h-5" />
                 <span className="font-semibold">Search</span>
