@@ -731,6 +731,10 @@ html {
   padding-block: 0.875em;
 }
 
+@media (max-width: 640px) {
+  .glass-btn--wide > span { padding-inline: 1.95em; }
+}
+
 .glass-btn > span::after {
   content: '';
   display: block;

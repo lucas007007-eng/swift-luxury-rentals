@@ -523,7 +523,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
           {/* Search Button - Hidden on mobile when guests dropdown is open */}
           <div className={`px-2 py-2 sm:px-2 sm:py-2 border-t sm:border-t-0 border-gray-200 ${showGuestSelector ? 'hidden sm:block' : 'block'}`}>
             <div className="glass-btn-wrap block w-full sm:w-auto">
-              <button onClick={handleSearch} className="glass-btn w-full sm:w-auto">
+              <button onClick={handleSearch} className="glass-btn glass-btn--wide w-full sm:w-auto">
                 <span className="flex items-center justify-center gap-2">
                   <MagnifyingGlassIcon className="w-5 h-5" />
                   <span className="sm:hidden font-semibold tracking-wide ml-2">Search</span>
@@ -625,7 +625,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
                     setFocusedField(null)
                     handleSearch()
                   }}
-                  className="glass-btn w-full text-center"
+                  className="glass-btn glass-btn--wide w-full text-center"
                 >
                   <span className="w-full flex items-center justify-center gap-2">
                     <MagnifyingGlassIcon className="w-5 h-5" />
