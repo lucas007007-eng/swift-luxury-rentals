@@ -137,18 +137,18 @@ export default function CityPage() {
       {/* Hero Section with Search */}
       <section ref={heroRef} className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-black overflow-hidden min-h-[360px]">
         {/* Rain FX container (only used when raining); behind content */}
-        <div
-          ref={rainContainerRef}
-          id="rain-container"
-          className="absolute inset-0 pointer-events-none z-10"
-          style={{
-            // ensure splash at hero bottom
-            // provide fall height to reach container bottom
-            // fallback keeps previous behavior
-            // @ts-ignore css var
-            ['--rain-height' as any]: (heroRef.current?.clientHeight || 0) > 0 ? `${heroRef.current!.clientHeight + 40}px` : undefined
-          }}
-        />
+        <div className="absolute inset-x-0 top-0 bottom-0 pointer-events-none z-10">
+          <div
+            ref={rainContainerRef}
+            id="rain-container"
+            className="relative h-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8"
+            style={{
+              // ensure splash at hero bottom relative to hero height
+              // @ts-ignore css var
+              ['--rain-height' as any]: (heroRef.current?.clientHeight || 0) > 0 ? `${heroRef.current!.clientHeight + 40}px` : undefined
+            }}
+          />
+        </div>
         <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Weather Widget */}
           <div className="absolute top-32 right-4 md:right-8 z-10">
