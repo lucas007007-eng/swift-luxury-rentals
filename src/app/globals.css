@@ -737,7 +737,7 @@ html {
 }
 
 @media (max-width: 640px) {
-  .glass-btn--wide > span { padding-inline: 1.95em; }
+  .glass-btn--wide > span { padding-inline: 2.55em; }
 }
 
 .glass-btn > span::after {
