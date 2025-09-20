@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Header from '@/components/Header'
@@ -22,6 +22,8 @@ export default function CityPage() {
   const [filterState, setFilterState] = useState<CityFilterState>({ amenities: [] })
   const [weatherBgClass, setWeatherBgClass] = useState<string>('weather-bg-clear')
   const [debugWeather, setDebugWeather] = useState<any>(null)
+  const heroRef = useRef<HTMLDivElement | null>(null)
+  const rainContainerRef = useRef<HTMLDivElement | null>(null)
   const searchParams = useSearchParams()
   const checkIn = searchParams.get('checkin') || ''
   const checkOut = searchParams.get('checkout') || ''
@@ -132,9 +134,11 @@ export default function CityPage() {
       <Header forceBackground={true} />
       
       {/* Hero Section with Search */}
-      <section className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-primary-50 to-secondary-50 overflow-hidden min-h-[360px]">
+      <section ref={heroRef} className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-transparent overflow-hidden min-h-[360px]">
         {/* Weather Animation Background */}
-        <div className={`absolute inset-0 pointer-events-none z-20 ${weatherBgClass}`} style={{opacity: 0.7}} />
+        <div className={`absolute inset-0 pointer-events-none z-20 ${weatherBgClass}`} style={{opacity: 0.9}} />
+        {/* Rain FX container (only used when raining) */}
+        <div ref={rainContainerRef} id="rain-container" className="absolute inset-0 pointer-events-none z-20" />
         
         {/* Debug Weather Info (remove in production) */}
         {debugWeather && (
@@ -280,6 +284,7 @@ export default function CityPage() {
 function WeatherBackgroundSetter({ cityName, onClass, onDebug }: { cityName: string, onClass: (c: string)=>void, onDebug: (d: any)=>void }) {
   useEffect(() => {
     let cancelled = false
+    let splashTimers: any[] = []
     const load = async () => {
       try {
         const res = await fetch(`/api/weather?city=${encodeURIComponent(cityName)}`, { cache: 'no-store' })
@@ -297,13 +302,48 @@ function WeatherBackgroundSetter({ cityName, onClass, onDebug }: { cityName: str
           onClass(cls)
           onDebug(data)
         }
+
+        // JS rain like the CodePen
+        const container = document.getElementById('rain-container')
+        if (container) {
+          container.innerHTML = ''
+          splashTimers.forEach(t => clearTimeout(t))
+          splashTimers = []
+          if (cls.endsWith('-rain') || cls.endsWith('-thunder')) {
+            const dropCount = 100
+            for (let i = 0; i < dropCount; i++) {
+              const d = document.createElement('div')
+              d.className = 'raindrop'
+              const left = Math.random() * 100
+              const delay = Math.random() * 2
+              const duration = 0.9 + Math.random() * 0.9
+              const scale = 0.8 + Math.random() * 0.6
+              d.style.left = `${left}%`
+              d.style.animationDelay = `${delay}s`
+              d.style.animationDuration = `${duration}s`
+              d.style.transform = `translateY(-120px) translateX(0) scale(${scale})`
+              container.appendChild(d)
+              const splashTime = (duration + delay) * 1000
+              const timer = setTimeout(() => {
+                const s = document.createElement('div')
+                s.className = 'splash'
+                s.style.left = `calc(${left}% + 25px)`
+                s.style.bottom = '2px'
+                s.style.opacity = '0.9'
+                container.appendChild(s)
+                setTimeout(() => s.remove(), 600)
+              }, splashTime)
+              splashTimers.push(timer)
+            }
+          }
+        }
       } catch (err) {
         if (!cancelled) onDebug({ error: String(err) })
       }
     }
     load()
     const id = setInterval(load, 5 * 60 * 1000)
-    return () => { cancelled = true; clearInterval(id) }
+    return () => { cancelled = true; clearInterval(id); splashTimers.forEach(t => clearTimeout(t)) }
   }, [cityName, onClass, onDebug])
   return null
 }
