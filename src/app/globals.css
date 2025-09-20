@@ -428,16 +428,24 @@ html {
 .weather-bg-rain::after {
   content: '';
   position: absolute; 
-  top: 15%; left: 0; right: 0; bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   z-index: 3;
   background-image: 
-    repeating-linear-gradient(85deg, 
-      rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 1px, 
-      transparent 1px, transparent 4px),
-    repeating-linear-gradient(87deg, 
-      rgba(200,220,255,0.6) 0px, rgba(200,220,255,0.6) 1px, 
-      transparent 1px, transparent 6px);
-  animation: cloud-rain-drops 0.8s linear infinite;
+    radial-gradient(ellipse 1px 8px at 10% 0%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(ellipse 1px 6px at 25% 0%, rgba(200,220,255,0.7), transparent),
+    radial-gradient(ellipse 1px 10px at 40% 0%, rgba(255,255,255,0.9), transparent),
+    radial-gradient(ellipse 1px 7px at 55% 0%, rgba(180,200,240,0.6), transparent),
+    radial-gradient(ellipse 1px 9px at 70% 0%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(ellipse 1px 5px at 85% 0%, rgba(160,180,220,0.7), transparent),
+    radial-gradient(ellipse 1px 8px at 15% 0%, rgba(255,255,255,0.7), transparent),
+    radial-gradient(ellipse 1px 6px at 30% 0%, rgba(200,220,255,0.8), transparent),
+    radial-gradient(ellipse 1px 9px at 45% 0%, rgba(255,255,255,0.9), transparent),
+    radial-gradient(ellipse 1px 7px at 60% 0%, rgba(180,200,240,0.6), transparent),
+    radial-gradient(ellipse 1px 8px at 75% 0%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(ellipse 1px 6px at 90% 0%, rgba(160,180,220,0.7), transparent);
+  background-size: 100px 100vh, 80px 100vh, 120px 100vh, 90px 100vh, 110px 100vh, 70px 100vh, 
+                   95px 100vh, 85px 100vh, 115px 100vh, 75px 100vh, 105px 100vh, 65px 100vh;
+  animation: individual-raindrops 1.2s linear infinite, raindrop-sway 3s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -529,9 +537,17 @@ html {
   75% { transform: translateX(20px) translateY(-3px) scale(1.02); opacity: 0.9; }
   100% { transform: translateX(0px) translateY(0px) scale(1); opacity: 0.8; }
 }
-@keyframes cloud-rain-drops {
-  0% { transform: translateY(-10px) translateX(0px); opacity: 0.9; }
-  100% { transform: translateY(30px) translateX(8px); opacity: 0.7; }
+@keyframes individual-raindrops {
+  0% { transform: translateY(-20px) translateX(0px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(100vh) translateX(15px); opacity: 0; }
+}
+@keyframes raindrop-sway {
+  0%, 100% { transform: translateX(0px); }
+  25% { transform: translateX(2px); }
+  50% { transform: translateX(-1px); }
+  75% { transform: translateX(3px); }
 }
 
 @keyframes realistic-snow { 
