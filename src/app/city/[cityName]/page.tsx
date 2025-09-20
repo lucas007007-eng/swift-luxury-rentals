@@ -134,7 +134,7 @@ export default function CityPage() {
       <Header forceBackground={true} />
       
       {/* Hero Section with Search */}
-      <section ref={heroRef} className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-900 dark:to-gray-800 overflow-hidden min-h-[360px]">
+      <section ref={heroRef} className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-black overflow-hidden min-h-[360px]">
         {/* Weather Animation Background */}
         <div className={`absolute inset-0 pointer-events-none z-20 ${weatherBgClass}`} style={{opacity: 0.9}} />
         {/* Rain FX container (only used when raining) */}
@@ -160,13 +160,13 @@ export default function CityPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl md:text-6xl font-extrabold text-black font-serif tracking-tight leading-tight mb-6">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-white font-serif tracking-tight leading-tight mb-6">
               {currentCityInfo?.title || `${cityName} Luxury Rentals`}
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto mb-8">
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-8">
               {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
             </p>
-            <div className="text-lg text-gray-500">
+            <div className="text-lg text-gray-400">
               {filtered.length} luxury properties available
             </div>
           </motion.div>
