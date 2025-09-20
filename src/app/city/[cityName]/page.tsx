@@ -134,17 +134,82 @@ export default function CityPage() {
       <Header forceBackground={true} />
       
       {/* Hero Section with Search */}
-      <section ref={heroRef} className="relative pt-24 md:pt-28 lg:pt-32 pb-10 overflow-hidden min-h-[420px]">
-        {/* Exact CodePen scene embedded full-bleed in hero */}
-        <div className="absolute inset-0 z-10">
-          <iframe
-            title="Weather Animation"
-            src="https://codepen.io/web-dev123/embed/MvaXwq?default-tab=result"
-            className="w-full h-full"
-            frameBorder="0"
-            loading="lazy"
-            allowFullScreen
-          />
+      <section ref={heroRef} className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-900 dark:to-gray-800 overflow-hidden min-h-[360px]">
+        {/* Weather Animation Background */}
+        <div className={`absolute inset-0 pointer-events-none z-20 ${weatherBgClass}`} style={{opacity: 0.9}} />
+        {/* Rain FX container (only used when raining) */}
+        <div ref={rainContainerRef} id="rain-container" className="absolute inset-0 pointer-events-none z-20" />
+        
+        {/* Debug Weather Info (remove in production) */}
+        {debugWeather && (
+          <div className="absolute top-4 left-4 z-40 bg-black/80 text-white p-2 rounded text-xs">
+            <div>Class: {weatherBgClass}</div>
+            <div>Condition: {debugWeather.condition}</div>
+            <div>Temp: {debugWeather.temperature}°C</div>
+          </div>
+        )}
+        <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Weather Widget */}
+          <div className="absolute top-32 right-4 md:right-8 z-10">
+            <WeatherWidget city={cityName} className="w-48" />
+          </div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
+          >
+            <h1 className="text-4xl md:text-6xl font-extrabold text-black font-serif tracking-tight leading-tight mb-6">
+              {currentCityInfo?.title || `${cityName} Luxury Rentals`}
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto mb-8">
+              {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
+            </p>
+            <div className="text-lg text-gray-500">
+              {filtered.length} luxury properties available
+            </div>
+          </motion.div>
+
+          {/* Search Interface */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="max-w-4xl mx-auto"
+          >
+            <div className="flex flex-col md:flex-row md:items-end gap-3">
+              <div className="flex-1">
+                <SearchInterface 
+                  initialDestination={initialDestination}
+                  initialCheckIn={checkIn}
+                  initialCheckOut={checkOut}
+                  initialGuests={Number(searchParams.get('guests') || '1')}
+                  initialAdults={Number(searchParams.get('adults') || '1')}
+                  initialChildren={Number(searchParams.get('children') || '0')}
+                  initialInfants={Number(searchParams.get('infants') || '0')}
+                  initialPets={Number(searchParams.get('pets') || '0')}
+                  onModeChange={(m)=>setSearchMode(m)}
+                />
+              </div>
+              {searchMode === 'homes' && (
+                <div className="flex justify-center md:justify-start">
+                  <button 
+                    onClick={()=>setShowFilters(true)} 
+                    className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-md hover:shadow-lg transition-all w-full md:w-auto justify-center md:justify-start md:h-[52px] md:mb-2"
+                  >
+                    <svg className="w-4 h-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M3 6h18M7 12h10m-7 6h4"/>
+                    </svg>
+                    <span>Filters</span>
+                    <span className="ml-1 bg-primary-600 text-white text-xs px-2 py-1 rounded-full">
+                      {filtered.length}
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
         </div>
       </section>
 
