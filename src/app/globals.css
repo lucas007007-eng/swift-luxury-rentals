@@ -324,3 +324,52 @@ html {
   50% { transform: scale(1.06); }
 }
 .twinkle-slow { animation: twinkle 1.8s ease-in-out infinite; }
+
+/* Weather background animations (city hero) */
+.weather-bg-clear { background: radial-gradient(ellipse at top, rgba(255,255,255,0.15), transparent 60%), linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0)); }
+.weather-bg-sunny { background: radial-gradient(circle at 80% 10%, rgba(255,223,0,0.25), transparent 40%), linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0)); }
+.weather-bg-cloudy {
+  background: linear-gradient(180deg, rgba(200,200,210,0.15), rgba(0,0,0,0));
+  position: relative;
+}
+.weather-bg-cloudy::before, .weather-bg-cloudy::after {
+  content: '';
+  position: absolute;
+  top: 10%; left: 10%;
+  width: 200px; height: 80px;
+  background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.2), transparent 60%), radial-gradient(circle at 60% 60%, rgba(255,255,255,0.15), transparent 60%);
+  filter: blur(6px);
+  animation: cloud-drift 30s linear infinite;
+}
+.weather-bg-cloudy::after { top: 25%; left: 50%; width: 260px; animation-duration: 36s; }
+
+.weather-bg-rain { background: linear-gradient(180deg, rgba(150,180,255,0.10), rgba(0,0,0,0)); position: relative; overflow: hidden; }
+.weather-bg-rain::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: linear-gradient(180deg, rgba(200,220,255,0.25) 2px, transparent 2px);
+  background-size: 2px 12px;
+  animation: rain-fall 1s linear infinite;
+}
+
+.weather-bg-snow { background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0)); position: relative; overflow: hidden; }
+.weather-bg-snow::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.7) 1px, transparent 1px);
+  background-size: 8px 16px;
+  animation: snow-fall 3s linear infinite;
+}
+
+.weather-bg-thunder { background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0)); position: relative; overflow: hidden; }
+.weather-bg-thunder::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 70% 20%, rgba(255,255,255,0.25), transparent 30%);
+  animation: thunder-flash 4s ease-in-out infinite;
+}
+
+@keyframes cloud-drift { 0% { transform: translateX(-10%);} 100% { transform: translateX(10%);} }
+@keyframes rain-fall { 0% { background-position-y: 0; } 100% { background-position-y: 12px; } }
+@keyframes snow-fall { 0% { background-position-y: 0; } 100% { background-position-y: 16px; } }
+@keyframes thunder-flash { 0%, 10%, 100% { opacity: 0; } 2%, 8% { opacity: 1; } 50% { opacity: 0.2; } }
