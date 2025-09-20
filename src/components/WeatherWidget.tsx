@@ -34,6 +34,9 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
         })
         if (response.ok) {
           const data = await response.json()
+          if (data.error) {
+            throw new Error(data.error)
+          }
           setWeather(data)
         } else {
           throw new Error('Weather data unavailable')
@@ -90,11 +93,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ city, className = '' }) =
   }
 
   if (error || !weather) {
-    return (
-      <div className={`bg-black/40 backdrop-blur-sm border border-white/20 rounded-xl p-4 ${className}`}>
-        <div className="text-gray-400 text-sm">Weather unavailable</div>
-      </div>
-    )
+    return null // Hide widget completely when API fails
   }
 
   const animationType = getWeatherAnimation(weather.condition)

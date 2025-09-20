@@ -165,11 +165,13 @@ export async function GET(request: NextRequest) {
     }
 
     if (!weatherData) {
-      // Use current real weather as fallback instead of fixed 22 degrees
-      const currentTemp = new Date().getHours() > 12 ? 28 : 25 // Realistic day/evening temps
-      weatherData = { main: { temp: currentTemp, humidity: 65 }, weather: [{ description: 'partly cloudy', icon: '01d' }], wind: { speed: 8 } }
-      basis = 'fallback'
-      provider = 'realistic-fallback'
+      // Return error instead of fallback when Google API fails
+      return NextResponse.json({ 
+        error: 'Weather data unavailable', 
+        debug: weatherDiagnostics,
+        provider: 'api-failed',
+        coordinates: { lat: coords.lat, lng: coords.lng }
+      }, { status: 503 })
     }
 
     const result: any = {
