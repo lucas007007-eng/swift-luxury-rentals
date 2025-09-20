@@ -9,6 +9,7 @@ import PropertyCard from '@/components/PropertyCard'
 import SearchInterface from '@/components/SearchInterface'
 import CityFilterModal, { CityFilterState } from '@/components/CityFilterModal'
 import PropertyMap from '@/components/PropertyMap'
+import WeatherWidget from '@/components/WeatherWidget'
 import { cityProperties, cityInfo } from '@/data/cityProperties'
 
 export default function CityPage() {
@@ -129,8 +130,17 @@ export default function CityPage() {
       <Header forceBackground={true} />
       
       {/* Hero Section with Search */}
-      <section className="pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-primary-50 to-secondary-50">
+      <section className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-primary-50 to-secondary-50 overflow-hidden">
+        {/* Weather Animation Background */}
+        <div className="absolute inset-0 pointer-events-none opacity-20">
+          <div className="weather-bg-animation"></div>
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Weather Widget */}
+          <div className="absolute top-32 right-4 md:right-8 z-10">
+            <WeatherWidget city={cityName} className="w-48" />
+          </div>
+          
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
