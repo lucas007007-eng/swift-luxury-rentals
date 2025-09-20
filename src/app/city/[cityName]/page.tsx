@@ -20,6 +20,7 @@ export default function CityPage() {
   const [overrides, setOverrides] = useState<Record<string, any>>({})
   const [showFilters, setShowFilters] = useState(false)
   const [filterState, setFilterState] = useState<CityFilterState>({ amenities: [] })
+  const [weatherBgClass, setWeatherBgClass] = useState<string>('weather-bg-clear')
   const searchParams = useSearchParams()
   const checkIn = searchParams.get('checkin') || ''
   const checkOut = searchParams.get('checkout') || ''
@@ -131,8 +132,8 @@ export default function CityPage() {
       
       {/* Hero Section with Search */}
       <section className="relative pt-32 md:pt-36 lg:pt-40 pb-12 bg-gradient-to-br from-primary-50 to-secondary-50 overflow-hidden">
-        {/* Weather Animation Background - class set by script below */}
-        <div id="city-weather-bg" className="absolute inset-0 pointer-events-none opacity-25" />
+        {/* Weather Animation Background */}
+        <div className={`absolute inset-0 pointer-events-none opacity-25 ${weatherBgClass}`} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Weather Widget */}
           <div className="absolute top-32 right-4 md:right-8 z-10">
@@ -198,26 +199,8 @@ export default function CityPage() {
         </div>
       </section>
 
-      {/* Dynamically set background animation based on Google Weather */}
-      <script dangerouslySetInnerHTML={{ __html: `
-        (function(){
-          const el = document.getElementById('city-weather-bg');
-          if(!el) return;
-          fetch('/api/weather?city=${encodeURIComponent(String((typeof window!== 'undefined' && (window as any).__CITY__) || '') || '') || 'Berlin'}', { cache: 'no-store' })
-            .then(r=>r.ok?r.json():null).then(data=>{
-              if(!data) return;
-              const c = String(data.condition || '').toLowerCase();
-              const clsBase = 'weather-bg';
-              let cls = clsBase + '-clear';
-              if(c.includes('thunder')||c.includes('storm')||c.includes('lightning')) cls = clsBase + '-thunder';
-              else if(c.includes('rain')||c.includes('drizzle')) cls = clsBase + '-rain';
-              else if(c.includes('snow')) cls = clsBase + '-snow';
-              else if(c.includes('cloud')) cls = clsBase + '-cloudy';
-              else if(c.includes('clear')||c.includes('sunny')) cls = clsBase + '-sunny';
-              el.className = 'absolute inset-0 pointer-events-none opacity-25 ' + cls;
-            }).catch(()=>{});
-        })();
-      ` }} />
+      {/* Set background class based on Google Weather */}
+      <WeatherBackgroundSetter cityName={cityName} onClass={setWeatherBgClass} />
 
       {/* Filter Modal */}
       {searchMode === 'homes' && (
@@ -282,4 +265,30 @@ export default function CityPage() {
       <Footer />
     </main>
   )
+}
+
+function WeatherBackgroundSetter({ cityName, onClass }: { cityName: string, onClass: (c: string)=>void }) {
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        const res = await fetch(`/api/weather?city=${encodeURIComponent(cityName)}`, { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json()
+        const c: string = String(data?.condition || '').toLowerCase()
+        const base = 'weather-bg'
+        let cls = `${base}-clear`
+        if (c.includes('thunder') || c.includes('storm') || c.includes('lightning')) cls = `${base}-thunder`
+        else if (c.includes('rain') || c.includes('drizzle')) cls = `${base}-rain`
+        else if (c.includes('snow')) cls = `${base}-snow`
+        else if (c.includes('cloud')) cls = `${base}-cloudy`
+        else if (c.includes('clear') || c.includes('sunny')) cls = `${base}-sunny`
+        if (!cancelled) onClass(cls)
+      } catch {}
+    }
+    load()
+    const id = setInterval(load, 5 * 60 * 1000)
+    return () => { cancelled = true; clearInterval(id) }
+  }, [cityName, onClass])
+  return null
 }
