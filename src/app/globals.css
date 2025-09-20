@@ -687,6 +687,11 @@ html {
   opacity: 1;
 }
 
+/* On mobile, hide the large outer shadow to avoid pill background halo when full-width */
+@media (max-width: 640px) {
+  .glass-btn-shadow, .glass-btn-shadow::after { display: none; }
+}
+
 .glass-btn {
   --border-width: clamp(1px, 0.0625em, 4px);
   all: unset;
