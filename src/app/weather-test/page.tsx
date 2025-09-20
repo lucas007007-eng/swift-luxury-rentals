@@ -24,7 +24,7 @@ export default function WeatherTestPage() {
     // Clear existing raindrops
     rainContainer.innerHTML = ''
 
-    // Create 80 raindrops
+    // Create 80 raindrops with size variation
     for (let i = 0; i < 80; i++) {
       const raindrop = document.createElement('div')
       raindrop.className = 'raindrop'
@@ -32,6 +32,15 @@ export default function WeatherTestPage() {
       // Random horizontal position
       const leftPos = Math.random() * 100
       raindrop.style.left = `${leftPos}vw`
+      
+      // Random size variation
+      const size = Math.random() * 2 + 3 // Between 3px and 5px
+      raindrop.style.width = `${size}px`
+      raindrop.style.height = `${size}px`
+      
+      // Random opacity for depth
+      const opacity = Math.random() * 0.4 + 0.6 // Between 0.6 and 1.0
+      raindrop.style.opacity = `${opacity}`
       
       // Random animation duration and delay
       const duration = Math.random() * 1.5 + 1 // Between 1s and 2.5s
