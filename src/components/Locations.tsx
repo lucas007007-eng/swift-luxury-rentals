@@ -156,7 +156,11 @@ const Locations = () => {
 
                 <div className="tilt-elevation-badge" data-tilt-transform-element>
                   <span className="text-2xl">{city.flag}</span>
-                  {city.properties === '0 Properties' ? 'Coming Soon' : city.properties}
+                  {(() => {
+                    if (city.properties === '0 Properties') return 'Coming Soon'
+                    const count = city.properties.split(' ')[0]
+                    return `${count}+ Homes`
+                  })()}
                 </div>
 
                 {/* Average Rent Mini Box */}
@@ -202,22 +206,6 @@ const Locations = () => {
           ))}
         </div>
 
-        {/* Call to Action */}
-        <div className="text-center mt-16">
-          <div className="bg-gray-900 rounded-3xl p-8 border border-gray-800 max-w-4xl mx-auto">
-            <h3 className="text-3xl font-bold text-white mb-4">Expanding Across Europe</h3>
-            <p className="text-gray-300 mb-6">
-              We're continuously adding luxury properties in Europe's most desirable cities. 
-              Be the first to know when we launch in your preferred destination.
-            </p>
-            <button 
-              onClick={() => router.push('/properties')}
-              className="bg-amber-500 hover:bg-amber-600 text-black font-bold px-8 py-4 rounded-xl transition-colors"
-            >
-              View All Cities
-            </button>
-          </div>
-        </div>
       </div>
     </section>
   )

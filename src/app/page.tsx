@@ -44,59 +44,186 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {/* Crypto Payment */}
-            <div className="bg-gray-800 rounded-2xl shadow-lg p-8 text-center border-2 border-gray-700">
-              <div className="bg-gradient-to-r from-orange-400 to-yellow-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-2xl">₿</span>
+            <div className="luxury-feature-card">
+              <svg className="w-20 h-20 mx-auto mb-8" viewBox="0 0 100 100" fill="none">
+                {/* Outer golden ring */}
+                <circle cx="50" cy="50" r="48" fill="url(#goldGradient)" stroke="url(#goldBorder)" strokeWidth="2"/>
+                
+                {/* Inner black circle */}
+                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#goldInner)" strokeWidth="1"/>
+                
+                {/* Concentric circles pattern */}
+                <circle cx="50" cy="50" r="35" fill="none" stroke="url(#goldInner)" strokeWidth="0.5" opacity="0.6"/>
+                <circle cx="50" cy="50" r="32" fill="none" stroke="url(#goldInner)" strokeWidth="0.5" opacity="0.4"/>
+                <circle cx="50" cy="50" r="29" fill="none" stroke="url(#goldInner)" strokeWidth="0.5" opacity="0.3"/>
+                
+                {/* Bitcoin B symbol */}
+                <path d="M42 30h6c3 0 5.5 1 5.5 4s-1.5 4-3.5 4c3 0 5 1.5 5 4.5s-2.5 4.5-6 4.5h-7V30zm4 6h2c1 0 2-0.5 2-1.5s-1-1.5-2-1.5h-2v3zm0 8h3c1.5 0 2.5-0.5 2.5-2s-1-2-2.5-2h-3v4z" 
+                      fill="url(#goldInner)" strokeWidth="0.5"/>
+                
+                {/* Decorative text around border */}
+                <path id="textCircle" d="M 50,10 A 40,40 0 1,1 49.9,10" fill="none"/>
+                <text fontSize="3.5" fill="url(#goldInner)" opacity="0.8">
+                  <textPath href="#textCircle" startOffset="0%">
+                    BITCOIN • DIGITAL • DECENTRALIZED • PEER TO PEER • 
+                  </textPath>
+                </text>
+                
+                <defs>
+                  <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FFD700"/>
+                    <stop offset="25%" stopColor="#FFA500"/>
+                    <stop offset="50%" stopColor="#FFD700"/>
+                    <stop offset="75%" stopColor="#DAA520"/>
+                    <stop offset="100%" stopColor="#FFD700"/>
+                  </linearGradient>
+                  <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DAA520"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                  <linearGradient id="goldInner" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DAA520"/>
+                    <stop offset="50%" stopColor="#FFD700"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <h3 className="text-2xl font-bold text-white mb-4 font-sora">Crypto Friendly</h3>
+              <div className="luxury-badge">
+                Secured Payments
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Crypto & Credit Card</h3>
-              <div className="flex justify-center space-x-4 mb-4">
-                <span className="bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full font-semibold">BTC</span>
-                <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full font-semibold">ETH</span>
-                <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded-full font-semibold">USDT</span>
+              <div className="flex justify-center space-x-2 mb-4">
+                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-white/10 text-white border border-white/20">BTC</span>
+                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-white/10 text-white border border-white/20">ETH</span>
+                <span className="px-2 py-1 rounded-full text-xs font-semibold bg-white/10 text-white border border-white/20">USDT</span>
               </div>
-              <p className="text-gray-300">
-                Use Bitcoin, Ethereum, USDT, or traditional credit card payments
+              <p className="text-gray-300 leading-relaxed">
+                Bitcoin, Ethereum, USDT, or traditional credit card payments accepted
               </p>
             </div>
 
             {/* EU Compliance */}
-            <div className="bg-gray-800 rounded-2xl shadow-lg p-8 text-center border-2 border-gray-700">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-2xl">🏦</span>
+            <div className="luxury-feature-card">
+              <svg className="w-20 h-20 mx-auto mb-8" viewBox="0 0 100 100" fill="none">
+                {/* Outer golden ring */}
+                <circle cx="50" cy="50" r="48" fill="url(#goldGradient2)" stroke="url(#goldBorder2)" strokeWidth="2"/>
+                
+                {/* Inner black circle */}
+                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#goldInner2)" strokeWidth="1"/>
+                
+                {/* Shield symbol - smaller */}
+                <path d="M50 30L38 36v16c0 7 5 12 12 14 7-2 12-7 12-14V36L50 30z" 
+                      fill="url(#goldInner2)" stroke="#1a1a1a" strokeWidth="1"/>
+                
+                {/* Checkmark - smaller */}
+                <path d="M44 50l4 4 8-8" stroke="#1a1a1a" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                
+                <defs>
+                  <linearGradient id="goldGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FFD700"/>
+                    <stop offset="50%" stopColor="#DAA520"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                  <linearGradient id="goldBorder2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DAA520"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                  <linearGradient id="goldInner2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DAA520"/>
+                    <stop offset="50%" stopColor="#FFD700"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <h3 className="text-2xl font-bold text-white mb-4 font-sora">EU Compliant</h3>
+              <div className="luxury-badge">
+                Fully Regulated
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">EU Compliant</h3>
-              <div className="bg-blue-500/20 rounded-lg p-3 mb-4">
-                <span className="text-blue-400 font-semibold">Fully Regulated</span>
-              </div>
-              <p className="text-gray-300">
+              <p className="text-gray-300 leading-relaxed">
                 All transactions comply with European banking regulations and anti-money laundering laws
               </p>
             </div>
 
             {/* Seamless Conversion */}
-            <div className="bg-gray-800 rounded-2xl shadow-lg p-8 text-center border-2 border-gray-700">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-600 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-2xl">⚡</span>
+            <div className="luxury-feature-card">
+              <svg className="w-20 h-20 mx-auto mb-8" viewBox="0 0 100 100" fill="none">
+                {/* Outer golden ring */}
+                <circle cx="50" cy="50" r="48" fill="url(#goldGradient3)" stroke="url(#goldBorder3)" strokeWidth="2"/>
+                
+                {/* Inner black circle */}
+                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#goldInner3)" strokeWidth="1"/>
+                
+                {/* Lightning bolt - smaller */}
+                <path d="M52 25L35 50h12L45 75 62 50H50L52 25z" 
+                      fill="url(#goldInner3)" stroke="#1a1a1a" strokeWidth="1"/>
+                
+                <defs>
+                  <linearGradient id="goldGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FFD700"/>
+                    <stop offset="50%" stopColor="#DAA520"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                  <linearGradient id="goldBorder3" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DAA520"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                  <linearGradient id="goldInner3" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DAA520"/>
+                    <stop offset="50%" stopColor="#FFD700"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <h3 className="text-2xl font-bold text-white mb-4 font-sora">Instant Booking</h3>
+              <div className="luxury-badge">
+                Auto Bank Wire
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Instant Booking</h3>
-              <div className="bg-purple-500/20 rounded-lg p-3 mb-4">
-                <span className="text-purple-400 font-semibold">Auto Bank Wire</span>
-              </div>
-              <p className="text-gray-300">
-                We automatically convert crypto to fiat and wire transfer to landlords
+              <p className="text-gray-300 leading-relaxed">
+                Automatic crypto to fiat conversion with wire transfer to landlords
               </p>
             </div>
 
             {/* Move In! card */}
-            <div className="bg-gray-800 rounded-2xl shadow-lg p-8 text-center border-2 border-gray-700">
-              <div className="bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-2xl">🏠</span>
+            <div className="luxury-feature-card">
+              <svg className="w-20 h-20 mx-auto mb-8" viewBox="0 0 100 100" fill="none">
+                {/* Outer golden ring */}
+                <circle cx="50" cy="50" r="48" fill="url(#goldGradient4)" stroke="url(#goldBorder4)" strokeWidth="2"/>
+                
+                {/* Inner black circle */}
+                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#goldInner4)" strokeWidth="1"/>
+                
+                {/* House symbol - smaller */}
+                <path d="M50 28L35 42v25h8V55h14v12h8V42L50 28z" 
+                      fill="url(#goldInner4)" stroke="#1a1a1a" strokeWidth="1"/>
+                
+                {/* Roof accent - smaller */}
+                <path d="M50 28L38 38h24L50 28z" 
+                      fill="url(#goldInner4)" opacity="0.8"/>
+                
+                <defs>
+                  <linearGradient id="goldGradient4" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#FFD700"/>
+                    <stop offset="50%" stopColor="#DAA520"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                  <linearGradient id="goldBorder4" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DAA520"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                  <linearGradient id="goldInner4" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DAA520"/>
+                    <stop offset="50%" stopColor="#FFD700"/>
+                    <stop offset="100%" stopColor="#B8860B"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <h3 className="text-2xl font-bold text-white mb-4 font-sora">Move In!</h3>
+              <div className="luxury-badge">
+                Seamless Check‑in
               </div>
-              <h3 className="text-2xl font-bold text-white mb-3">Move In!</h3>
-              <div className="bg-emerald-500/20 rounded-lg p-3 mb-4">
-                <span className="text-emerald-400 font-semibold">Seamless Check‑in</span>
-              </div>
-              <p className="text-gray-300">Keys, utilities, and Wi‑Fi are live from day one; suites are deep‑cleaned with hotel‑grade linens, and our guided check‑in gets you settled in minutes.</p>
+              <p className="text-gray-300 leading-relaxed">
+                Keys, utilities, and Wi‑Fi ready from day one with hotel‑grade service
+              </p>
             </div>
           </div>
 
@@ -107,13 +234,15 @@ export default function Home() {
       <section className="relative bg-black py-14">
         <div className="pointer-events-none absolute inset-0 agent-grid opacity-20" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] p-8 md:p-12 text-center shadow-[0_0_28px_rgba(16,185,129,0.18)]">
-            <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text mb-2">Access Granted</div>
-            <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-3">Join the Swift Luxury Network</h3>
-            <p className="text-white/70 max-w-3xl mx-auto mb-6">Create your account to manage bookings, preferences, and secure crypto-enabled payments with our agent-style dashboard.</p>
-            <div className="flex items-center justify-center gap-4">
-              <Link href="/register" className="px-6 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-black font-semibold shadow-lg transition">Register</Link>
-              <Link href="/login" className="px-6 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold border border-white/20 transition">Login</Link>
+          <div className="spy-cta-section rounded-3xl border border-gray-400/40 bg-gradient-to-br from-[#000000] via-[#0a0a0a] to-[#000000] p-8 md:p-12 text-center shadow-[0_0_40px_rgba(192,192,192,0.15)]">
+            <div className="relative z-10">
+              <div className="font-mono uppercase tracking-wider text-sm text-gray-300 mb-2">Access Granted</div>
+              <h3 className="text-3xl md:text-4xl font-extrabold text-white mb-3 font-sora">Join the Swift Luxury Network</h3>
+              <p className="text-gray-300 max-w-3xl mx-auto mb-6">Create your account to manage bookings, preferences, and secure crypto-enabled payments with our agent-style dashboard.</p>
+              <div className="flex items-center justify-center gap-4">
+                <Link href="/register" className="px-6 py-3 rounded-xl bg-gray-200 hover:bg-white text-black font-bold shadow-lg transition border border-gray-300">Register</Link>
+                <Link href="/login" className="px-6 py-3 rounded-xl bg-transparent hover:bg-gray-800/50 text-white font-bold border-2 border-gray-400 hover:border-gray-300 transition">Login</Link>
+              </div>
             </div>
           </div>
         </div>

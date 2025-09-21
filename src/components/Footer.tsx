@@ -51,19 +51,19 @@ const Footer = () => {
   ]
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-black text-white border-t border-gray-400/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Brand Section */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center space-x-2 mb-6">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">SL</span>
+            <Link href="/" className="flex items-center space-x-3 mb-6">
+              <div className="w-8 h-8 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg drop-shadow-lg">SL</span>
               </div>
-              <span className="font-bold text-xl">Swift Luxury</span>
+              <span className="font-sora font-bold text-xl tracking-wide">Swift Luxury</span>
             </Link>
-            <p className="text-gray-400 mb-6">
+            <p className="text-gray-300 mb-6">
               Making Rentals Easy with One Platform for Every Duration.
             </p>
             <div className="flex space-x-4">
@@ -73,7 +73,7 @@ const Footer = () => {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-primary-400 transition-colors"
+                  className="text-gray-300 hover:text-white transition-colors p-2 rounded-lg border border-gray-400/30 hover:border-gray-300/50 bg-gray-800/50 hover:bg-gray-700/50"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -87,13 +87,13 @@ const Footer = () => {
           {/* Footer Links */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h3 className="font-semibold text-lg mb-4">{category}</h3>
+              <h3 className="font-semibold text-lg mb-4 text-gray-200">{category}</h3>
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="text-gray-300 hover:text-white transition-colors font-medium"
                     >
                       {link.name}
                     </Link>
@@ -106,11 +106,11 @@ const Footer = () => {
 
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center">
-          <div className="text-gray-400 text-sm mb-4 sm:mb-0">
-            <p>© 2024 Swift Luxury. All rights reserved.</p>
+        <div className="border-t border-gray-400/20 pt-8 flex flex-col sm:flex-row justify-between items-center">
+          <div className="text-gray-300 text-sm mb-4 sm:mb-0 font-medium">
+            <p>© 2025 Swift Luxury. All rights reserved.</p>
           </div>
-          <div className="text-gray-400 text-sm">
+          <div className="text-gray-300 text-sm font-medium">
             <p>Berlin, renting made easy.</p>
           </div>
         </div>
