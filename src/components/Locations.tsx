@@ -118,7 +118,7 @@ const Locations = () => {
 
   return (
     <section className="py-20 bg-black">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-6 drop-shadow-lg">
@@ -130,7 +130,7 @@ const Locations = () => {
         </div>
 
         {/* European Cities Grid - 3D Tilt Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-3 md:gap-x-4 gap-y-8 md:gap-y-12 justify-items-center">
           {europeanCities.map((city, index) => (
             <div
               key={city.name}
