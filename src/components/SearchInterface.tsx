@@ -366,6 +366,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
             <span className="text-sm font-semibold tracking-wide">Homes</span>
           </div>
         </button>
+{/* Concierge mode hidden until pages are built
         <button onClick={()=>setMode('concierge')} className="group">
           <div className={`flex items-center gap-3 rounded-full px-5 py-3 shadow-md backdrop-blur ring-1 transition-colors ${
             mode==='concierge' ? 'bg-white/90 text-gray-900 ring-black/10' : 'bg-white/60 text-gray-700 ring-black/10 hover:bg-white/80'
@@ -376,6 +377,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
             <span className="text-sm font-semibold tracking-wide">Concierge</span>
           </div>
         </button>
+        */}
       </div>
 
       <div ref={wrapperRef} className={`bg-white shadow-2xl border border-gray-200 relative ${className} rounded-2xl sm:rounded-full`}>
