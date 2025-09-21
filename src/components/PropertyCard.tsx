@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { HeartIcon, PlayIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import { HeartIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import { Property } from '@/types'
 import { formatPrice } from '@/lib/utils'
@@ -151,10 +151,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
           )}
         </div>
 
-        {/* Video Play Button */}
-        <button className="absolute bottom-4 right-4 p-2 bg-white/80 rounded-full hover:bg-white transition-colors">
-          <PlayIcon className="w-5 h-5 text-gray-700" />
-        </button>
+{/* Video Play Button removed until video functionality is added */}
       </div>
 
       {/* Content Section */}
