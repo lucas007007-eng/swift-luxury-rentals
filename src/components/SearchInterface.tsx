@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { MagnifyingGlassIcon, CalendarDaysIcon, UserGroupIcon, MapPinIcon, HomeIcon, SparklesIcon } from '@heroicons/react/24/outline'
 import MiniDateRange from './MiniDateRange'
+import { cityProperties } from '@/data/cityProperties'
 
 interface SearchInterfaceProps {
   onSearch?: (searchData: SearchData) => void
@@ -62,59 +63,75 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
   const checkOutAnchorRef = useRef<HTMLDivElement>(null)
   const dateDropdownRef = useRef<HTMLDivElement>(null)
 
-  // European cities with descriptions
-  const destinations = [
+  // European cities with descriptions - only show cities with active listings
+  const allDestinations = [
     { 
       city: 'Berlin, Germany', 
       description: 'Capital with rich history and vibrant culture',
-      icon: '🇩🇪'
+      icon: '🇩🇪',
+      key: 'Berlin'
     },
     { 
       city: 'Paris, France', 
       description: 'City of Light and romance',
-      icon: '🇫🇷'
+      icon: '🇫🇷',
+      key: 'Paris'
     },
     { 
       city: 'Amsterdam, Netherlands', 
       description: 'Canals, museums, and cycling culture',
-      icon: '🇳🇱'
+      icon: '🇳🇱',
+      key: 'Amsterdam'
     },
     { 
       city: 'Vienna, Austria', 
       description: 'Imperial architecture and classical music',
-      icon: '🇦🇹'
+      icon: '🇦🇹',
+      key: 'Vienna'
     },
     { 
       city: 'Barcelona, Spain', 
       description: 'Mediterranean beaches and Gaudí architecture',
-      icon: '🇪🇸'
+      icon: '🇪🇸',
+      key: 'Barcelona'
     },
     { 
       city: 'London, United Kingdom', 
       description: 'Historic landmarks and modern attractions',
-      icon: '🇬🇧'
+      icon: '🇬🇧',
+      key: 'London'
     },
     { 
       city: 'Rome, Italy', 
       description: 'Ancient history and incredible cuisine',
-      icon: '🇮🇹'
+      icon: '🇮🇹',
+      key: 'Rome'
     },
     { 
       city: 'Prague, Czech Republic', 
       description: 'Medieval charm and stunning architecture',
-      icon: '🇨🇿'
+      icon: '🇨🇿',
+      key: 'Prague'
     },
     { 
       city: 'Copenhagen, Denmark', 
       description: 'Scandinavian design and cozy atmosphere',
-      icon: '🇩🇰'
+      icon: '🇩🇰',
+      key: 'Copenhagen'
     },
     { 
       city: 'Zurich, Switzerland', 
       description: 'Alpine beauty and financial hub',
-      icon: '🇨🇭'
+      icon: '🇨🇭',
+      key: 'Zurich'
     }
   ]
+
+  // Filter destinations to only show cities with active listings
+  const destinations = allDestinations.filter(dest => {
+    const cityKey = dest.key
+    return cityProperties[cityKey] && cityProperties[cityKey].length > 0
+  })
 
   const services = [
     { key: 'chauffeur', label: 'Chauffeur', icon: '🎩' },
