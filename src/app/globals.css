@@ -1796,6 +1796,13 @@ html {
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
+  width: 260px;
+}
+
+@media (min-width: 768px) {
+  .spy-clock-container {
+    width: 280px;
+  }
 }
 
 .spy-clock-container::before {

@@ -213,17 +213,9 @@ export default function CityPage() {
               transition={{ duration: 0.8 }}
               className="text-center md:text-left flex-1"
             >
-              <div className="flex flex-col md:flex-row md:items-center md:gap-6 mb-4">
-                <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight">
-                  {cityName}
-                </h1>
-                <div className="md:hidden mt-3 mb-2">
-                  <CityTimeClock cityName={cityName} />
-                </div>
-                <div className="hidden md:block">
-                  <CityTimeClock cityName={cityName} />
-                </div>
-              </div>
+              <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight mb-4">
+                {cityName}
+              </h1>
               <p className="text-xl md:text-2xl text-gray-300 max-w-3xl md:max-w-4xl mb-4 md:mb-6 mx-auto md:mx-0">
                 {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
               </p>
@@ -232,9 +224,10 @@ export default function CityPage() {
               </div>
             </motion.div>
 
-            {/* Weather card integrated into hero; right on desktop, below on mobile */}
-            <div className="md:mt-2 md:self-start md:shrink-0 flex md:block justify-center mb-6 md:mb-0">
-              <WeatherWidget city={cityName} className="w-[260px] md:w-[280px] shadow-xl mb-4 md:mb-0" />
+            {/* Clock and Weather widgets stacked on desktop; clock above weather on mobile */}
+            <div className="md:mt-8 md:self-start md:shrink-0 flex flex-col items-center md:items-end space-y-4 mb-6 md:mb-0">
+              <CityTimeClock cityName={cityName} />
+              <WeatherWidget city={cityName} className="w-[260px] md:w-[280px] shadow-xl" />
             </div>
           </div>
 
