@@ -1308,14 +1308,18 @@ html {
   .tilt-elevation-badge {
     top: 0.5rem;
     right: 0.5rem;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.65rem;
-    gap: 0.3rem;
-    max-width: 110px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6rem;
+    gap: 0.25rem;
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .tilt-elevation-badge span {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    flex-shrink: 0;
   }
 }
 
