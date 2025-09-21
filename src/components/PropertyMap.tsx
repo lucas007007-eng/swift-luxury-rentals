@@ -226,7 +226,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
                   streetViewControl: false,
                   mapTypeControl: false,
                   fullscreenControl: false,
-                  gestureHandling: 'greedy',
+                  gestureHandling: 'cooperative',
                   styles: [
                     { elementType: 'geometry', stylers: [{ color: '#1f2937' }] },
                     { elementType: 'labels.text.stroke', stylers: [{ color: '#1f2937' }] },
