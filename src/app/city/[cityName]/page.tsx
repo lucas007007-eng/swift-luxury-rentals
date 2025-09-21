@@ -217,17 +217,16 @@ export default function CityPage() {
                 {cityName}
               </h1>
               
-              {/* Mobile clock and weather stacked */}
-              <div className="md:hidden mb-4 flex flex-col items-center space-y-3">
-                <CityTimeClock cityName={cityName} />
-                <WeatherWidget city={cityName} className="w-[260px] shadow-xl" />
-              </div>
-              
               <p className="text-xl md:text-2xl text-gray-300 max-w-3xl md:max-w-4xl mb-4 md:mb-6 mx-auto md:mx-0">
                 {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
               </p>
-              <div className="text-lg text-gray-400">
+              <div className="text-lg text-gray-400 mb-4 md:mb-0">
                 {filtered.length} luxury properties available
+              </div>
+              
+              {/* Mobile clock positioned after property count */}
+              <div className="md:hidden mt-4 mb-4 flex justify-center">
+                <CityTimeClock cityName={cityName} />
               </div>
             </motion.div>
 
@@ -235,6 +234,11 @@ export default function CityPage() {
             <div className="hidden md:flex flex-col items-end space-y-3 mt-2">
               <CityTimeClock cityName={cityName} />
               <WeatherWidget city={cityName} className="w-[280px] shadow-xl" />
+            </div>
+            
+            {/* Mobile weather widget - positioned after mobile clock */}
+            <div className="md:hidden flex justify-center">
+              <WeatherWidget city={cityName} className="w-[260px] shadow-xl" />
             </div>
           </div>
 
