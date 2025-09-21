@@ -138,11 +138,23 @@ const Locations = () => {
 
                 <div className="tilt-elevation-badge" data-tilt-transform-element>
                   <span className="text-2xl">{city.flag}</span>
-                  {(() => {
-                    const avgRent = getAvgRent(city.name)
-                    return avgRent > 0 ? `€${avgRent.toLocaleString()}/mo` : 'Coming Soon'
-                  })()}
+                  {city.properties === '0 Properties' ? 'Coming Soon' : city.properties}
                 </div>
+
+                {/* Average Rent Mini Box */}
+                {(() => {
+                  const avgRent = getAvgRent(city.name)
+                  return avgRent > 0 ? (
+                    <div className="tilt-rent-box" data-tilt-transform-element>
+                      <div className="text-xs text-amber-200 font-semibold">
+                        €{avgRent.toLocaleString()}/mo
+                      </div>
+                      <div className="text-[10px] text-amber-300/70 leading-tight">
+                        average rent of our properties
+                      </div>
+                    </div>
+                  ) : null
+                })()}
 
                 <div className="tilt-text-block" data-tilt-transform-element>
                   <h1 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">

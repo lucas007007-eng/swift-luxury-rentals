@@ -1387,4 +1387,22 @@ html {
   transform: translateZ(40px) translateY(0px);
 }
 
+.tilt-rent-box {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: linear-gradient(145deg, rgba(10, 10, 10, 0.85), rgba(20, 20, 20, 0.9));
+  border: 1px solid rgba(255, 214, 102, 0.3);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    inset 0.5px 0.5px 1px rgba(255, 235, 180, 0.2),
+    inset -0.5px -0.5px 1px rgba(160, 110, 0, 0.3);
+  transform: translateZ(65px);
+  z-index: 30;
+  will-change: transform;
+}
+
 
