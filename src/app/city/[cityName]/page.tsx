@@ -213,15 +213,9 @@ export default function CityPage() {
               transition={{ duration: 0.8 }}
               className="text-center md:text-left flex-1"
             >
-              {/* Title row with clock aligned */}
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight">
-                  {cityName}
-                </h1>
-                <div className="hidden md:block mt-2 md:mt-0">
-                  <CityTimeClock cityName={cityName} />
-                </div>
-              </div>
+              <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight mb-4">
+                {cityName}
+              </h1>
               
               {/* Mobile clock */}
               <div className="md:hidden mb-4 flex justify-center">
@@ -236,8 +230,9 @@ export default function CityPage() {
               </div>
             </motion.div>
 
-            {/* Weather widget positioned below title area on desktop */}
-            <div className="hidden md:flex justify-end mt-16">
+            {/* Desktop: Clock and Weather stacked on the right */}
+            <div className="hidden md:flex flex-col items-end space-y-3 mt-2">
+              <CityTimeClock cityName={cityName} />
               <WeatherWidget city={cityName} className="w-[280px] shadow-xl" />
             </div>
             
