@@ -804,9 +804,6 @@ export default function PropertyPage() {
                         <span>Apply to Rent Monthly</span>
                       </span>
                     </button>
-                    <button className="w-full bg-white/20 hover:bg-white/30 text-white font-bold py-3 rounded-xl transition-colors backdrop-blur-sm">
-                      Chat with Landlord
-                    </button>
                   </div>
 
                   {/* Property Features */}
