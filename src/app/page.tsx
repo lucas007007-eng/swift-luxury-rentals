@@ -8,7 +8,10 @@ import dynamic from 'next/dynamic'
 
 // Defer below-the-fold components to reduce initial bundle
 const About = dynamic(() => import('@/components/About'), { ssr: false })
-const Locations = dynamic(() => import('@/components/Locations'), { ssr: false })
+const Locations = dynamic(() => import('@/components/Locations'), { 
+  ssr: false,
+  loading: () => <div className="py-20 bg-black flex justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400"></div></div>
+})
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: false })
 
 

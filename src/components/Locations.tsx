@@ -27,29 +27,41 @@ const Locations = () => {
     // Initialize vanilla-tilt for 3D effects (desktop only for performance)
     const initTilt = async () => {
       try {
-        // Only initialize on desktop (screen width > 768px)
+        // Only initialize on desktop (screen width > 768px) and when visible
         if (window.innerWidth <= 768) return
         
-        const VanillaTilt = (await import('vanilla-tilt')).default
-        const tiltElements = Array.from(document.querySelectorAll('[data-tilt]')) as HTMLElement[]
-        if (tiltElements.length > 0) {
-          VanillaTilt.init(tiltElements, {
-            max: 10,
-            speed: 500,
-            perspective: 1800,
-            glare: true,
-            'max-glare': 0.1,
-            scale: 1.03,
-            reset: true
+        // Use Intersection Observer to only init when cards are visible
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(async (entry) => {
+            if (entry.isIntersecting) {
+              const VanillaTilt = (await import('vanilla-tilt')).default
+              const element = entry.target as HTMLElement
+              VanillaTilt.init(element, {
+                max: 10,
+                speed: 500,
+                perspective: 1800,
+                glare: true,
+                'max-glare': 0.1,
+                scale: 1.03,
+                reset: true
+              })
+              observer.unobserve(element)
+            }
           })
-        }
+        }, { rootMargin: '50px' })
+
+        // Observe all tilt elements
+        const tiltElements = Array.from(document.querySelectorAll('[data-tilt]')) as HTMLElement[]
+        tiltElements.forEach(el => observer.observe(el))
+        
+        return () => observer.disconnect()
       } catch (error) {
         console.error('Failed to initialize tilt:', error)
       }
     }
     
     // Delay initialization to ensure DOM is ready
-    const timer = setTimeout(initTilt, 100)
+    const timer = setTimeout(initTilt, 200)
     return () => clearTimeout(timer)
   }, [])
   
@@ -123,7 +135,10 @@ const Locations = () => {
             <div
               key={city.name}
               className="tilt-card-container"
-              style={{ backgroundImage: `url('${city.image}')` }}
+              style={{ 
+                backgroundImage: `url('${city.image}')`,
+                willChange: 'auto'
+              }}
               data-tilt
               data-tilt-max="10"
               data-tilt-speed="500"
@@ -133,6 +148,7 @@ const Locations = () => {
               data-tilt-scale="1.03"
               data-tilt-reset="true"
               onClick={() => router.push(`/city/${city.name}`)}
+              loading="lazy"
             >
               <div className="tilt-inner-border" data-tilt-transform-element></div>
 

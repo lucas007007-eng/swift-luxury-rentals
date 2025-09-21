@@ -1236,21 +1236,29 @@ html {
   overflow: hidden;
   background-size: cover;
   background-position: center;
-  box-shadow:
-    0 0 0 2px rgba(255, 214, 102, 0.4),
-    0 0 25px 8px rgba(255, 214, 102, 0.15);
+  box-shadow: 0 0 0 2px rgba(255, 214, 102, 0.4);
   transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
-              box-shadow 0.4s ease-out,
-              background-size 1.5s ease-out;
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
   cursor: grab;
-  will-change: transform, box-shadow, background-size;
+  contain: layout style paint;
 }
 
-.tilt-card-container:hover {
-  box-shadow:
-    0 0 0 3px rgba(255, 214, 102, 0.6),
-    0 0 35px 12px rgba(255, 214, 102, 0.25);
+/* Desktop-only performance optimizations */
+@media (min-width: 769px) {
+  .tilt-card-container {
+    will-change: transform;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+                box-shadow 0.4s ease-out;
+  }
+}
+
+/* Hover effects only on desktop for performance */
+@media (min-width: 769px) {
+  .tilt-card-container:hover {
+    box-shadow:
+      0 0 0 3px rgba(255, 214, 102, 0.6),
+      0 0 25px 8px rgba(255, 214, 102, 0.2);
+  }
 }
 
 .tilt-inner-border {
