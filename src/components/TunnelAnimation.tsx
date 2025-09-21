@@ -62,9 +62,9 @@ const TunnelAnimation: React.FC = () => {
       canvas.height = render.height * render.dpi
     }
 
-    const tweenValue = (start: number, end: number, p: number, ease = false) => {
+    const tweenValue = (start: number, end: number, p: number, ease?: string) => {
       const delta = end - start
-      const easeFn = easingUtils[ease ? 'easeInExpo' : 'linear']
+      const easeFn = easingUtils[ease === 'easeInExpo' ? 'easeInExpo' : 'linear']
       return start + delta * easeFn(p)
     }
 

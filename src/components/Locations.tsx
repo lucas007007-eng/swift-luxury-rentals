@@ -1,11 +1,28 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { cityProperties } from '@/data/cityProperties'
 
 const Locations = () => {
   const router = useRouter()
+
+  useEffect(() => {
+    // Initialize vanilla-tilt for 3D effects
+    const initTilt = async () => {
+      const VanillaTilt = (await import('vanilla-tilt')).default
+      VanillaTilt.init(document.querySelectorAll('[data-tilt]'), {
+        max: 10,
+        speed: 500,
+        perspective: 1800,
+        glare: true,
+        'max-glare': 0.1,
+        scale: 1.03,
+        reset: true
+      })
+    }
+    initTilt()
+  }, [])
   
   const europeanCities = [
     {
@@ -71,67 +88,56 @@ const Locations = () => {
           </p>
         </div>
 
-        {/* European Cities Grid - Artin Properties Style */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* European Cities Grid - 3D Tilt Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
           {europeanCities.map((city, index) => (
             <div
               key={city.name}
-              className="group relative overflow-hidden rounded-3xl bg-gray-900 border border-gray-800 hover:border-amber-400/50 transition-all duration-500 hover:scale-105 cursor-pointer"
+              className="tilt-card-container"
+              style={{ backgroundImage: `url('${city.image}')` }}
+              data-tilt
+              data-tilt-max="10"
+              data-tilt-speed="500"
+              data-tilt-perspective="1800"
+              data-tilt-glare
+              data-tilt-max-glare="0.1"
+              data-tilt-scale="1.03"
+              data-tilt-reset="true"
               onClick={() => router.push(`/city/${city.name}`)}
-              role="button"
-              tabIndex={0}
-              aria-label={`View ${city.name} properties`}
-              onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/city/${city.name}`) }}
             >
-              {/* Image */}
-              <div className="aspect-[4/3] overflow-hidden relative">
-                <div
-                  className="w-full h-full bg-gray-800 group-hover:scale-110 transition-transform duration-700"
-                  style={{
-                    backgroundImage: `url('${city.image}')`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                />
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-500" />
-                
-                {/* Flag Overlay */}
-                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm rounded-full p-2">
-                  <span className="text-2xl">{city.flag}</span>
-                </div>
-              </div>
+              <div className="tilt-inner-border" data-tilt-transform-element></div>
 
-              {/* Content */}
-              <div className="p-8">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-1">{city.name}</h3>
-                    <p className="text-gray-400 text-sm">{city.country}</p>
-                  </div>
-                  <span className={`text-sm font-semibold px-4 py-2 rounded-full ${
-                    city.properties === '0 Properties' 
-                      ? 'text-amber-400 bg-amber-500/20 border border-amber-500/30' 
-                      : 'text-green-400 bg-green-500/20 border border-green-500/30'
-                  }`}>
-                    {city.properties === '0 Properties' ? 'Coming Soon' : city.properties}
-                  </span>
+              <div className="tilt-content-area p-4 sm:p-5 lg:p-7" data-tilt-transform-element>
+                <div className="tilt-gradient-overlay"></div>
+
+                <div className="tilt-elevation-badge" data-tilt-transform-element>
+                  <span className="text-2xl">{city.flag}</span>
+                  {city.properties === '0 Properties' ? 'Coming Soon' : city.properties}
                 </div>
-                
-                <p className="text-gray-300 leading-relaxed mb-6">
-                  {city.description}
-                </p>
-                
-                <div className="pt-4 border-t border-gray-800">
-                  <button 
-                    onClick={() => router.push(`/city/${city.name}`)}
-                    className="text-amber-400 hover:text-amber-300 font-semibold transition-all duration-300 group-hover:translate-x-1 transform flex items-center space-x-2"
-                  >
-                    <span>Explore {city.name}</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </button>
+
+                <div className="tilt-text-block" data-tilt-transform-element>
+                  <h1 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
+                    {city.name}
+                  </h1>
+                  <p className="text-sm sm:text-base lg:text-lg font-light">
+                    {city.country}
+                  </p>
                 </div>
+
+                <button 
+                  className="tilt-tour-button" 
+                  data-tilt-transform-element
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    router.push(`/city/${city.name}`)
+                  }}
+                >
+                  Explore {city.name}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5l7 7-7 7"></path>
+                    <path d="M5 12h14"></path>
+                  </svg>
+                </button>
               </div>
             </div>
           ))}
