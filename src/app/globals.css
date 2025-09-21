@@ -1231,7 +1231,6 @@ html {
   display: block;
   width: 100%;
   max-width: 380px;
-  aspect-ratio: 4 / 3;
   border-radius: 1.5rem;
   overflow: hidden;
   background-size: cover;
@@ -1241,6 +1240,17 @@ html {
   transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
   cursor: grab;
   contain: layout style paint;
+}
+
+/* Different aspect ratios for different pages */
+.tilt-card-container.homepage-style {
+  aspect-ratio: 4 / 5;
+  border-radius: 1.75rem;
+}
+
+.tilt-card-container.properties-style {
+  aspect-ratio: 4 / 3;
+  border-radius: 1.5rem;
 }
 
 /* Desktop-only performance optimizations */

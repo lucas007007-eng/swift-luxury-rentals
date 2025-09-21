@@ -134,7 +134,7 @@ const Locations = () => {
           {europeanCities.map((city, index) => (
             <div
               key={city.name}
-              className="tilt-card-container"
+              className="tilt-card-container homepage-style"
               style={{ 
                 backgroundImage: `url('${city.image}')`,
                 willChange: 'auto'

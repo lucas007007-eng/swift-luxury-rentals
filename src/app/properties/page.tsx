@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -18,6 +18,48 @@ function getCityStats() {
 export default function PropertiesPage() {
   const router = useRouter()
   const cities = getCityStats()
+
+  useEffect(() => {
+    // Initialize vanilla-tilt for 3D effects (desktop only for performance)
+    const initTilt = async () => {
+      try {
+        // Only initialize on desktop (screen width > 768px) and when visible
+        if (window.innerWidth <= 768) return
+        
+        // Use Intersection Observer to only init when cards are visible
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(async (entry) => {
+            if (entry.isIntersecting) {
+              const VanillaTilt = (await import('vanilla-tilt')).default
+              const element = entry.target as HTMLElement
+              VanillaTilt.init(element, {
+                max: 10,
+                speed: 500,
+                perspective: 1800,
+                glare: true,
+                'max-glare': 0.1,
+                scale: 1.03,
+                reset: true
+              })
+              observer.unobserve(element)
+            }
+          })
+        }, { rootMargin: '50px' })
+
+        // Observe all tilt elements
+        const tiltElements = Array.from(document.querySelectorAll('[data-tilt]')) as HTMLElement[]
+        tiltElements.forEach(el => observer.observe(el))
+        
+        return () => observer.disconnect()
+      } catch (error) {
+        console.error('Failed to initialize tilt:', error)
+      }
+    }
+    
+    // Delay initialization to ensure DOM is ready
+    const timer = setTimeout(initTilt, 200)
+    return () => clearTimeout(timer)
+  }, [])
   const cityIcons: Record<string, string> = {
     Berlin: '🇩🇪',
     Paris: '🇫🇷',
@@ -56,42 +98,67 @@ export default function PropertiesPage() {
             <p className="text-amber-300/90 text-lg">Select a city to view its luxury properties</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {cities.map(({ city, count, avg }) => (
-              <div key={city} className="group relative overflow-hidden rounded-3xl bg-gray-900 border border-gray-800 hover:border-amber-400/50 transition-all duration-500 hover:scale-[1.02] cursor-pointer"
-                   onClick={() => router.push(`/city/${city}`)}>
-                <div className="aspect-[4/3] overflow-hidden relative">
-                  <div className="w-full h-full bg-gray-800 group-hover:scale-110 transition-transform duration-700" style={{ backgroundImage: `url('${cityImages[city] || 'https://images.unsplash.com/photo-1599946347371-68eb71b16afc?auto=format&fit=crop&w=1200&q=80'}')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-500" />
-                  {/* City Icon Badge */}
-                  <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center border border-white/10 shadow-md">
-                    <span className="text-xl">{cityIcons[city] || '🏙️'}</span>
+              <div 
+                key={city} 
+                className="tilt-card-container homepage-style"
+                style={{ backgroundImage: `url('${cityImages[city] || 'https://images.unsplash.com/photo-1599946347371-68eb71b16afc?auto=format&fit=crop&w=1200&q=80'}')` }}
+                data-tilt
+                data-tilt-max="10"
+                data-tilt-speed="500"
+                data-tilt-perspective="1800"
+                data-tilt-glare
+                data-tilt-max-glare="0.1"
+                data-tilt-scale="1.03"
+                data-tilt-reset="true"
+                onClick={() => router.push(`/city/${city}`)}
+              >
+                <div className="tilt-inner-border" data-tilt-transform-element></div>
+
+                <div className="tilt-content-area p-4 sm:p-5 lg:p-7" data-tilt-transform-element>
+                  <div className="tilt-gradient-overlay"></div>
+
+                  <div className="tilt-elevation-badge" data-tilt-transform-element>
+                    <span className="text-2xl">{cityIcons[city] || '🏙️'}</span>
+                    {count > 0 ? `${count}+ Homes` : 'Coming Soon'}
                   </div>
-                </div>
-                <div className="p-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-2xl font-bold text-white mb-1">{city}</h3>
-                      <p className="text-gray-400 text-sm">{count} {count === 1 ? 'Property' : 'Properties'}</p>
+
+                  {/* Average Rent Mini Box */}
+                  {avg > 0 && (
+                    <div className="tilt-rent-box" data-tilt-transform-element>
+                      <div className="text-xs text-amber-200 font-semibold">
+                        €{avg.toLocaleString()}/mo
+                      </div>
+                      <div className="text-[10px] text-amber-300/70 leading-tight">
+                        average rent of our properties
+                      </div>
                     </div>
-                    {count > 0 ? (
-                      <span className="text-sm font-semibold px-4 py-2 rounded-full text-green-400 bg-green-500/20 border border-green-500/30">
-                        Avg €{avg.toLocaleString('de-DE')}/month
-                      </span>
-                    ) : (
-                      <span className="text-sm font-semibold px-4 py-2 rounded-full text-amber-400 bg-amber-500/20 border border-amber-500/30">
-                        Coming Soon
-                      </span>
-                    )}
+                  )}
+
+                  <div className="tilt-text-block" data-tilt-transform-element>
+                    <h1 className="font-serif-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
+                      {city}
+                    </h1>
+                    <p className="text-sm sm:text-base lg:text-lg font-light">
+                      {count} {count === 1 ? 'Property' : 'Properties'}
+                    </p>
                   </div>
-                  <div className="pt-4 border-t border-gray-800">
-                    <button className="text-amber-400 hover:text-amber-300 font-semibold transition-all duration-300 group-hover:translate-x-1 transform flex items-center space-x-2">
-                      <span>Explore {city}</span>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </button>
-                  </div>
+
+                  <button 
+                    className="tilt-tour-button" 
+                    data-tilt-transform-element
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push(`/city/${city}`)
+                    }}
+                  >
+                    Explore {city}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 5l7 7-7 7"></path>
+                      <path d="M5 12h14"></path>
+                    </svg>
+                  </button>
                 </div>
               </div>
             ))}
