@@ -24,9 +24,12 @@ const Locations = () => {
   }
 
   useEffect(() => {
-    // Initialize vanilla-tilt for 3D effects
+    // Initialize vanilla-tilt for 3D effects (desktop only for performance)
     const initTilt = async () => {
       try {
+        // Only initialize on desktop (screen width > 768px)
+        if (window.innerWidth <= 768) return
+        
         const VanillaTilt = (await import('vanilla-tilt')).default
         const tiltElements = Array.from(document.querySelectorAll('[data-tilt]')) as HTMLElement[]
         if (tiltElements.length > 0) {
@@ -106,7 +109,7 @@ const Locations = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6 drop-shadow-lg">
+          <h2 className="text-4xl md:text-5xl font-black mb-6 drop-shadow-lg glow-text" data-text="Our European Destinations">
             Our European Destinations
           </h2>
           <p className="text-xl text-white max-w-4xl mx-auto">
