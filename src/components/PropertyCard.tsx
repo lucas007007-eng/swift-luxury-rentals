@@ -223,7 +223,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
           </div>
           <Link
             href={`/property/${property.id}`}
-            className="bg-gradient-to-r from-black to-gray-900 hover:from-gray-900 hover:to-black text-white px-6 py-3 rounded-lg font-semibold transition-all border border-gray-400/40 hover:border-gray-300/60 shadow-lg hover:shadow-xl"
+            className="bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors border border-gray-400 hover:border-gray-300 shadow-lg"
           >
             View Details
           </Link>
