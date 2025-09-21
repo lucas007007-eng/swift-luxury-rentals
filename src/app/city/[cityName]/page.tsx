@@ -217,9 +217,10 @@ export default function CityPage() {
                 {cityName}
               </h1>
               
-              {/* Mobile clock */}
-              <div className="md:hidden mb-4 flex justify-center">
+              {/* Mobile clock and weather stacked */}
+              <div className="md:hidden mb-4 flex flex-col items-center space-y-3">
                 <CityTimeClock cityName={cityName} />
+                <WeatherWidget city={cityName} className="w-[260px] shadow-xl" />
               </div>
               
               <p className="text-xl md:text-2xl text-gray-300 max-w-3xl md:max-w-4xl mb-4 md:mb-6 mx-auto md:mx-0">
@@ -234,11 +235,6 @@ export default function CityPage() {
             <div className="hidden md:flex flex-col items-end space-y-3 mt-2">
               <CityTimeClock cityName={cityName} />
               <WeatherWidget city={cityName} className="w-[280px] shadow-xl" />
-            </div>
-            
-            {/* Mobile weather widget */}
-            <div className="md:hidden flex justify-center">
-              <WeatherWidget city={cityName} className="w-[260px] shadow-xl" />
             </div>
           </div>
 
