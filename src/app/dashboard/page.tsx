@@ -120,6 +120,47 @@ export default function ClientDashboard() {
     }).length
   }, [supportTickets])
 
+  // Get priority-based colors
+  const getPriorityColors = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case 'low':
+        return {
+          border: 'border-green-400/60',
+          bg: 'bg-green-500/20',
+          text: 'text-green-300',
+          shadow: 'shadow-[0_0_20px_rgba(34,197,94,0.1)]'
+        }
+      case 'medium':
+        return {
+          border: 'border-yellow-400/60',
+          bg: 'bg-yellow-500/20',
+          text: 'text-yellow-300',
+          shadow: 'shadow-[0_0_20px_rgba(234,179,8,0.1)]'
+        }
+      case 'high':
+        return {
+          border: 'border-orange-400/60',
+          bg: 'bg-orange-500/20',
+          text: 'text-orange-300',
+          shadow: 'shadow-[0_0_20px_rgba(249,115,22,0.1)]'
+        }
+      case 'urgent':
+        return {
+          border: 'border-red-400/60',
+          bg: 'bg-red-500/20',
+          text: 'text-red-300',
+          shadow: 'shadow-[0_0_20px_rgba(239,68,68,0.1)]'
+        }
+      default:
+        return {
+          border: 'border-gray-400/60',
+          bg: 'bg-gray-500/20',
+          text: 'text-gray-300',
+          shadow: 'shadow-[0_0_20px_rgba(107,114,128,0.1)]'
+        }
+    }
+  }
+
   const tabs = [
     { key: 'bookings', title: 'Bookings', desc: 'View your current and upcoming bookings', count: currentBookings.length },
     { key: 'applications', title: 'Lease Applications', desc: 'View ongoing applications', count: applications.length },
@@ -700,66 +741,67 @@ export default function ClientDashboard() {
                         rows={4}
                       />
                     </div>
-                     <button 
-                        onClick={async () => {
-                         if (!session?.user?.email) { setShowLoginPrompt(true); return }
-                         if (!ticketForm.subject.trim() || !ticketForm.description.trim()) return
-                         
-                         setShowTicketModal(true)
-                         setTicketSubmissionStage('processing')
-                         
-                         try {
-                           const response = await fetch('/api/support/tickets', {
-                             method: 'POST',
-                             headers: { 'Content-Type': 'application/json' },
-                             body: JSON.stringify(ticketForm)
-                           })
-                           
-                           if (response.ok) {
-                             const { ticket } = await response.json()
-                             // Immediately reflect new ticket in UI and expand
-                             const mapped = {
-                               id: String(ticket.id),
-                               userId: String(ticket.userId ?? ticket.user?.id ?? ''),
-                               subject: String(ticket.subject ?? ''),
-                               description: String(ticket.description ?? ''),
-                               status: String(ticket.status ?? 'open'),
-                               priority: String(ticket.priority ?? 'medium'),
-                               category: String(ticket.category ?? 'general'),
-                               createdAt: String(ticket.createdAt ?? new Date().toISOString()),
-                               updatedAt: String(ticket.updatedAt ?? new Date().toISOString()),
-                               user: ticket.user ? { id: ticket.user.id, name: ticket.user.name, email: ticket.user.email } : undefined,
-                               messages: (ticket.messages || []).map((m: any) => ({
-                                 id: String(m.id),
-                                 fromType: String(m.fromType ?? 'tenant'),
-                                 message: String(m.message ?? ''),
-                                 createdAt: String(m.createdAt ?? new Date().toISOString()),
-                               })),
-                             }
-                             setSupportTickets(prev => [mapped, ...prev])
-                             setExpandedTicket(mapped)
-                             // Show confirmed state after 1 second
-                             setTimeout(() => {
-                               setTicketSubmissionStage('confirmed')
-                               
-                               // Close modal and refresh after confirmation
-                               setTimeout(() => {
-                                 setShowTicketModal(false)
-                                 setTicketSubmissionStage('idle')
-                                 setTicketForm({ category: 'maintenance', priority: 'medium', subject: '', description: '' })
-                                 
-                                 // Reload support tickets to show new ticket
-                                 loadSupportTickets()
-                               }, 1500)
-                             }, 1000)
-                           }
-                         } catch (error) {
-                           console.error('Failed to create ticket:', error)
-                           setShowTicketModal(false)
-                           setTicketSubmissionStage('idle')
-                         }
-                       }}
-                      className="glass-button w-full"
+                    <button 
+                      onClick={async () => {
+                        if (!session?.user?.email) { setShowLoginPrompt(true); return }
+                        if (!ticketForm.subject.trim() || !ticketForm.description.trim()) return
+                        
+                        setShowTicketModal(true)
+                        setTicketSubmissionStage('processing')
+                        
+                        try {
+                          const response = await fetch('/api/support/tickets', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(ticketForm)
+                          })
+                          
+                          if (response.ok) {
+                            const { ticket } = await response.json()
+                            // Immediately reflect new ticket in UI and expand
+                            const mapped = {
+                              id: String(ticket.id),
+                              userId: String(ticket.userId ?? ticket.user?.id ?? ''),
+                              subject: String(ticket.subject ?? ''),
+                              description: String(ticket.description ?? ''),
+                              status: String(ticket.status ?? 'open'),
+                              priority: String(ticket.priority ?? 'medium'),
+                              category: String(ticket.category ?? 'general'),
+                              createdAt: String(ticket.createdAt ?? new Date().toISOString()),
+                              updatedAt: String(ticket.updatedAt ?? new Date().toISOString()),
+                              user: ticket.user ? { id: ticket.user.id, name: ticket.user.name, email: ticket.user.email } : undefined,
+                              messages: (ticket.messages || []).map((m: any) => ({
+                                id: String(m.id),
+                                fromType: String(m.fromType ?? 'tenant'),
+                                message: String(m.message ?? ''),
+                                createdAt: String(m.createdAt ?? new Date().toISOString()),
+                              })),
+                            }
+                            setSupportTickets(prev => [mapped, ...prev])
+                            setExpandedTicket(mapped)
+                            // Show confirmed state after 1 second
+                            setTimeout(() => {
+                              setTicketSubmissionStage('confirmed')
+                              
+                              // Close modal and refresh after confirmation
+                              setTimeout(() => {
+                                setShowTicketModal(false)
+                                setTicketSubmissionStage('idle')
+                                setTicketForm({ category: 'maintenance', priority: 'medium', subject: '', description: '' })
+                                
+                                // Reload support tickets to show new ticket
+                                loadSupportTickets()
+                              }, 1500)
+                            }, 1000)
+                          }
+                        } catch (error) {
+                          console.error('Failed to create ticket:', error)
+                          setShowTicketModal(false)
+                          setTicketSubmissionStage('idle')
+                        }
+                      }}
+                      className="glass-button mx-auto px-8 py-3"
+                      disabled={!ticketForm.subject.trim() || !ticketForm.description.trim()}
                     >
                       Submit Support Request
                     </button>
@@ -779,12 +821,14 @@ export default function ClientDashboard() {
                               <div>No support tickets yet</div>
                             </div>
                           ) : (
-                            supportTickets.map((t) => (
+                            supportTickets.map((t) => {
+                              const priorityColors = getPriorityColors(t.priority)
+                              return (
                               <div
                                 key={t.id}
                                 onClick={() => setExpandedTicket(t)}
-                                className={`bg-gray-800/80 border rounded-lg p-4 cursor-pointer transition-all hover:bg-gray-700/80 ${
-                                  expandedTicket?.id === t.id ? 'border-purple-400/60 bg-purple-500/20' : 'border-gray-600 hover:border-gray-500'
+                                className={`bg-gray-800/80 border rounded-lg p-4 cursor-pointer transition-all hover:bg-gray-700/80 ${priorityColors.border} ${priorityColors.bg} ${
+                                  expandedTicket?.id === t.id ? 'ring-2 ring-white/20' : ''
                                 }`}
                               >
                               <div className="flex items-start justify-between mb-2">
@@ -810,7 +854,7 @@ export default function ClientDashboard() {
                                       })()}
                                     </div>
                                   </div>
-                                  <div className="px-2 py-1 rounded text-xs font-mono border bg-gray-700 text-gray-200">
+                                  <div className={`px-2 py-1 rounded text-xs font-mono border ${priorityColors.bg} ${priorityColors.text} ${priorityColors.border}`}>
                                     {String(t.priority).toUpperCase()}
                                   </div>
                                 </div>
@@ -825,7 +869,8 @@ export default function ClientDashboard() {
                                   </span>
                                 </div>
                               </div>
-                            ))
+                            )
+                            })
                           )}
                         </div>
                       </div>
@@ -833,7 +878,7 @@ export default function ClientDashboard() {
                       {/* Chat area */}
                       <div className="lg:col-span-2">
                           {expandedTicket ? (
-                          <div className="bg-gray-800/60 border border-purple-400/40 rounded-xl p-5 shadow-[0_0_20px_rgba(168,85,247,0.1)]">
+                          <div className={`bg-gray-800/60 border rounded-xl p-5 ${getPriorityColors(expandedTicket.priority).border} ${getPriorityColors(expandedTicket.priority).shadow}`}>
                             <div className="mb-4">
                               <h4 className="text-white font-semibold text-lg">{expandedTicket.subject}</h4>
                               <p className="text-gray-400 text-sm">{expandedTicket.description}</p>

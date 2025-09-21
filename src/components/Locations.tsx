@@ -148,7 +148,6 @@ const Locations = () => {
               data-tilt-scale="1.03"
               data-tilt-reset="true"
               onClick={() => router.push(`/city/${city.name}`)}
-              loading="lazy"
             >
               <div className="tilt-inner-border" data-tilt-transform-element></div>
 
