@@ -12,6 +12,62 @@ import PropertyMap from '@/components/PropertyMap'
 import WeatherWidget from '@/components/WeatherWidget'
 import { cityProperties, cityInfo } from '@/data/cityProperties'
 
+// Spy-style clock component for city time
+const CityTimeClock = ({ cityName }: { cityName: string }) => {
+  const [time, setTime] = useState('')
+  
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date()
+      let timezone = 'Europe/Berlin' // Default
+      
+      // Map city names to timezones
+      const timezones: Record<string, string> = {
+        'Berlin': 'Europe/Berlin',
+        'Paris': 'Europe/Paris', 
+        'Amsterdam': 'Europe/Amsterdam',
+        'Vienna': 'Europe/Vienna',
+        'Barcelona': 'Europe/Madrid',
+        'London': 'Europe/London',
+        'Rome': 'Europe/Rome',
+        'Prague': 'Europe/Prague',
+        'Copenhagen': 'Europe/Copenhagen',
+        'Zurich': 'Europe/Zurich'
+      }
+      
+      timezone = timezones[cityName] || 'Europe/Berlin'
+      
+      const timeString = now.toLocaleTimeString('en-US', {
+        timeZone: timezone,
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      })
+      
+      setTime(timeString)
+    }
+    
+    updateTime()
+    const interval = setInterval(updateTime, 1000)
+    
+    return () => clearInterval(interval)
+  }, [cityName])
+  
+  return (
+    <div className="spy-clock">
+      <div className="spy-clock-container">
+        <div className="spy-clock-display font-sora">
+          {time}
+        </div>
+        <div className="spy-clock-label">
+          LOCAL TIME
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function CityPage() {
   const params = useParams()
   const cityName = params.cityName as string
@@ -157,9 +213,12 @@ export default function CityPage() {
               transition={{ duration: 0.8 }}
               className="text-center md:text-left flex-1"
             >
-              <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight mb-4">
-                {cityName}
-              </h1>
+              <div className="flex flex-col md:flex-row md:items-center md:gap-6 mb-4">
+                <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight">
+                  {cityName}
+                </h1>
+                <CityTimeClock cityName={cityName} />
+              </div>
               <p className="text-xl md:text-2xl text-gray-300 max-w-3xl md:max-w-4xl mb-4 md:mb-6 mx-auto md:mx-0">
                 {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
               </p>
