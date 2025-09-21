@@ -807,9 +807,6 @@ export default function PropertyPage() {
                     <button className="w-full bg-white/20 hover:bg-white/30 text-white font-bold py-3 rounded-xl transition-colors backdrop-blur-sm">
                       Chat with Landlord
                     </button>
-                    <button className="w-full bg-white/10 hover:bg-white/20 text-white font-medium py-3 rounded-xl transition-colors backdrop-blur-sm">
-                      Book a Viewing
-                    </button>
                   </div>
 
                   {/* Property Features */}
