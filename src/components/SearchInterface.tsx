@@ -555,13 +555,12 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
       {/* Portal Dropdowns - Rendered at body level */}
       {mounted && showDestinations && createPortal(
         <div 
-          className="absolute w-full sm:w-80 bg-white rounded-2xl shadow-xl border border-gray-200 z-[9999] mx-4 sm:mx-0"
+          className="absolute bg-white rounded-2xl shadow-xl border border-gray-200 z-[9999]"
           style={{
             top: `${dropdownPosition.top + 8}px`,
-            left: window.innerWidth < 640 ? '16px' : `${dropdownPosition.left}px`,
-            right: window.innerWidth < 640 ? '16px' : 'auto',
+            left: `${dropdownPosition.left}px`,
             position: 'absolute',
-            maxWidth: window.innerWidth < 640 ? 'calc(100vw - 32px)' : '320px'
+            width: window.innerWidth < 640 ? `${Math.min(280, window.innerWidth - dropdownPosition.left - 16)}px` : '320px'
           }}
         >
           <div className="p-4" onMouseDown={(e)=>e.stopPropagation()} onClick={(e)=>e.stopPropagation()}>
