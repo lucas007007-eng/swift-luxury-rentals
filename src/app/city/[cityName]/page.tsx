@@ -217,7 +217,12 @@ export default function CityPage() {
                 <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight">
                   {cityName}
                 </h1>
-                <CityTimeClock cityName={cityName} />
+                <div className="md:hidden mt-3 mb-2">
+                  <CityTimeClock cityName={cityName} />
+                </div>
+                <div className="hidden md:block">
+                  <CityTimeClock cityName={cityName} />
+                </div>
               </div>
               <p className="text-xl md:text-2xl text-gray-300 max-w-3xl md:max-w-4xl mb-4 md:mb-6 mx-auto md:mx-0">
                 {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
