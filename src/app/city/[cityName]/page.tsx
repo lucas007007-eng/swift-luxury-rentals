@@ -206,16 +206,28 @@ export default function CityPage() {
           />
         </div>
         <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               className="text-center md:text-left flex-1"
             >
-              <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight mb-4">
-                {cityName}
-              </h1>
+              {/* Title row with clock aligned */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                <h1 className="text-4xl md:text-6xl font-extrabold text-white heading-sora leading-tight">
+                  {cityName}
+                </h1>
+                <div className="hidden md:block mt-2 md:mt-0">
+                  <CityTimeClock cityName={cityName} />
+                </div>
+              </div>
+              
+              {/* Mobile clock */}
+              <div className="md:hidden mb-4 flex justify-center">
+                <CityTimeClock cityName={cityName} />
+              </div>
+              
               <p className="text-xl md:text-2xl text-gray-300 max-w-3xl md:max-w-4xl mb-4 md:mb-6 mx-auto md:mx-0">
                 {currentCityInfo?.description || `Discover luxury rental properties in ${cityName}.`}
               </p>
@@ -224,10 +236,14 @@ export default function CityPage() {
               </div>
             </motion.div>
 
-            {/* Clock and Weather widgets stacked on desktop; clock above weather on mobile */}
-            <div className="md:mt-8 md:self-start md:shrink-0 flex flex-col items-center md:items-end space-y-4 mb-6 md:mb-0">
-              <CityTimeClock cityName={cityName} />
-              <WeatherWidget city={cityName} className="w-[260px] md:w-[280px] shadow-xl" />
+            {/* Weather widget positioned below title area on desktop */}
+            <div className="hidden md:flex justify-end mt-16">
+              <WeatherWidget city={cityName} className="w-[280px] shadow-xl" />
+            </div>
+            
+            {/* Mobile weather widget */}
+            <div className="md:hidden flex justify-center">
+              <WeatherWidget city={cityName} className="w-[260px] shadow-xl" />
             </div>
           </div>
 
@@ -236,7 +252,7 @@ export default function CityPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="max-w-4xl mx-auto"
+            className="max-w-4xl mx-auto mt-12 md:mt-16"
           >
             <div className="flex flex-col md:flex-row md:items-end gap-3">
               <div className="flex-1">
