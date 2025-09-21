@@ -646,15 +646,22 @@ export default function ClientDashboard() {
                   </div>
                   
                   {/* Create New Ticket */}
-                  <div className="bg-gray-800 rounded-xl p-6 mb-6 border border-purple-400/30">
-                    <h3 className="text-lg font-semibold text-white mb-4">Submit New Support Request</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="glass-menu mb-6">
+                    <span className="shine shine-top"></span>
+                    <span className="shine shine-bottom"></span>
+                    <span className="glow glow-top"></span>
+                    <span className="glow glow-bottom"></span>
+                    <span className="glow glow-bright glow-top"></span>
+                    <span className="glow glow-bright glow-bottom"></span>
+                    
+                    <div className="inner">
+                      <h3 className="text-lg font-semibold text-white mb-4">Submit New Support Request</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
                         <label className="block text-sm text-gray-300 mb-2">Category</label>
                         <select 
                           value={ticketForm.category}
                           onChange={(e) => setTicketForm(prev => ({ ...prev, category: e.target.value }))}
-                          className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white"
                         >
                           <option value="maintenance">🔧 Maintenance</option>
                           <option value="payment">💳 Payment Issue</option>
@@ -667,7 +674,6 @@ export default function ClientDashboard() {
                         <select 
                           value={ticketForm.priority}
                           onChange={(e) => setTicketForm(prev => ({ ...prev, priority: e.target.value }))}
-                          className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white"
                         >
                           <option value="low">🟢 Low</option>
                           <option value="medium">🟡 Medium</option>
@@ -683,7 +689,6 @@ export default function ClientDashboard() {
                         value={ticketForm.subject}
                         onChange={(e) => setTicketForm(prev => ({ ...prev, subject: e.target.value }))}
                         placeholder="Brief description of your issue..."
-                        className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none"
                       />
                     </div>
                     <div className="mb-4">
@@ -692,7 +697,6 @@ export default function ClientDashboard() {
                         value={ticketForm.description}
                         onChange={(e) => setTicketForm(prev => ({ ...prev, description: e.target.value }))}
                         placeholder="Please provide detailed information about your request..."
-                        className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none"
                         rows={4}
                       />
                     </div>
@@ -755,10 +759,11 @@ export default function ClientDashboard() {
                            setTicketSubmissionStage('idle')
                          }
                        }}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors"
+                      className="glass-button w-full"
                     >
                       Submit Support Request
                     </button>
+                    </div>
                   </div>
 
                   {/* My Tickets */}

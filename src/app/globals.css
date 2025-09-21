@@ -818,4 +818,311 @@ html {
 .glass-btn-wrap:has(.glass-btn:active) .glass-btn-shadow { filter: blur(clamp(2px, 0.125em, 12px)); }
 .glass-btn-wrap:has(.glass-btn:active) span { text-shadow: 0.025em 0.25em 0.05em rgba(0,0,0,0.12); }
 
-/* (shimmer container removed per request) */
+/* ===================== Neon Glass Context Menu Styling ===================== */
+:root {
+  --glass-hue1: 255;
+  --glass-hue2: 222;
+  --glass-border: 1px;
+  --glass-border-color: hsl(var(--glass-hue2), 12%, 20%);
+  --glass-radius: 22px;
+  --glass-ease: cubic-bezier(0.5, 1, 0.89, 1);
+}
+
+@property --item-opacity {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+.glass-menu {
+  font-family: 'Inter', sans-serif;
+  color: #e5e7eb;
+  min-width: 275px;
+  min-height: 275px;
+  border-radius: var(--glass-radius);
+  border: var(--glass-border) solid var(--glass-border-color);
+  padding: 1em;
+  background: linear-gradient(235deg, hsl(var(--glass-hue1) 50% 10% / 0.8), hsl(var(--glass-hue1) 50% 10% / 0) 33%), 
+              linear-gradient(45deg , hsl(var(--glass-hue2) 50% 10% / 0.8), hsl(var(--glass-hue2) 50% 10% / 0) 33%), 
+              linear-gradient(hsl(220deg 25% 4.8% / 0.66));
+  backdrop-filter: blur(12px);
+  box-shadow: hsl(var(--glass-hue2) 50% 2%) 0px 10px 16px -8px, 
+              hsl(var(--glass-hue2) 50% 4%) 0px 20px 36px -14px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.glass-menu .shine,
+.glass-menu .glow {
+  --hue: var(--glass-hue1);
+}
+
+.glass-menu .shine-bottom,
+.glass-menu .glow-bottom {
+  --hue: var(--glass-hue2);
+  --conic: 135deg;
+}
+
+.glass-menu .shine {
+  pointer-events: none;
+  border-radius: inherit;
+  border: 2px solid transparent;
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  --start: 12%;
+  background: conic-gradient(
+    from var(--conic, -45deg) at center in oklch,
+    transparent var(--start,0%), 
+    hsl(var(--hue), var(--sat,80%), var(--lit,60%)), 
+    transparent var(--end,50%) 
+  ) border-box;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-repeat: no-repeat;
+  mask-clip: padding-box, border-box;
+  mask-composite: subtract;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  animation: glass-glow 2s var(--glass-ease) forwards;
+}
+
+.glass-menu .shine::before,
+.glass-menu .shine::after {
+  content: "";
+  width: auto;
+  inset: -2px;
+  mask: none;
+  position: absolute;
+  border-radius: inherit;
+  border: inherit;
+}
+
+.glass-menu .shine::after { 
+  z-index: 2;
+  --start: 17%;
+  --end: 33%;
+  background: conic-gradient(
+    from var(--conic, -45deg) at center in oklch,
+    transparent var(--start,0%), 
+    hsl(var(--hue), var(--sat,80%), var(--lit,85%)), 
+    transparent var(--end,50%) 
+  );
+}
+
+.glass-menu .shine-bottom {
+  top: auto;
+  bottom: calc(var(--glass-border) * -1);
+  left: calc(var(--glass-border) * -1);
+  right: auto;
+}
+
+.glass-menu .glow {
+  pointer-events: none;
+  border-radius: inherit;
+  border: 8px solid transparent;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  display: block;
+  position: absolute;
+  opacity: 1;
+  filter: blur(8px) saturate(1.25) brightness(0.5);
+  mix-blend-mode: plus-lighter;
+  z-index: 0;
+  animation: glass-glow 1s var(--glass-ease) forwards;
+  animation-delay: 0.2s;
+}
+
+.glass-menu .glow.glow-bottom {
+  inset: calc(var(--glass-radius) * -2);
+  top: auto;
+  right: auto;
+}
+
+.glass-menu .glow::before, 
+.glass-menu .glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: inherit;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--conic, -45deg) at center in oklch,
+    transparent var(--start,0%), 
+    hsl(var(--hue), var(--sat,95%), var(--lit,60%)), 
+    transparent var(--end,50%) 
+  ) border-box;
+  mask: linear-gradient(transparent), linear-gradient(black);
+  mask-repeat: no-repeat;
+  mask-clip: padding-box, border-box;
+  mask-composite: subtract;
+  filter: saturate(2) brightness(1);
+}
+
+.glass-menu .glow::after {
+  --lit: 70%;
+  --sat: 100%;
+  --start: 15%;
+  --end: 35%;
+  border-width: calc(var(--glass-radius) * 1.75);
+  border-radius: calc(var(--glass-radius) * 2.75);
+  inset: calc(var(--glass-radius) * -0.25);
+  z-index: 4;
+  opacity: 0.75;
+}
+
+.glass-menu .glow-bright {
+  --lit: 80%;
+  --sat: 100%;
+  --start: 13%;
+  --end: 37%;
+  border-width: 3px;
+  border-radius: inherit;
+  inset: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  filter: blur(2px) brightness(0.66);
+  animation: glass-glow 1.5s var(--glass-ease) forwards;
+  animation-delay: 0.1s;
+}
+
+.glass-menu .glow-bright::after {
+  content: none;
+}
+
+.glass-menu .glow-bright.glow-bottom {
+  inset: -7px;
+  right: auto;
+  top: auto;
+}
+
+.glass-menu .inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  font-size: 0.875rem;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.glass-menu input,
+.glass-menu textarea,
+.glass-menu select {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  box-shadow: 0 0 0 1px transparent;
+  border: 1px solid hsl(var(--glass-hue2) 13% 18.5% / 0.5);
+  background: hsl(var(--glass-hue1) 0% 8% / 0.8);
+  border-radius: calc(var(--glass-radius) * 0.33333);
+  padding: 0.66em;
+  color: #fff;
+  transition: all 0.3s var(--glass-ease);
+  width: 100%;
+}
+
+.glass-menu select option {
+  background: hsl(220deg 25% 8%);
+  color: #fff;
+  padding: 0.5em;
+}
+
+.glass-menu input:focus,
+.glass-menu textarea:focus,
+.glass-menu select:focus {
+  outline: none;
+  border-color: hsl(var(--glass-hue1) 50% 50% / 0.5);
+  background: hsl(var(--glass-hue1) 0% 12% / 0.9);
+}
+
+.glass-menu label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #e5e7eb;
+  margin-bottom: 0.25em;
+}
+
+.glass-menu .glass-button {
+  position: relative;
+  padding: 0.8em 1.4em;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  border-radius: calc(var(--glass-radius) * 0.4);
+  border: 1px solid hsl(var(--glass-hue2) 20% 30% / 0.6);
+  transition: all 0.3s ease-in, --item-opacity 0.3s ease-in;
+  background: linear-gradient(
+    135deg, 
+    hsl(var(--glass-hue1) 25% 18% / 0.8),
+    hsl(var(--glass-hue1) 30% 22% / 0.9) 30%, 
+    hsl(var(--glass-hue1) 15% 12% / 0.7) 70%,
+    hsl(var(--glass-hue1) 20% 15% / 0.8)
+  );
+  box-shadow: 
+    0 4px 12px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.1),
+    inset 0 -1px 0 rgba(0,0,0,0.2);
+  color: #f3f4f6;
+  font-weight: 600;
+  cursor: pointer;
+  --item-opacity: 0.8;
+}
+
+.glass-menu .glass-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: inherit;
+  background: linear-gradient(
+    90deg in oklch, 
+    hsl(var(--glass-hue1) 15% 16% / var(--item-opacity)),
+    hsl(var(--glass-hue1) 40% 24% / var(--item-opacity)) 20% 32%, 
+    hsl(var(--glass-hue1) 2% 12% / var(--item-opacity))
+  ) border-box;
+  mask: linear-gradient(transparent), linear-gradient(black);
+  mask-repeat: no-repeat;
+  mask-clip: padding-box, border-box;
+  mask-composite: subtract;
+}
+
+.glass-menu .glass-button:hover,
+.glass-menu .glass-button:hover::after {
+  --item-opacity: 1;
+  transition: all 0.1s ease-out, --item-opacity 0.1s ease-out;
+  color: white;
+  border-color: hsl(var(--glass-hue1) 50% 50% / 0.8);
+  box-shadow: 
+    0 6px 16px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    inset 0 -1px 0 rgba(0,0,0,0.3),
+    0 0 20px hsl(var(--glass-hue1) 50% 50% / 0.3);
+  transform: translateY(-1px);
+}
+
+.glass-menu .glass-button:active {
+  animation: glass-flash 0.75s ease-out 1 forwards;
+}
+
+@keyframes glass-glow {
+  0% { opacity: 0; }
+  3% { opacity: 1; }
+  10% { opacity: 0; }
+  12% { opacity: 0.7; }
+  16% { opacity: 0.3; animation-timing-function: var(--glass-ease); }
+  100% { opacity: 1; animation-timing-function: var(--glass-ease); }
+}
+
+@keyframes glass-flash {
+  0% { opacity: 0; --item-opacity: 0; }
+  7% { opacity: 0.5; --item-opacity: 1; }
+  14% { opacity: 0; --item-opacity: 0.5; }
+  21%, 100% { opacity: 1; --item-opacity: 1; }
+}
+
