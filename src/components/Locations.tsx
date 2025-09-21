@@ -63,7 +63,7 @@ const Locations = () => {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-black text-amber-400 mb-6 drop-shadow-lg" style={{ color: '#fbbf24', textShadow: '0 4px 8px rgba(251, 191, 36, 0.3)' }}>
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-6 drop-shadow-lg">
             Our European Destinations
           </h2>
           <p className="text-xl text-white max-w-4xl mx-auto">
