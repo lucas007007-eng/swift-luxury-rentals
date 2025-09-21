@@ -225,7 +225,7 @@ export default function CityPage() {
               </div>
               
               {/* Mobile clock positioned after property count */}
-              <div className="md:hidden mt-4 mb-2 flex justify-center">
+              <div className="md:hidden mt-4 mb-1 flex justify-center">
                 <CityTimeClock cityName={cityName} />
               </div>
             </motion.div>
