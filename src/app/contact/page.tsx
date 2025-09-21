@@ -71,7 +71,7 @@ export default function ContactPage() {
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <h1 className="text-4xl md:text-6xl mb-6 text-amber-400 font-semibold">
+            <h1 className="text-4xl md:text-6xl mb-6 text-white font-sora font-bold">
               Get in Touch
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto">
@@ -86,26 +86,37 @@ export default function ContactPage() {
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {contactInfo.map((info, index) => (
-              <motion.div
-                key={info.title}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="text-center bg-gray-900 rounded-2xl p-8 border border-gray-800"
-              >
-                <div className="text-amber-400 mb-4 flex justify-center">
-                  {info.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white mb-4">{info.title}</h3>
-                <div className="space-y-2 mb-4">
-                  {info.details.map((detail, idx) => (
-                    <p key={idx} className="text-gray-300 font-medium">{detail}</p>
-                  ))}
-                </div>
-                <p className="text-gray-400 text-sm">{info.description}</p>
-              </motion.div>
-            ))}
+            {contactInfo.map((info, index) => {
+              const cardVariants = [
+                'luxury-feature-card', // Phone - Standard luxury card
+                'luxury-feature-card border-2 border-gray-300/20', // Email - Enhanced border
+                'luxury-feature-card bg-gradient-to-br from-gray-900 via-black to-gray-900', // Office - Different gradient
+                'luxury-feature-card border border-gray-400/30 shadow-[0_0_30px_rgba(192,192,192,0.1)]' // Hours - Silver glow
+              ]
+              
+              return (
+                <motion.div
+                  key={info.title}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className={cardVariants[index]}
+                >
+                  <div className="text-gray-300 mb-6 flex justify-center">
+                    <div className="p-3 rounded-full border border-gray-400/30 bg-gray-800/50">
+                      {info.icon}
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-4 font-sora">{info.title}</h3>
+                  <div className="space-y-2 mb-4">
+                    {info.details.map((detail, idx) => (
+                      <p key={idx} className="text-gray-300 font-medium">{detail}</p>
+                    ))}
+                  </div>
+                  <p className="text-gray-400 text-sm leading-relaxed">{info.description}</p>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -117,7 +128,7 @@ export default function ContactPage() {
       <section className="py-20 bg-black">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-6">Frequently Asked Questions</h2>
+            <h2 className="text-4xl font-bold text-white mb-6 font-sora">Frequently Asked Questions</h2>
             <p className="text-xl text-gray-300">
               Find quick answers to common questions about our rental services.
             </p>
@@ -130,21 +141,21 @@ export default function ContactPage() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-gray-900 rounded-2xl p-8 border border-gray-800"
+                className="luxury-feature-card text-left"
               >
-                <h3 className="text-xl font-bold text-white mb-4">{faq.question}</h3>
+                <h3 className="text-xl font-bold text-white mb-4 font-sora">{faq.question}</h3>
                 <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
               </motion.div>
             ))}
           </div>
           
           <div className="text-center mt-12">
-            <p className="text-gray-400 mb-4">
+            <p className="text-gray-300 mb-4">
               Still have questions? We're here to help!
             </p>
             <a
               href="mailto:info@swiftluxury.de"
-              className="inline-block bg-amber-500 hover:bg-amber-600 text-black font-bold px-6 py-3 rounded-xl transition-colors"
+              className="luxury-badge px-8 py-4 text-lg font-bold hover:transform hover:-translate-y-1"
             >
               Contact Our Support Team
             </a>
@@ -153,29 +164,33 @@ export default function ContactPage() {
       </section>
 
       {/* Map Section */}
-      <section className="py-20 bg-gray-900">
+      <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-6">Visit Our Office</h2>
+            <h2 className="text-4xl font-bold text-white mb-6 font-sora">Visit Our Office</h2>
             <p className="text-xl text-gray-300">
               Located in the heart of Berlin, we're easy to reach by public transport.
             </p>
           </div>
           
-          <div className="bg-black rounded-2xl border border-gray-800 overflow-hidden">
+          <div className="luxury-feature-card overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-2">
               <div className="p-8 lg:p-12">
-                <h3 className="text-2xl font-bold text-white mb-6">Office Information</h3>
-                <div className="space-y-4">
+                <h3 className="text-2xl font-bold text-white mb-6 font-sora">Office Information</h3>
+                <div className="space-y-6">
                   <div className="flex items-start space-x-4">
-                    <MapPinIcon className="w-6 h-6 text-amber-400 mt-1" />
+                    <div className="p-2 rounded-full border border-gray-400/30 bg-gray-800/50">
+                      <MapPinIcon className="w-5 h-5 text-gray-300" />
+                    </div>
                     <div>
                       <p className="font-semibold text-white">Address</p>
                       <p className="text-gray-300">Unter den Linden 77<br />10117 Berlin, Germany</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
-                    <ClockIcon className="w-6 h-6 text-amber-400 mt-1" />
+                    <div className="p-2 rounded-full border border-gray-400/30 bg-gray-800/50">
+                      <ClockIcon className="w-5 h-5 text-gray-300" />
+                    </div>
                     <div>
                       <p className="font-semibold text-white">Office Hours</p>
                       <p className="text-gray-300">
@@ -186,9 +201,11 @@ export default function ContactPage() {
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
-                    <svg className="w-6 h-6 text-amber-400 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
+                    <div className="p-2 rounded-full border border-gray-400/30 bg-gray-800/50">
+                      <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                      </svg>
+                    </div>
                     <div>
                       <p className="font-semibold text-white">Public Transport</p>
                       <p className="text-gray-300">
@@ -200,9 +217,11 @@ export default function ContactPage() {
                 </div>
               </div>
               
-              <div className="h-96 lg:h-auto bg-gray-900 flex items-center justify-center">
-                <div className="text-center text-gray-400">
-                  <MapPinIcon className="w-16 h-16 mx-auto mb-4" />
+              <div className="h-96 lg:h-auto bg-gray-900/50 flex items-center justify-center border-l border-gray-400/20">
+                <div className="text-center text-gray-300">
+                  <div className="p-4 rounded-full border border-gray-400/30 bg-gray-800/50 mx-auto mb-4 w-fit">
+                    <MapPinIcon className="w-12 h-12" />
+                  </div>
                   <p className="text-lg font-medium">Interactive Map</p>
                   <p className="text-sm">Map integration would be implemented here</p>
                 </div>
