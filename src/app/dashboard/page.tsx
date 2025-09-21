@@ -161,10 +161,13 @@ export default function ClientDashboard() {
     }
   }
 
+  // Only show support tab if user has active bookings or applications
+  const hasActiveBookingsOrApps = currentBookings.length > 0 || applications.length > 0
+  
   const tabs = [
     { key: 'bookings', title: 'Bookings', desc: 'View your current and upcoming bookings', count: currentBookings.length },
     { key: 'applications', title: 'Lease Applications', desc: 'View ongoing applications', count: applications.length },
-    { key: 'support', title: 'Support', desc: 'Submit and track support tickets', count: supportUnreadCount > 0 ? supportUnreadCount : supportTickets.length },
+    ...(hasActiveBookingsOrApps ? [{ key: 'support', title: 'Support', desc: 'Submit and track support tickets', count: supportUnreadCount > 0 ? supportUnreadCount : supportTickets.length }] : []),
     { key: 'past', title: 'Past Bookings', desc: 'View properties you\'ve booked in the past', count: pastBookings.length },
   ]
   React.useEffect(() => {
@@ -173,7 +176,12 @@ export default function ClientDashboard() {
       const url = new URL(window.location.href)
       const tab = url.searchParams.get('tab')
       if (tab === 'applications' || tab === 'bookings' || tab === 'support' || tab === 'past') {
-        setActiveTab(tab)
+        // Only allow support tab if user has active bookings or applications
+        if (tab === 'support' && !hasActiveBookingsOrApps) {
+          setActiveTab('bookings')
+        } else {
+          setActiveTab(tab)
+        }
       }
     } catch {}
 
