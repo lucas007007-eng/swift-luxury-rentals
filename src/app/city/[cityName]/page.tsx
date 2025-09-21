@@ -225,7 +225,7 @@ export default function CityPage() {
               </div>
               
               {/* Mobile clock positioned after property count */}
-              <div className="md:hidden mt-4 mb-4 flex justify-center">
+              <div className="md:hidden mt-4 mb-2 flex justify-center">
                 <CityTimeClock cityName={cityName} />
               </div>
             </motion.div>
@@ -389,6 +389,11 @@ function WeatherBackgroundSetter({ cityName, onClass, onDebug, forceWeather }: {
           splashTimers.forEach(t => clearTimeout(t))
           splashTimers = []
           if (c.includes('rain') || c.includes('drizzle') || c.includes('thunder') || c.includes('storm')) {
+            // Disable rain animation on mobile for now
+            const isMobile = window.innerWidth < 768
+            if (isMobile) {
+              return
+            }
             const dropCount = 100
             for (let i = 0; i < dropCount; i++) {
               const d = document.createElement('div')
