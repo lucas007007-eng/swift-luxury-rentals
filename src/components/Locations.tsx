@@ -7,21 +7,47 @@ import { cityProperties } from '@/data/cityProperties'
 const Locations = () => {
   const router = useRouter()
 
+  // Calculate average rent for each city
+  const getCityStats = () => {
+    return Object.entries(cityProperties).map(([city, props]) => {
+      const priced = props.filter(p => typeof p.price === 'number' && !p.priceHidden)
+      const count = props.length
+      const avg = priced.length > 0 ? Math.round(priced.reduce((s, p) => s + (p.price || 0), 0) / priced.length) : 0
+      return { city, count, avg }
+    })
+  }
+
+  const cityStats = getCityStats()
+  const getAvgRent = (cityName: string) => {
+    const stat = cityStats.find(s => s.city === cityName)
+    return stat?.avg || 0
+  }
+
   useEffect(() => {
     // Initialize vanilla-tilt for 3D effects
     const initTilt = async () => {
-      const VanillaTilt = (await import('vanilla-tilt')).default
-      VanillaTilt.init(document.querySelectorAll('[data-tilt]'), {
-        max: 10,
-        speed: 500,
-        perspective: 1800,
-        glare: true,
-        'max-glare': 0.1,
-        scale: 1.03,
-        reset: true
-      })
+      try {
+        const VanillaTilt = (await import('vanilla-tilt')).default
+        const tiltElements = Array.from(document.querySelectorAll('[data-tilt]')) as HTMLElement[]
+        if (tiltElements.length > 0) {
+          VanillaTilt.init(tiltElements, {
+            max: 10,
+            speed: 500,
+            perspective: 1800,
+            glare: true,
+            'max-glare': 0.1,
+            scale: 1.03,
+            reset: true
+          })
+        }
+      } catch (error) {
+        console.error('Failed to initialize tilt:', error)
+      }
     }
-    initTilt()
+    
+    // Delay initialization to ensure DOM is ready
+    const timer = setTimeout(initTilt, 100)
+    return () => clearTimeout(timer)
   }, [])
   
   const europeanCities = [
@@ -112,7 +138,10 @@ const Locations = () => {
 
                 <div className="tilt-elevation-badge" data-tilt-transform-element>
                   <span className="text-2xl">{city.flag}</span>
-                  {city.properties === '0 Properties' ? 'Coming Soon' : city.properties}
+                  {(() => {
+                    const avgRent = getAvgRent(city.name)
+                    return avgRent > 0 ? `€${avgRent.toLocaleString()}/mo` : 'Coming Soon'
+                  })()}
                 </div>
 
                 <div className="tilt-text-block" data-tilt-transform-element>

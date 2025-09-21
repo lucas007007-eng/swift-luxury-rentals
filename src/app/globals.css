@@ -1230,7 +1230,7 @@ html {
   display: block;
   width: 100%;
   max-width: 380px;
-  aspect-ratio: 9 / 15.5;
+  aspect-ratio: 4 / 5;
   max-height: 90vh;
   border-radius: 1.75rem;
   overflow: hidden;
