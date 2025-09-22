@@ -47,15 +47,14 @@ export default function Home() {
             <div className="luxury-feature-card">
               <svg className="w-20 h-20 mx-auto mb-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2500 2500">
                 <defs>
-                  <linearGradient id="btcGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#DB9125"/>
-                    <stop offset="20%" stopColor="#FFF778"/>
-                    <stop offset="34%" stopColor="#D99A26"/>
-                    <stop offset="68%" stopColor="#F6CE69"/>
-                    <stop offset="100%" stopColor="#F6CE69"/>
+                  <linearGradient id="btcSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#E6E6E6"/>
+                    <stop offset="40%" stopColor="#BDBDBD"/>
+                    <stop offset="70%" stopColor="#9A9A9A"/>
+                    <stop offset="100%" stopColor="#BEBEBE"/>
                   </linearGradient>
                 </defs>
-                <circle fill="url(#btcGold)" cx="1250" cy="1250" r="1250"/>
+                <circle fill="url(#btcSilver)" cx="1250" cy="1250" r="1250"/>
                 <path fill="#1a1a1a" d="M1563.2,1208.4c29.9-45.5,45.5-98.8,45.5-153.3c0-140.3-102.7-258.6-240.4-278.1V648.4l0-9.1h-10.4h-122.1h-10.4v10.4v124.7l-63.7,0V649.7v-10.4h-10.4h-122.1h-10.4v10.4v124.7l-198.8,0h-10.4v10.4v153.3v10.4h10.4H955v602.9H819.9h-10.4v10.4v153.3v10.4h10.4h198.8v124.7v10.4l10.4,0h122.1h10.4v-10.4v-124.7l63.7,0v124.7v10.4l10.4,0h122.1h10.4v-10.4v-124.7l41.6,0c154.6,0,280.7-126,280.7-280.7C1690.5,1350.1,1641.1,1260.4,1563.2,1208.4L1563.2,1208.4z M1129.2,1337.1H1328h81.9c59.8,0,107.8,48.1,107.8,107.8c0,59.8-48.1,107.8-107.8,107.8l-279.4,0v-215.7L1129.2,1337.1L1129.2,1337.1z M1129.2,1162.9V948.5H1328c59.8,0,107.8,48.1,107.8,107.8c0,59.8-48.1,107.8-107.8,107.8l-198.8,0V1162.9L1129.2,1162.9z"/>
               </svg>
               <h3 className="text-2xl font-bold text-white mb-4 font-sora">Crypto Friendly</h3>
@@ -75,33 +74,33 @@ export default function Home() {
             {/* EU Compliance */}
             <div className="luxury-feature-card">
               <svg className="w-20 h-20 mx-auto mb-8" viewBox="0 0 100 100" fill="none">
-                {/* Outer golden ring */}
-                <circle cx="50" cy="50" r="48" fill="url(#goldGradient2)" stroke="url(#goldBorder2)" strokeWidth="2"/>
+                {/* Outer silver ring */}
+                <circle cx="50" cy="50" r="48" fill="url(#silverGradient2)" stroke="url(#silverBorder2)" strokeWidth="2"/>
                 
                 {/* Inner black circle */}
-                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#goldInner2)" strokeWidth="1"/>
+                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#silverInner2)" strokeWidth="1"/>
                 
                 {/* Shield symbol - smaller */}
                 <path d="M50 30L38 36v16c0 7 5 12 12 14 7-2 12-7 12-14V36L50 30z" 
-                      fill="url(#goldInner2)" stroke="#1a1a1a" strokeWidth="1"/>
+                      fill="url(#silverInner2)" stroke="#1a1a1a" strokeWidth="1"/>
                 
                 {/* Checkmark - smaller */}
                 <path d="M44 50l4 4 8-8" stroke="#1a1a1a" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                 
                 <defs>
-                  <linearGradient id="goldGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FFD700"/>
-                    <stop offset="50%" stopColor="#DAA520"/>
-                    <stop offset="100%" stopColor="#B8860B"/>
+                  <linearGradient id="silverGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#E6E6E6"/>
+                    <stop offset="50%" stopColor="#BDBDBD"/>
+                    <stop offset="100%" stopColor="#9A9A9A"/>
                   </linearGradient>
-                  <linearGradient id="goldBorder2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#DAA520"/>
-                    <stop offset="100%" stopColor="#B8860B"/>
+                  <linearGradient id="silverBorder2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DADADA"/>
+                    <stop offset="100%" stopColor="#AFAFAF"/>
                   </linearGradient>
-                  <linearGradient id="goldInner2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#DAA520"/>
-                    <stop offset="50%" stopColor="#FFD700"/>
-                    <stop offset="100%" stopColor="#B8860B"/>
+                  <linearGradient id="silverInner2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#CFCFCF"/>
+                    <stop offset="50%" stopColor="#E6E6E6"/>
+                    <stop offset="100%" stopColor="#A7A7A7"/>
                   </linearGradient>
                 </defs>
               </svg>
@@ -117,30 +116,30 @@ export default function Home() {
             {/* Seamless Conversion */}
             <div className="luxury-feature-card">
               <svg className="w-20 h-20 mx-auto mb-8" viewBox="0 0 100 100" fill="none">
-                {/* Outer golden ring */}
-                <circle cx="50" cy="50" r="48" fill="url(#goldGradient3)" stroke="url(#goldBorder3)" strokeWidth="2"/>
+                {/* Outer silver ring */}
+                <circle cx="50" cy="50" r="48" fill="url(#silverGradient3)" stroke="url(#silverBorder3)" strokeWidth="2"/>
                 
                 {/* Inner black circle */}
-                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#goldInner3)" strokeWidth="1"/>
+                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#silverInner3)" strokeWidth="1"/>
                 
                 {/* Lightning bolt - smaller */}
                 <path d="M52 25L35 50h12L45 75 62 50H50L52 25z" 
-                      fill="url(#goldInner3)" stroke="#1a1a1a" strokeWidth="1"/>
+                      fill="url(#silverInner3)" stroke="#1a1a1a" strokeWidth="1"/>
                 
                 <defs>
-                  <linearGradient id="goldGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FFD700"/>
-                    <stop offset="50%" stopColor="#DAA520"/>
-                    <stop offset="100%" stopColor="#B8860B"/>
+                  <linearGradient id="silverGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#E6E6E6"/>
+                    <stop offset="50%" stopColor="#BDBDBD"/>
+                    <stop offset="100%" stopColor="#9A9A9A"/>
                   </linearGradient>
-                  <linearGradient id="goldBorder3" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#DAA520"/>
-                    <stop offset="100%" stopColor="#B8860B"/>
+                  <linearGradient id="silverBorder3" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DADADA"/>
+                    <stop offset="100%" stopColor="#AFAFAF"/>
                   </linearGradient>
-                  <linearGradient id="goldInner3" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#DAA520"/>
-                    <stop offset="50%" stopColor="#FFD700"/>
-                    <stop offset="100%" stopColor="#B8860B"/>
+                  <linearGradient id="silverInner3" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#CFCFCF"/>
+                    <stop offset="50%" stopColor="#E6E6E6"/>
+                    <stop offset="100%" stopColor="#A7A7A7"/>
                   </linearGradient>
                 </defs>
               </svg>
@@ -156,34 +155,34 @@ export default function Home() {
             {/* Move In! card */}
             <div className="luxury-feature-card">
               <svg className="w-20 h-20 mx-auto mb-8" viewBox="0 0 100 100" fill="none">
-                {/* Outer golden ring */}
-                <circle cx="50" cy="50" r="48" fill="url(#goldGradient4)" stroke="url(#goldBorder4)" strokeWidth="2"/>
+                {/* Outer silver ring */}
+                <circle cx="50" cy="50" r="48" fill="url(#silverGradient4)" stroke="url(#silverBorder4)" strokeWidth="2"/>
                 
                 {/* Inner black circle */}
-                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#goldInner4)" strokeWidth="1"/>
+                <circle cx="50" cy="50" r="38" fill="#1a1a1a" stroke="url(#silverInner4)" strokeWidth="1"/>
                 
                 {/* House symbol - smaller */}
                 <path d="M50 28L35 42v25h8V55h14v12h8V42L50 28z" 
-                      fill="url(#goldInner4)" stroke="#1a1a1a" strokeWidth="1"/>
+                      fill="url(#silverInner4)" stroke="#1a1a1a" strokeWidth="1"/>
                 
                 {/* Roof accent - smaller */}
                 <path d="M50 28L38 38h24L50 28z" 
-                      fill="url(#goldInner4)" opacity="0.8"/>
+                      fill="url(#silverInner4)" opacity="0.8"/>
                 
                 <defs>
-                  <linearGradient id="goldGradient4" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FFD700"/>
-                    <stop offset="50%" stopColor="#DAA520"/>
-                    <stop offset="100%" stopColor="#B8860B"/>
+                  <linearGradient id="silverGradient4" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#E6E6E6"/>
+                    <stop offset="50%" stopColor="#BDBDBD"/>
+                    <stop offset="100%" stopColor="#9A9A9A"/>
                   </linearGradient>
-                  <linearGradient id="goldBorder4" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#DAA520"/>
-                    <stop offset="100%" stopColor="#B8860B"/>
+                  <linearGradient id="silverBorder4" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#DADADA"/>
+                    <stop offset="100%" stopColor="#AFAFAF"/>
                   </linearGradient>
-                  <linearGradient id="goldInner4" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#DAA520"/>
-                    <stop offset="50%" stopColor="#FFD700"/>
-                    <stop offset="100%" stopColor="#B8860B"/>
+                  <linearGradient id="silverInner4" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#CFCFCF"/>
+                    <stop offset="50%" stopColor="#E6E6E6"/>
+                    <stop offset="100%" stopColor="#A7A7A7"/>
                   </linearGradient>
                 </defs>
               </svg>

@@ -168,10 +168,10 @@ const Locations = () => {
                   const avgRent = getAvgRent(city.name)
                   return avgRent > 0 ? (
                     <div className="tilt-rent-box" data-tilt-transform-element>
-                      <div className="text-xs text-amber-200 font-semibold">
+                      <div className="text-xs text-zinc-200 font-semibold">
                         €{avgRent.toLocaleString()}/mo
                       </div>
-                      <div className="text-[10px] text-amber-300/70 leading-tight">
+                      <div className="text-[10px] text-zinc-300/80 leading-tight">
                         average rent of our properties
                       </div>
                     </div>

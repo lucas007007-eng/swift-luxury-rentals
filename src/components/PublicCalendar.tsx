@@ -97,11 +97,11 @@ export default function PublicCalendar({ availability = {}, monthlyPrice, onChan
             <button
               key={key}
               onClick={()=>handleClick(key, available)}
-              className={`aspect-square rounded-xl border transition-colors flex flex-col items-center justify-center p-2 ${available ? 'bg-gray-800 hover:border-amber-400/60' : 'bg-gray-900/50 opacity-40'} ${selected ? 'border-amber-400 bg-amber-500/20' : 'border-gray-600'} ${isStart ? 'bg-amber-500/30 border-amber-400 ring-2 ring-amber-400' : ''} ${isEnd ? 'bg-amber-500/30 border-amber-400 ring-2 ring-amber-400' : ''}`}
+              className={`aspect-square rounded-xl border transition-colors flex flex-col items-center justify-center p-2 ${available ? 'bg-zinc-800 hover:border-amber-400/60' : 'bg-zinc-900/50 opacity-40'} ${selected ? 'border-amber-400 bg-amber-500/20' : 'border-zinc-600'} ${isStart ? 'bg-amber-500/30 border-amber-400 ring-2 ring-amber-400' : ''} ${isEnd ? 'bg-amber-500/30 border-amber-400 ring-2 ring-amber-400' : ''}`}
             >
               <div className="text-lg md:text-xl font-bold text-white mb-1">{d.getDate()}</div>
               {priceDisplay && (
-                <div className={`text-xs font-bold ${available ? 'text-blue-400' : 'text-gray-500'}`}>
+                <div className={`text-xs font-bold ${available ? 'text-amber-300' : 'text-zinc-400'}`}>
                   {priceDisplay}
                 </div>
               )}

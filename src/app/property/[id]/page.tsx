@@ -223,7 +223,7 @@ export default function PropertyPage() {
               {property?.images?.map((src, index) => (
                 <div
                   key={index}
-                  className="snap-start shrink-0 w-full min-w-full h-[60vh] rounded-2xl overflow-hidden bg-gray-800 cursor-pointer"
+                  className="snap-start shrink-0 w-full min-w-full h-[60vh] rounded-2xl overflow-hidden bg-zinc-800 cursor-pointer"
                   onClick={() => {
                     setCurrentImageIndex(index)
                     setIsModalOpen(true)
@@ -262,7 +262,7 @@ export default function PropertyPage() {
               <img
                 src={getProxiedImageUrl(property?.images?.[0] || '')}
                 alt={`${property.title} - Image 1`}
-                className="w-full h-full object-cover bg-gray-800 transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-full object-cover bg-zinc-800 transition-transform duration-500 group-hover:scale-105"
                 referrerPolicy="no-referrer"
                 crossOrigin="anonymous"
                 onError={(e) => {
@@ -288,7 +288,7 @@ export default function PropertyPage() {
                 <img
                   src={getProxiedImageUrl(property?.images?.[index] || property?.images?.[0] || '')}
                   alt={`${property.title} - Image ${index + 1}`}
-                  className="w-full h-full object-cover bg-gray-800 transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover bg-zinc-800 transition-transform duration-500 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                   crossOrigin="anonymous"
                   onError={(e) => {
@@ -315,7 +315,7 @@ export default function PropertyPage() {
                 <img
                   src={getProxiedImageUrl(property?.images?.[index] || property?.images?.[0] || '')}
                   alt={`${property.title} - Image ${index + 1}`}
-                  className="w-full h-full object-cover bg-gray-800 transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover bg-zinc-800 transition-transform duration-500 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                   crossOrigin="anonymous"
                   onError={(e) => {
@@ -342,7 +342,7 @@ export default function PropertyPage() {
                 <img
                   src={getProxiedImageUrl(property?.images?.[index] || property?.images?.[0] || '')}
                   alt={`${property.title} - Image ${index + 1}`}
-                  className="w-full h-full object-cover bg-gray-800 transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover bg-zinc-800 transition-transform duration-500 group-hover:scale-105"
                   referrerPolicy="no-referrer"
                   crossOrigin="anonymous"
                   onError={(e) => {
@@ -414,22 +414,22 @@ export default function PropertyPage() {
                 
                 {/* Property Stats - Mobile Optimized */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
-                  <div className="text-center bg-gray-900 rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center">
+                <div className="text-center bg-zinc-900/70 backdrop-blur-sm rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center border border-zinc-700/40">
                     <HomeIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
                     <div className="text-xl md:text-2xl font-bold text-white">{property.bedrooms}</div>
                     <div className="text-gray-400 text-xs md:text-sm">Bedrooms</div>
                   </div>
-                  <div className="text-center bg-gray-900 rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center">
+                <div className="text-center bg-zinc-900/70 backdrop-blur-sm rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center border border-zinc-700/40">
                     <ShieldCheckIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
                     <div className="text-xl md:text-2xl font-bold text-white">{property.bathrooms}</div>
                     <div className="text-gray-400 text-xs md:text-sm">Bathrooms</div>
                   </div>
-                  <div className="text-center bg-gray-900 rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center">
+                <div className="text-center bg-zinc-900/70 backdrop-blur-sm rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center border border-zinc-700/40">
                     <UserGroupIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
                     <div className="text-xl md:text-2xl font-bold text-white">{property.guests}</div>
                     <div className="text-gray-400 text-xs md:text-sm">max. guests</div>
                   </div>
-                  <div className="text-center bg-gray-900 rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center">
+                <div className="text-center bg-zinc-900/70 backdrop-blur-sm rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center border border-zinc-700/40">
                     <MapPinIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
                     <div className="text-xl md:text-2xl font-bold text-white">250m²</div>
                     <div className="text-gray-400 text-xs md:text-sm">Size</div>
@@ -455,7 +455,7 @@ export default function PropertyPage() {
               </div>
               
                 {/* Overview Section - Moved below lease details */}
-                <div className="bg-gray-900 rounded-2xl p-8 mt-6">
+                <div className="bg-zinc-800/80 backdrop-blur-md rounded-2xl p-8 mt-6 border border-zinc-600/50 shadow-xl">
                   <h2 className="text-2xl font-bold text-white mb-6">Overview</h2>
                   <p className="text-gray-300 leading-relaxed text-lg">
                     {property.description}
@@ -463,13 +463,13 @@ export default function PropertyPage() {
                 </div>
 
                 {/* Amenities Section - Directly under Overview */}
-                <div className="bg-gray-900 rounded-2xl p-8 mt-6">
+                <div className="bg-zinc-800/80 backdrop-blur-md rounded-2xl p-8 mt-6 border border-zinc-600/50 shadow-xl">
                   <h2 className="text-2xl font-bold text-white mb-6">Amenities</h2>
                   
                   {/* Amenities Grid with Icons */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* Kitchen Amenities */}
-                    <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
+                    <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="bg-amber-500/20 rounded-lg p-2">
                           <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -491,7 +491,7 @@ export default function PropertyPage() {
               </div>
 
                     {/* Comfort Amenities */}
-                    <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
+                    <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="bg-amber-500/20 rounded-lg p-2">
                           <HomeIcon className="w-6 h-6 text-amber-400" />
@@ -509,7 +509,7 @@ export default function PropertyPage() {
               </div>
 
                     {/* Technology */}
-                    <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
+                    <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="bg-amber-500/20 rounded-lg p-2">
                           <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -529,7 +529,7 @@ export default function PropertyPage() {
                 </div>
 
                     {/* Bathroom */}
-                    <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
+                    <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="bg-amber-500/20 rounded-lg p-2">
                           <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -549,7 +549,7 @@ export default function PropertyPage() {
                     </div>
 
                     {/* Outdoor */}
-                    <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
+                    <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="bg-amber-500/20 rounded-lg p-2">
                           <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -578,13 +578,13 @@ export default function PropertyPage() {
                 </div>
 
                 {/* House Rules Section - Moved to bottom with icons */}
-                <div className="bg-gray-900 rounded-2xl p-8 mt-6">
+                <div className="bg-zinc-800/80 backdrop-blur-md rounded-2xl p-8 mt-6 border border-zinc-600/50 shadow-xl">
                   <h2 className="text-2xl font-bold text-white mb-6">House Rules</h2>
                   
                   {/* House Rules Grid with Icons - Single row on desktop */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {/* Check In/Out Times */}
-                    <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
+                    <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="bg-amber-500/20 rounded-lg p-2">
                           <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -606,7 +606,7 @@ export default function PropertyPage() {
                     </div>
 
                     {/* Guest Policies */}
-                    <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
+                    <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="bg-amber-500/20 rounded-lg p-2">
                           <UserGroupIcon className="w-6 h-6 text-amber-400" />
@@ -624,7 +624,7 @@ export default function PropertyPage() {
                     </div>
 
                     {/* Safety Rules */}
-                    <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
+                    <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
                         <div className="bg-amber-500/20 rounded-lg p-2">
                           <ShieldCheckIcon className="w-6 h-6 text-amber-400" />
@@ -646,7 +646,7 @@ export default function PropertyPage() {
               </div>
 
                     {/* Cancellation Policy */}
-                    <div className="bg-black/40 rounded-xl p-4 border border-gray-800 overflow-hidden">
+                    <div className="bg-black/40 rounded-xl p-4 border border-zinc-800 overflow-hidden">
                       <div className="flex items-start space-x-3 mb-3 pr-2">
                         <div className="bg-amber-500/20 rounded-lg p-2">
                           <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -679,7 +679,7 @@ export default function PropertyPage() {
               {/* Right Column - Pricing & Actions */}
               <div className="lg:col-span-4 xl:col-span-4">
                 {/* Book Now Calendar Section - Moved Above Pricing */}
-                <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 mb-6">
+                <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 mb-6">
                   <h3 className="text-white font-semibold mb-4">Book Now</h3>
                   <p className="text-gray-400 text-sm mb-6">Select your check‑in and check‑out dates below.</p>
                   <div className="mb-6">
@@ -698,7 +698,7 @@ export default function PropertyPage() {
                         readOnly
                         value={selectedStart || ''}
                         placeholder="Select on calendar"
-                        className="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                        className="w-full bg-black/40 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm"
                       />
                     </div>
                     <div>
@@ -707,13 +707,13 @@ export default function PropertyPage() {
                         readOnly
                         value={selectedEnd || ''}
                         placeholder="Select on calendar"
-                        className="w-full bg-black/40 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+                        className="w-full bg-black/40 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm"
                       />
                     </div>
                   </div>
                   
                   {/* Pricing Breakdown */}
-                  <div className="bg-black/40 rounded-lg p-4 border border-gray-700 mb-6">
+                  <div className="bg-black/40 rounded-lg p-4 border border-zinc-700 mb-6">
                     {bookingSummary && !bookingSummary.unavailable ? (
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
@@ -724,7 +724,7 @@ export default function PropertyPage() {
                           <span className="text-gray-400 text-sm">Damage Deposit</span>
                           <span className="text-white">€{Number(damageDepositForSelection||0).toLocaleString('de-DE')}</span>
                         </div>
-                        <hr className="border-gray-700" />
+                        <hr className="border-zinc-700" />
                         <div className="flex justify-between items-center font-semibold">
                           <span className="text-white">Total</span>
                           <span className="text-white text-lg">€{(bookingSummary.total + Number(damageDepositForSelection||0)).toLocaleString('de-DE')}</span>
@@ -762,7 +762,7 @@ export default function PropertyPage() {
                   <p className="text-gray-400 text-xs text-center">You won't be charged yet</p>
                 </div>
 
-                <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 sticky top-24">
+                <div className="bg-zinc-900/80 backdrop-blur-md rounded-2xl p-6 border border-zinc-700/50 shadow-xl sticky top-24">
                   <div className="text-center mb-6">
                     {property.id === 'berlin-real-5' ? (
                       <>
@@ -782,7 +782,7 @@ export default function PropertyPage() {
                   
                   <div className="space-y-4">
                     {/* Apply to Rent Button with ArtinAI-style border animation */}
-                    <button className="relative w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-3 rounded-full transition-all duration-300 transform hover:scale-105 border border-gray-600 overflow-hidden">
+                    <button className="relative w-full bg-zinc-800/80 backdrop-blur-sm hover:bg-zinc-700/80 text-white font-bold py-3 rounded-full transition-all duration-300 transform hover:scale-105 border border-zinc-600/60 shadow-lg overflow-hidden">
                       {/* ArtinAI-style animated border */}
                       <div className="absolute inset-0 rounded-full">
                         <div className="absolute inset-0 rounded-full border-2 border-transparent bg-gradient-to-r from-transparent via-amber-400 to-transparent bg-clip-border animate-spin" style={{
@@ -807,7 +807,7 @@ export default function PropertyPage() {
                   </div>
 
                   {/* Property Features */}
-                  <div className="mt-4 pt-4 border-t border-gray-800">
+                  <div className="mt-4 pt-4 border-t border-zinc-800">
                     <div className="text-white font-semibold mb-4">Property Features:</div>
                     <div className="space-y-1">
                       <div className="flex items-center justify-between">
@@ -829,7 +829,7 @@ export default function PropertyPage() {
                 
 
                 {/* Tenant Protection Section */}
-                <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800 mt-6">
+                <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 mt-6">
                   <div className="flex items-start space-x-4">
                     <div className="bg-green-500/20 rounded-lg p-3 flex-shrink-0">
                       <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -934,7 +934,7 @@ export default function PropertyPage() {
                 : currentImageIndex - 1
               setCurrentImageIndex(newIndex)
             }}
-            className="absolute left-6 top-1/2 transform -translate-y-1/2 z-[10000] bg-black/60 hover:bg-black/80 text-amber-400 p-4 rounded-full transition-all duration-300 border border-amber-400 hover:scale-110"
+            className="absolute left-6 top-1/2 transform -translate-y-1/2 z-[10000] bg-black/60 hover:bg-black/80 text-zinc-200 p-4 rounded-full transition-all duration-300 border border-zinc-400 hover:scale-110"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -949,7 +949,7 @@ export default function PropertyPage() {
                 : currentImageIndex + 1
               setCurrentImageIndex(newIndex)
             }}
-            className="absolute right-6 top-1/2 transform -translate-y-1/2 z-[10000] bg-black/60 hover:bg-black/80 text-amber-400 p-4 rounded-full transition-all duration-300 border border-amber-400 hover:scale-110"
+            className="absolute right-6 top-1/2 transform -translate-y-1/2 z-[10000] bg-black/60 hover:bg-black/80 text-zinc-200 p-4 rounded-full transition-all duration-300 border border-zinc-400 hover:scale-110"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

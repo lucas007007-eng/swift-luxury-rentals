@@ -398,7 +398,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
               }`}
             >
               <div className="flex items-center space-x-3">
-                <MapPinIcon className={`w-5 h-5 ${focusedField === 'destination' ? 'text-amber-400' : 'text-gray-400'}`} />
+                <MapPinIcon className={`w-5 h-5 ${focusedField === 'destination' ? 'text-zinc-200 drop-shadow-[0_0_6px_rgba(255,255,255,0.2)]' : 'text-zinc-500'}`} />
                 <div>
                   <div className={`text-xs font-semibold uppercase tracking-wide ${focusedField === 'destination' ? 'text-white' : 'text-gray-900'}`}>
                     Where
@@ -428,7 +428,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
               }}
             >
               <div className="flex items-center space-x-3">
-                <CalendarDaysIcon className={`w-5 h-5 ${focusedField === 'checkin' ? 'text-amber-400' : 'text-gray-400'}`} />
+                <CalendarDaysIcon className={`w-5 h-5 ${focusedField === 'checkin' ? 'text-zinc-200 drop-shadow-[0_0_6px_rgba(255,255,255,0.2)]' : 'text-zinc-500'}`} />
                 <div>
                   <div className={`text-xs font-semibold uppercase tracking-wide ${focusedField === 'checkin' ? 'text-white' : 'text-gray-900'}`}>
                     Check in
@@ -461,7 +461,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
               }}
             >
               <div className="flex items-center space-x-3">
-                <CalendarDaysIcon className={`w-5 h-5 ${focusedField === 'checkout' ? 'text-amber-400' : 'text-gray-400'}`} />
+                <CalendarDaysIcon className={`w-5 h-5 ${focusedField === 'checkout' ? 'text-zinc-200 drop-shadow-[0_0_6px_rgba(255,255,255,0.2)]' : 'text-zinc-500'}`} />
                 <div>
                   <div className={`text-xs font-semibold uppercase tracking-wide ${focusedField === 'checkout' ? 'text-white' : 'text-gray-900'}`}>
                     Check out
@@ -493,7 +493,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <UserGroupIcon className={`w-5 h-5 ${focusedField === 'guests' ? 'text-amber-400' : 'text-gray-400'}`} />
+                  <UserGroupIcon className={`w-5 h-5 ${focusedField === 'guests' ? 'text-zinc-200 drop-shadow-[0_0_6px_rgba(255,255,255,0.2)]' : 'text-zinc-500'}`} />
                   <div>
                     <div className={`text-xs font-semibold uppercase tracking-wide ${focusedField === 'guests' ? 'text-white' : 'text-gray-900'}`}>
                       Who
@@ -526,7 +526,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <span className={`text-xl ${focusedField === 'guests' ? 'text-amber-400' : 'text-gray-400'}`}>🛎️</span>
+                  <span className={`text-xl ${focusedField === 'guests' ? 'text-zinc-200 drop-shadow-[0_0_6px_rgba(255,255,255,0.2)]' : 'text-zinc-500'}`}>🛎️</span>
                   <div>
                     <div className={`text-xs font-semibold uppercase tracking-wide ${focusedField === 'guests' ? 'text-white' : 'text-gray-900'}`}>
                       Service
@@ -689,7 +689,7 @@ const SearchInterface: React.FC<SearchInterfaceProps> = ({ onSearch, onModeChang
             left: window.innerWidth < 640 ? '16px' : `${dateDropdownPosition.left}px`,
             right: window.innerWidth < 640 ? '16px' : 'auto',
             position: 'absolute',
-            maxWidth: window.innerWidth < 640 ? 'calc(100vw - 32px)' : '700px'
+            maxWidth: window.innerWidth < 640 ? 'calc(100vw - 32px)' : '860px'
           }}
           onClick={(e) => {
             // prevent outside-click handler from firing when clicking inside

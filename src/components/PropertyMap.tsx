@@ -175,7 +175,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   }
 
   return (
-    <div className="bg-gray-900 rounded-2xl p-6 border border-gray-800">
+    <div className="luxury-feature-card p-6">
       {/* Map Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

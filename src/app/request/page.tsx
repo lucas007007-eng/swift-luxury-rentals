@@ -255,9 +255,9 @@ export default function RequestToBook() {
             {/* Left: Property Details & Payment Options */}
             <div className="space-y-8">
             {/* Property Overview */}
-            <div className="bg-gray-900 rounded-2xl p-4 md:p-8 border border-gray-800">
+            <div className="bg-zinc-900 rounded-2xl p-4 md:p-8 border border-zinc-800">
               <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start mb-6 md:mb-8">
-                <div className="w-full md:w-32 h-32 md:h-32 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0">
+                <div className="w-full md:w-32 h-32 md:h-32 rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0">
                   {img ? (
                     <img 
                       src={img} 
@@ -292,10 +292,10 @@ export default function RequestToBook() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="bg-gray-800 px-3 py-1 rounded-full text-sm text-gray-300">
+                    <div className="bg-zinc-800 px-3 py-1 rounded-full text-sm text-gray-300">
                       {checkin} → {checkout}
                     </div>
-                    <div className="bg-gray-800 px-3 py-1 rounded-full text-sm text-gray-300">
+                    <div className="bg-zinc-800 px-3 py-1 rounded-full text-sm text-gray-300">
                       {nights} nights
                     </div>
                   </div>
@@ -306,7 +306,7 @@ export default function RequestToBook() {
               {paymentsEnabled ? (
                 <div className="mb-8">
                   <h3 className="text-xl font-semibold text-white mb-4">Payment Options</h3>
-                  <div className="bg-gray-800 p-1 rounded-xl flex">
+                  <div className="bg-zinc-800 p-1 rounded-xl flex">
                     <button 
                       onClick={() => setPaymentOption('full')}
                       className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
@@ -345,7 +345,7 @@ export default function RequestToBook() {
             </div>
 
             {/* Contact Details */}
-            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
+            <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
               <h3 className="text-xl font-semibold text-white mb-6">Contact Details</h3>
               
               {status === 'unauthenticated' ? (
@@ -378,32 +378,32 @@ export default function RequestToBook() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm text-gray-300 mb-2">First name</label>
-                  <input value={firstName} onChange={(e)=>setFirstName(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="John" />
+                  <input value={firstName} onChange={(e)=>setFirstName(e.target.value)} className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="John" />
                 </div>
                 <div>
                   <label className="block text-sm text-gray-300 mb-2">Last name</label>
-                  <input value={lastName} onChange={(e)=>setLastName(e.target.value)} className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Doe" />
+                  <input value={lastName} onChange={(e)=>setLastName(e.target.value)} className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Doe" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm text-gray-300 mb-2">Email</label>
-                  <input value={emailInput} onChange={(e)=>setEmailInput(e.target.value)} type="email" className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="you@example.com" />
+                  <input value={emailInput} onChange={(e)=>setEmailInput(e.target.value)} type="email" className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="you@example.com" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm text-gray-300 mb-2">Phone</label>
                   <div className="flex gap-2 md:gap-3">
-                    <select className="w-20 md:w-28 bg-gray-800 border border-gray-700 rounded-xl px-2 md:px-3 py-3 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm md:text-base">
+                    <select className="w-20 md:w-28 bg-zinc-800 border border-zinc-700 rounded-xl px-2 md:px-3 py-3 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm md:text-base">
                       <option>+49</option>
                       <option>+34</option>
                       <option>+33</option>
                       <option>+39</option>
                       <option>+44</option>
                     </select>
-                    <input value={phoneInput} onChange={(e)=>setPhoneInput(e.target.value)} className="flex-1 min-w-0 bg-gray-800 border border-gray-700 rounded-xl px-3 md:px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm md:text-base" placeholder="Phone number" />
+                    <input value={phoneInput} onChange={(e)=>setPhoneInput(e.target.value)} className="flex-1 min-w-0 bg-zinc-800 border border-zinc-700 rounded-xl px-3 md:px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm md:text-base" placeholder="Phone number" />
                   </div>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm text-gray-300 mb-2">Residence country</label>
-                  <select className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors">
+                  <select className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors">
                     <option value="">Select a country</option>
                     <optgroup label="Europe">
                       <option>Albania</option>
@@ -474,15 +474,15 @@ export default function RequestToBook() {
 
             {/* Payment Method (hidden in test mode) */}
             {paymentsEnabled && (
-            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
+            <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
               <h3 className="text-xl font-semibold text-white mb-6">Payment Method</h3>
               <div className="flex items-center gap-6 mb-6">
                 <label className="inline-flex items-center gap-3 cursor-pointer">
-                  <input type="radio" name="paymethod" className="w-4 h-4 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500" checked={paymentMethod==='card'} onChange={() => setPaymentMethod('card')} />
+                  <input type="radio" name="paymethod" className="w-4 h-4 text-amber-500 bg-zinc-800 border-zinc-600 focus:ring-amber-500" checked={paymentMethod==='card'} onChange={() => setPaymentMethod('card')} />
                   <span className="text-white text-sm font-medium">Card</span>
                 </label>
                 <label className="inline-flex items-center gap-3 cursor-pointer">
-                  <input type="radio" name="paymethod" className="w-4 h-4 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500" checked={paymentMethod==='crypto'} onChange={() => setPaymentMethod('crypto')} />
+                  <input type="radio" name="paymethod" className="w-4 h-4 text-amber-500 bg-zinc-800 border-zinc-600 focus:ring-amber-500" checked={paymentMethod==='crypto'} onChange={() => setPaymentMethod('crypto')} />
                   <span className="text-white text-sm font-medium">Crypto</span>
                 </label>
               </div>
@@ -494,8 +494,8 @@ export default function RequestToBook() {
               )}
               
               {paymentMethod === 'card' && (
-                <div className="mb-4 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
-                  <div className="text-xs text-blue-400">Credit Card will not be charged until your booking is Confirmed. You will receive an update within 24hrs!</div>
+                <div className="mb-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                  <div className="text-xs text-amber-300">Credit Card will not be charged until your booking is Confirmed. You will receive an update within 24hrs!</div>
               </div>
               )}
 
@@ -504,19 +504,19 @@ export default function RequestToBook() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="sm:col-span-2">
                       <label className="block text-sm text-gray-300 mb-2">Cardholder name</label>
-                      <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Name on card" />
+                      <input className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="Name on card" />
                     </div>
                     <div className="sm:col-span-2">
                       <label className="block text-sm text-gray-300 mb-2">Card number</label>
-                      <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="1234 5678 9012 3456" />
+                      <input className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="1234 5678 9012 3456" />
                     </div>
                     <div>
                       <label className="block text-sm text-gray-300 mb-2">Expiry</label>
-                      <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="MM/YY" />
+                      <input className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="MM/YY" />
                     </div>
                     <div>
                       <label className="block text-sm text-gray-300 mb-2">CVC</label>
-                      <input className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="CVC" />
+                      <input className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors" placeholder="CVC" />
                     </div>
                   </div>
                 </div>
@@ -526,7 +526,7 @@ export default function RequestToBook() {
                   <div>
                     <label className="block text-sm mb-1">Currency</label>
                     <select
-                      className="w-full border border-gray-300 rounded-xl px-3 py-2 bg-white"
+                      className="w-full border border-zinc-300 rounded-xl px-3 py-2 bg-white"
                       value={cryptoCurrency}
                       onChange={(e) => setCryptoCurrency(e.target.value as 'ETH' | 'USDT' | 'BTC')}
                     >
@@ -541,17 +541,17 @@ export default function RequestToBook() {
                   <div>
                     <label className="block text-sm mb-1">Wallet address</label>
                     <div className="flex items-center gap-2">
-                      <input readOnly className="flex-1 border border-gray-300 rounded-xl px-3 py-2 bg-gray-50 text-gray-900" value={selectedAddress} />
+                      <input readOnly className="flex-1 border border-zinc-300 rounded-xl px-3 py-2 bg-gray-50 text-gray-900" value={selectedAddress} />
                       <button
                         onClick={async () => { try { await navigator.clipboard.writeText(selectedAddress); setCopied(true); setTimeout(() => setCopied(false), 1500) } catch {} }}
-                        className="px-3 py-2 rounded-lg border border-gray-300 text-sm hover:bg-gray-50"
+                        className="px-3 py-2 rounded-lg border border-zinc-300 text-sm hover:bg-gray-50"
                       >
                         {copied ? 'Copied' : 'Copy'}
                       </button>
                     </div>
                   </div>
                   <div className="flex justify-center py-4">
-                    <div className="bg-white p-3 rounded-xl border border-gray-200">
+                    <div className="bg-white p-3 rounded-xl border border-zinc-200">
                       <QRCode value={qrValue} size={140} />
                     </div>
                   </div>
@@ -564,15 +564,15 @@ export default function RequestToBook() {
             )}
 
             {/* Terms & Complete Booking */}
-            <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
+            <div className="bg-zinc-900 rounded-2xl p-8 border border-zinc-800">
               <h3 className="text-xl font-semibold text-white mb-6">Review your request</h3>
               <div className="space-y-4 mb-8">
                 <label className="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" className="w-4 h-4 mt-1 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500 rounded" />
+                  <input type="checkbox" className="w-4 h-4 mt-1 text-amber-500 bg-zinc-800 border-zinc-600 focus:ring-amber-500 rounded" />
                   <span className="text-gray-300 text-sm">I agree to the Terms of Service, Sublease Agreement and Cancellation Policy and understand that this reservation is contingent on successfully passing tenant screening.</span>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" className="w-4 h-4 mt-1 text-amber-500 bg-gray-800 border-gray-600 focus:ring-amber-500 rounded" />
+                  <input type="checkbox" className="w-4 h-4 mt-1 text-amber-500 bg-zinc-800 border-zinc-600 focus:ring-amber-500 rounded" />
                   <span className="text-gray-300 text-sm">I agree to the Privacy Policy.</span>
                 </label>
               </div>
@@ -580,11 +580,11 @@ export default function RequestToBook() {
           </div>
 
           {/* Right: Your Stay Summary */}
-          <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8 h-max">
+          <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-8 h-max">
             <h3 className="text-2xl font-bold text-white mb-6">Your Stay</h3>
             
             <div className="flex gap-4 items-start mb-8">
-              <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-800 flex-shrink-0">
+              <div className="w-20 h-20 rounded-xl overflow-hidden bg-zinc-800 flex-shrink-0">
                 {img ? (
                   <img 
                     src={img} 
@@ -630,7 +630,7 @@ export default function RequestToBook() {
                     <span className="text-white font-medium">€{damageDeposit.toLocaleString('de-DE')}</span>
                   </div>
                   
-                  <div className="border-t border-gray-700 pt-3 mt-4">
+                  <div className="border-t border-zinc-700 pt-3 mt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-300 text-sm">Due today:</span>
                       <span className="text-white text-xl font-bold">€{Math.round((payNowInfo?.amount ?? 0) + actualMoveInFee + damageDeposit).toLocaleString('de-DE')}</span>
@@ -658,7 +658,7 @@ export default function RequestToBook() {
                     <span className="text-white font-medium">€{damageDeposit.toLocaleString('de-DE')}</span>
                   </div>
                   
-                  <div className="border-t border-gray-700 pt-3 mt-4">
+                  <div className="border-t border-zinc-700 pt-3 mt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-white text-lg font-semibold">Total now</span>
                       <span className="text-white text-xl font-bold">€{Math.round(subtotal + actualMoveInFee + damageDeposit).toLocaleString('de-DE')}</span>
@@ -669,11 +669,11 @@ export default function RequestToBook() {
             </div>
             {/* Next Payments - Clean design matching image */}
             {paymentOption === 'monthly' && nextPayments.length > 0 && (
-              <div className="border-t border-gray-700 pt-6">
+              <div className="border-t border-zinc-700 pt-6">
                 <h4 className="text-lg font-semibold text-white mb-4">Next Payments</h4>
                 <div className="space-y-2">
                   {nextPayments.map((p, idx) => (
-                    <div key={idx} className="bg-gray-800/50 rounded-lg p-3">
+                    <div key={idx} className="bg-zinc-800/50 rounded-lg p-3">
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-gray-400 text-xs">Charge date: {p.chargeDate}</div>
@@ -688,7 +688,7 @@ export default function RequestToBook() {
             )}
             
             {/* Complete Booking Button */}
-            <div className="mt-8 pt-6 border-t border-gray-700">
+            <div className="mt-8 pt-6 border-t border-zinc-700">
               {status === 'unauthenticated' ? (
                 <button 
                   onClick={() => setShowLoginPrompt(true)}
