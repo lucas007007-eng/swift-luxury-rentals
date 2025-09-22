@@ -74,7 +74,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
 
         {/* New Badge */}
         {property.featured && (
-          <div className="absolute top-4 right-16 z-10 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+          <div className="absolute top-4 right-16 z-10 rounded-full text-white text-xs font-semibold px-3 py-1 border border-[rgba(192,192,192,0.35)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.15)] bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)]">
             New
           </div>
         )}
@@ -163,7 +163,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, index = 0 }) => {
               property.type === 'short-term' 
                 ? 'bg-blue-100 text-blue-800'
                 : property.type === 'month-to-month'
-                ? 'bg-green-100 text-green-800'
+                ? 'bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white border border-[rgba(192,192,192,0.35)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)]'
                 : 'bg-purple-100 text-purple-800'
             }`}>
               {property.type === 'short-term' ? 'Short Term' : 

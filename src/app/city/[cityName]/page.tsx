@@ -273,7 +273,7 @@ export default function CityPage() {
                       <path d="M3 6h18M7 12h10m-7 6h4"/>
                     </svg>
                     <span>Filters</span>
-                    <span className="ml-1 bg-primary-600 text-white text-xs px-2 py-1 rounded-full">
+                    <span className="ml-1 text-white text-xs px-2 py-1 rounded-full border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)]">
                       {filtered.length}
                     </span>
                   </button>
