@@ -402,7 +402,7 @@ export default function PropertyPage() {
                   <span className="bg-white text-black px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider">
                     {property.type.replace('-', ' ')}
                   </span>
-                  <span className="bg-amber-500 text-black px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider">
+                  <span className="px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider text-white border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)]">
                     Swift Luxury Operated
                   </span>
                 </div>
@@ -415,22 +415,22 @@ export default function PropertyPage() {
                 {/* Property Stats - Mobile Optimized */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
                 <div className="text-center bg-zinc-900/70 backdrop-blur-sm rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center border border-zinc-700/40">
-                    <HomeIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
+                    <HomeIcon className="w-6 h-6 md:w-8 md:h-8 text-zinc-300 mx-auto mb-1 md:mb-2" />
                     <div className="text-xl md:text-2xl font-bold text-white">{property.bedrooms}</div>
                     <div className="text-gray-400 text-xs md:text-sm">Bedrooms</div>
                   </div>
                 <div className="text-center bg-zinc-900/70 backdrop-blur-sm rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center border border-zinc-700/40">
-                    <ShieldCheckIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
+                    <ShieldCheckIcon className="w-6 h-6 md:w-8 md:h-8 text-zinc-300 mx-auto mb-1 md:mb-2" />
                     <div className="text-xl md:text-2xl font-bold text-white">{property.bathrooms}</div>
                     <div className="text-gray-400 text-xs md:text-sm">Bathrooms</div>
                   </div>
                 <div className="text-center bg-zinc-900/70 backdrop-blur-sm rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center border border-zinc-700/40">
-                    <UserGroupIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
+                    <UserGroupIcon className="w-6 h-6 md:w-8 md:h-8 text-zinc-300 mx-auto mb-1 md:mb-2" />
                     <div className="text-xl md:text-2xl font-bold text-white">{property.guests}</div>
                     <div className="text-gray-400 text-xs md:text-sm">max. guests</div>
                   </div>
                 <div className="text-center bg-zinc-900/70 backdrop-blur-sm rounded-xl p-3 md:p-4 min-h-[100px] flex flex-col justify-center border border-zinc-700/40">
-                    <MapPinIcon className="w-6 h-6 md:w-8 md:h-8 text-amber-400 mx-auto mb-1 md:mb-2" />
+                    <MapPinIcon className="w-6 h-6 md:w-8 md:h-8 text-zinc-300 mx-auto mb-1 md:mb-2" />
                     <div className="text-xl md:text-2xl font-bold text-white">250m²</div>
                     <div className="text-gray-400 text-xs md:text-sm">Size</div>
                   </div>
@@ -471,8 +471,8 @@ export default function PropertyPage() {
                     {/* Kitchen Amenities */}
                     <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className="bg-amber-500/20 rounded-lg p-2">
-                          <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="rounded-lg p-2 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <svg className="w-6 h-6 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10z" />
                           </svg>
                         </div>
@@ -483,7 +483,7 @@ export default function PropertyPage() {
                       <div className="space-y-2">
                         {amenityGroups.kitchen.map((amenity, index) => (
                           <div key={index} className="flex items-center space-x-2">
-                            <CheckIcon className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                            <CheckIcon className="w-4 h-4 text-zinc-300 flex-shrink-0" />
                             <span className="text-gray-300 text-sm">{amenity}</span>
                 </div>
                         ))}
@@ -493,15 +493,15 @@ export default function PropertyPage() {
                     {/* Comfort Amenities */}
                     <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className="bg-amber-500/20 rounded-lg p-2">
-                          <HomeIcon className="w-6 h-6 text-amber-400" />
+                        <div className="rounded-lg p-2 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <HomeIcon className="w-6 h-6 text-zinc-300" />
             </div>
                         <span className="text-white font-semibold">Comfort</span>
           </div>
                       <div className="space-y-2">
                         {amenityGroups.comfort.map((amenity, index) => (
                           <div key={index} className="flex items-center space-x-2">
-                            <CheckIcon className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                            <CheckIcon className="w-4 h-4 text-zinc-300 flex-shrink-0" />
                             <span className="text-gray-300 text-sm">{amenity}</span>
         </div>
                         ))}
@@ -511,8 +511,8 @@ export default function PropertyPage() {
                     {/* Technology */}
                     <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className="bg-amber-500/20 rounded-lg p-2">
-                          <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="rounded-lg p-2 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <svg className="w-6 h-6 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
                           </svg>
                         </div>
@@ -521,7 +521,7 @@ export default function PropertyPage() {
                       <div className="space-y-2">
                         {amenityGroups.technology.map((amenity, index) => (
                           <div key={index} className="flex items-center space-x-2">
-                            <CheckIcon className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                            <CheckIcon className="w-4 h-4 text-zinc-300 flex-shrink-0" />
                             <span className="text-gray-300 text-sm">{amenity}</span>
                           </div>
                         ))}
@@ -531,8 +531,8 @@ export default function PropertyPage() {
                     {/* Bathroom */}
                     <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className="bg-amber-500/20 rounded-lg p-2">
-                          <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="rounded-lg p-2 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <svg className="w-6 h-6 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                           </svg>
                         </div>
@@ -541,7 +541,7 @@ export default function PropertyPage() {
                       <div className="space-y-2">
                         {amenityGroups.bathroom.map((amenity, index) => (
                           <div key={index} className="flex items-center space-x-2">
-                            <CheckIcon className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                            <CheckIcon className="w-4 h-4 text-zinc-300 flex-shrink-0" />
                             <span className="text-gray-300 text-sm">{amenity}</span>
                           </div>
                         ))}
@@ -551,8 +551,8 @@ export default function PropertyPage() {
                     {/* Outdoor */}
                     <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className="bg-amber-500/20 rounded-lg p-2">
-                          <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="rounded-lg p-2 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <svg className="w-6 h-6 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                           </svg>
                         </div>
@@ -561,7 +561,7 @@ export default function PropertyPage() {
                       <div className="space-y-2">
                         {amenityGroups.outdoor.map((amenity, index) => (
                           <div key={index} className="flex items-center space-x-2">
-                            <CheckIcon className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                            <CheckIcon className="w-4 h-4 text-zinc-300 flex-shrink-0" />
                             <span className="text-gray-300 text-sm">{amenity}</span>
                           </div>
                         ))}
@@ -571,7 +571,7 @@ export default function PropertyPage() {
 
                   {/* Signature Property Badge */}
                   <div className="mt-8 text-center">
-                    <span className="bg-amber-500/20 text-amber-400 px-6 py-3 rounded-full text-sm font-bold border border-amber-500/30">
+                    <span className="px-6 py-3 rounded-full text-sm font-bold text-white border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)]">
                       ⭐ Signature Property
                     </span>
                   </div>
@@ -586,8 +586,8 @@ export default function PropertyPage() {
                     {/* Check In/Out Times */}
                     <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className="bg-amber-500/20 rounded-lg p-2">
-                          <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="rounded-lg p-2 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <svg className="w-6 h-6 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         </div>
@@ -608,8 +608,8 @@ export default function PropertyPage() {
                     {/* Guest Policies */}
                     <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className="bg-amber-500/20 rounded-lg p-2">
-                          <UserGroupIcon className="w-6 h-6 text-amber-400" />
+                        <div className="rounded-lg p-2 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <UserGroupIcon className="w-6 h-6 text-zinc-300" />
                         </div>
                         <span className="text-white font-semibold">Guests</span>
                       </div>
@@ -626,8 +626,8 @@ export default function PropertyPage() {
                     {/* Safety Rules */}
                     <div className="bg-zinc-800/60 backdrop-blur-sm rounded-xl p-4 border border-zinc-600/40 shadow-md">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className="bg-amber-500/20 rounded-lg p-2">
-                          <ShieldCheckIcon className="w-6 h-6 text-amber-400" />
+                        <div className="rounded-lg p-2 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <ShieldCheckIcon className="w-6 h-6 text-zinc-300" />
                         </div>
                         <span className="text-white font-semibold">Safety Rules</span>
                       </div>
@@ -648,8 +648,8 @@ export default function PropertyPage() {
                     {/* Cancellation Policy */}
                     <div className="bg-black/40 rounded-xl p-4 border border-zinc-800 overflow-hidden">
                       <div className="flex items-start space-x-3 mb-3 pr-2">
-                        <div className="bg-amber-500/20 rounded-lg p-2">
-                          <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="rounded-lg p-2 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <svg className="w-6 h-6 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         </div>
