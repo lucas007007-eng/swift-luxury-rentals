@@ -93,77 +93,77 @@ export default function AdminDashboard() {
       <Header forceBackground={true} />
       <div className="flex-1 flex items-center justify-center pt-8 pb-16">
         <div className="max-w-[1800px] mx-auto px-6 py-8 w-full">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-white/70">Select a city to manage its listings.</p>
+        {/* Ultra-Premium Header Section */}
+        <div className="luxury-feature-card mb-8 p-8">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-4xl font-bold heading-sora text-white mb-2 text-left">Admin Dashboard</h1>
+              <p className="text-zinc-300 text-lg text-left">Elite Property Management</p>
+            </div>
+            <button
+              onClick={async () => {
+                try {
+                  await fetch('/api/admin/logout', { method: 'POST' })
+                  router.push('/admin/login')
+                } catch (e) {
+                  console.error('Logout failed:', e)
+                }
+              }}
+              className="px-6 py-3 rounded-xl text-white font-semibold border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 transition-all duration-300"
+            >
+              Logout
+            </button>
           </div>
-          <button
-            onClick={async () => {
-              try {
-                await fetch('/api/admin/logout', { method: 'POST' })
-                router.push('/admin/login')
-              } catch (e) {
-                console.error('Logout failed:', e)
-              }
-            }}
-            className="bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-300 px-4 py-2 rounded-lg text-sm transition-colors"
-          >
-            Logout
-          </button>
         </div>
         {/* Quick Access CTAs */}
         <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* CMS Dashboard CTA */}
           <div
-            className="relative rounded-2xl p-6 border border-green-400/30 bg-gradient-to-br from-[#0b1a0b] to-[#08120a] shadow-[0_0_22px_rgba(34,197,94,0.22)] cursor-pointer overflow-hidden group"
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-green-400/30 bg-[linear-gradient(135deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(34,197,94,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/admin/pages')}
             role="link"
             aria-label="Click to access CMS dashboard"
           >
-            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
             <div className="flex items-center justify-between gap-6">
               <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-green-400">Content Management</div>
-                <div className="text-xl font-extrabold text-white mt-1">CMS Dashboard</div>
-                <div className="text-white/70 mt-1 text-sm">Edit page content, SEO, and site copy.</div>
-                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-green-500 text-white font-semibold text-sm group-hover:bg-green-400 transition-colors">Open CMS →</div>
+                <div className="font-mono uppercase tracking-wider text-sm text-green-400 font-sora">Content Management</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">CMS Dashboard</div>
+                <div className="text-zinc-300 mt-1 text-sm">Edit page content, SEO, and site copy.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-green-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-green-400/40 transition-all">Open CMS →</div>
               </div>
             </div>
           </div>
           
           {/* CRM Dashboard CTA */}
           <div
-            className="relative rounded-2xl p-6 border border-amber-400/30 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_22px_rgba(245,158,11,0.22)] cursor-pointer overflow-hidden group"
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1c1c1c_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(245,158,11,0.15),inset_0_1px_0_rgba(255,255,255,0.14)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/crm')}
             role="link"
             aria-label="Click to access CRM dashboard"
           >
-            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
             <div className="flex items-center justify-between gap-6">
               <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-amber-400">Customer Relations</div>
-                <div className="text-xl font-extrabold text-white mt-1">CRM Dashboard</div>
-                <div className="text-white/70 mt-1 text-sm">Manage customers, VIPs, and lease agreements.</div>
-                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-amber-500 text-black font-semibold text-sm group-hover:bg-amber-400 transition-colors">Open CRM →</div>
+                <div className="font-mono uppercase tracking-wider text-sm text-amber-400 font-sora">Customer Relations</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">CRM Dashboard</div>
+                <div className="text-zinc-300 mt-1 text-sm">Manage customers, VIPs, and lease agreements.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-amber-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-amber-400/40 transition-all">Open CRM →</div>
               </div>
             </div>
           </div>
           
           {/* Sales Analytics CTA */}
           <div
-            className="relative rounded-2xl p-6 border border-blue-400/30 bg-gradient-to-br from-[#0b0f1a] to-[#08120d] shadow-[0_0_22px_rgba(59,130,246,0.22)] cursor-pointer overflow-hidden group"
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-blue-400/30 bg-[linear-gradient(125deg,#0a0a0a_0%,#181818_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(59,130,246,0.15),inset_0_1px_0_rgba(255,255,255,0.13)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/sales-analytics')}
             role="link"
             aria-label="Click to access sales analytics"
           >
-            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
             <div className="flex items-center justify-between gap-6">
               <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-blue-400">Analytics</div>
-                <div className="text-xl font-extrabold text-white mt-1">Sales Analytics</div>
-                <div className="text-white/70 mt-1 text-sm">Revenue targets, metrics, and charts.</div>
-                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-blue-500 text-white font-semibold text-sm group-hover:bg-blue-400 transition-colors">Open Analytics →</div>
+                <div className="font-mono uppercase tracking-wider text-sm text-blue-400 font-sora">Analytics</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Sales Analytics</div>
+                <div className="text-zinc-300 mt-1 text-sm">Revenue targets, metrics, and charts.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-blue-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-blue-400/40 transition-all">Open Analytics →</div>
               </div>
             </div>
           </div>
@@ -173,18 +173,17 @@ export default function AdminDashboard() {
         <div className="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Booking Radar CTA */}
           <div
-            className="relative rounded-2xl p-6 border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_22px_rgba(16,185,129,0.22)] cursor-pointer overflow-hidden group h-[280px] flex flex-col justify-center"
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-emerald-400/30 bg-[linear-gradient(135deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(16,185,129,0.15),inset_0_1px_0_rgba(255,255,255,0.16)] cursor-pointer overflow-hidden group h-[280px] flex flex-col justify-center hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/admin/bookings')}
             role="link"
             aria-label="Click to manage bookings"
           >
-            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
             <div className="flex items-center justify-between gap-6">
               <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-amber-400">Operations</div>
-                <div className="text-xl font-extrabold text-white mt-1">Manage Bookings</div>
-                <div className="text-white/70 mt-1 text-sm">View, confirm, or cancel reservations.</div>
-                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-emerald-500 text-black font-semibold text-sm group-hover:bg-emerald-400 transition-colors">Open Bookings →</div>
+                <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Operations</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Manage Bookings</div>
+                <div className="text-zinc-300 mt-1 text-sm">View, confirm, or cancel reservations.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-emerald-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-emerald-400/40 transition-all">Open Bookings →</div>
               </div>
             </div>
           </div>
@@ -198,18 +197,17 @@ export default function AdminDashboard() {
           
           {/* Accounting CTA */}
           <div
-            className="relative rounded-2xl p-6 border border-indigo-400/30 bg-gradient-to-br from-[#0b0f1a] to-[#080a12] shadow-[0_0_22px_rgba(99,102,241,0.22)] cursor-pointer overflow-hidden group h-[280px] flex flex-col justify-center"
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-indigo-400/30 bg-[linear-gradient(155deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(99,102,241,0.15),inset_0_1px_0_rgba(255,255,255,0.12)] cursor-pointer overflow-hidden group h-[280px] flex flex-col justify-center hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/admin/accounting')}
             role="link"
             aria-label="Click to access accounting dashboard"
           >
-            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
             <div className="flex items-center justify-between gap-6">
               <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-indigo-400">Financial Management</div>
-                <div className="text-xl font-extrabold text-white mt-1">Accounting</div>
-                <div className="text-white/70 mt-1 text-sm">Track expenses, profits, and financial reports.</div>
-                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-indigo-500 text-white font-semibold text-sm group-hover:bg-indigo-400 transition-colors">Open Accounting →</div>
+                <div className="font-mono uppercase tracking-wider text-sm text-indigo-400 font-sora">Financial Management</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Accounting</div>
+                <div className="text-zinc-300 mt-1 text-sm">Track expenses, profits, and financial reports.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-indigo-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-indigo-400/40 transition-all">Open Accounting →</div>
               </div>
             </div>
           </div>
@@ -219,54 +217,51 @@ export default function AdminDashboard() {
         <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Skill Tree CTA */}
           <div
-            className="relative rounded-2xl p-6 border border-yellow-400/30 bg-gradient-to-br from-[#1a1a0b] to-[#12120a] shadow-[0_0_22px_rgba(234,179,8,0.22)] cursor-pointer overflow-hidden group"
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-yellow-400/30 bg-[linear-gradient(165deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(234,179,8,0.15),inset_0_1px_0_rgba(255,255,255,0.14)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/admin/accomplishments')}
             role="link"
             aria-label="Click to view skill tree"
           >
-            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
             <div className="flex items-center justify-between gap-6">
               <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-yellow-400">Development</div>
-                <div className="text-xl font-extrabold text-white mt-1">Skill Tree</div>
-                <div className="text-white/70 mt-1 text-sm">Interactive skill tree with completed achievements and current objectives.</div>
-                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-yellow-500 text-black font-semibold text-sm group-hover:bg-yellow-400 transition-colors">Open Skill Tree →</div>
+                <div className="font-mono uppercase tracking-wider text-sm text-yellow-400 font-sora">Development</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Skill Tree</div>
+                <div className="text-zinc-300 mt-1 text-sm">Interactive skill tree with completed achievements and current objectives.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-yellow-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-yellow-400/40 transition-all">Open Skill Tree →</div>
               </div>
             </div>
           </div>
           
           {/* DevOps Tools CTA */}
           <div
-            className="relative rounded-2xl p-6 border border-orange-400/30 bg-gradient-to-br from-[#1a0f0b] to-[#120a08] shadow-[0_0_22px_rgba(249,115,22,0.22)] cursor-pointer overflow-hidden group"
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-orange-400/30 bg-[linear-gradient(175deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(249,115,22,0.15),inset_0_1px_0_rgba(255,255,255,0.13)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/admin/devops')}
             role="link"
             aria-label="Click to access DevOps tools"
           >
-            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
             <div className="flex items-center justify-between gap-6">
               <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-orange-400">Development</div>
-                <div className="text-xl font-extrabold text-white mt-1">DevOps Tools</div>
-                <div className="text-white/70 mt-1 text-sm">Page Edits, Operating Manual, Engineering Playbooks, Saved Prompts, Repo Map, Week Plan.</div>
-                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-orange-500 text-white font-semibold text-sm group-hover:bg-orange-400 transition-colors">Open DevOps →</div>
+                <div className="font-mono uppercase tracking-wider text-sm text-orange-400 font-sora">Development</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">DevOps Tools</div>
+                <div className="text-zinc-300 mt-1 text-sm">Page Edits, Operating Manual, Engineering Playbooks, Saved Prompts, Repo Map, Week Plan.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-orange-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-orange-400/40 transition-all">Open DevOps →</div>
               </div>
             </div>
           </div>
           
           {/* Support Tickets CTA */}
           <div
-            className="relative rounded-2xl p-6 border border-purple-400/30 bg-gradient-to-br from-[#1a0b1a] to-[#120a12] shadow-[0_0_22px_rgba(168,85,247,0.22)] cursor-pointer overflow-hidden group"
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-purple-400/30 bg-[linear-gradient(185deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(168,85,247,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/support-dashboard')}
             role="link"
             aria-label="Click to access support tickets"
           >
-            <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
             <div className="flex items-center justify-between gap-6">
               <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-purple-400">Support</div>
-                <div className="text-xl font-extrabold text-white mt-1">Support Tickets</div>
-                <div className="text-white/70 mt-1 text-sm">Manage tenant communications and support requests.</div>
-                <div className="inline-flex items-center mt-4 px-3 py-1.5 rounded bg-purple-500 text-white font-semibold text-sm group-hover:bg-purple-400 transition-colors">Open Support →</div>
+                <div className="font-mono uppercase tracking-wider text-sm text-purple-400 font-sora">Support</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Support Tickets</div>
+                <div className="text-zinc-300 mt-1 text-sm">Manage tenant communications and support requests.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-purple-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-purple-400/40 transition-all">Open Support →</div>
               </div>
             </div>
           </div>
