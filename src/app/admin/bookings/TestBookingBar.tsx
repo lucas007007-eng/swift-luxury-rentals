@@ -122,30 +122,20 @@ export default function TestBookingBar(_: Props) {
   React.useEffect(() => { recomputePreview() }, [recomputePreview])
 
   return (
-    <div className="relative mx-auto max-w-[720px] rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-[#07140F] to-[#0b1a12] shadow-[0_0_28px_rgba(16,185,129,0.28)] p-4 mb-6 overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 opacity-25 agent-grid" />
-      <div className="absolute -top-20 -right-24 w-72 h-72 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-      <div className="flex items-center justify-between mb-3 relative z-10">
-        <div className="inline-flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-center">
-            <svg className="w-3.5 h-3.5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
-          </div>
-          <div className="font-mono uppercase tracking-wider text-xs md:text-sm gold-metallic-text">Test booking</div>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-3 items-center relative z-10">
-        <input className="bg-black/40 border border-white/10 rounded px-2 py-1 text-xs md:text-sm" value={name} onChange={e=>setName(e.target.value)} placeholder="Name" />
-        <select className="bg-black/40 border border-white/10 rounded px-2 py-1 text-xs md:text-sm" value={city} onChange={e=>{ setCity(e.target.value); const list=(cityProperties as any)[e.target.value]||[]; setPropertyId(list[0]?.id||'') }}>
-          {cityNames.map(c => <option key={c} value={c}>{c}</option>)}
+    <div className="mt-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-center">
+        <input className="bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] focus:border-emerald-400/50 focus:outline-none transition-all" value={name} onChange={e=>setName(e.target.value)} placeholder="Name" />
+        <select className="bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] rounded-lg px-3 py-2 text-sm text-white font-sora shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] focus:border-emerald-400/50 focus:outline-none transition-all" value={city} onChange={e=>{ setCity(e.target.value); const list=(cityProperties as any)[e.target.value]||[]; setPropertyId(list[0]?.id||'') }}>
+          {cityNames.map(c => <option key={c} value={c} className="bg-black text-white">{c}</option>)}
         </select>
-        <select className="bg-black/40 border border-white/10 rounded px-2 py-1 text-xs md:text-sm" value={propertyId} onChange={e=>setPropertyId(e.target.value)}>
-          {properties.map((p:any)=> <option key={p.id} value={p.id}>{p.title}</option>)}
+        <select className="bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] rounded-lg px-3 py-2 text-sm text-white font-sora shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] focus:border-emerald-400/50 focus:outline-none transition-all" value={propertyId} onChange={e=>setPropertyId(e.target.value)}>
+          {properties.map((p:any)=> <option key={p.id} value={p.id} className="bg-black text-white">{p.title}</option>)}
         </select>
-        <button type="button" className="bg-black/40 border border-white/10 rounded px-2 py-1 text-xs md:text-sm text-left hover:border-emerald-400/40 transition-colors" onClick={()=>setShowCal(v=>!v)}>
+        <button type="button" className="bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] rounded-lg px-3 py-2 text-sm text-white font-sora text-left shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:border-emerald-400/50 transition-all" onClick={()=>setShowCal(v=>!v)}>
           {checkIn && checkOut ? `${checkIn} → ${checkOut}` : 'Select dates'}
         </button>
-        <button onClick={onCreate} className="px-3 py-1.5 rounded border border-emerald-400/40 bg-[linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05))] text-emerald-300 hover:text-emerald-200 text-xs md:text-sm inline-flex items-center gap-2 shadow-[0_0_18px_rgba(16,185,129,0.25)]">
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+        <button onClick={onCreate} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
           Create test booking
         </button>
       </div>

@@ -1,5 +1,7 @@
 import React from 'react'
 import prisma from '@/lib/prisma'
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 import TestBookingBar from './TestBookingBar'
 import DeleteButton from './DeleteButton'
 
@@ -87,39 +89,52 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   const pageRevenue = Math.round(bookings.reduce((s: number, b: any) => s + (Number(b.totalCents || 0) / 100), 0))
   return (
     <main className="min-h-screen bg-black text-white">
-      <div className="max-w-[2200px] mx-auto px-6 py-10">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text">Agent Ops</div>
-            <h1 className="text-3xl font-extrabold">Bookings</h1>
-            <p className="text-white/60">Manage Prisma-backed bookings. Update statuses and review details.</p>
+      <Header forceBackground={true} />
+      <div className="max-w-[2200px] mx-auto px-6 py-10 pt-28">
+        {/* Header Row: Testing Suite + Operations Command */}
+        <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Testing Suite Card */}
+          <div className="luxury-feature-card p-8">
+            <div className="mb-4">
+              <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Testing Suite</div>
+              <h2 className="text-2xl font-bold heading-sora text-white mb-2 text-left">Create Test Booking</h2>
+            </div>
+            <TestBookingBar />
           </div>
-          <a
-            href="/admin"
-            className="inline-flex items-center gap-3 px-4 py-2 rounded-lg border border-emerald-400/40 bg-gradient-to-br from-[#0b1a12] to-[#08120d] text-emerald-300 hover:text-emerald-200 shadow-[0_0_20px_rgba(16,185,129,0.25)]"
-            aria-label="Back to Admin"
-          >
-            <span className="text-emerald-300 text-xl leading-none">←</span>
-            <span className="font-mono uppercase tracking-wider text-sm font-semibold">Back</span>
-          </a>
-        </div>
-
-        {/* (moved) Status summary integrated into table header below */}
-
-        {/* Test booking tile below summary, aligned left */}
-        <div className="mb-6">
-          <TestBookingBar />
+          
+          {/* Operations Command Card */}
+          <div className="luxury-feature-card p-8">
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Operations Command</div>
+                <h1 className="text-4xl font-bold heading-sora text-white mb-2 text-left">Booking Operations</h1>
+                <p className="text-zinc-300 text-lg text-left">Elite Reservation Management</p>
+              </div>
+              <a
+                href="/admin"
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
+                aria-label="Back to Admin"
+              >
+                ← Back to Admin
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Table card */}
-        <div className="relative overflow-x-auto rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] shadow-[0_0_20px_rgba(16,185,129,0.18)]">
-          <div className="pointer-events-none absolute inset-0 opacity-20 agent-grid" />
-          <div className="p-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-col gap-2 w-full lg:w-auto">
-              <div className="flex items-baseline gap-2">
-                <div className="font-mono uppercase tracking-wider text-sm gold-metallic-text">All Bookings</div>
+        <div className="relative overflow-x-auto luxury-feature-card">
+          {/* Corner accent lights */}
+          <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-emerald-400/60 opacity-80 z-20" />
+          <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-emerald-400/60 opacity-80 z-20" />
+          <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-emerald-400/60 opacity-80 z-20" />
+          <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-emerald-400/60 opacity-80 z-20" />
+          
+          <div className="p-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between relative z-10">
+            <div className="flex flex-col gap-3 w-full lg:w-auto">
+              <div className="flex items-baseline gap-3">
+                <div className="font-mono uppercase tracking-wider text-lg text-emerald-400 font-sora">All Bookings</div>
                 {statusFilter && (
-                  <div className="text-xs text-white/70">— {activeStatus}</div>
+                  <div className="text-sm text-zinc-300 font-sora">— {activeStatus}</div>
                 )}
               </div>
               {/* Inline scoreboard (reflects current view) */}
@@ -137,7 +152,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               <form action="/api/admin/bookings/recompute?all=1&redirect=1" method="post" className="inline">
                 <button
                   type="submit"
-                  className="text-xs px-3 py-1.5 rounded border border-emerald-400/40 bg-emerald-500/10 text-emerald-300 hover:text-emerald-200"
+                  className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300"
                   title="Safely recompute monthly schedules and totals for all bookings (idempotent). Confirmation required."
                 >
                   Recompute totals
@@ -146,7 +161,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               <form action="/api/admin/bookings/cleanup-holds?redirect=1" method="post" className="inline">
                 <button
                   type="submit"
-                  className="text-xs px-3 py-1.5 rounded border border-red-400/40 bg-red-500/10 text-red-300 hover:text-red-200"
+                  className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-orange-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-orange-400/50 transition-all duration-300"
                   title="Fix hold bookings that incorrectly show payments as received"
                 >
                   Fix Hold Payments
@@ -154,12 +169,15 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               </form>
               <a
                 href="/api/admin/bookings/synthesize-first?all=1&redirect=1"
-                className="text-xs px-3 py-1.5 rounded border border-sky-400/40 bg-sky-500/10 text-sky-300 hover:text-sky-200"
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-sky-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-sky-400/50 transition-all duration-300"
                 title="Synthesize received payments for past-start bookings and refresh"
               >
                 Synthesize received
               </a>
-              <div className="text-sm text-emerald-300">€{pageRevenue.toLocaleString('de-DE')} page total</div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)]">
+                <span className="text-sm font-semibold text-zinc-100 font-sora">€{pageRevenue.toLocaleString('de-DE')}</span>
+                <span className="text-xs text-zinc-400 font-mono uppercase tracking-wider">Page Total</span>
+              </div>
             </div>
           </div>
           {/* Mobile card list (sm) */}
@@ -246,38 +264,48 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
           </div>
 
           {/* Responsive table layout */}
-          <div className="hidden md:block px-6 md:px-8">
+          <div className="hidden md:block px-6 md:px-8 relative z-10">
             <div className="w-full">
-          <table className="w-full divide-y divide-white/10 table-auto">
-            <thead className="bg-black/20">
+          <table className="w-full divide-y divide-zinc-700/50 table-auto">
+            <thead className="bg-black/30 backdrop-blur-sm">
               <tr>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[10%]">Created</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[10%]">Client</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Email</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[18%]">Property</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[10%]">Dates</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Deposit</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Payment Received</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[12%]">Scheduled Payments</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[14%]">Overdue Payments</th>
-                <th className="px-2 py-3 text-left text-[11px] uppercase tracking-wide text-white/70 w-[10%]">Status</th>
+                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Created</th>
+                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Client</th>
+                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Property</th>
+                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Dates</th>
+                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Deposit</th>
+                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Payment Received</th>
+                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Scheduled Payments</th>
+                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Overdue Payments</th>
+                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/10">
+            <tbody className="divide-y divide-zinc-700/30">
               {withDeposit.map((b: any) => (
-                <tr key={b.id} className="hover:bg-white/5">
-                  <td className="px-2 py-3 text-xs text-white/80">{new Date(b.createdAt).toLocaleDateString()}</td>
-                  <td className="px-2 py-3 text-sm">
-                    <div className="text-white/90 font-medium text-sm">{b.user?.name || '—'}</div>
-                    <div className="text-white/40 text-xs">{b.userId?.slice?.(0,6) || ''}</div>
+                <tr key={b.id} className="hover:bg-zinc-900/20 transition-colors">
+                  <td className="px-3 py-4 text-sm text-white font-semibold font-sora">{new Date(b.createdAt).toLocaleDateString()}</td>
+                  <td className="px-3 py-4 text-sm">
+                    <div className="inline-flex flex-col p-3 rounded-lg border border-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full">
+                      <div className="text-white font-bold text-sm font-sora mb-1">{b.user?.name || '—'}</div>
+                      <div className="text-blue-300 text-xs font-sora truncate mb-1">{b.user?.email || '—'}</div>
+                      <div className="text-zinc-400 text-xs font-mono bg-zinc-900/50 px-2 py-0.5 rounded inline-block">{b.userId?.slice?.(0,6) || ''}</div>
+                    </div>
                   </td>
                   
-                  <td className="px-2 py-3 text-xs text-white/80 break-all">{b.user?.email || '—'}</td>
-                  <td className="px-2 py-3 text-sm">
-                    <div className="text-white/90 text-sm leading-tight">{b.property?.title || '—'}</div>
-                    <div className="text-white/40 text-xs">{b.property?.address || ''}</div>
+                  <td className="px-3 py-4 text-sm">
+                    <a href={`/admin/property/${b.property?.extId || ''}`} className="inline-flex flex-col p-3 rounded-lg border border-zinc-600/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full hover:border-zinc-400/50 hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                      <div className="text-white font-bold text-sm leading-tight font-sora mb-1">{b.property?.title || '—'}</div>
+                      <div className="text-zinc-400 text-xs leading-relaxed">{b.property?.address || ''}</div>
+                    </a>
                   </td>
-                  <td className="px-2 py-3 text-xs text-white/60">{new Date(b.checkin).toLocaleDateString()} → {new Date(b.checkout).toLocaleDateString()}</td>
+                  <td className="px-3 py-4 text-sm">
+                    <div className="inline-flex flex-col p-3 rounded-lg border border-sky-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full">
+                      <div className="text-sky-300 text-xs font-sora mb-1">Check-in</div>
+                      <div className="text-white font-semibold text-sm font-sora mb-2">{new Date(b.checkin).toLocaleDateString()}</div>
+                      <div className="text-sky-300 text-xs font-sora mb-1">Checkout</div>
+                      <div className="text-white font-semibold text-sm font-sora">{new Date(b.checkout).toLocaleDateString()}</div>
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-sm">
                     {(() => {
                       const depHeldCents = Number(b.depositHeld || 0)
@@ -329,10 +357,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       if (receivedTotalEuros <= 0) return <span className="text-white/40 text-xs">—</span>
                       return (
                         <div className="space-y-2">
-                          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] whitespace-nowrap" aria-label="Payment received">
-                            <svg className="w-3.5 h-3.5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
+                          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] w-full justify-between" aria-label="Payment received">
+                            <div className="flex items-center gap-2">
+                              <svg className="w-3.5 h-3.5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
+                              <span className="uppercase tracking-wider text-[10px] text-emerald-200">Received</span>
+                            </div>
                             <span className="font-semibold">€{receivedTotalEuros.toLocaleString('de-DE')}</span>
-                            <span className="uppercase tracking-wider text-[10px] text-emerald-200">Received</span>
                           </div>
                           {receivedList.length > 0 && (
                             <div className="rounded-md border border-emerald-400/30 bg-emerald-500/5 p-3 shadow-[0_0_12px_rgba(16,185,129,0.12)]">
@@ -379,12 +409,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                   }
                                   return (
                                     <div key={p.id} className="flex items-center justify-between gap-3">
-                                      <div className="flex flex-col">
-                                        <span className="text-sm text-emerald-300 whitespace-nowrap">{dateStr}</span>
-                                        <span className="text-sm text-emerald-200/90 whitespace-nowrap font-semibold">{label}</span>
-                                        {daysNote && <span className="text-sm text-emerald-200/70 whitespace-nowrap">{daysNote}</span>}
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{dateStr}</span>
+                                        <span className="text-sm text-zinc-300 whitespace-nowrap font-sora">{label}</span>
+                                        {daysNote && <span className="text-xs text-zinc-400 whitespace-nowrap">{daysNote}</span>}
                                       </div>
-                                      <span className="px-2 py-0.5 rounded text-sm bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                      <span className="px-3 py-1 rounded-lg text-sm bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-semibold font-sora">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
                                     </div>
                                   )
                                 })}
@@ -446,9 +476,9 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                           })()}
                           {scheduled.length > 0 ? (
                             <div className="rounded-md border border-amber-400/30 bg-amber-500/5 p-3 shadow-[0_0_12px_rgba(245,158,11,0.12)]">
-                              <div className="flex items-center gap-2 text-xs text-amber-300 mb-2">
-                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                                <span className="uppercase tracking-wider">Scheduled Payments</span>
+                              <div className="flex items-center gap-2 text-sm text-amber-300 mb-2 font-sora">
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                <span className="uppercase tracking-wider font-semibold">Scheduled Payments</span>
                               </div>
                               <div className="space-y-1 mt-2">
                                 {scheduled.map((p:any, idx:number) => {
@@ -466,12 +496,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                     return `${months[d.getMonth()]} ${dd}${sfx}`
                                   }
                                   return (
-                                    <label key={p.id} className="flex items-center justify-between gap-3 whitespace-nowrap">
-                                      <div className="flex items-center gap-2">
-                                        <input type="checkbox" name="paymentId" value={p.id} form={`receive-${b.id}`} className="accent-emerald-500" />
-                                        <div className="flex flex-col">
-                                          <span className="px-2 py-0.5 rounded text-sm bg-amber-500/20 text-amber-300 border border-amber-400/30 whitespace-nowrap">{formatShortDate(due)}</span>
-                                          {(() => {
+                                    <label key={p.id} className="flex items-center justify-between gap-3 cursor-pointer hover:bg-zinc-900/20 p-2 rounded transition-colors">
+                                      <div className="flex items-center gap-3">
+                                        <input type="checkbox" name="paymentId" value={p.id} form={`receive-${b.id}`} className="w-4 h-4 rounded border-2 border-zinc-400 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] checked:bg-emerald-500 checked:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus:ring-offset-0 accent-emerald-500" />
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{formatShortDate(due)}</span>
+                                          <span className="text-sm text-zinc-300 whitespace-nowrap font-sora">{(() => {
                                             try {
                                               const list = (payments || []).filter((x:any)=> x.purpose === 'monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
                                               const myIdx = list.findIndex((x:any)=> x.id === p.id)
@@ -479,14 +509,14 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                               const j = n % 10, k = n % 100
                                               const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
                                               if (isLast && isPartial) {
-                                                return <span className="text-sm text-amber-200/80 whitespace-nowrap">({fmtShort(due)} - {fmtShort(endLessOne)})</span>
+                                                return `Monthly rent (${fmtShort(due)} - ${fmtShort(endLessOne)})`
                                               }
-                                              return <span className="text-sm text-amber-200/80 whitespace-nowrap">({ord} month rent)</span>
-                                            } catch { return null }
-                                          })()}
+                                              return `Monthly rent (${ord} month rent)`
+                                            } catch { return 'Monthly rent' }
+                                          })()}</span>
                                         </div>
                                       </div>
-                                      <span className="text-sm font-semibold text-white whitespace-nowrap">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                      <span className="px-3 py-1 rounded-lg text-sm bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-semibold font-sora">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
                                     </label>
                                   )
                                 })}
@@ -536,27 +566,28 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       )
                     })()}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-3 py-4 text-sm">
                     {b.status === 'confirmed' ? (
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] whitespace-nowrap">
-                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                          <span className="uppercase tracking-wider text-[10px]">Confirmed</span>
+                      <div className="flex items-center gap-1">
+                        <span className="inline-flex items-center px-2 py-1 rounded text-xs border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 font-semibold font-sora">
+                          Confirmed
                         </span>
                         <DeleteButton id={b.id} />
                       </div>
                     ) : (
-                      <form action="/api/admin/bookings" method="post" className="inline-flex items-center">
-                        <input type="hidden" name="id" value={b.id} />
-                        <select name="status" defaultValue={b.status} className="bg-black/40 border border-emerald-400/30 rounded px-2 py-1 text-sm">
-                          <option value="hold">hold</option>
-                          <option value="confirmed">confirmed</option>
-                          <option value="cancelled">cancelled</option>
-                          <option value="__delete__">DELETE</option>
-                        </select>
-                        <button className="ml-2 px-2 py-1 text-xs rounded bg-amber-500 hover:bg-amber-600 text-black font-semibold shadow">Save</button>
-                        <span className="ml-2"><DeleteButton id={b.id} /></span>
-                      </form>
+                      <div className="flex flex-col gap-1">
+                        <form action="/api/admin/bookings" method="post" className="flex items-center gap-1">
+                          <input type="hidden" name="id" value={b.id} />
+                          <select name="status" defaultValue={b.status} className="bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-2 py-1 text-xs text-white font-sora">
+                            <option value="hold" className="bg-black">Hold</option>
+                            <option value="confirmed" className="bg-black">Confirmed</option>
+                            <option value="cancelled" className="bg-black">Cancelled</option>
+                            <option value="__delete__" className="bg-black">DELETE</option>
+                          </select>
+                          <button className="px-2 py-1 text-xs rounded bg-amber-500 hover:bg-amber-600 text-black font-semibold font-sora">Save</button>
+                        </form>
+                        <DeleteButton id={b.id} />
+                      </div>
                     )}
                   </td>
                   
@@ -575,6 +606,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   )
 }
@@ -592,19 +624,59 @@ function SummaryCard({ title, value, color }: { title: string; value: string; co
 }
 
 function ScorePill({ title, value, color, href, active }: { title: string; value: string; color: 'emerald' | 'amber' | 'sky'; href: string; active?: boolean }) {
-  const border = color === 'emerald' ? 'border-emerald-400/40' : color === 'amber' ? 'border-amber-400/40' : 'border-sky-400/40'
-  const bg = color === 'emerald' ? 'bg-emerald-500/10' : color === 'amber' ? 'bg-amber-500/10' : 'bg-sky-500/10'
-  const text = color === 'emerald' ? 'text-emerald-300' : color === 'amber' ? 'text-amber-300' : 'text-sky-300'
-  const glow = color === 'emerald' ? 'shadow-[0_0_16px_rgba(16,185,129,0.28)]' : color === 'amber' ? 'shadow-[0_0_16px_rgba(245,158,11,0.28)]' : 'shadow-[0_0_16px_rgba(56,189,248,0.28)]'
-  const ring = active ? 'ring-2 ring-offset-0 ring-emerald-400/40' : ''
+  const accentColor = color === 'emerald' ? '16,185,129' : color === 'amber' ? '245,158,11' : '56,189,248'
+  const borderColor = color === 'emerald' ? 'border-emerald-400/40' : color === 'amber' ? 'border-amber-400/40' : 'border-sky-400/40'
+  const textColor = color === 'emerald' ? 'text-emerald-300' : color === 'amber' ? 'text-amber-300' : 'text-sky-300'
+  
   return (
-    <a href={href} className={`group inline-flex items-center justify-between gap-3 px-4 py-3 rounded-xl border ${border} ${bg} ${text} ${glow} ${ring} transition transform hover:scale-[1.02] hover:brightness-110`}
+    <a href={href} 
+       className={`group relative rounded-xl p-4 overflow-hidden transition-all duration-300 hover:scale-[1.02] ${active ? 'ring-2 ring-emerald-400/40' : ''}`}
+       style={{
+         background: `
+           linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
+           radial-gradient(circle at 30% 20%, rgba(${accentColor},0.08) 0%, transparent 50%)
+         `,
+         border: `1px solid rgba(${accentColor},0.4)`,
+         backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
+         boxShadow: `
+           0 20px 60px rgba(0,0,0,0.9),
+           0 10px 30px rgba(0,0,0,0.7),
+           inset 0 2px 0 rgba(255,255,255,0.15),
+           inset 0 -1px 0 rgba(255,255,255,0.1),
+           0 0 40px rgba(${accentColor},0.12)
+         `,
+         transform: 'perspective(1000px) rotateX(1deg)',
+         transformStyle: 'preserve-3d'
+       }}
        aria-current={active ? 'page' : undefined}>
-      <div className="flex items-center gap-2">
-        <span className="font-mono uppercase tracking-wider text-[11px] opacity-90">{title}</span>
-        <span className="font-semibold text-white">{value}</span>
+      
+      {/* Holographic grid overlay */}
+      <div className="absolute inset-0 opacity-8 z-0" 
+           style={{
+             backgroundImage: `
+               linear-gradient(90deg, rgba(${accentColor},0.15) 1px, transparent 1px),
+               linear-gradient(rgba(${accentColor},0.15) 1px, transparent 1px)
+             `,
+             backgroundSize: '20px 20px',
+             animation: 'grid-pulse 4s ease-in-out infinite alternate'
+           }} />
+      
+      <div className="relative z-10 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className={`font-mono uppercase tracking-wider text-sm ${textColor} font-sora`}>{title}</span>
+          <span className="font-semibold text-white">{value}</span>
+        </div>
+        <svg className={`w-4 h-4 ${textColor} opacity-70 group-hover:opacity-100 transition-opacity`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
       </div>
-      <svg className="w-4 h-4 opacity-70 group-hover:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      
+      {/* Enhanced 3D hover effect */}
+      <div className={`absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-500`}
+           style={{
+             background: `rgba(${accentColor},0.08)`,
+             boxShadow: `inset 0 0 60px rgba(${accentColor},0.15), 0 0 80px rgba(${accentColor},0.2)`
+           }} />
     </a>
   )
 }
