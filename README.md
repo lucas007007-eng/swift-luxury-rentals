@@ -1,27 +1,29 @@
-# BerlinLuxerentals.de
+# Swift Luxury Rentals — Ultra‑Premium Rentals Platform
 
-A modern, responsive rental property website built with Next.js, TypeScript, and Tailwind CSS. This website is customized for the Berlin luxury rental market.
+An ultra‑premium, spy‑tech inspired luxury rentals platform built with Next.js 14 (App Router), TypeScript, Tailwind CSS, and Prisma. Designed for high‑end city rentals with real‑time support, analytics dashboards, and cinematic UI/UX across tenant and admin experiences.
 
-## 🌟 Features
+## 🌟 Highlights
 
-- **Modern Design**: Beautiful, responsive UI with smooth animations
-- **Property Listings**: Comprehensive property cards with image carousels
-- **Multi-Duration Rentals**: Support for short-term, month-to-month, and long-term rentals
-- **Advanced Filtering**: Filter properties by type, location, amenities, and more
-- **Contact Forms**: Interactive contact forms with validation
-- **Location Pages**: Detailed information about Berlin neighborhoods
-- **Mobile Responsive**: Fully responsive design for all devices
-- **SEO Optimized**: Built with Next.js for optimal performance and SEO
+- **Ultra‑premium design system**: Metallic black‑silver “James Bond” glass morphism, Sora headings, animated borders, premium shadows, 3D tilt, and HUD elements.
+- **Real‑time Support Tickets**: Tenant dashboard support tab with ticket creation + live chat; Admin support dashboard for triage, status, and replies with unread indicators.
+- **Weather + Clock Hero**: City pages include a sleek Bond‑style WeatherWidget (AQI + apparent temperature) and synchronized local time, with dramatic weather animations (rain/snow/sunny/cloudy/thunder).
+- **Luxury Search + Calendar**: Glassy “press‑down” CodePen‑style search button, sophisticated dark calendar with thicker fonts, larger desktop size, premium selection chips, and controlled month navigation.
+- **Admin Suite**: Ultra‑premium `/admin` dashboard, `/sales-analytics` spy‑tech analytics (metric cards, neon bar charts, target cards), and `/admin/pages` premium CMS list.
+- **CRM + Bookings**: Mobile‑optimized CRM cards, admin bookings operations with deposits, scheduled/received payments, and quick actions.
+- **Maps + Properties**: Metallic black‑silver map cards, modern property tiles, Instagram in‑app “View Details” compatibility, metallic silver iconography.
+- **Authentication**: NextAuth credentials + Google OAuth, admin login with username support and middleware route protection. Automatic login post‑registration.
 
 ## 🚀 Tech Stack
 
-- **Framework**: Next.js 14 with App Router
+- **Framework**: Next.js 14 (App Router), React 18
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
-- **Icons**: Heroicons
-- **Forms**: React Hook Form
-- **Development**: ESLint, PostCSS, Autoprefixer
+- **Styling**: Tailwind CSS, custom globals for HUD/spy effects, glass morphism, metallic borders
+- **Animations**: Framer Motion, CSS keyframes (scan, grid‑pulse, spy‑metric glow), dynamic raindrops/splashes
+- **Auth**: NextAuth.js (Credentials + Google), middleware protection
+- **DB/ORM**: PostgreSQL + Prisma (`SupportTicket`, `SupportMessage`, `User`, `Booking`, `Payment`)
+- **APIs**: Next.js Route Handlers (support, analytics, weather, bookings)
+- **Maps**: Google Maps via `@react-google-maps/api` with graceful fallback
+- **UX Libs**: Vanilla‑Tilt (3D), React Hook Form
 
 ## 📦 Installation
 
@@ -45,27 +47,31 @@ powershell -ExecutionPolicy Bypass -File .\start-server.ps1
 ```
 
 4. **Open your browser**
-Navigate to [http://localhost:3002](http://localhost:3002)
+Navigate to [http://localhost:3000](http://localhost:3000)
 
-## 🏗️ Project Structure
+## 🏗️ Project Structure (key paths)
 
 ```
 berlinluxerentals/
 ├── src/
 │   ├── app/                    # App Router pages
-│   │   ├── about/             # About page
-│   │   ├── contact/           # Contact page
+│   │   ├── admin/             # Admin dashboards (main, bookings, pages, etc.)
+│   │   ├── city/[cityName]/   # City page with hero (clock + weather + rain bg)
 │   │   ├── properties/        # Properties listing page
-│   │   ├── globals.css        # Global styles
-│   │   ├── layout.tsx         # Root layout
+│   │   ├── sales-analytics/   # Spy‑tech analytics dashboard
+│   │   ├── support-dashboard/ # Admin support tickets dashboard
+│   │   ├── dashboard/         # Tenant dashboard (support tab + chat)
+│   │   ├── api/               # Route handlers (support, analytics, weather, bookings)
+│   │   ├── globals.css        # Global styles (spy‑tech HUD, glass, weather)
 │   │   └── page.tsx           # Home page
 │   ├── components/            # Reusable components
-│   │   ├── Header.tsx         # Navigation header
-│   │   ├── Hero.tsx           # Hero section
-│   │   ├── PropertyCard.tsx   # Property listing card
-│   │   ├── About.tsx          # About section
-│   │   ├── Locations.tsx      # Locations section
-│   │   ├── ContactForm.tsx    # Contact form
+│   │   ├── Header.tsx         # Premium header
+│   │   ├── WeatherWidget.tsx  # Bond‑style weather + AQI card
+│   │   ├── PublicCalendar.tsx # Dark premium calendar
+│   │   ├── PropertyCard.tsx   # Metallic‑styled property tiles
+│   │   ├── Locations.tsx      # City tiles (tilt on desktop)
+│   │   ├── SearchInterface.tsx# Glassy press‑down search button, filters
+│   │   ├── SpyEuropeMap.tsx   # Map with metallic frame
 │   │   └── Footer.tsx         # Site footer
 │   ├── lib/                   # Utility functions
 │   │   └── utils.ts           # Helper functions
@@ -77,7 +83,7 @@ berlinluxerentals/
 └── package.json              # Dependencies and scripts
 ```
 
-## 🎨 Components Overview
+## 🎨 Premium UX Overview
 
 ### Header Component
 - Responsive navigation with mobile menu
@@ -85,18 +91,14 @@ berlinluxerentals/
 - Authentication links
 - Logo and branding
 
-### Hero Component
-- Dynamic search functionality
-- Rental type tabs (Short-term, Month-to-month, Long-term)
-- Animated elements with Framer Motion
-- Quick filter buttons
+### City Hero (Berlin, etc.)
+- Black hero with Sora headings, Bond‑style clock, Weather widget (AQI + apparent temp)
+- Dramatic weather overlays (rain at angle with teardrops + splashes, snow, thunder)
+- Search bar with glassy press‑down animation and thin silver border; mobile‑optimized
 
-### PropertyCard Component
-- Image carousel with navigation
-- Property details and amenities
-- Pricing and availability
-- Like/bookmark functionality
-- Responsive design
+### Property Cards
+- Metallic black‑silver styling, silver icons, Instagram in‑app “View Details” compatibility
+- Removed play button; metallic silver slider arrows
 
 ### ContactForm Component
 - Form validation with React Hook Form
@@ -104,7 +106,7 @@ berlinluxerentals/
 - Success/error states
 - Responsive layout
 
-## 🌍 Pages
+## 🌍 Pages (key)
 
 ### Home Page (`/`)
 - Hero section with search
@@ -114,16 +116,17 @@ berlinluxerentals/
 - Contact form
 
 ### Properties Page (`/properties`)
-- Property filtering and sorting
-- Grid/map view toggle
-- Advanced search options
-- Pagination
+- Metallic tiles, 4 per row on desktop, filters showing only active‐listing cities
 
-### About Page (`/about`)
-- Company mission and values
-- Team profiles
-- Statistics and achievements
-- Company history
+### Admin (`/admin`)
+- Ultra‑premium cards with metallic borders, glow, and spy‑tech accents
+- CTAs: CMS, CRM, Analytics, Bookings, Accounting, DevOps, Support
+
+### Sales Analytics (`/sales-analytics`)
+- “Spy‑Tech HUD” metrics, neon grid bars, mission‑style targets; silver glowing numbers
+
+### Support Dashboard (`/support-dashboard`) / Tenant Dashboard (`/dashboard`)
+- Tickets list, filters, chat; tenant unread badges, NEW REPLY indicators
 
 ### Contact Page (`/contact`)
 - Contact information
@@ -140,17 +143,14 @@ berlinluxerentals/
 - Touch-friendly interfaces
 
 ### Animations
-- Smooth page transitions
-- Scroll-triggered animations
-- Hover effects
-- Loading states
+- Weather: code‑driven raindrops with diagonal fall + splash cycles, thunder/snow/clouds
+- HUD: scan, grid‑pulse, spy‑metric glows; subtle 3D hover transforms
 
-### Property Management
-- Multiple property types
-- Image galleries
-- Amenity listings
-- Availability tracking
-- Pricing display
+### Support & Comms
+- Prisma‑backed SupportTicket/SupportMessage models, real‑time chat UX, unread counts
+ 
+### Bookings & CRM
+- Admin bookings table: deposits (active/refunded), scheduled vs received, overdue chips, quick receive/refund actions
 
 ### Search & Filtering
 - Real-time search
@@ -161,7 +161,7 @@ berlinluxerentals/
 
 ## 🚀 Deployment
 
-### Build for Production
+### Production Build
 ```bash
 npm run build
 ```
@@ -179,11 +179,7 @@ npm run lint
 ## 🔧 Configuration
 
 ### Tailwind CSS
-The project uses a custom Tailwind configuration with:
-- Custom color palette (primary/secondary)
-- Extended font family (Inter)
-- Custom utility classes
-- Responsive breakpoints
+Custom metallic palette, Sora font for headings, glass morphism layers, backdrop‑filter, animated borders, and premium shadows.
 
 ### Next.js
 - App Router architecture
@@ -213,9 +209,8 @@ This project is licensed under the MIT License.
 
 ## 📞 Support
 
-For support or questions about this project:
-- Email: info@berlinluxerentals.de
-- Phone: +49 (30) 1234-5678
+For product or partnership inquiries:
+- Email: contact@swiftluxuryrentals.com
 
 ## 🌟 Acknowledgments
 
@@ -226,7 +221,7 @@ For support or questions about this project:
 
 ---
 
-**BerlinLuxerentals.de** - Making Rentals Easy with One Platform for Every Duration.
+**Swift Luxury Rentals** — Ultra‑premium rentals with spy‑tech precision and hospitality‑grade UX.
 
 
 
