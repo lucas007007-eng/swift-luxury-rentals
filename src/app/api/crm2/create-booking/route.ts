@@ -49,7 +49,49 @@ export async function POST(req: Request) {
       include: { property: true, user: true }
     })
 
-    return NextResponse.json({ ok:true, data: { id: booking.id, adminUrl: `/admin/bookings` } })
+    // Create initial payments: deposit, move-in fee, first period
+    const paymentsToCreate: any[] = []
+    if (depositCents > 0) {
+      paymentsToCreate.push({
+        bookingId: booking.id,
+        provider: 'manual',
+        status: 'scheduled',
+        purpose: 'deposit',
+        dueAt: checkin,
+        amountCents: depositCents,
+        currency: 'EUR',
+      })
+    }
+    if (moveInFeeCents > 0) {
+      paymentsToCreate.push({
+        bookingId: booking.id,
+        provider: 'manual',
+        status: 'scheduled',
+        purpose: 'move_in_fee',
+        dueAt: checkin,
+        amountCents: moveInFeeCents,
+        currency: 'EUR',
+      })
+    }
+    if (monthlyRateCents > 0) {
+      paymentsToCreate.push({
+        bookingId: booking.id,
+        provider: 'manual',
+        status: 'scheduled',
+        purpose: 'first_period',
+        dueAt: checkin,
+        amountCents: monthlyRateCents,
+        currency: 'EUR',
+      })
+    }
+    let createdPayments: any[] = []
+    if (paymentsToCreate.length) {
+      createdPayments = await prisma.$transaction(
+        paymentsToCreate.map((p) => prisma.payment.create({ data: p }))
+      )
+    }
+
+    return NextResponse.json({ ok:true, data: { id: booking.id, adminUrl: `/admin/bookings`, payments: createdPayments } })
   } catch (e) {
     console.error('create-booking error', e)
     return NextResponse.json({ ok:false, error:'create-failed' }, { status: 500 })

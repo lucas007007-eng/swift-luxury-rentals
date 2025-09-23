@@ -461,6 +461,7 @@ export default function CRM2Page() {
                             const j = await res.json()
                             if (j.ok) {
                               await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Created booking from quote • property ${q.propertyExtId}` }) })
+                              alert(`Booking created with ${j.data.payments?.length||0} scheduled payments`)
                               window.open(j.data.adminUrl, '_blank')
                             } else alert('Failed to create booking')
                           } catch { alert('Failed to create booking') }
