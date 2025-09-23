@@ -37,6 +37,7 @@ export default function CRM2Page() {
   const [newLeadOpen, setNewLeadOpen] = useState(false)
   const [drawerLead, setDrawerLead] = useState<Lead | null>(null)
   const [activities, setActivities] = useState<any[]>([])
+  const [matches, setMatches] = useState<any[]>([])
   const [form, setForm] = useState<Partial<Lead>>({ stage: 'new' })
 
   useEffect(() => {
@@ -208,6 +209,32 @@ export default function CRM2Page() {
                 <button className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all" onClick={async ()=>{
                   try { await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, email: drawerLead.email, phone: drawerLead.phone }) }) } catch {}
                 }}>Save</button>
+              </div>
+            </div>
+
+            {/* Matches */}
+            <div className="luxury-feature-card p-4 mt-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="font-mono uppercase tracking-wider text-sm text-white">Matches</div>
+                <button className="px-3 py-1 text-xs rounded border border-zinc-400/30 text-white"
+                        onClick={async ()=>{
+                          try {
+                            const url = `/api/crm2/match?city=${encodeURIComponent(drawerLead.city||'')}&budgetCents=${encodeURIComponent(String(drawerLead.budgetCents||0))}`
+                            const res = await fetch(url)
+                            const j = await res.json()
+                            if (j.ok) setMatches(j.data || [])
+                          } catch {}
+                        }}>Find</button>
+              </div>
+              <div className="space-y-2">
+                {matches.map((m:any)=> (
+                  <a key={m.id} href={`/admin/property/${m.extId||''}`} className="block rounded border border-zinc-600/40 p-2 hover:border-zinc-400/60">
+                    <div className="text-white text-sm font-semibold">{m.title}</div>
+                    <div className="text-zinc-400 text-xs">{m.address || '—'}</div>
+                    <div className="text-zinc-300 text-xs">€{Number(m.priceMonthly||0).toLocaleString('de-DE')}/mo</div>
+                  </a>
+                ))}
+                {matches.length===0 && (<div className="text-zinc-400 text-sm">No matches yet</div>)}
               </div>
             </div>
 
