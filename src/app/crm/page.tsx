@@ -196,7 +196,34 @@ export default function CRMPage() {
                               {r.leasePdf ? (
                                 <a className="text-amber-400 hover:text-amber-300 text-xs font-sora" href={r.leasePdf} target="_blank">Lease PDF</a>
                               ) : (
-                                <button className="bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold px-2 py-1 rounded font-sora">
+                                <button 
+                                  className="bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold px-2 py-1 rounded font-sora"
+                                  onClick={async()=>{
+                                    try {
+                                      const res = await fetch('/api/admin/lease', { 
+                                        method: 'POST', 
+                                        headers: { 'Content-Type': 'application/json' }, 
+                                        body: JSON.stringify({ id: r.id }) 
+                                      })
+                                      const text = await res.text()
+                                      let data: any = null
+                                      try { data = JSON.parse(text) } catch {}
+                                      if (res.ok && data?.url) {
+                                        // Update the row with the PDF URL
+                                        const updatedRows = rows.map(row => 
+                                          row.id === r.id ? { ...row, leasePdf: data.url } : row
+                                        )
+                                        setRows(updatedRows)
+                                      } else {
+                                        const msg = typeof data === 'object' && data ? (data.message || '') : ''
+                                        const err = typeof data === 'object' && data ? (data.error || '') : ''
+                                        alert(`Failed to generate lease. ${msg} ${err}`.trim())
+                                      }
+                                    } catch (e: any) {
+                                      alert('Failed to generate lease. Please try again.')
+                                    }
+                                  }}
+                                >
                                   Generate
                                 </button>
                               )}
