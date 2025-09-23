@@ -6,21 +6,22 @@ import { authOptions } from '@/lib/authOptions'
 // GET - Fetch support tickets
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const isAdmin = searchParams.get('admin') === 'true'
+    const adminCookie = request.cookies.get('admin_auth')?.value === 'true'
+
+    // Allow admin dashboard access either via admin_auth cookie or NextAuth session
     const session = await getServerSession(authOptions)
-    if (!session?.user?.email) {
+    const hasSession = !!session?.user?.email
+    if (!hasSession && !(isAdmin && adminCookie)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { searchParams } = new URL(request.url)
-    const isAdmin = searchParams.get('admin') === 'true'
-
     // Admin sees all tickets; tenant sees their own
     const tickets = await prisma.supportTicket.findMany({
-      where: isAdmin
+      where: (isAdmin && (adminCookie || hasSession))
         ? undefined
-        : {
-            user: { email: session.user.email },
-          },
+        : { user: { email: session!.user!.email! } },
       orderBy: { createdAt: 'desc' },
       include: {
         user: { select: { id: true, name: true, email: true } },
