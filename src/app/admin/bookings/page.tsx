@@ -273,7 +273,6 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                 <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Client</th>
                 <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Property</th>
                 <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Dates</th>
-                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Deposit</th>
                 <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Payment Received</th>
                 <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Scheduled Payments</th>
                 <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Overdue Payments</th>
@@ -283,87 +282,100 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
             <tbody className="divide-y divide-zinc-700/30">
               {withDeposit.map((b: any) => (
                 <tr key={b.id} className="hover:bg-zinc-900/20 transition-colors">
-                  <td className="px-3 py-4 text-sm text-white font-semibold font-sora">{new Date(b.createdAt).toLocaleDateString()}</td>
-                  <td className="px-3 py-4 text-sm">
-                    <div className="inline-flex flex-col p-3 rounded-lg border border-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full">
+                  <td className="px-3 py-4 text-sm align-top">
+                    <div className="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full h-[60px]">
+                      <div className="text-white font-semibold text-sm font-sora text-center">{new Date(b.createdAt).toLocaleDateString()}</div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-4 text-sm align-top">
+                    <div className="inline-flex flex-col justify-center p-3 rounded-lg border border-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full min-h-[80px]">
                       <div className="text-white font-bold text-sm font-sora mb-1">{b.user?.name || '—'}</div>
                       <div className="text-blue-300 text-xs font-sora truncate mb-1">{b.user?.email || '—'}</div>
                       <div className="text-zinc-400 text-xs font-mono bg-zinc-900/50 px-2 py-0.5 rounded inline-block">{b.userId?.slice?.(0,6) || ''}</div>
                     </div>
                   </td>
                   
-                  <td className="px-3 py-4 text-sm">
-                    <a href={`/admin/property/${b.property?.extId || ''}`} className="inline-flex flex-col p-3 rounded-lg border border-zinc-600/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full hover:border-zinc-400/50 hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                  <td className="px-3 py-4 text-sm align-top">
+                    <a href={`/admin/property/${b.property?.extId || ''}`} className="inline-flex flex-col justify-center p-3 rounded-lg border border-zinc-600/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full min-h-[80px] hover:border-zinc-400/50 hover:scale-[1.02] transition-all duration-200 cursor-pointer">
                       <div className="text-white font-bold text-sm leading-tight font-sora mb-1">{b.property?.title || '—'}</div>
                       <div className="text-zinc-400 text-xs leading-relaxed">{b.property?.address || ''}</div>
                     </a>
                   </td>
-                  <td className="px-3 py-4 text-sm">
-                    <div className="inline-flex flex-col p-3 rounded-lg border border-sky-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full">
+                  <td className="px-3 py-4 text-sm align-top">
+                    <div className="inline-flex flex-col justify-center p-3 rounded-lg border border-sky-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full min-h-[80px]">
                       <div className="text-sky-300 text-xs font-sora mb-1">Check-in</div>
                       <div className="text-white font-semibold text-sm font-sora mb-2">{new Date(b.checkin).toLocaleDateString()}</div>
                       <div className="text-sky-300 text-xs font-sora mb-1">Checkout</div>
                       <div className="text-white font-semibold text-sm font-sora">{new Date(b.checkout).toLocaleDateString()}</div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm">
-                    {(() => {
-                      const depHeldCents = Number(b.depositHeld || 0)
-                      const refundedCents = (b.payments || [])
-                        .filter((p:any)=> p.purpose==='deposit' && p.status==='refunded')
-                        .reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
-                      const hasAnyDeposit = depHeldCents > 0 || refundedCents > 0
-                      if (!hasAnyDeposit) return <span className="text-white/40 text-xs">—</span>
-                      const hasDepositPaymentReceived = (b.payments || []).some((p:any)=> p.purpose === 'deposit' && p.status === 'received')
-                      // Treat confirmed bookings as having an active deposit (green), like before
-                      const depositReceived = hasDepositPaymentReceived || b.status === 'confirmed'
-                      const isRefunded = refundedCents > 0
-                      const amountEuros = Math.round(((isRefunded ? refundedCents : depHeldCents) / 100))
-                      const colorBox = isRefunded
-                        ? 'border-sky-400/30 bg-sky-500/10 text-sky-300 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
-                        : depositReceived ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]' : 'border-amber-400/30 bg-amber-500/10 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
-                      const label = isRefunded ? 'Deposit Refunded' : (depositReceived ? 'Deposit Received' : 'Deposit')
-                      const today = new Date()
-                      const finished = new Date(b.checkout) <= today
-                      return (
-                        <div className="flex items-center gap-3">
-                          <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded border ${colorBox} whitespace-nowrap`} aria-label="Deposit status">
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>
-                            </svg>
-                            <span className="font-semibold">€{amountEuros.toLocaleString('de-DE')}</span>
-                            <span className="uppercase tracking-wider text-[10px] opacity-80">{label}</span>
-                          </div>
-                          {!isRefunded && finished && depositReceived && (
-                            <form action="/api/admin/bookings/refund?redirect=1" method="post">
-                              <input type="hidden" name="bookingId" value={b.id} />
-                              <button className="px-2.5 py-1 rounded border border-sky-400/30 bg-sky-500/10 text-sky-300 hover:text-sky-200 text-xs inline-flex items-center gap-2" title="Refund deposit">
-                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10l4-4 4 4"/><path d="M7 6v11a4 4 0 004 4h5"/></svg>
-                                Refund Deposit
-                              </button>
-                            </form>
-                          )}
-                        </div>
-                      )
-                    })()}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm align-top">
                     {(() => {
                       const payments = (b.payments || [])
                       const receivedList = payments
                         .filter((p:any)=> p.status === 'received' && p.purpose !== 'deposit')
                         .sort((a:any,b:any)=> new Date(b.receivedAt||0).getTime() - new Date(a.receivedAt||0).getTime())
                       const receivedTotalEuros = Math.round(((b.receivedCents||0)/100))
-                      if (receivedTotalEuros <= 0) return <span className="text-white/40 text-xs">—</span>
+                      
+                      // Deposit logic
+                      const depHeldCents = Number(b.depositHeld || 0)
+                      const refundedCents = payments
+                        .filter((p:any)=> p.purpose==='deposit' && p.status==='refunded')
+                        .reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
+                      const hasAnyDeposit = depHeldCents > 0 || refundedCents > 0
+                      const hasDepositPaymentReceived = payments.some((p:any)=> p.purpose === 'deposit' && p.status === 'received')
+                      const depositReceived = hasDepositPaymentReceived || b.status === 'confirmed'
+                      const isRefunded = refundedCents > 0
+                      const amountEuros = Math.round(((isRefunded ? refundedCents : depHeldCents) / 100))
+                      const today = new Date()
+                      const finished = new Date(b.checkout) <= today
+                      
                       return (
                         <div className="space-y-2">
-                          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] w-full justify-between" aria-label="Payment received">
-                            <div className="flex items-center gap-2">
-                              <svg className="w-3.5 h-3.5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
-                              <span className="uppercase tracking-wider text-[10px] text-emerald-200">Received</span>
+                          {/* Deposit Section - only show if deposit is paid/confirmed (emerald theme for Payment Received column) */}
+                          {hasAnyDeposit && depositReceived && (
+                            <div className="space-y-2">
+                              <div className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 ${
+                                isRefunded 
+                                  ? 'border-sky-400/30 bg-sky-500/10 text-sky-300 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
+                                  : 'border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+                              }`} aria-label="Deposit status">
+                                <div className="flex items-center gap-2">
+                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>
+                                  </svg>
+                                  <span className="uppercase tracking-wider text-sm font-semibold font-sora">
+                                    {isRefunded ? 'Deposit Refunded' : 'Deposit Received'}
+                                  </span>
+                                </div>
+                                <span className="text-lg font-semibold text-white font-sora">€{amountEuros.toLocaleString('de-DE')}</span>
+                              </div>
+                              {!isRefunded && finished && (
+                                <form action="/api/admin/bookings/refund?redirect=1" method="post">
+                                  <input type="hidden" name="bookingId" value={b.id} />
+                                  <button className="w-full px-2 py-1 rounded text-xs border border-sky-400/30 bg-sky-500/10 text-sky-300 hover:text-sky-200 inline-flex items-center justify-center gap-1 font-sora" title="Refund deposit">
+                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10l4-4 4 4"/><path d="M7 6v11a4 4 0 004 4h5"/></svg>
+                                    Refund
+                                  </button>
+                                </form>
+                              )}
                             </div>
-                            <span className="font-semibold">€{receivedTotalEuros.toLocaleString('de-DE')}</span>
-                          </div>
+                          )}
+                          
+                          {/* Payment Received Section */}
+                          {receivedTotalEuros > 0 && (
+                            <div className="inline-flex items-center gap-2 px-3 py-2 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] w-full justify-between" aria-label="Payment received">
+                              <div className="flex items-center gap-2">
+                                <svg className="w-4 h-4 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
+                                <span className="uppercase tracking-wider text-sm font-semibold text-emerald-200 font-sora">Received</span>
+                              </div>
+                              <span className="font-semibold text-lg font-sora">€{receivedTotalEuros.toLocaleString('de-DE')}</span>
+                            </div>
+                          )}
+                          
+                          {receivedTotalEuros <= 0 && (!hasAnyDeposit || !depositReceived) && (
+                            <span className="text-white/40 text-xs">—</span>
+                          )}
                           {receivedList.length > 0 && (
                             <div className="rounded-md border border-emerald-400/30 bg-emerald-500/5 p-3 shadow-[0_0_12px_rgba(16,185,129,0.12)]">
                               <div className="flex items-center gap-2 text-xs text-emerald-300 mb-2">
@@ -425,7 +437,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       )
                     })()}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm align-top">
                     {(() => {
                       const payments = (b.payments || [])
                       const scheduled = payments
@@ -433,6 +445,34 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                         .sort((a:any,b:any)=> new Date(a.dueAt||0).getTime() - new Date(b.dueAt||0).getTime())
                       return (
                         <div className="space-y-3">
+                          {/* Unpaid Deposit Section - show in amber theme for Scheduled Payments column */}
+                          {(() => {
+                            const depHeldCents = Number(b.depositHeld || 0)
+                            const refundedCents = payments
+                              .filter((p:any)=> p.purpose==='deposit' && p.status==='refunded')
+                              .reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
+                            const hasAnyDeposit = depHeldCents > 0 || refundedCents > 0
+                            const hasDepositPaymentReceived = payments.some((p:any)=> p.purpose === 'deposit' && p.status === 'received')
+                            const depositReceived = hasDepositPaymentReceived || b.status === 'confirmed'
+                            const amountEuros = Math.round(((refundedCents > 0 ? refundedCents : depHeldCents) / 100))
+                            
+                            // Show unpaid deposit in Scheduled Payments column (amber theme)
+                            if (hasAnyDeposit && !depositReceived && b.status !== 'confirmed') {
+                              return (
+                                <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-400/40 bg-amber-500/10 text-amber-300 px-3 py-2">
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>
+                                    </svg>
+                                    <span className="uppercase tracking-wider text-sm font-semibold font-sora">Unpaid Deposit</span>
+                                  </div>
+                                  <span className="text-lg font-semibold text-white font-sora">€{amountEuros.toLocaleString('de-DE')}</span>
+                                </div>
+                              )
+                            }
+                            return null
+                          })()}
+                          
                           {(() => {
                             // Pay Now should mirror request page: first period (monthly/30 basis) + move-in fee, deposit excluded
                             const s = new Date(b.checkin)
@@ -463,12 +503,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                             const pendingEuros = firstPeriodAmount + moveInFeeAmount
                             if (pendingEuros > 0 && b.status !== 'confirmed') {
                               return (
-                                <div className="flex items-center justify-between gap-2 rounded-md border border-amber-400/40 bg-amber-500/10 text-amber-300 px-2 py-1">
-                                  <div className="flex items-center gap-2">
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2 4 4 8-8 4 4"/></svg>
-                                    <span className="uppercase tracking-wider text-[10px]">Payment Pending</span>
+                                <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-400/40 bg-amber-500/10 text-amber-300 px-3 py-2">
+                                  <div className="flex items-center gap-3">
+                                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2 4 4 8-8 4 4"/></svg>
+                                    <span className="uppercase tracking-wider text-sm font-semibold font-sora">Payment Pending</span>
                                   </div>
-                                  <span className="text-sm font-semibold text-white">€{pendingEuros.toLocaleString('de-DE')}</span>
+                                  <span className="text-lg font-semibold text-white font-sora">€{pendingEuros.toLocaleString('de-DE')}</span>
                                 </div>
                               )
                             }
@@ -523,12 +563,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                               </div>
                               {/* Payment Received tile */}
                               <form id={`receive-${b.id}`} action="/api/admin/bookings/receive-selected" method="post" className="mt-3">
-                                <div className="flex items-center justify-between gap-2 rounded-md border border-emerald-400/30 bg-emerald-500/10 p-2">
-                                  <div className="flex items-center gap-2 text-emerald-300">
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
-                                    <span className="uppercase tracking-wider text-[10px]">Payment Received</span>
+                                <div className="flex items-center justify-between gap-3 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2">
+                                  <div className="flex items-center gap-3 text-emerald-300">
+                                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
+                                    <span className="uppercase tracking-wider text-sm font-semibold font-sora">Select Payment Received</span>
                                   </div>
-                                  <button className="px-2 py-1 text-xs rounded bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow">Approve</button>
+                                  <button className="px-3 py-1.5 text-sm rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow font-sora">Approve</button>
                                 </div>
                               </form>
                             </div>
