@@ -1254,7 +1254,10 @@ function MetricCard({ title, value, prefix = '', suffix = '', loading, moneyBack
 }
 
 // Ultra-Premium Spy-Tech BarChart
-function BarChart({ title, labels, series, color, loading, prefix = '', suffix = '' }: { title: string; labels: string[]; series: number[]; color: string; loading?: boolean; prefix?: string; suffix?: string }) {
+function BarChart(props: any) {
+  const { title, labels, series, color, loading, prefix = '', suffix = '' } = props as {
+    title: string; labels: string[]; series: number[]; color: string; loading?: boolean; prefix?: string; suffix?: string
+  }
   const maxVal = Math.max(1, ...(series || [1]))
   const [animate, setAnimate] = useState(false)
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
