@@ -84,6 +84,20 @@ export async function POST(req: Request) {
         currency: 'EUR',
       })
     }
+    // Remaining months as monthly_rent
+    if (monthlyRateCents > 0 && termMonths > 1) {
+      for (let i = 1; i < termMonths; i++) {
+        paymentsToCreate.push({
+          bookingId: booking.id,
+          provider: 'manual',
+          status: 'scheduled',
+          purpose: 'monthly_rent',
+          dueAt: addMonths(checkin, i),
+          amountCents: monthlyRateCents,
+          currency: 'EUR',
+        })
+      }
+    }
     let createdPayments: any[] = []
     if (paymentsToCreate.length) {
       createdPayments = await prisma.$transaction(
