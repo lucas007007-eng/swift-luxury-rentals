@@ -161,12 +161,7 @@ export default function AccomplishmentsPage() {
     sum + category.achievements.reduce((catSum, achievement) => catSum + achievement.xp, 0), 0)
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
-      {/* Cyberpunk Grid Background */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(59,130,246,0.1)_1px,transparent_1px),linear-gradient(rgba(59,130,246,0.1)_1px,transparent_1px)] bg-[size:50px_50px]" />
-      </div>
-      
+    <main className="min-h-screen bg-black text-white relative overflow-hidden">
       <Header forceBackground={true} />
       <div className="pt-28 pb-20 relative z-10">
         <div className="max-w-[1600px] mx-auto px-6 py-10">
@@ -174,22 +169,22 @@ export default function AccomplishmentsPage() {
           <div className="mb-8 flex justify-end">
             <Link 
               href="/admin" 
-              className="inline-flex items-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/40 hover:border-red-400/60 rounded-xl text-red-400 hover:text-red-300 font-mono text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-red-400/20"
+              className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
-              EXIT SKILL TREE
+              Back to Admin
             </Link>
           </div>
 
           {/* MVP Progress Integration */}
           <div className="mb-8">
-            <div className="bg-black/60 border border-cyan-400/30 rounded-xl p-6">
+            <div className="luxury-feature-card p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-cyan-400 font-mono">&gt;&gt; CURRENT OBJECTIVES</h2>
-                  <p className="text-white/70">Active development missions in progress</p>
+                  <h2 className="text-2xl font-bold heading-sora text-white">Current Objectives</h2>
+                  <p className="text-zinc-300">Active development missions in progress</p>
                 </div>
               </div>
               <MVPProgress />
@@ -198,37 +193,31 @@ export default function AccomplishmentsPage() {
 
           {/* Integrated Skill Tree Header */}
           <div className="mb-6 relative">
-            <div className="bg-gradient-to-r from-black/60 via-black/80 to-black/60 border border-emerald-400/30 rounded-2xl p-6 relative overflow-hidden">
-              {/* Background Effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-cyan-500/10 to-amber-500/5 rounded-2xl" />
-              
-              {/* Content */}
+            <div className="luxury-feature-card p-6 relative overflow-hidden">
               <div className="relative z-10 flex items-center justify-between">
                 {/* Left Stats */}
                 <div className="flex items-center gap-4">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-emerald-400 font-mono">{totalAchievements}</div>
-                    <div className="text-xs text-emerald-300 uppercase tracking-widest">NODES</div>
+                    <div className="text-3xl font-bold text-white font-sora">{totalAchievements}</div>
+                    <div className="text-xs text-zinc-300 uppercase tracking-widest">Nodes</div>
                   </div>
                   <div className="w-px h-12 bg-emerald-400/30"></div>
-                  <div className="text-emerald-400/60 font-mono text-sm">UNLOCKED</div>
+                  <div className="text-zinc-300 font-sora text-sm">Unlocked</div>
                 </div>
                 
                 {/* Center Header */}
                 <div className="text-center">
-                  <h2 className="text-4xl font-bold text-emerald-400 font-mono tracking-wider mb-1">
-                    &gt;&gt; SKILL TREE &lt;&lt;
-                  </h2>
-                  <p className="text-white/70 text-sm">Completed development skills and mastered abilities</p>
+                  <h2 className="text-4xl font-bold heading-sora text-white tracking-wider mb-1">Skill Tree</h2>
+                  <p className="text-zinc-300 text-sm">Completed development skills and mastered abilities</p>
                 </div>
                 
                 {/* Right Stats */}
                 <div className="flex items-center gap-4">
-                  <div className="text-amber-400/60 font-mono text-sm">EARNED</div>
+                  <div className="text-zinc-300 font-sora text-sm">Earned</div>
                   <div className="w-px h-12 bg-amber-400/30"></div>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-amber-400 font-mono">{totalXP.toLocaleString('en-US')}</div>
-                    <div className="text-xs text-amber-300 uppercase tracking-widest">SKILL POINTS</div>
+                    <div className="text-3xl font-bold text-white font-sora">{totalXP.toLocaleString('en-US')}</div>
+                    <div className="text-xs text-zinc-300 uppercase tracking-widest">Skill Points</div>
                   </div>
                 </div>
               </div>
@@ -241,21 +230,19 @@ export default function AccomplishmentsPage() {
             {Object.entries(skillTree).map(([categoryName, category]) => (
               <div
                 key={categoryName}
-                className={`relative rounded-xl border-2 p-4 transition-all duration-300 cursor-pointer z-10 ${
-                  selectedNode === categoryName 
-                    ? getColorClasses(category.color) + ' shadow-2xl transform scale-105' 
-                    : 'border-gray-600 bg-black/60 hover:border-gray-500 hover:bg-black/80'
+                className={`relative rounded-2xl p-4 transition-all duration-300 cursor-pointer z-10 luxury-feature-card ${
+                  selectedNode === categoryName ? 'ring-1 ring-emerald-400/40 scale-[1.02]' : ''
                 }`}
                 onClick={() => setSelectedNode(selectedNode === categoryName ? null : categoryName)}
               >
                 {/* Category Header */}
                 <div className="text-center mb-4">
-                  <div className={`text-lg font-bold font-mono uppercase tracking-wider ${
-                    selectedNode === categoryName ? 'text-white' : 'text-gray-300'
+                  <div className={`text-lg font-bold heading-sora uppercase tracking-wider ${
+                    selectedNode === categoryName ? 'text-white' : 'text-zinc-300'
                   }`}>
                     {categoryName}
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-xs text-zinc-400 mt-1">
                     {category.achievements.length} NODES UNLOCKED
                   </div>
                 </div>
@@ -264,17 +251,17 @@ export default function AccomplishmentsPage() {
                 <div className="space-y-2">
                   {category.achievements.map((achievement, idx) => (
                     <div key={achievement.id} className="flex items-center gap-2 text-xs">
-                      <div className="w-3 h-3 rounded-full bg-emerald-400 flex-shrink-0"></div>
-                      <span className="text-gray-300 truncate font-mono">{achievement.title}</span>
-                      <span className="text-emerald-400 font-mono">+{achievement.xp}</span>
+                      <div className="w-3 h-3 rounded-full bg-zinc-300 flex-shrink-0"></div>
+                      <span className="text-zinc-300 truncate font-sora">{achievement.title}</span>
+                      <span className="text-white font-sora">+{achievement.xp}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Total XP for this category */}
-                <div className="mt-3 pt-2 border-t border-gray-600">
+                <div className="mt-3 pt-2 border-t border-zinc-700/50">
                   <div className="text-center">
-                    <span className="text-purple-400 font-mono font-bold">
+                    <span className="text-zinc-100 font-sora font-bold">
                       {category.achievements.reduce((sum, a) => sum + a.xp, 0)} SP
                     </span>
                   </div>
@@ -293,19 +280,17 @@ export default function AccomplishmentsPage() {
               />
               
               {/* Modal Content */}
-              <div className="relative bg-black/90 border border-cyan-400/40 rounded-2xl p-8 max-w-6xl w-full max-h-[80vh] overflow-hidden shadow-2xl shadow-cyan-400/20">
-                {/* Glass effect overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-2xl pointer-events-none" />
+              <div className="relative luxury-feature-card p-8 max-w-6xl w-full max-h-[80vh] overflow-hidden">
                 
                 {/* Modal Header */}
                 <div className="relative z-10 flex justify-between items-center mb-6">
                   <div>
-                    <h3 className="text-3xl font-bold text-cyan-400 font-mono">{selectedNode}</h3>
-                    <p className="text-white/70 mt-1">Skill tree detailed breakdown</p>
+                    <h3 className="text-3xl font-bold heading-sora text-white">{selectedNode}</h3>
+                    <p className="text-zinc-300 mt-1">Skill tree detailed breakdown</p>
                   </div>
                   <button 
                     onClick={() => setSelectedNode(null)}
-                    className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/30 border border-red-400/40 hover:border-red-400/60 flex items-center justify-center text-red-400 hover:text-red-300 transition-all duration-300"
+                    className="w-10 h-10 rounded-full border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white hover:scale-105 transition-all duration-300"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M18 6L6 18M6 6l12 12"/>
@@ -316,22 +301,22 @@ export default function AccomplishmentsPage() {
                 {/* Achievements Grid */}
                 <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-[60vh] overflow-y-auto pr-2">
                   {skillTree[selectedNode as keyof typeof skillTree].achievements.map((achievement) => (
-                    <div key={achievement.id} className="bg-gray-900/80 border border-gray-600 rounded-xl p-4 hover:border-cyan-400/40 transition-all duration-300">
+                    <div key={achievement.id} className="luxury-feature-card p-4 transition-all duration-300">
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-400 flex items-center justify-center shadow-lg">
-                          <svg className="w-4 h-4 text-black" viewBox="0 0 24 24" fill="currentColor">
+                        <div className="w-8 h-8 rounded-lg bg-[linear-gradient(145deg,#1a1a1a_0%,#2a2a2a_50%,#1a1a1a_100%)] border border-zinc-400/30 flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                          <svg className="w-4 h-4 text-zinc-300" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                           </svg>
                         </div>
                         <div className="flex-1">
-                          <div className="text-cyan-400 font-bold text-sm font-mono">{achievement.title}</div>
-                          <div className="text-purple-400 font-bold text-xs">+{achievement.xp} SKILL POINTS</div>
+                          <div className="text-white font-bold text-sm font-sora">{achievement.title}</div>
+                          <div className="text-zinc-300 font-bold text-xs">+{achievement.xp} Skill Points</div>
                         </div>
-                        <div className="text-emerald-400 text-lg">✓</div>
+                        <div className="text-emerald-300 text-lg">✓</div>
                       </div>
-                      <div className="text-gray-300 text-sm leading-relaxed mb-3">{achievement.desc}</div>
-                      <div className="px-3 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-lg">
-                        <div className="text-emerald-400 font-bold text-xs text-center">SKILL MASTERED</div>
+                      <div className="text-zinc-300 text-sm leading-relaxed mb-3">{achievement.desc}</div>
+                      <div className="px-3 py-1 rounded-lg border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)]">
+                        <div className="text-white font-bold text-xs text-center">Skill Mastered</div>
                       </div>
                     </div>
                   ))}
@@ -408,7 +393,7 @@ function MVPProgress() {
   }
   
   return (
-    <div className="relative rounded-xl p-4 border border-cyan-400/40 bg-gradient-to-br from-[#0b1a1a] to-[#081212] shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+    <div className="luxury-feature-card p-4">
       <button
         type="button"
         onClick={(e) => {
@@ -421,12 +406,12 @@ function MVPProgress() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <div className="font-mono uppercase tracking-wider text-lg text-cyan-400 font-bold">MVP PROGRESS</div>
-            <div className="text-cyan-200/80 text-sm">{completed} of {total} objectives completed</div>
+            <div className="heading-sora uppercase tracking-wider text-lg text-white font-bold">MVP Progress</div>
+            <div className="text-zinc-300 text-sm">{completed} of {total} objectives completed</div>
           </div>
           <div className="relative">
-            <div className={`w-8 h-8 rounded-full border border-cyan-400/40 bg-cyan-400/10 flex items-center justify-center transition-all ${expanded ? 'rotate-180' : ''}`}>
-              <svg className="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <div className={`w-8 h-8 rounded-full border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white flex items-center justify-center transition-all ${expanded ? 'rotate-180' : ''}`}>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 9l6 6 6-6"/>
               </svg>
             </div>
@@ -437,13 +422,13 @@ function MVPProgress() {
       {expanded && (
         <div className="mt-4 space-y-2 max-h-[400px] overflow-y-auto">
           {items.map((item) => (
-            <div key={item.id} className="flex items-center gap-3 p-2 rounded bg-black/40 hover:bg-black/60 transition-colors">
+            <div key={item.id} className="flex items-center gap-3 p-2 rounded bg-black/30 border border-zinc-700/40 hover:bg-black/50 transition-colors">
               <button
                 onClick={() => toggle(item.id)}
                 className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                   item.done 
-                    ? 'bg-emerald-500 border-emerald-500' 
-                    : 'border-gray-500 hover:border-cyan-400'
+                    ? 'bg-emerald-500 border-emerald-400' 
+                    : 'border-zinc-500 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:border-zinc-300'
                 }`}
               >
                 {item.done && (
@@ -452,18 +437,18 @@ function MVPProgress() {
                   </svg>
                 )}
               </button>
-              <span className={`text-sm flex-1 ${item.done ? 'text-white/80 line-through' : 'text-white'}`}>
+              <span className={`text-sm flex-1 font-sora ${item.done ? 'text-white/80 line-through' : 'text-white'}`}>
                 {item.label}
               </span>
-              <span className={`text-xs font-mono ${item.done ? 'text-emerald-400' : 'text-cyan-400'}`}>
-                {item.done ? '✓' : '○'}
+              <span className={`text-xs font-sora ${item.done ? 'text-emerald-300' : 'text-zinc-300'}`}>
+                {item.done ? 'Done' : 'Todo'}
               </span>
             </div>
           ))}
         </div>
       )}
       
-      <div className="mt-3 text-xs text-cyan-300/80 text-center">
+      <div className="mt-3 text-xs text-zinc-300 text-center">
         {pct}% complete • {total - completed} objectives remaining
       </div>
     </div>
