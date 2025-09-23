@@ -171,8 +171,53 @@ model Lead {
   owner        String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  Deal         Deal[]
 
   @@index([createdAt])
   @@index([stage])
   @@index([city])
+}
+
+// CRM2: Companies and Contacts
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  domain    String?  @unique
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contacts Contact[]
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  name      String
+  email     String?
+  phone     String?
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// CRM2: Deals linked to Leads
+model Deal {
+  id               String    @id @default(cuid())
+  leadId           String
+  lead             Lead      @relation(fields: [leadId], references: [id])
+  propertyExtId    String?
+  city             String?
+  termMonths       Int?
+  monthlyRateCents Int?
+  depositCents     Int?
+  moveInFeeCents   Int?
+  startDate        DateTime?
+  status           String    @default("draft")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([leadId])
+  @@index([createdAt])
 }
