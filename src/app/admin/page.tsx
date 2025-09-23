@@ -188,11 +188,46 @@ export default function AdminDashboard() {
             </div>
           </div>
           
-          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-[0_15px_50px_rgba(0,0,0,0.5)] h-[280px] bg-[#07140F]">
-            <div className="absolute top-3 left-4 z-10">
-              <div className="font-mono uppercase tracking-wider text-sm md:text-base gold-metallic-text">Edit Live Listings</div>
+          <div className="relative rounded-2xl overflow-hidden h-[280px] border border-[rgba(192,192,192,0.35)] border-l-2 border-l-zinc-300/40 group hover:scale-[1.02] transition-all duration-300"
+               style={{
+                 background: `
+                   linear-gradient(165deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
+                   radial-gradient(circle at 25% 25%, rgba(192,192,192,0.06) 0%, transparent 50%)
+                 `,
+                 backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
+                 boxShadow: `
+                   0 30px 80px rgba(0,0,0,0.95),
+                   0 15px 40px rgba(0,0,0,0.8),
+                   inset 0 2px 0 rgba(255,255,255,0.2),
+                   inset 0 -1px 0 rgba(255,255,255,0.1),
+                   inset 1px 0 0 rgba(255,255,255,0.1),
+                   inset -1px 0 0 rgba(255,255,255,0.1),
+                   0 0 60px rgba(192,192,192,0.12)
+                 `,
+                 transform: 'perspective(1000px) rotateX(2deg)',
+                 transformStyle: 'preserve-3d'
+               }}>
+            
+            {/* Corner accent lights */}
+            <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-zinc-300/70 opacity-80 z-20" />
+            <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-zinc-300/70 opacity-80 z-20" />
+            <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-zinc-300/70 opacity-80 z-20" />
+            <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-zinc-300/70 opacity-80 z-20" />
+            
+            <div className="absolute top-4 left-4 z-30">
+              <div className="font-mono uppercase tracking-wider text-sm text-amber-400 font-sora">Geographic Management</div>
+              <div className="text-xl font-extrabold text-white mt-1 heading-sora">Edit Live Listings</div>
+              <div className="text-zinc-300 text-sm mt-1">Click to Edit</div>
             </div>
-            <SpyEuropeMap onPinClick={(city) => router.push(`/admin/city/${encodeURIComponent(city)}`)} />
+            <div className="relative z-10 h-full pointer-events-auto">
+              <SpyEuropeMap onPinClick={(city) => router.push(`/admin/city/${encodeURIComponent(city)}`)} />
+            </div>
+            
+            {/* Enhanced 3D hover effect - only on borders, not blocking map */}
+            <div className="absolute inset-0 rounded-2xl bg-zinc-300/6 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"
+                 style={{
+                   boxShadow: 'inset 0 0 60px rgba(192,192,192,0.12), 0 0 80px rgba(192,192,192,0.15)'
+                 }} />
           </div>
           
           {/* Accounting CTA */}
