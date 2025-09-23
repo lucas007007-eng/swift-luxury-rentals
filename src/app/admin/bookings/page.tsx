@@ -303,9 +303,9 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                   </td>
                   <td className="px-3 py-4 text-sm align-top">
                     <div className="inline-flex flex-col justify-center p-3 rounded-lg border border-sky-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full min-h-[80px]">
-                      <div className="text-sky-300 text-xs font-sora mb-1">Check-in</div>
+                      <div className="text-sky-300 text-sm font-sora mb-1">Check-in</div>
                       <div className="text-white font-semibold text-sm font-sora mb-2">{new Date(b.checkin).toLocaleDateString()}</div>
-                      <div className="text-sky-300 text-xs font-sora mb-1">Checkout</div>
+                      <div className="text-sky-300 text-sm font-sora mb-1">Checkout</div>
                       <div className="text-white font-semibold text-sm font-sora">{new Date(b.checkout).toLocaleDateString()}</div>
                     </div>
                   </td>
@@ -332,44 +332,41 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       
                       return (
                         <div className="space-y-2">
-                          {/* Deposit Section - only show if deposit is paid/confirmed (emerald theme for Payment Received column) */}
-                          {hasAnyDeposit && depositReceived && (
-                            <div className="space-y-2">
-                              <div className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 ${
-                                isRefunded 
-                                  ? 'border-sky-400/30 bg-sky-500/10 text-sky-300 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
-                                  : 'border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
-                              }`} aria-label="Deposit status">
-                                <div className="flex items-center gap-2">
-                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>
-                                  </svg>
-                                  <span className="uppercase tracking-wider text-sm font-semibold font-sora">
-                                    {isRefunded ? 'Deposit Refunded' : 'Deposit Received'}
-                                  </span>
-                                </div>
-                                <span className="text-lg font-semibold text-white font-sora">€{amountEuros.toLocaleString('de-DE')}</span>
-                              </div>
-                              {!isRefunded && finished && (
-                                <form action="/api/admin/bookings/refund?redirect=1" method="post">
-                                  <input type="hidden" name="bookingId" value={b.id} />
-                                  <button className="w-full px-2 py-1 rounded text-xs border border-sky-400/30 bg-sky-500/10 text-sky-300 hover:text-sky-200 inline-flex items-center justify-center gap-1 font-sora" title="Refund deposit">
-                                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10l4-4 4 4"/><path d="M7 6v11a4 4 0 004 4h5"/></svg>
-                                    Refund
-                                  </button>
-                                </form>
-                              )}
-                            </div>
-                          )}
+                          {/* Deposit Section moved below Payment History */}
                           
                           {/* Payment Received Section */}
                           {receivedTotalEuros > 0 && (
-                            <div className="inline-flex items-center gap-2 px-3 py-2 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] w-full justify-between" aria-label="Payment received">
-                              <div className="flex items-center gap-2">
-                                <svg className="w-4 h-4 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
-                                <span className="uppercase tracking-wider text-sm font-semibold text-emerald-200 font-sora">Received</span>
+                            <div className="relative rounded-xl px-0 py-4 overflow-hidden" 
+                                 style={{
+                                   background: `
+                                     linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
+                                     radial-gradient(circle at 30% 20%, rgba(16,185,129,0.08) 0%, transparent 50%)
+                                   `,
+                                   border: '1px solid rgba(16,185,129,0.4)',
+                                   backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
+                                   boxShadow: `
+                                     0 20px 60px rgba(0,0,0,0.9),
+                                     0 10px 30px rgba(0,0,0,0.7),
+                                     inset 0 2px 0 rgba(255,255,255,0.15),
+                                     inset 0 -1px 0 rgba(255,255,255,0.1),
+                                     0 0 40px rgba(16,185,129,0.12)
+                                   `,
+                                   transform: 'perspective(1000px) rotateX(1deg)',
+                                   transformStyle: 'preserve-3d'
+                                 }} aria-label="Payment received">
+                              <div className="relative z-10">
+                                <div className="flex items-center gap-2 text-sm text-emerald-300 mb-4 font-sora px-3">
+                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                  <span className="uppercase tracking-wider font-semibold">Payments Received To Date</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-3 px-3 py-2">
+                                  <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
+                                    <span className="uppercase tracking-wider text-sm font-semibold text-emerald-200 font-sora">Total</span>
+                                  </div>
+                                  <span className="font-semibold text-lg text-white font-sora ml-auto text-right">€{receivedTotalEuros.toLocaleString('de-DE')}</span>
+                                </div>
                               </div>
-                              <span className="font-semibold text-lg font-sora">€{receivedTotalEuros.toLocaleString('de-DE')}</span>
                             </div>
                           )}
                           
@@ -377,59 +374,134 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                             <span className="text-white/40 text-xs">—</span>
                           )}
                           {receivedList.length > 0 && (
-                            <div className="rounded-md border border-emerald-400/30 bg-emerald-500/5 p-3 shadow-[0_0_12px_rgba(16,185,129,0.12)]">
-                              <div className="flex items-center gap-2 text-xs text-emerald-300 mb-2">
-                                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                                <span className="uppercase tracking-wider">Paid on</span>
-                              </div>
-                              <div className="space-y-2 mt-1">
-                                {receivedList.slice(0,4).map((p:any)=> {
-                                  const dateStr = formatShortDate(new Date(p.receivedAt||p.createdAt))
-                                  let label = 'Payment'
-                                  let daysNote: string | null = null
-                                  if (p.purpose === 'first_period') {
-                                    label = '1st month rent'
-                                    try {
-                                      const s0 = new Date(b.checkin)
-                                      const e0 = new Date(b.checkout)
-                                      const endOfCurrentMonth = new Date(s0.getFullYear(), s0.getMonth() + 1, 0)
-                                      const dayAfterEndOfCurrentMonth = new Date(endOfCurrentMonth.getFullYear(), endOfCurrentMonth.getMonth(), endOfCurrentMonth.getDate() + 1)
-                                      const endOfNextMonth = new Date(s0.getFullYear(), s0.getMonth() + 2, 0)
-                                      const dayAfterEndOfNextMonth = new Date(endOfNextMonth.getFullYear(), endOfNextMonth.getMonth(), endOfNextMonth.getDate() + 1)
-                                      const crossesMonthEnd = e0 > dayAfterEndOfCurrentMonth
-                                      let firstPeriodEndExclusive = e0
-                                      if (s0.getDate() >= 25) {
-                                        firstPeriodEndExclusive = e0 < dayAfterEndOfNextMonth ? e0 : dayAfterEndOfNextMonth
-                                      } else if (crossesMonthEnd) {
-                                        firstPeriodEndExclusive = dayAfterEndOfCurrentMonth
-                                      }
-                                      const nightsFirst = Math.max(0, Math.round((firstPeriodEndExclusive.getTime() - s0.getTime())/86400000))
-                                      daysNote = `(${nightsFirst} days)`
-                                    } catch {}
-                                  } else if (p.purpose === 'move_in_fee') {
-                                    label = 'Move-in fee'
-                                  } else if (p.purpose === 'monthly_rent') {
-                                    label = 'Monthly rent'
-                                    try {
-                                      const list = (payments || []).filter((x:any)=> x.purpose === 'monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
-                                      const idx = list.findIndex((x:any)=> x.id === p.id)
-                                      const n = (idx >= 0 ? idx + 2 : 2)
-                                      const j = n % 10, k = n % 100
-                                      const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
-                                      daysNote = `(${ord} month rent)`
-                                    } catch {}
-                                  }
-                                  return (
-                                    <div key={p.id} className="flex items-center justify-between gap-3">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{dateStr}</span>
-                                        <span className="text-sm text-zinc-300 whitespace-nowrap font-sora">{label}</span>
-                                        {daysNote && <span className="text-xs text-zinc-400 whitespace-nowrap">{daysNote}</span>}
+                            <div className="relative rounded-xl px-0 py-4 overflow-hidden"
+                                 style={{
+                                   background: `
+                                     linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
+                                     radial-gradient(circle at 30% 20%, rgba(16,185,129,0.08) 0%, transparent 50%)
+                                   `,
+                                   border: '1px solid rgba(16,185,129,0.4)',
+                                   backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
+                                   boxShadow: `
+                                     0 20px 60px rgba(0,0,0,0.9),
+                                     0 10px 30px rgba(0,0,0,0.7),
+                                     inset 0 2px 0 rgba(255,255,255,0.15),
+                                     inset 0 -1px 0 rgba(255,255,255,0.1),
+                                     0 0 40px rgba(16,185,129,0.12)
+                                   `,
+                                   transform: 'perspective(1000px) rotateX(1deg)',
+                                   transformStyle: 'preserve-3d'
+                                 }}>
+                              
+                              <div className="relative z-10">
+                                <div className="flex items-center gap-2 text-sm text-emerald-300 mb-4 font-sora px-3">
+                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                  <span className="uppercase tracking-wider font-semibold">Payment History</span>
+                                </div>
+                                <div className="space-y-3">
+                                  {receivedList.slice(0,4).map((p:any)=> {
+                                    const dateStr = formatShortDate(new Date(p.receivedAt||p.createdAt))
+                                    let label = 'Payment'
+                                    let daysNote: string | null = null
+                                    if (p.purpose === 'first_period') {
+                                      label = '1st month rent'
+                                      try {
+                                        const s0 = new Date(b.checkin)
+                                        const e0 = new Date(b.checkout)
+                                        const endOfCurrentMonth = new Date(s0.getFullYear(), s0.getMonth() + 1, 0)
+                                        const dayAfterEndOfCurrentMonth = new Date(endOfCurrentMonth.getFullYear(), endOfCurrentMonth.getMonth(), endOfCurrentMonth.getDate() + 1)
+                                        const endOfNextMonth = new Date(s0.getFullYear(), s0.getMonth() + 2, 0)
+                                        const dayAfterEndOfNextMonth = new Date(endOfNextMonth.getFullYear(), endOfNextMonth.getMonth(), endOfNextMonth.getDate() + 1)
+                                        const crossesMonthEnd = e0 > dayAfterEndOfCurrentMonth
+                                        let firstPeriodEndExclusive = e0
+                                        if (s0.getDate() >= 25) {
+                                          firstPeriodEndExclusive = e0 < dayAfterEndOfNextMonth ? e0 : dayAfterEndOfNextMonth
+                                        } else if (crossesMonthEnd) {
+                                          firstPeriodEndExclusive = dayAfterEndOfCurrentMonth
+                                        }
+                                        const nightsFirst = Math.max(0, Math.round((firstPeriodEndExclusive.getTime() - s0.getTime())/86400000))
+                                        daysNote = `(${nightsFirst} days)`
+                                      } catch {}
+                                    } else if (p.purpose === 'move_in_fee') {
+                                      label = 'Move-in fee'
+                                    } else if (p.purpose === 'monthly_rent') {
+                                      label = 'Monthly rent'
+                                      try {
+                                        const list = (payments || []).filter((x:any)=> x.purpose === 'monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
+                                        const idx = list.findIndex((x:any)=> x.id === p.id)
+                                        const n = (idx >= 0 ? idx + 2 : 2)
+                                        const j = n % 10, k = n % 100
+                                        const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
+                                        daysNote = `(${ord} month rent)`
+                                      } catch {}
+                                    }
+                                    return (
+                                      <div key={p.id} className="flex items-center justify-between gap-3 px-3 py-2">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{dateStr}</span>
+                                          <span className="text-sm text-zinc-300 whitespace-nowrap font-sora">{label}</span>
+                                          {daysNote && <span className="text-xs text-zinc-400 whitespace-nowrap">{daysNote}</span>}
+                                        </div>
+                                        <span className="text-lg font-bold text-white font-sora ml-auto text-right">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
                                       </div>
-                                      <span className="px-3 py-1 rounded-lg text-sm bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-semibold font-sora">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Deposit Section - now rendered after Payment History */}
+                          {hasAnyDeposit && depositReceived && (
+                            <div className="relative rounded-xl px-0 py-4 overflow-hidden"
+                                 style={{
+                                   background: `
+                                     linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
+                                     radial-gradient(circle at 30% 20%, rgba(16,185,129,0.08) 0%, transparent 50%)
+                                   `,
+                                   border: '1px solid rgba(16,185,129,0.4)',
+                                   backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
+                                   boxShadow: `
+                                     0 20px 60px rgba(0,0,0,0.9),
+                                     0 10px 30px rgba(0,0,0,0.7),
+                                     inset 0 2px 0 rgba(255,255,255,0.15),
+                                     inset 0 -1px 0 rgba(255,255,255,0.1),
+                                     0 0 40px rgba(16,185,129,0.12)
+                                   `,
+                                   transform: 'perspective(1000px) rotateX(1deg)',
+                                   transformStyle: 'preserve-3d'
+                                 }}>
+                              <div className="relative z-10">
+                                <div className="flex items-center gap-2 text-sm text-emerald-300 mb-4 font-sora px-3">
+                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                  <span className="uppercase tracking-wider font-semibold">Deposit</span>
+                                </div>
+                                <div className="space-y-2">
+                                  <div className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 ${
+                                    isRefunded 
+                                      ? 'border-transparent bg-transparent text-sky-300 shadow-none'
+                                      : 'border-transparent bg-transparent text-emerald-300 shadow-none'
+                                  }`} aria-label="Deposit status">
+                                    <div className="flex items-center gap-2">
+                                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>
+                                      </svg>
+                                      <span className="uppercase tracking-wider text-sm font-semibold font-sora">
+                                        {isRefunded ? 'Deposit Refunded' : 'Deposit Received'}
+                                      </span>
                                     </div>
-                                  )
-                                })}
+                                    <span className="text-lg font-semibold text-white font-sora ml-auto text-right">€{amountEuros.toLocaleString('de-DE')}</span>
+                                  </div>
+                                  {!isRefunded && finished && (
+                                    <form action="/api/admin/bookings/refund?redirect=1" method="post">
+                                      <input type="hidden" name="bookingId" value={b.id} />
+                                      <button className="w-full px-2 py-1 rounded text-xs border border-sky-400/30 bg-sky-500/10 text-sky-300 hover:text-sky-200 inline-flex items-center justify-center gap-1 font-sora" title="Refund deposit">
+                                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 10l4-4 4 4"/><path d="M7 6v11a4 4 0 004 4h5"/></svg>
+                                        Refund
+                                      </button>
+                                    </form>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           )}
@@ -445,33 +517,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                         .sort((a:any,b:any)=> new Date(a.dueAt||0).getTime() - new Date(b.dueAt||0).getTime())
                       return (
                         <div className="space-y-3">
-                          {/* Unpaid Deposit Section - show in amber theme for Scheduled Payments column */}
-                          {(() => {
-                            const depHeldCents = Number(b.depositHeld || 0)
-                            const refundedCents = payments
-                              .filter((p:any)=> p.purpose==='deposit' && p.status==='refunded')
-                              .reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
-                            const hasAnyDeposit = depHeldCents > 0 || refundedCents > 0
-                            const hasDepositPaymentReceived = payments.some((p:any)=> p.purpose === 'deposit' && p.status === 'received')
-                            const depositReceived = hasDepositPaymentReceived || b.status === 'confirmed'
-                            const amountEuros = Math.round(((refundedCents > 0 ? refundedCents : depHeldCents) / 100))
-                            
-                            // Show unpaid deposit in Scheduled Payments column (amber theme)
-                            if (hasAnyDeposit && !depositReceived && b.status !== 'confirmed') {
-                              return (
-                                <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-400/40 bg-amber-500/10 text-amber-300 px-3 py-2">
-                                  <div className="flex items-center gap-2">
-                                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>
-                                    </svg>
-                                    <span className="uppercase tracking-wider text-sm font-semibold font-sora">Unpaid Deposit</span>
-                                  </div>
-                                  <span className="text-lg font-semibold text-white font-sora">€{amountEuros.toLocaleString('de-DE')}</span>
-                                </div>
-                              )
-                            }
-                            return null
-                          })()}
+                          {/* Unpaid Deposit Section moved below Scheduled Payments card */}
                           
                           {(() => {
                             // Pay Now should mirror request page: first period (monthly/30 basis) + move-in fee, deposit excluded
@@ -515,66 +561,139 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                             return null
                           })()}
                           {scheduled.length > 0 ? (
-                            <div className="rounded-md border border-amber-400/30 bg-amber-500/5 p-3 shadow-[0_0_12px_rgba(245,158,11,0.12)]">
-                              <div className="flex items-center gap-2 text-sm text-amber-300 mb-2 font-sora">
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                                <span className="uppercase tracking-wider font-semibold">Scheduled Payments</span>
-                              </div>
-                              <div className="space-y-1 mt-2">
-                                {scheduled.map((p:any, idx:number) => {
-                                  const due = new Date(p.dueAt)
-                                  const nextMonthStart = new Date(due.getFullYear(), due.getMonth()+1, 1)
-                                  const checkout = new Date(b.checkout)
-                                  const segEnd = checkout < nextMonthStart ? checkout : nextMonthStart
-                                  const isLast = idx === scheduled.length - 1
-                                  const isPartial = segEnd.getTime() !== nextMonthStart.getTime()
-                                  const endLessOne = new Date(segEnd.getTime() - 86400000)
-                                  const fmtShort = (d: Date) => {
-                                    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-                                    const dd = d.getDate(); const j = dd % 10, k = dd % 100
-                                    let sfx = 'th'; if (k!==11 && k!==12 && k!==13) { if (j===1) sfx='st'; else if (j===2) sfx='nd'; else if (j===3) sfx='rd' }
-                                    return `${months[d.getMonth()]} ${dd}${sfx}`
-                                  }
-                                  return (
-                                    <label key={p.id} className="flex items-center justify-between gap-3 cursor-pointer hover:bg-zinc-900/20 p-2 rounded transition-colors">
-                                      <div className="flex items-center gap-3">
-                                        <input type="checkbox" name="paymentId" value={p.id} form={`receive-${b.id}`} className="w-4 h-4 rounded border-2 border-zinc-400 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] checked:bg-emerald-500 checked:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus:ring-offset-0 accent-emerald-500" />
-                                        <div className="flex items-center gap-2">
-                                          <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{formatShortDate(due)}</span>
-                                          <span className="text-sm text-zinc-300 whitespace-nowrap font-sora">{(() => {
-                                            try {
-                                              const list = (payments || []).filter((x:any)=> x.purpose === 'monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
-                                              const myIdx = list.findIndex((x:any)=> x.id === p.id)
-                                              const n = (myIdx >= 0 ? myIdx + 2 : 2)
-                                              const j = n % 10, k = n % 100
-                                              const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
-                                              if (isLast && isPartial) {
-                                                return `Monthly rent (${fmtShort(due)} - ${fmtShort(endLessOne)})`
-                                              }
-                                              return `Monthly rent (${ord} month rent)`
-                                            } catch { return 'Monthly rent' }
-                                          })()}</span>
-                                        </div>
-                                      </div>
-                                      <span className="px-3 py-1 rounded-lg text-sm bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-semibold font-sora">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
-                                    </label>
-                                  )
-                                })}
-                              </div>
-                              {/* Payment Received tile */}
-                              <form id={`receive-${b.id}`} action="/api/admin/bookings/receive-selected" method="post" className="mt-3">
-                                <div className="flex items-center justify-between gap-3 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2">
-                                  <div className="flex items-center gap-3 text-emerald-300">
-                                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
-                                    <span className="uppercase tracking-wider text-sm font-semibold font-sora">Select Payment Received</span>
-                                  </div>
-                                  <button className="px-3 py-1.5 text-sm rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow font-sora">Approve</button>
+                            <div className="relative rounded-xl px-0 py-4 overflow-hidden"
+                                 style={{
+                                   background: `
+                                     linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
+                                     radial-gradient(circle at 30% 20%, rgba(245,158,11,0.08) 0%, transparent 50%)
+                                   `,
+                                   border: '1px solid rgba(245,158,11,0.4)',
+                                   backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
+                                   boxShadow: `
+                                     0 20px 60px rgba(0,0,0,0.9),
+                                     0 10px 30px rgba(0,0,0,0.7),
+                                     inset 0 2px 0 rgba(255,255,255,0.15),
+                                     inset 0 -1px 0 rgba(255,255,255,0.1),
+                                     0 0 40px rgba(245,158,11,0.12)
+                                   `,
+                                   transform: 'perspective(1000px) rotateX(1deg)',
+                                   transformStyle: 'preserve-3d'
+                                 }}>
+                              <div className="relative z-10">
+                                <div className="flex items-center gap-2 text-sm text-amber-300 mb-4 font-sora px-3">
+                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                  <span className="uppercase tracking-wider font-semibold">Scheduled Payments</span>
                                 </div>
-                              </form>
+                                <div className="space-y-3">
+                                  {scheduled.map((p:any, idx:number) => {
+                                    const due = new Date(p.dueAt)
+                                    const nextMonthStart = new Date(due.getFullYear(), due.getMonth()+1, 1)
+                                    const checkout = new Date(b.checkout)
+                                    const segEnd = checkout < nextMonthStart ? checkout : nextMonthStart
+                                    const isLast = idx === scheduled.length - 1
+                                    const isPartial = segEnd.getTime() !== nextMonthStart.getTime()
+                                    const endLessOne = new Date(segEnd.getTime() - 86400000)
+                                    const fmtShort = (d: Date) => {
+                                      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+                                      const dd = d.getDate(); const j = dd % 10, k = dd % 100
+                                      let sfx = 'th'; if (k!==11 && k!==12 && k!==13) { if (j===1) sfx='st'; else if (j===2) sfx='nd'; else if (j===3) sfx='rd' }
+                                      return `${months[d.getMonth()]} ${dd}${sfx}`
+                                    }
+                                    return (
+                                      <label key={p.id} className="flex items-center justify-between gap-3 cursor-pointer hover:bg-zinc-900/20 px-3 py-2 rounded transition-colors">
+                                        <div className="flex items-center gap-3">
+                                          <input type="checkbox" name="paymentId" value={p.id} form={`receive-${b.id}`} className="w-4 h-4 rounded border-2 border-zinc-400 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] checked:bg-emerald-500 checked:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus:ring-offset-0 accent-emerald-500" />
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{formatShortDate(due)}</span>
+                                            <span className="text-sm text-zinc-300 whitespace-nowrap font-sora">{(() => {
+                                              try {
+                                                const list = (payments || []).filter((x:any)=> x.purpose === 'monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
+                                                const myIdx = list.findIndex((x:any)=> x.id === p.id)
+                                                const n = (myIdx >= 0 ? myIdx + 2 : 2)
+                                                const j = n % 10, k = n % 100
+                                                const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
+                                                if (isLast && isPartial) {
+                                                  return `Monthly rent (${fmtShort(due)} - ${fmtShort(endLessOne)})`
+                                                }
+                                                return `Monthly rent (${ord} month rent)`
+                                              } catch { return 'Monthly rent' }
+                                            })()}</span>
+                                          </div>
+                                        </div>
+                                        <span className="text-lg font-bold text-white font-sora ml-auto text-right">
+                                          €{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}
+                                        </span>
+                                      </label>
+                                    )
+                                  })}
+                                </div>
+                              </div>
                             </div>
                           ) : (
                             <span className="text-white/40 text-xs">No schedule</span>
                           )}
+
+                          {/* Unpaid Deposit - now rendered after Scheduled Payments */}
+                          {(() => {
+                            const depHeldCents = Number(b.depositHeld || 0)
+                            const refundedCents = payments
+                              .filter((p:any)=> p.purpose==='deposit' && p.status==='refunded')
+                              .reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
+                            const hasAnyDeposit = depHeldCents > 0 || refundedCents > 0
+                            const hasDepositPaymentReceived = payments.some((p:any)=> p.purpose === 'deposit' && p.status === 'received')
+                            const depositReceived = hasDepositPaymentReceived || b.status === 'confirmed'
+                            const amountEuros = Math.round(((refundedCents > 0 ? refundedCents : depHeldCents) / 100))
+                            if (hasAnyDeposit && !depositReceived && b.status !== 'confirmed') {
+                              return (
+                                <div className="relative rounded-xl px-0 py-4 overflow-hidden"
+                                     style={{
+                                       background: `
+                                         linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
+                                         radial-gradient(circle at 30% 20%, rgba(245,158,11,0.08) 0%, transparent 50%)
+                                       `,
+                                       border: '1px solid rgba(245,158,11,0.4)',
+                                       backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
+                                       boxShadow: `
+                                         0 20px 60px rgba(0,0,0,0.9),
+                                         0 10px 30px rgba(0,0,0,0.7),
+                                         inset 0 2px 0 rgba(255,255,255,0.15),
+                                         inset 0 -1px 0 rgba(255,255,255,0.1),
+                                         0 0 40px rgba(245,158,11,0.12)
+                                       `,
+                                       transform: 'perspective(1000px) rotateX(1deg)',
+                                       transformStyle: 'preserve-3d'
+                                     }}>
+                                  <div className="relative z-10">
+                                    <div className="flex items-center gap-2 text-sm text-amber-300 mb-4 font-sora px-3">
+                                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                      <span className="uppercase tracking-wider font-semibold">Deposit</span>
+                                    </div>
+                                    <div className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 border-transparent bg-transparent text-amber-300`}>
+                                      <div className="flex items-center gap-2">
+                                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                          <path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>
+                                        </svg>
+                                        <span className="uppercase tracking-wider text-sm font-semibold font-sora">Unpaid Deposit</span>
+                                      </div>
+                                      <span className="text-lg font-semibold text-white font-sora ml-auto text-right">€{amountEuros.toLocaleString('de-DE')}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )
+                            }
+                            return null
+                          })()}
+                          
+                          {/* Payment Received tile */}
+                          <form id={`receive-${b.id}`} action="/api/admin/bookings/receive-selected" method="post" className="mt-3">
+                            <div className="flex items-center justify-between gap-3 rounded-lg border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] px-4 py-3">
+                              <div className="flex items-center gap-3 text-emerald-300">
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
+                                <span className="uppercase tracking-wider text-sm font-semibold font-sora">Select Payment Received</span>
+                              </div>
+                              <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300">Approve</button>
+                            </div>
+                          </form>
                         </div>
                       )
                     })()}
