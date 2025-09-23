@@ -74,4 +74,32 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true, data: lead })
 }
 
+export async function PATCH(req: Request) {
+  const body = await req.json().catch(() => ({}))
+  const id = String(body.id || '').trim()
+  if (!id) return NextResponse.json({ ok: false, error: 'id-required' }, { status: 400 })
+  const data: any = { ...body }
+  delete data.id
+  data.updatedAt = new Date()
+
+  // Try DB
+  try {
+    const db = (prisma as any)
+    if (db?.lead?.update) {
+      const row = await db.lead.update({ where: { id }, data })
+      return NextResponse.json({ ok: true, data: row })
+    }
+  } catch {}
+
+  // Fallback JSON
+  const rows = readFallback()
+  const idx = rows.findIndex((r:any)=> r.id===id)
+  if (idx>=0) {
+    rows[idx] = { ...rows[idx], ...data }
+    writeFallback(rows)
+    return NextResponse.json({ ok: true, data: rows[idx] })
+  }
+  return NextResponse.json({ ok: false, error: 'not-found' }, { status: 404 })
+}
+
 

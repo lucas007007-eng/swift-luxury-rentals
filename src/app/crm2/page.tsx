@@ -35,6 +35,8 @@ export default function CRM2Page() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [newLeadOpen, setNewLeadOpen] = useState(false)
+  const [drawerLead, setDrawerLead] = useState<Lead | null>(null)
+  const [activities, setActivities] = useState<any[]>([])
   const [form, setForm] = useState<Partial<Lead>>({ stage: 'new' })
 
   useEffect(() => {
@@ -44,6 +46,9 @@ export default function CRM2Page() {
         const json = await res.json()
         if (!json.ok) throw new Error(json.error || 'load-failed')
         setLeads(json.data || [])
+        const a = await fetch('/api/crm2/activities', { cache: 'no-store' })
+        const aj = await a.json()
+        if (aj.ok) setActivities(aj.data || [])
       } catch (e: any) {
         setError(e?.message || 'load-failed')
       } finally {
@@ -127,7 +132,7 @@ export default function CRM2Page() {
                 <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">{stage}</div>
                 <div className="space-y-3">
                   {(grouped[stage] || []).map(l => (
-                    <div key={l.id} className="rounded-lg border border-zinc-600/40 bg-black/30 p-3">
+                    <button key={l.id} onClick={()=>setDrawerLead(l)} className="w-full text-left rounded-lg border border-zinc-600/40 bg-black/30 p-3 hover:border-zinc-400/60 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="text-white font-semibold font-sora truncate">{l.name}</div>
                         <div className="text-xs text-zinc-400 ml-2">{l.company || '—'}</div>
@@ -137,7 +142,7 @@ export default function CRM2Page() {
                         <span>{l.city || '—'}</span>
                         <span className="text-white">{(Number(l.budgetCents||0)/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -173,8 +178,93 @@ export default function CRM2Page() {
         </div>
       )}
 
+      {/* Drawer */}
+      {drawerLead && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/70" onClick={()=>setDrawerLead(null)} />
+          <div className="absolute right-0 top-0 h-full w-full max-w-xl luxury-feature-card p-6 overflow-y-auto">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-emerald-400">Lead</div>
+                <div className="text-2xl font-bold heading-sora text-white">{drawerLead.name}</div>
+                <div className="text-zinc-300 text-sm">{drawerLead.company || '—'} • {drawerLead.city || '—'}</div>
+              </div>
+              <button onClick={()=>setDrawerLead(null)} className="px-3 py-2 rounded-lg border border-zinc-400/30 text-white">Close</button>
+            </div>
+
+            {/* Edit basics */}
+            <div className="grid grid-cols-1 gap-3 mb-6">
+              <select className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.stage} onChange={async e=>{
+                const stage = e.target.value
+                setDrawerLead(prev=> prev ? { ...prev, stage } : prev)
+                setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, stage } : x))
+                try { await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, stage }) }) } catch {}
+              }}>
+                {STAGES.map(s=> <option key={s} value={s} className="bg-black">{s}</option>)}
+              </select>
+              <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.email||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, email: e.target.value } : prev)} placeholder="Email" />
+              <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.phone||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, phone: e.target.value } : prev)} placeholder="Phone" />
+              <div className="flex items-center justify-end">
+                <button className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all" onClick={async ()=>{
+                  try { await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, email: drawerLead.email, phone: drawerLead.phone }) }) } catch {}
+                }}>Save</button>
+              </div>
+            </div>
+
+            {/* Activities */}
+            <div className="luxury-feature-card p-4">
+              <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Activities</div>
+              <div className="space-y-2">
+                {activities.filter(a=> a.leadId===drawerLead.id).map(a=> (
+                  <div key={a.id} className="flex items-center justify-between text-sm">
+                    <div className="text-zinc-300 truncate">{a.type}: {a.content}</div>
+                    <div className="text-zinc-400 text-xs whitespace-nowrap">{a.dueAt ? new Date(a.dueAt).toLocaleDateString() : ''}</div>
+                  </div>
+                ))}
+              </div>
+              <AddActivity leadId={drawerLead.id} onAdd={(row)=> setActivities(prev=> [row, ...prev])} />
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </main>
+  )
+}
+
+function AddActivity({ leadId, onAdd }: { leadId: string; onAdd: (row:any)=>void }) {
+  const [content, setContent] = React.useState('')
+  const [type, setType] = React.useState('note')
+  const [dueAt, setDueAt] = React.useState('')
+  const submit = async () => {
+    if (!content.trim()) return
+    try {
+      const res = await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId, content, type, dueAt: dueAt || undefined }) })
+      const json = await res.json()
+      if (json.ok) {
+        onAdd(json.data)
+        setContent('')
+        setDueAt('')
+      }
+    } catch {}
+  }
+  return (
+    <div className="mt-3 grid grid-cols-1 gap-2">
+      <div className="grid grid-cols-3 gap-2">
+        <select className="bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-2 py-1 text-xs text-white" value={type} onChange={e=>setType(e.target.value)}>
+          <option className="bg-black" value="note">note</option>
+          <option className="bg-black" value="call">call</option>
+          <option className="bg-black" value="task">task</option>
+          <option className="bg-black" value="email">email</option>
+        </select>
+        <input className="bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-xs text-white" placeholder="Due date (YYYY-MM-DD)" value={dueAt} onChange={e=>setDueAt(e.target.value)} />
+      </div>
+      <div className="flex items-center gap-2">
+        <input className="flex-1 bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-sm text-white" placeholder="Add note / task / call summary" value={content} onChange={e=>setContent(e.target.value)} />
+        <button onClick={submit} className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white">Add</button>
+      </div>
+    </div>
   )
 }
 
