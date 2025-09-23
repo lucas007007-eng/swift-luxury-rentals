@@ -1254,7 +1254,7 @@ function MetricCard({ title, value, prefix = '', suffix = '', loading, moneyBack
 }
 
 // Ultra-Premium Spy-Tech BarChart
-function BarChart({ title, labels, series, color, loading, prefix = '' }: { title: string; labels: string[]; series: number[]; color: string; loading?: boolean; prefix?: string }) {
+function BarChart({ title, labels, series, color, loading, prefix = '', suffix = '' }: { title: string; labels: string[]; series: number[]; color: string; loading?: boolean; prefix?: string; suffix?: string }) {
   const maxVal = Math.max(1, ...(series || [1]))
   const [animate, setAnimate] = useState(false)
   const [hoverIdx, setHoverIdx] = useState<number | null>(null)
@@ -1312,7 +1312,7 @@ function BarChart({ title, labels, series, color, loading, prefix = '' }: { titl
                style={{
                  textShadow: '0 0 8px rgba(16,185,129,0.5)'
                }}>
-            {labels[hoverIdx]}: {prefix}{Number(series[hoverIdx]).toLocaleString('de-DE')}
+            {labels[hoverIdx]}: {prefix}{Number(series[hoverIdx]).toLocaleString('de-DE')}{suffix}
           </div>
         )}
       </div>
@@ -1366,8 +1366,8 @@ function BarChart({ title, labels, series, color, loading, prefix = '' }: { titl
             </div>
             {/* Right axis */}
             <div className="absolute right-0 top-0 h-full flex flex-col justify-between text-xs text-white/50 py-1">
-              <span>{prefix}{maxVal.toLocaleString('de-DE')}</span>
-              <span>{prefix}{Math.round(maxVal * 0.5).toLocaleString('de-DE')}</span>
+              <span>{prefix}{maxVal.toLocaleString('de-DE')}{suffix}</span>
+              <span>{prefix}{Math.round(maxVal * 0.5).toLocaleString('de-DE')}{suffix}</span>
               <span>0</span>
             </div>
           </div>
