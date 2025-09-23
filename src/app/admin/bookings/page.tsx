@@ -1,4 +1,5 @@
 import React from 'react'
+import Highlighter from '@/components/Highlighter'
 import prisma from '@/lib/prisma'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -91,8 +92,10 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   ])
   const totalsGlobal = { all: countAll, hold: countHold, confirmed: countConfirmed, cancelled: countCancelled, overdue: countOverdue }
   const pageRevenue = Math.round(bookings.reduce((s: number, b: any) => s + (Number(b.totalCents || 0) / 100), 0))
+  const highlight = (typeof (global as any)?.window !== 'undefined') ? (new URL((global as any).window.location.href).searchParams.get('highlight') || undefined) : undefined
   return (
     <main className="min-h-screen bg-black text-white">
+      {highlight && <Highlighter targetId={highlight} />}
       <Header forceBackground={true} />
       <div className="max-w-[2200px] mx-auto px-6 py-10 pt-28">
         {/* Header Row: Testing Suite + Operations Command */}
@@ -286,7 +289,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
             </thead>
             <tbody className="divide-y divide-zinc-700/30">
               {withDeposit.map((b: any) => (
-                <tr key={b.id} className="hover:bg-zinc-900/20 transition-colors">
+                <tr key={b.id} id={b.id} className="hover:bg-zinc-900/20 transition-colors">
                   <td className="px-3 py-4 text-sm align-top">
                     <div className="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full h-[60px]">
                       <div className="text-white font-semibold text-sm font-sora text-center">{new Date(b.createdAt).toLocaleDateString()}</div>

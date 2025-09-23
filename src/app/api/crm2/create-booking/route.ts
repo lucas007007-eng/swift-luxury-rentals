@@ -105,7 +105,7 @@ export async function POST(req: Request) {
       )
     }
 
-    return NextResponse.json({ ok:true, data: { id: booking.id, adminUrl: `/admin/bookings`, payments: createdPayments } })
+    return NextResponse.json({ ok:true, data: { id: booking.id, adminUrl: `/admin/bookings?highlight=${booking.id}`, payments: createdPayments } })
   } catch (e) {
     console.error('create-booking error', e)
     return NextResponse.json({ ok:false, error:'create-failed' }, { status: 500 })

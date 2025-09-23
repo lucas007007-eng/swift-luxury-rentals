@@ -39,6 +39,7 @@ export default function CRM2Page() {
   const [activities, setActivities] = useState<any[]>([])
   const [matches, setMatches] = useState<any[]>([])
   const [deals, setDeals] = useState<any[]>([])
+  const [bookingPreview, setBookingPreview] = useState<{ id: string; payments?: any[] } | null>(null)
   const [dragId, setDragId] = useState<string | null>(null)
   const [form, setForm] = useState<Partial<Lead>>({ stage: 'new' })
   const [companies, setCompanies] = useState<any[]>([])
@@ -138,6 +139,12 @@ export default function CRM2Page() {
     <main className="min-h-screen bg-black text-white">
       <Header forceBackground={true} />
       <div className="max-w-[2200px] mx-auto px-6 py-10 pt-28">
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-400/40 bg-red-500/10 text-red-300 px-4 py-3 flex items-center justify-between">
+            <div className="text-sm">{error}</div>
+            <button onClick={()=>setError(null)} className="text-xs px-2 py-1 rounded border border-red-400/40">Dismiss</button>
+          </div>
+        )}
         {/* Header Row */}
         <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="luxury-feature-card p-8">
@@ -463,17 +470,58 @@ export default function CRM2Page() {
                               await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Created booking from quote • property ${q.propertyExtId}` }) })
                               const count = j.data.payments?.length||0
                               const url = j.data.adminUrl || '/admin/bookings'
+                              setBookingPreview({ id: j.data.id, payments: j.data.payments || [] })
                               if (confirm(`Booking created with ${count} scheduled payments. Open bookings now?`)) {
                                 window.open(url, '_blank')
                               }
-                            } else alert('Failed to create booking')
-                          } catch { alert('Failed to create booking') }
+                            } else { setError(j.error || 'Failed to create booking'); alert('Failed to create booking') }
+                          } catch (e:any) { setError(e?.message || 'Failed to create booking'); alert('Failed to create booking') }
                         }}>Create Booking</button>
                     </div>
                   </div>
                 )
               })()}
             </div>
+
+            {/* Scheduled Payments Preview (after booking creation) */}
+            {bookingPreview && (
+              <div className="luxury-feature-card p-4 mt-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="font-mono uppercase tracking-wider text-sm text-white">Scheduled Payments</div>
+                  <div className="text-zinc-300 text-xs">Booking {bookingPreview.id.slice(0,8)}</div>
+                </div>
+                <div className="space-y-2">
+                  {(bookingPreview.payments || []).map((p:any)=> (
+                    <div key={p.id || `${p.purpose}-${p.dueAt}`} className="flex items-center justify-between rounded border border-zinc-600/40 bg-black/30 px-3 py-2">
+                      <div className="text-sm text-zinc-300 capitalize">{String(p.purpose).replace('_',' ')}</div>
+                      <div className="text-xs text-zinc-400">{p.dueAt ? new Date(p.dueAt).toLocaleDateString() : ''}</div>
+                      <div className="text-sm text-white">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</div>
+                    </div>
+                  ))}
+                  {(bookingPreview.payments || []).length === 0 && (
+                    <div className="text-zinc-400 text-sm">No payments created</div>
+                  )}
+                </div>
+                <div className="flex items-center justify-end gap-2 mt-3">
+                  <button
+                    className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
+                    onClick={async ()=>{
+                      try {
+                        const res = await fetch('/api/admin/lease', { method:'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: bookingPreview.id }) })
+                        const j = await res.json()
+                        if (res.ok && j?.url) {
+                          await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead!.id, type:'note', content:`Lease PDF generated for booking ${bookingPreview.id}` }) })
+                          window.open(j.url, '_blank')
+                        } else {
+                          setError(j?.message || 'Failed to generate lease')
+                          alert('Failed to generate lease')
+                        }
+                      } catch (e:any) { setError(e?.message || 'lease-failed'); alert('Failed to generate lease') }
+                    }}
+                  >Generate Lease PDF</button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
