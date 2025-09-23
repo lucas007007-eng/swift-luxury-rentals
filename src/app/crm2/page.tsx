@@ -441,6 +441,27 @@ export default function CRM2Page() {
                             await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Client accepted quote • property ${q.propertyExtId}` }) })
                           } catch {}
                         }}>Mark Signed</button>
+                      <button
+                        className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
+                        onClick={async ()=>{
+                          try {
+                            const res = await fetch('/api/crm2/create-booking', { method:'POST', body: JSON.stringify({
+                              propertyExtId: q.propertyExtId,
+                              email: drawerLead.email,
+                              name: drawerLead.name,
+                              termMonths: q.termMonths,
+                              monthlyRateCents: q.monthlyRateCents,
+                              depositCents: q.depositCents,
+                              moveInFeeCents: q.moveInFeeCents,
+                              startDate: new Date().toISOString()
+                            }) })
+                            const j = await res.json()
+                            if (j.ok) {
+                              await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Created booking from quote • property ${q.propertyExtId}` }) })
+                              window.open(j.data.adminUrl, '_blank')
+                            } else alert('Failed to create booking')
+                          } catch { alert('Failed to create booking') }
+                        }}>Create Booking</button>
                     </div>
                   </div>
                 )
