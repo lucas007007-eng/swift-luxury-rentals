@@ -38,6 +38,7 @@ export default function CRM2Page() {
   const [drawerLead, setDrawerLead] = useState<Lead | null>(null)
   const [activities, setActivities] = useState<any[]>([])
   const [matches, setMatches] = useState<any[]>([])
+  const [deals, setDeals] = useState<any[]>([])
   const [dragId, setDragId] = useState<string | null>(null)
   const [form, setForm] = useState<Partial<Lead>>({ stage: 'new' })
   const [companies, setCompanies] = useState<any[]>([])
@@ -59,6 +60,9 @@ export default function CRM2Page() {
         const c = await fetch('/api/crm2/companies', { cache: 'no-store' })
         const cj = await c.json()
         if (cj.ok) setCompanies(cj.data || [])
+        const d = await fetch('/api/crm2/deals', { cache: 'no-store' })
+        const dj = await d.json()
+        if (dj.ok) setDeals(dj.data || [])
       } catch (e: any) {
         setError(e?.message || 'load-failed')
       } finally {
@@ -399,6 +403,48 @@ export default function CRM2Page() {
                   }}
                 >Send Quote</button>
               </div>
+            </div>
+
+            {/* Latest Quote */}
+            <div className="luxury-feature-card p-4 mt-6">
+              <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Latest Quote</div>
+              {(() => {
+                const list = deals.filter(d=> d.leadId === drawerLead.id)
+                  .sort((a,b)=> new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime())
+                const q = list[0]
+                if (!q) return <div className="text-zinc-400 text-sm">No quotes yet</div>
+                const rate = (Number(q.monthlyRateCents||0)/100).toLocaleString('de-DE')
+                const dep = (Number(q.depositCents||0)/100).toLocaleString('de-DE')
+                const mv = (Number(q.moveInFeeCents||0)/100).toLocaleString('de-DE')
+                return (
+                  <div className="space-y-2">
+                    <div className="text-white text-sm font-semibold">{q.city || '—'} • {q.termMonths||1} mo • €{rate}/mo</div>
+                    <div className="text-zinc-300 text-sm">Deposit €{dep} • Move-in €{mv} • Property {q.propertyExtId}</div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="px-3 py-1 text-xs rounded border border-zinc-400/30 text-white"
+                        onClick={()=>{
+                          const text = `Quote for ${drawerLead.name}: ${q.city||'—'} • ${q.termMonths||1} months • €${rate}/mo\nDeposit €${dep} • Move-in €${mv} • Property ${q.propertyExtId}`
+                          navigator.clipboard?.writeText(text)
+                        }}>Copy Summary</button>
+                      <a
+                        className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
+                        href={`mailto:${(drawerLead.email||'').trim()}?subject=${encodeURIComponent('Quote from Swift Luxury')}&body=${encodeURIComponent(`Hello ${drawerLead.name},%0D%0A%0D%0AHere is your quote:%0D%0A• City: ${q.city||'—'}%0D%0A• Term: ${q.termMonths||1} months%0D%0A• Monthly: €${rate}%0D%0A• Deposit: €${dep}%0D%0A• Move-in: €${mv}%0D%0A• Property: ${q.propertyExtId}%0D%0A%0D%0ABest regards,%0D%0ASwift Luxury`)}`}
+                        target="_blank" rel="noopener noreferrer">Email Quote</a>
+                      <button
+                        className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
+                        onClick={async ()=>{
+                          setDrawerLead(prev=> prev ? { ...prev, stage: 'signed' } : prev)
+                          setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, stage: 'signed' } : x))
+                          try {
+                            await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, stage: 'signed' }) })
+                            await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Client accepted quote • property ${q.propertyExtId}` }) })
+                          } catch {}
+                        }}>Mark Signed</button>
+                    </div>
+                  </div>
+                )
+              })()}
             </div>
           </div>
         </div>
