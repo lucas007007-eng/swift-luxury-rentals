@@ -87,6 +87,96 @@ export function getDefaultContent(slug: string): Record<string, string> {
       'cta.subtitle': 'Discover our curated collection of ultra-luxury properties across Europe',
     }
   }
+  if (slug === 'home') {
+    return {
+      'hero.subtitle': 'Discover luxury furnished apartments across Europe with flexible month-to-month leases and secure crypto payments',
+      'mission.body': 'Swift Luxury offers premium furnished apartments in Europe\'s most desirable cities. Experience luxury living with the convenience of cryptocurrency payments.',
+      'mission.body.2': 'From Berlin to Paris, our handpicked properties provide the perfect blend of comfort, style, and technology for modern travelers and residents.',
+      'values.intro': 'Why choose Swift Luxury for your premium rental needs',
+      'features.intro': 'Advanced features designed for the modern luxury traveler',
+      'cta.subtitle': 'Join the Swift Luxury Network and access exclusive properties with crypto-enabled payments',
+    }
+  }
+  if (slug === 'properties') {
+    return {
+      'hero.subtitle': 'Browse our curated collection of luxury properties across Europe\'s most prestigious cities',
+      'mission.body': 'Each property is handpicked for its exceptional quality, prime location, and luxury amenities to ensure your stay exceeds expectations.',
+      'mission.body.2': 'From penthouse apartments in Berlin to elegant flats in Paris, discover your perfect temporary home.',
+      'values.intro': 'What makes our property collection exceptional',
+      'features.intro': 'Premium amenities and services included with every property',
+      'cta.subtitle': 'Find your perfect luxury rental and book with cryptocurrency',
+    }
+  }
+  if (slug === 'contact') {
+    return {
+      'hero.subtitle': 'Get in touch with our luxury rental specialists for personalized assistance',
+      'mission.body': 'Our dedicated team is here to help you find the perfect luxury accommodation or answer any questions about our services.',
+      'mission.body.2': 'Whether you\'re booking a short stay or looking for a long-term rental, we\'re committed to providing exceptional service.',
+      'values.intro': 'How we can assist you with your luxury rental needs',
+      'features.intro': 'Multiple ways to connect with our expert team',
+      'cta.subtitle': 'Ready to experience luxury living? Contact us today',
+    }
+  }
+  if (slug === 'corporate') {
+    return {
+      'hero.subtitle': 'Flexible corporate housing solutions for teams, executives, and business travelers',
+      'mission.body': 'Swift Luxury Corporate provides premium furnished accommodations designed specifically for business needs with flexible terms and professional service.',
+      'mission.body.2': 'From executive relocations to team housing, we offer customized solutions that meet your company\'s requirements.',
+      'values.intro': 'Why leading companies choose Swift Luxury for corporate housing',
+      'features.intro': 'Enterprise-grade services tailored for business travelers',
+      'cta.subtitle': 'Contact our corporate team for customized housing solutions',
+    }
+  }
+  if (slug === 'pricing') {
+    return {
+      'hero.subtitle': 'Transparent pricing for luxury furnished apartments with no hidden fees',
+      'mission.body': 'Our pricing is straightforward and competitive, with all costs clearly outlined upfront so you can make informed decisions.',
+      'mission.body.2': 'From monthly rates to service fees, everything is transparent with options for traditional and cryptocurrency payments.',
+      'values.intro': 'What\'s included in our pricing structure',
+      'features.intro': 'Pricing benefits that provide exceptional value',
+      'cta.subtitle': 'Ready to secure your luxury rental? View our competitive rates',
+    }
+  }
+  if (slug === 'list') {
+    return {
+      'hero.subtitle': 'Partner with Swift Luxury to list your premium property and access our exclusive clientele',
+      'mission.body': 'We work with property owners to showcase exceptional rental properties to our curated network of luxury travelers and residents.',
+      'mission.body.2': 'Our platform provides maximum exposure for your property while maintaining the highest standards of service and guest quality.',
+      'values.intro': 'Benefits of listing your property with Swift Luxury',
+      'features.intro': 'Professional services to maximize your property\'s potential',
+      'cta.subtitle': 'Ready to list your luxury property? Get started today',
+    }
+  }
+  if (slug === 'privacy') {
+    return {
+      'hero.subtitle': 'Your privacy and data security are our top priorities',
+      'mission.body': 'This privacy policy explains how Swift Luxury collects, uses, and protects your personal information when you use our services.',
+      'mission.body.2': 'We are committed to transparency and compliance with all applicable data protection regulations.',
+      'values.intro': 'Our commitment to protecting your personal information',
+      'features.intro': 'Security measures we implement to safeguard your data',
+      'cta.subtitle': 'Questions about our privacy practices? Contact our team',
+    }
+  }
+  if (slug === 'terms') {
+    return {
+      'hero.subtitle': 'Terms of service governing your use of Swift Luxury platform and services',
+      'mission.body': 'These terms outline the legal relationship between you and Swift Luxury when using our rental platform and related services.',
+      'mission.body.2': 'By using our platform, you agree to these terms which are designed to protect both guests and property owners.',
+      'values.intro': 'Key terms that govern our service relationship',
+      'features.intro': 'Rights and responsibilities for platform users',
+      'cta.subtitle': 'Have questions about our terms? Contact our legal team',
+    }
+  }
+  if (slug === 'cookies') {
+    return {
+      'hero.subtitle': 'How Swift Luxury uses cookies and tracking technologies to enhance your experience',
+      'mission.body': 'We use cookies and similar technologies to provide personalized experiences, analyze usage, and improve our services.',
+      'mission.body.2': 'This policy explains what cookies we use, why we use them, and how you can control your preferences.',
+      'values.intro': 'Types of cookies used on our platform',
+      'features.intro': 'How cookies enhance your browsing experience',
+      'cta.subtitle': 'Manage your cookie preferences or contact us with questions',
+    }
+  }
   return {}
 }
 

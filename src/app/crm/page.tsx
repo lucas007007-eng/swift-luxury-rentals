@@ -62,48 +62,152 @@ export default function CRMPage() {
       <Header forceBackground={true} />
       <div className="pt-28 pb-20">
         <div className="max-w-[1800px] mx-auto px-6 py-10">
-          <h1 className="text-3xl font-bold mb-8">CRM Dashboard</h1>
+          {/* Ultra-Premium Header Section */}
+          <div className="luxury-feature-card mb-8 p-8">
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-amber-400 font-sora">Customer Relations</div>
+                <h1 className="text-4xl font-bold heading-sora text-white mb-2 text-left">CRM Dashboard</h1>
+                <p className="text-zinc-300 text-lg text-left">Elite Client Management</p>
+              </div>
+              <a
+                href="/admin"
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
+                aria-label="Back to Admin"
+              >
+                ← Back to Admin
+              </a>
+            </div>
+          </div>
           
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+          <div className="luxury-feature-card p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="text-white/90 font-semibold text-lg">CRM Dashboard</div>
             </div>
             
             {/* CRM Tables Component Content */}
             <div className="space-y-8">
-              {/* Quick Add Booking */}
-              <div className="rounded-xl border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] p-4">
-                <div className="flex items-center justify-between">
-                  <div className="font-mono uppercase tracking-wider text-sm text-amber-400">Add Booking</div>
-                  {!adding ? (
-                    <button className="bg-amber-500 hover:bg-amber-600 text-black text-sm font-semibold px-3 py-1.5 rounded" onClick={()=>setAdding(true)}>Add</button>
-                  ) : (
-                    <button className="text-white/70 text-sm" onClick={()=>setAdding(false)}>Cancel</button>
-                  )}
-                </div>
-              </div>
 
-              {/* VIP Row */}
-              <div>
-                <div className="text-white/80 font-semibold mb-3 flex items-center justify-between">
-                  <span>VIP Customers</span>
+              {/* CRM Table (desktop) */}
+              <div className="hidden md:block">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-400/40 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3h18v18H3zM9 9h6v6H9z"/></svg>
+                  </div>
+                  <div>
+                    <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Client Records</div>
+                    <div className="text-xl font-bold text-white heading-sora">Customer Database</div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {loading ? (
-                    Array.from({length:4}).map((_,i)=>(
-                      <div key={i} className="rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4 text-white/60">Loading…</div>
-                    ))
-                  ) : vips.slice(0,4).map((vip) => (
-                    <div key={vip.clientName} className="rounded-xl border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] p-4 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="font-semibold text-amber-400">{vip.clientName}</div>
-                        <div className="text-xs text-emerald-400/80">Since {new Date(vip.dateJoined).toLocaleDateString()}</div>
-                      </div>
-                      <div className="text-sm text-white/80">Total Spend</div>
-                      <div className="text-2xl font-bold text-emerald-400">€{Number(vip.total).toLocaleString('de-DE')}</div>
-                    </div>
-                  ))}
-                </div>
+                <table className="w-full divide-y divide-zinc-700/50 table-auto">
+                  <thead className="bg-black/30 backdrop-blur-sm">
+                    <tr>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Client</th>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">City</th>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Property</th>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Dates</th>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Lease Total</th>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Received</th>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Deposit</th>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Next Due</th>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Status</th>
+                      <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Documents</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-700/30">
+                    {loading ? (
+                      <tr><td className="py-6 text-white/40" colSpan={10}>Loading…</td></tr>
+                    ) : rows.length === 0 ? (
+                      <tr><td className="py-6 text-white/60" colSpan={10}>No records yet.</td></tr>
+                    ) : (
+                      rows.map((r, idx) => (
+                        <tr key={r.id} className="border-t border-zinc-700/30 hover:bg-zinc-900/20 transition-colors">
+                          <td className="px-3 py-4 text-sm text-white font-semibold font-sora">{r.overdue ? (<span className="px-2 py-0.5 rounded bg-red-500/20 text-red-300">{r.clientName}</span>) : r.clientName}</td>
+                          <td className="px-3 py-4 text-sm text-zinc-300 font-sora">{r.city}</td>
+                          <td className="px-3 py-4 text-sm text-white font-sora">{r.propertyTitle || r.propertyId}</td>
+                          <td className="px-3 py-4 text-sm">
+                            <div className="inline-flex flex-col gap-1 px-2.5 py-1.5 rounded border border-sky-400/30 bg-sky-500/10 shadow-[0_0_12px_rgba(56,189,248,0.25)]">
+                              <span className="text-[11px] text-sky-300 whitespace-nowrap">Check-In: {formatShortDate(r.checkIn)}</span>
+                              <span className="text-[11px] text-sky-200/80 whitespace-nowrap">Checkout: {formatShortDate(r.checkOut)}</span>
+                            </div>
+                          </td>
+                          <td className="px-3 py-4 text-sm">
+                            {typeof r.leaseValue === 'number' ? (
+                              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-amber-400/40 bg-amber-500/10 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.35)] whitespace-nowrap">
+                                <span className="font-bold">€</span>
+                                <span className="font-semibold">{Number(r.leaseValue||0).toLocaleString('de-DE')}</span>
+                                <span className="uppercase tracking-wider text-[10px] text-amber-200">Lease Total</span>
+                              </div>
+                            ) : (
+                              <span className="text-white/40">—</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-4 text-sm">
+                            {(() => {
+                              const amt = Number(r.receivedAmount || 0)
+                              if (!amt) return <span className="text-white/40">—</span>
+                              return (
+                                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] whitespace-nowrap">
+                                  <svg className="w-3.5 h-3.5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
+                                  <span className="font-semibold">€{amt.toLocaleString('de-DE')}</span>
+                                  <span className="uppercase tracking-wider text-[10px] text-emerald-200">Received</span>
+                                </div>
+                              )
+                            })()}
+                          </td>
+                          <td className="px-3 py-4 text-sm">
+                            {typeof r.depositAmount === 'number' ? (
+                              (() => {
+                                const isCompleted = r.paid !== false
+                                const isRefunded = r.depositStatus === 'refunded'
+                                const chipClass = isRefunded
+                                  ? 'border-sky-400/30 bg-sky-500/10 text-sky-300 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
+                                  : isCompleted
+                                    ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+                                    : 'border-amber-400/30 bg-amber-500/10 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+                                const label = isRefunded ? 'Deposit Refunded' : (isCompleted ? 'Deposit Active' : 'No deposit')
+                                return (
+                                  <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded border ${chipClass} whitespace-nowrap`}>
+                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>
+                                    </svg>
+                                    <span className="font-semibold">€{Number(r.depositAmount||0).toLocaleString('de-DE')}</span>
+                                    <span className="uppercase tracking-wider text-[10px] opacity-80">{label}</span>
+                                  </div>
+                                )
+                              })()
+                            ) : <span className="text-white/40">—</span>}
+                          </td>
+                          <td className="px-3 py-4 text-sm">
+                            {r.nextDue ? (
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="px-2 py-0.5 rounded text-xs whitespace-nowrap bg-amber-500/20 text-amber-300">{r.nextDue}</span>
+                                <span className="text-sm font-semibold text-white whitespace-nowrap">€{Number(r.nextDueAmount||0).toLocaleString('de-DE')}</span>
+                              </div>
+                            ) : <span className="text-white/40">—</span>}
+                          </td>
+                          <td className="px-3 py-4 text-sm">
+                            <span className={`px-2 py-1 text-xs rounded border ${r.paid !== false ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-amber-500/20 text-amber-300 border-amber-400/30'}`}>
+                              {r.paid !== false ? 'Paid' : 'Unpaid'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-4 text-sm">
+                            <div className="flex gap-2">
+                              {r.leasePdf ? (
+                                <a className="text-amber-400 hover:text-amber-300 text-xs font-sora" href={r.leasePdf} target="_blank">Lease PDF</a>
+                              ) : (
+                                <button className="bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold px-2 py-1 rounded font-sora">
+                                  Generate
+                                </button>
+                              )}
+                              {r.invoicePdf ? <a className="text-amber-400 hover:text-amber-300 text-xs font-sora" href={r.invoicePdf} target="_blank">Invoice</a> : <span className="text-white/40 text-xs">—</span>}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
 
               {/* CRM Mobile Cards */}
@@ -165,120 +269,6 @@ export default function CRMPage() {
                     </div>
                   ))
                 )}
-              </div>
-
-              {/* CRM Table (desktop) */}
-              <div className="hidden md:block">
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-white/60">
-                      <th className="py-2 pr-4">Client</th>
-                      <th className="py-2 pr-4">City</th>
-                      <th className="py-2 pr-4">Property</th>
-                      <th className="py-2 pr-4">Checkin/Checkout</th>
-                      <th className="py-2 pr-4">Lease Agreement Total</th>
-                      <th className="py-2 pr-4">Payment received</th>
-                      <th className="py-2 pr-4">Deposit</th>
-                      <th className="py-2 pr-4">Next due</th>
-                      <th className="py-2 pr-4">Paid</th>
-                      <th className="py-2 pr-4">Lease</th>
-                      <th className="py-2 pr-4">Invoice</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {loading ? (
-                      <tr><td className="py-6 text-white/40" colSpan={11}>Loading…</td></tr>
-                    ) : rows.length === 0 ? (
-                      <tr><td className="py-6 text-white/60" colSpan={11}>No records yet.</td></tr>
-                    ) : (
-                      rows.map((r, idx) => (
-                        <tr key={r.id} className="border-t border-white/10">
-                          <td className="py-3 pr-4">{r.overdue ? (<span className="px-2 py-0.5 rounded bg-red-500/20 text-red-300">{r.clientName}</span>) : r.clientName}</td>
-                          <td className="py-3 pr-4">{r.city}</td>
-                          <td className="py-3 pr-4">{r.propertyTitle || r.propertyId}</td>
-                          <td className="py-3 pr-4">
-                            <div className="inline-flex flex-col gap-1 px-2.5 py-1.5 rounded border border-sky-400/30 bg-sky-500/10 shadow-[0_0_12px_rgba(56,189,248,0.25)]">
-                              <span className="text-[11px] text-sky-300 whitespace-nowrap">Check-In: {formatShortDate(r.checkIn)}</span>
-                              <span className="text-[11px] text-sky-200/80 whitespace-nowrap">Checkout: {formatShortDate(r.checkOut)}</span>
-                            </div>
-                          </td>
-                          <td className="py-3 pr-4">
-                            {typeof r.leaseValue === 'number' ? (
-                              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-amber-400/40 bg-amber-500/10 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.35)] whitespace-nowrap">
-                                <span className="font-bold">€</span>
-                                <span className="font-semibold">{Number(r.leaseValue||0).toLocaleString('de-DE')}</span>
-                                <span className="uppercase tracking-wider text-[10px] text-amber-200">Lease Total</span>
-                              </div>
-                            ) : (
-                              <span className="text-white/40">—</span>
-                            )}
-                          </td>
-                          <td className="py-3 pr-4">
-                            {(() => {
-                              const amt = Number(r.receivedAmount || 0)
-                              if (!amt) return <span className="text-white/40">—</span>
-                              return (
-                                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)] whitespace-nowrap">
-                                  <svg className="w-3.5 h-3.5 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
-                                  <span className="font-semibold">€{amt.toLocaleString('de-DE')}</span>
-                                  <span className="uppercase tracking-wider text-[10px] text-emerald-200">Received</span>
-                                </div>
-                              )
-                            })()}
-                          </td>
-                          <td className="py-3 pr-4">
-                            {typeof r.depositAmount === 'number' ? (
-                              (() => {
-                                const isCompleted = r.paid !== false
-                                const isRefunded = r.depositStatus === 'refunded'
-                                const chipClass = isRefunded
-                                  ? 'border-sky-400/30 bg-sky-500/10 text-sky-300 shadow-[0_0_12px_rgba(56,189,248,0.25)]'
-                                  : isCompleted
-                                    ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
-                                    : 'border-amber-400/30 bg-amber-500/10 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
-                                const label = isRefunded ? 'Deposit Refunded' : (isCompleted ? 'Deposit Active' : 'No deposit')
-                                return (
-                                  <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded border ${chipClass} whitespace-nowrap`}>
-                                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <path d="M12 1v22"/><path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6"/>
-                                    </svg>
-                                    <span className="font-semibold">€{Number(r.depositAmount||0).toLocaleString('de-DE')}</span>
-                                    <span className="uppercase tracking-wider text-[10px] opacity-80">{label}</span>
-                                  </div>
-                                )
-                              })()
-                            ) : <span className="text-white/40">—</span>}
-                          </td>
-                          <td className="py-3 pr-4">
-                            {r.nextDue ? (
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="px-2 py-0.5 rounded text-xs whitespace-nowrap bg-amber-500/20 text-amber-300">{r.nextDue}</span>
-                                <span className="text-sm font-semibold text-white whitespace-nowrap">€{Number(r.nextDueAmount||0).toLocaleString('de-DE')}</span>
-                              </div>
-                            ) : <span className="text-white/40">—</span>}
-                          </td>
-                          <td className="py-3 pr-4">
-                            <span className={`px-2 py-1 text-xs rounded border ${r.paid !== false ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-amber-500/20 text-amber-300 border-amber-400/30'}`}>
-                              {r.paid !== false ? 'Paid' : 'Unpaid'}
-                            </span>
-                          </td>
-                          <td className="py-3 pr-4">
-                            {r.leasePdf ? (
-                              <a className="text-amber-400 hover:text-amber-300" href={r.leasePdf} target="_blank">Open PDF</a>
-                            ) : (
-                              <button className="bg-amber-500 hover:bg-amber-600 text-black text-xs font-semibold px-2 py-1 rounded">
-                                Generate PDF
-                              </button>
-                            )}
-                          </td>
-                          <td className="py-3 pr-4">
-                            {r.invoicePdf ? <a className="text-amber-400 hover:text-amber-300" href={r.invoicePdf} target="_blank">Open PDF</a> : <span className="text-white/40">—</span>}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
               </div>
             </div>
           </div>
