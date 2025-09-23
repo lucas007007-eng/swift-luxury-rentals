@@ -298,7 +298,7 @@ export default function SalesAnalyticsPage() {
 
                 {/* Revenue Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 items-stretch">
-            <MetricCard title={`${currentMonthLabel} Revenue`} value={metrics?.totals?.monthlyRevenue ?? 0} prefix="€" loading={loading} trend bgGifSrc="/images/pepe.gif" gifHeight={180} className="min-h-[280px]" />
+            <MetricCard title={`${currentMonthLabel} Revenue`} value={metrics?.totals?.monthlyRevenue ?? 0} prefix="€" loading={loading} trend className="min-h-[280px]" />
             <MetricCard title="Annual Revenue" value={metrics?.totals?.annualRevenue ?? 0} prefix="€" loading={loading} trend className="min-h-[280px]" />
             <div className="relative rounded-2xl p-6 border border-purple-400/30 bg-gradient-to-br from-[#1a0b1a] to-[#120d12] shadow-[0_0_20px_rgba(139,92,246,0.25)] overflow-hidden min-h-[280px]">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(139,92,246,0.15),transparent_40%),radial-gradient(circle_at_80%_100%,rgba(139,92,246,0.1),transparent_40%)]" style={{ zIndex: 0 }} />
