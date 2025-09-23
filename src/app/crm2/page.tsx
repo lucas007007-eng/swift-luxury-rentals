@@ -365,6 +365,7 @@ export default function CRM2Page() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input id="qb_property" placeholder="Property extId" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_city" placeholder="City" defaultValue={drawerLead.city||''} className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input id="qb_start" type="date" defaultValue={new Date().toISOString().slice(0,10)} className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_term" type="number" placeholder="Term (months)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_rate" type="number" placeholder="Monthly rate (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_deposit" type="number" placeholder="Deposit (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
@@ -445,6 +446,8 @@ export default function CRM2Page() {
                         className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
                         onClick={async ()=>{
                           try {
+                            const startVal = (document.getElementById('qb_start') as HTMLInputElement)?.value
+                            const startISO = startVal ? new Date(startVal).toISOString() : new Date().toISOString()
                             const res = await fetch('/api/crm2/create-booking', { method:'POST', body: JSON.stringify({
                               propertyExtId: q.propertyExtId,
                               email: drawerLead.email,
@@ -453,7 +456,7 @@ export default function CRM2Page() {
                               monthlyRateCents: q.monthlyRateCents,
                               depositCents: q.depositCents,
                               moveInFeeCents: q.moveInFeeCents,
-                              startDate: new Date().toISOString()
+                              startDate: startISO
                             }) })
                             const j = await res.json()
                             if (j.ok) {
