@@ -136,6 +136,7 @@ export default function CRM2Page() {
     const temp: Lead = { id: 'tmp_' + Date.now(), ...payload }
     setLeads(prev => [temp, ...prev])
     setNewLeadOpen(false)
+    setFilterStage('all')
     setForm({ stage: 'new' })
     try {
       const res = await fetch('/api/crm2/leads', { method: 'POST', body: JSON.stringify(payload) })
