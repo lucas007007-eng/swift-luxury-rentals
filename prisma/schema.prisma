@@ -8,28 +8,28 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  phone     String?
-  password  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  bookings  Booking[]
+  id             String          @id @default(cuid())
+  email          String          @unique
+  name           String?
+  phone          String?
+  password       String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  bookings       Booking[]
   supportTickets SupportTicket[]
 }
 
 model SupportTicket {
-  id          String   @id @default(cuid())
-  user        User     @relation(fields: [userId], references: [id])
+  id          String           @id @default(cuid())
+  user        User             @relation(fields: [userId], references: [id])
   userId      String
   subject     String
-  description String   @db.Text
-  category    String   // maintenance, payment, booking, general
-  priority    String   // low, medium, high, urgent
-  status      String   @default("open") // open, in_progress, resolved, closed
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  description String           @db.Text
+  category    String // maintenance, payment, booking, general
+  priority    String // low, medium, high, urgent
+  status      String           @default("open") // open, in_progress, resolved, closed
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   messages    SupportMessage[]
 
   @@index([userId])
@@ -42,7 +42,7 @@ model SupportMessage {
   id        String        @id @default(cuid())
   ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   ticketId  String
-  fromType  String        // tenant, admin
+  fromType  String // tenant, admin
   message   String        @db.Text
   createdAt DateTime      @default(now())
 
@@ -51,26 +51,26 @@ model SupportMessage {
 }
 
 model City {
-  id    String @id @default(cuid())
-  name  String @unique
-  slug  String @unique
+  id         String     @id @default(cuid())
+  name       String     @unique
+  slug       String     @unique
   properties Property[]
 }
 
 model Property {
-  id          String   @id @default(cuid())
-  extId       String?  @unique
-  title       String
-  city        City     @relation(fields: [cityId], references: [id])
-  cityId      String
-  address     String?
+  id           String          @id @default(cuid())
+  extId        String?         @unique
+  title        String
+  city         City            @relation(fields: [cityId], references: [id])
+  cityId       String
+  address      String?
   priceMonthly Int?
-  currency    String   @default("EUR")
-  images      PropertyImage[]
-  calendars   CalendarDay[]
-  bookings    Booking[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  currency     String          @default("EUR")
+  images       PropertyImage[]
+  calendars    CalendarDay[]
+  bookings     Booking[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 }
 
 model PropertyImage {
@@ -88,6 +88,7 @@ model CalendarDay {
   date       DateTime
   available  Boolean  @default(true)
   priceNight Int?
+
   @@unique([propertyId, date])
 }
 
@@ -116,20 +117,20 @@ model Booking {
 }
 
 model Payment {
-  id          String   @id @default(cuid())
-  booking     Booking  @relation(fields: [bookingId], references: [id])
+  id          String    @id @default(cuid())
+  booking     Booking   @relation(fields: [bookingId], references: [id])
   bookingId   String
-  provider    String   // stripe|coinbase
+  provider    String // stripe|coinbase
   intentId    String?
-  status      String   @default("created")
-  purpose     String   @default("other") // deposit|first_period|move_in_fee|other
+  status      String    @default("created")
+  purpose     String    @default("other") // deposit|first_period|move_in_fee|other
   refundedAt  DateTime?
   receivedAt  DateTime?
   dueAt       DateTime?
   amountCents Int
-  currency    String   @default("EUR")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  currency    String    @default("EUR")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([bookingId])
   @@index([purpose])
@@ -137,12 +138,11 @@ model Payment {
   @@index([dueAt])
 }
 
-
 model AdminOverride {
-  id             String   @id @default(cuid())
-  propertyExtId  String   @unique
-  data           Json
-  updatedAt      DateTime @updatedAt
+  id            String   @id @default(cuid())
+  propertyExtId String   @unique
+  data          Json
+  updatedAt     DateTime @updatedAt
 }
 
 model TimerSession {
@@ -153,8 +153,26 @@ model TimerSession {
   isActive         Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  
+
   @@map("timer_sessions")
 }
 
+// Minimal CRM2 lead persistence to enable saving leads in Postgres
+model Lead {
+  id           String    @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  company      String?
+  city         String?
+  budgetCents  Int?
+  stage        String    @default("new")
+  nextActionAt DateTime?
+  owner        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
+  @@index([createdAt])
+  @@index([stage])
+  @@index([city])
+}
