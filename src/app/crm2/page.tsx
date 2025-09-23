@@ -38,6 +38,7 @@ export default function CRM2Page() {
   const [drawerLead, setDrawerLead] = useState<Lead | null>(null)
   const [activities, setActivities] = useState<any[]>([])
   const [matches, setMatches] = useState<any[]>([])
+  const [dragId, setDragId] = useState<string | null>(null)
   const [form, setForm] = useState<Partial<Lead>>({ stage: 'new' })
 
   useEffect(() => {
@@ -129,11 +130,30 @@ export default function CRM2Page() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {STAGES.map(stage => (
-              <div key={stage} className="luxury-feature-card p-4">
+              <div
+                key={stage}
+                className="luxury-feature-card p-4"
+                onDragOver={(e)=>{ e.preventDefault() }}
+                onDrop={async (e)=>{
+                  e.preventDefault()
+                  const id = dragId
+                  if (!id) return
+                  setDragId(null)
+                  // optimistic stage move
+                  setLeads(prev=> prev.map(x=> x.id===id ? { ...x, stage } : x))
+                  try { await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id, stage }) }) } catch {}
+                }}
+              >
                 <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">{stage}</div>
                 <div className="space-y-3">
                   {(grouped[stage] || []).map(l => (
-                    <button key={l.id} onClick={()=>setDrawerLead(l)} className="w-full text-left rounded-lg border border-zinc-600/40 bg-black/30 p-3 hover:border-zinc-400/60 transition-colors">
+                    <button
+                      key={l.id}
+                      onClick={()=>setDrawerLead(l)}
+                      draggable
+                      onDragStart={()=> setDragId(l.id)}
+                      className="w-full text-left rounded-lg border border-zinc-600/40 bg-black/30 p-3 hover:border-zinc-400/60 transition-colors"
+                    >
                       <div className="flex items-center justify-between">
                         <div className="text-white font-semibold font-sora truncate">{l.name}</div>
                         <div className="text-xs text-zinc-400 ml-2">{l.company || '—'}</div>
@@ -203,11 +223,27 @@ export default function CRM2Page() {
               }}>
                 {STAGES.map(s=> <option key={s} value={s} className="bg-black">{s}</option>)}
               </select>
+              <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.name||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, name: e.target.value } : prev)} placeholder="Name" />
               <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.email||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, email: e.target.value } : prev)} placeholder="Email" />
               <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.phone||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, phone: e.target.value } : prev)} placeholder="Phone" />
+              <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.company||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, company: e.target.value } : prev)} placeholder="Company" />
+              <div className="grid grid-cols-2 gap-3">
+                <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.city||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, city: e.target.value } : prev)} placeholder="City" />
+                <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.budgetCents? String(Number(drawerLead.budgetCents)/100):''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, budgetCents: Math.round(Number(e.target.value||0)*100) } : prev)} placeholder="Budget (€)" />
+              </div>
               <div className="flex items-center justify-end">
                 <button className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all" onClick={async ()=>{
-                  try { await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, email: drawerLead.email, phone: drawerLead.phone }) }) } catch {}
+                  try {
+                    await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({
+                      id: drawerLead.id,
+                      name: drawerLead.name,
+                      email: drawerLead.email,
+                      phone: drawerLead.phone,
+                      company: drawerLead.company,
+                      city: drawerLead.city,
+                      budgetCents: drawerLead.budgetCents
+                    }) })
+                  } catch {}
                 }}>Save</button>
               </div>
             </div>
