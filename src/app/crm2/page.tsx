@@ -42,6 +42,9 @@ export default function CRM2Page() {
   const [form, setForm] = useState<Partial<Lead>>({ stage: 'new' })
   const [companies, setCompanies] = useState<any[]>([])
   const [newCompany, setNewCompany] = useState<{ name: string; domain?: string }>({ name: '' })
+  const [filterStage, setFilterStage] = useState<string>('all')
+  const [filterCity, setFilterCity] = useState<string>('')
+  const [filterText, setFilterText] = useState<string>('')
 
   useEffect(() => {
     const load = async () => {
@@ -65,13 +68,33 @@ export default function CRM2Page() {
     load()
   }, [])
 
+  const filteredLeads = useMemo(() => {
+    return leads.filter(l =>
+      (filterStage === 'all' || l.stage === filterStage) &&
+      (!filterCity || (l.city || '').toLowerCase().includes(filterCity.toLowerCase())) &&
+      (!filterText || [l.name, l.email, l.phone, l.company, l.city].some(v => (v||'').toLowerCase().includes(filterText.toLowerCase())))
+    )
+  }, [leads, filterStage, filterCity, filterText])
+
   const grouped = useMemo(() => {
     const map: Record<string, Lead[]> = {}
     STAGES.forEach(s => (map[s] = []))
-    for (const l of leads) {
+    for (const l of filteredLeads) {
       (map[l.stage] ||= []).push(l)
     }
     return map
+  }, [filteredLeads])
+
+  const kpis = useMemo(() => {
+    const total = leads.length
+    const offers = leads.filter(l => l.stage === 'offer').length
+    const signed = leads.filter(l => l.stage === 'signed').length
+    const weekAgo = Date.now() - 7*24*60*60*1000
+    const newWeek = leads.filter(l => {
+      const ts = l.createdAt ? new Date(l.createdAt).getTime() : 0
+      return ts >= weekAgo
+    }).length
+    return { total, offers, signed, newWeek }
   }, [leads])
 
   const createLead = async () => {
@@ -116,14 +139,39 @@ export default function CRM2Page() {
           <div className="luxury-feature-card p-8">
             <div className="font-mono uppercase tracking-wider text-sm text-emerald-400">CRM Prototype</div>
             <h1 className="text-4xl font-bold heading-sora text-white mb-2">Pipeline Overview</h1>
-            <p className="text-zinc-300 text-lg">Leads by stage, drag ready (MVP)</p>
-          </div>
-          <div className="luxury-feature-card p-8 flex items-center justify-between">
-            <div>
-              <div className="font-mono uppercase tracking-wider text-sm text-emerald-400">Actions</div>
-              <div className="text-zinc-300">Create and track new leads</div>
+            <p className="text-zinc-300 text-lg">Leads by stage with filters and KPIs</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+              <div className="luxury-feature-card p-3 text-center">
+                <div className="text-xs text-zinc-300">Total Leads</div>
+                <div className="text-2xl font-bold text-white">{kpis.total.toLocaleString('de-DE')}</div>
+              </div>
+              <div className="luxury-feature-card p-3 text-center">
+                <div className="text-xs text-zinc-300">New (7d)</div>
+                <div className="text-2xl font-bold text-white">{kpis.newWeek}</div>
+              </div>
+              <div className="luxury-feature-card p-3 text-center">
+                <div className="text-xs text-zinc-300">Offers Out</div>
+                <div className="text-2xl font-bold text-white">{kpis.offers}</div>
+              </div>
+              <div className="luxury-feature-card p-3 text-center">
+                <div className="text-xs text-zinc-300">Signed</div>
+                <div className="text-2xl font-bold text-white">{kpis.signed}</div>
+              </div>
             </div>
-            <button onClick={()=>setNewLeadOpen(true)} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300">New Lead</button>
+          </div>
+          <div className="luxury-feature-card p-8">
+            <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 mb-3">Filters & Actions</div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <select value={filterStage} onChange={e=>setFilterStage(e.target.value)} className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded-lg px-3 py-2 text-sm text-white font-sora">
+                <option className="bg-black" value="all">All Stages</option>
+                {STAGES.map(s=> <option className="bg-black" key={s} value={s}>{s}</option>)}
+              </select>
+              <input value={filterCity} onChange={e=>setFilterCity(e.target.value)} placeholder="City" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" />
+              <input value={filterText} onChange={e=>setFilterText(e.target.value)} placeholder="Search name/email/company" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora md:col-span-2" />
+            </div>
+            <div className="mt-4 flex items-center justify-end">
+              <button onClick={()=>setNewLeadOpen(true)} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all">New Lead</button>
+            </div>
           </div>
         </div>
 
