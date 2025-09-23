@@ -354,6 +354,52 @@ export default function CRM2Page() {
               </div>
               <AddActivity leadId={drawerLead.id} onAdd={(row)=> setActivities(prev=> [row, ...prev])} />
             </div>
+
+            {/* Quote Builder */}
+            <div className="luxury-feature-card p-4 mt-6">
+              <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Create Quote</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input id="qb_property" placeholder="Property extId" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input id="qb_city" placeholder="City" defaultValue={drawerLead.city||''} className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input id="qb_term" type="number" placeholder="Term (months)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input id="qb_rate" type="number" placeholder="Monthly rate (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input id="qb_deposit" type="number" placeholder="Deposit (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input id="qb_movein" type="number" placeholder="Move-in fee (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+              </div>
+              <div className="flex items-center justify-end mt-3">
+                <button
+                  className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all"
+                  onClick={async ()=>{
+                    const propertyExtId = (document.getElementById('qb_property') as HTMLInputElement)?.value.trim()
+                    const city = (document.getElementById('qb_city') as HTMLInputElement)?.value.trim()
+                    const termMonths = Number((document.getElementById('qb_term') as HTMLInputElement)?.value || 0)
+                    const monthlyRateCents = Math.round(Number((document.getElementById('qb_rate') as HTMLInputElement)?.value || 0)*100)
+                    const depositCents = Math.round(Number((document.getElementById('qb_deposit') as HTMLInputElement)?.value || 0)*100)
+                    const moveInFeeCents = Math.round(Number((document.getElementById('qb_movein') as HTMLInputElement)?.value || 0)*100)
+                    if (!propertyExtId || monthlyRateCents<=0) return alert('Property and monthly rate required')
+                    try {
+                      const res = await fetch('/api/crm2/deals', { method:'POST', body: JSON.stringify({
+                        leadId: drawerLead.id, propertyExtId, city, termMonths, monthlyRateCents, depositCents, moveInFeeCents
+                      }) })
+                      const j = await res.json()
+                      if (j.ok) {
+                        // Mark stage as offer
+                        setDrawerLead(prev=> prev ? { ...prev, stage: 'offer' } : prev)
+                        setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, stage: 'offer' } : x))
+                        await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, stage: 'offer' }) })
+                        // Activity
+                        await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Sent quote for ${city||'—'} • €${(monthlyRateCents/100).toLocaleString('de-DE')}/mo` }) })
+                        alert('Quote created')
+                      } else {
+                        alert('Failed to create quote')
+                      }
+                    } catch {
+                      alert('Failed to create quote')
+                    }
+                  }}
+                >Send Quote</button>
+              </div>
+            </div>
           </div>
         </div>
       )}
