@@ -407,6 +407,7 @@ function MVPProgress() {
         <div className="flex items-center justify-between">
           <div>
             <div className="heading-sora uppercase tracking-wider text-lg text-white font-bold">MVP Progress</div>
+            <div className="text-emerald-300 text-sm">{pct}% complete</div>
             <div className="text-zinc-300 text-sm">{completed} of {total} objectives completed</div>
           </div>
           <div className="relative">
@@ -448,9 +449,7 @@ function MVPProgress() {
         </div>
       )}
       
-      <div className="mt-3 text-xs text-zinc-300 text-center">
-        {pct}% complete • {total - completed} objectives remaining
-      </div>
+      {/* Footer summary removed per design: only show percentage above */}
     </div>
   )
 }
