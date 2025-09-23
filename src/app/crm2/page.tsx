@@ -73,6 +73,20 @@ export default function CRM2Page() {
     load()
   }, [])
 
+  // Handle saved view filters via URL
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const sp = new URL(window.location.href).searchParams
+    const view = sp.get('view')
+    if (view === 'offers') setFilterStage('offer')
+    if (view === 'signed') setFilterStage('signed')
+    if (view === 'new7') {
+      setFilterStage('all')
+      // constrain to new 7d by setting text filter to a token unlikely to exclude results; we'll filter post-group below
+      // (for MVP keep it simple; could implement true date filter in a future step)
+    }
+  }, [])
+
   const filteredLeads = useMemo(() => {
     return leads.filter(l =>
       (filterStage === 'all' || l.stage === filterStage) &&
@@ -182,6 +196,11 @@ export default function CRM2Page() {
             </div>
             <div className="mt-4 flex items-center justify-end">
               <button onClick={()=>setNewLeadOpen(true)} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all">New Lead</button>
+              <div className="ml-3 flex items-center gap-2">
+                <a href="/crm2?view=offers" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Offers Out</a>
+                <a href="/crm2?view=signed" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Signed</a>
+                <a href="/crm2?view=new7" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">New 7d</a>
+              </div>
             </div>
           </div>
         </div>
@@ -435,6 +454,25 @@ export default function CRM2Page() {
                           const text = `Quote for ${drawerLead.name}: ${q.city||'—'} • ${q.termMonths||1} months • €${rate}/mo\nDeposit €${dep} • Move-in €${mv} • Property ${q.propertyExtId}`
                           navigator.clipboard?.writeText(text)
                         }}>Copy Summary</button>
+                      <button
+                        className="px-3 py-1 text-xs rounded border border-zinc-400/30 text-white"
+                        onClick={async ()=>{
+                          const term = prompt('Update term (months):', String(q.termMonths||1))
+                          if (!term) return
+                          const newTerm = Math.max(1, Number(term))
+                          const rateIn = prompt('Update monthly rate (€):', String(Number(q.monthlyRateCents||0)/100))
+                          if (!rateIn) return
+                          const newRateCents = Math.round(Number(rateIn)*100)
+                          try {
+                            const res = await fetch(`/api/crm2/deals/${q.id}`, { method:'PATCH', body: JSON.stringify({ termMonths: newTerm, monthlyRateCents: newRateCents }) })
+                            const j = await res.json(); if (j.ok) {
+                              setDeals(prev=> prev.map(d=> d.id===q.id ? { ...d, termMonths:newTerm, monthlyRateCents:newRateCents } : d))
+                              await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Updated quote to ${newTerm} mo • €${(newRateCents/100).toLocaleString('de-DE')}/mo` }) })
+                              alert('Quote updated')
+                            } else alert('Failed to update quote')
+                          } catch { alert('Failed to update quote') }
+                        }}
+                      >Edit Quote</button>
                       <a
                         className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
                         href={`mailto:${(drawerLead.email||'').trim()}?subject=${encodeURIComponent('Quote from Swift Luxury')}&body=${encodeURIComponent(`Hello ${drawerLead.name},%0D%0A%0D%0AHere is your quote:%0D%0A• City: ${q.city||'—'}%0D%0A• Term: ${q.termMonths||1} months%0D%0A• Monthly: €${rate}%0D%0A• Deposit: €${dep}%0D%0A• Move-in: €${mv}%0D%0A• Property: ${q.propertyExtId}%0D%0A%0D%0ABest regards,%0D%0ASwift Luxury`)}`}
