@@ -530,7 +530,6 @@ export default function SalesAnalyticsPage() {
                     series={[96, 94, 88, 91, 89]} 
                     color="#10b981" 
                     loading={loading} 
-                    suffix="%" 
                   />
                   <BarChart 
                     title="Average Lease Duration by Month" 
@@ -538,7 +537,6 @@ export default function SalesAnalyticsPage() {
                     series={[8.2, 8.8, 9.1, 8.5, 8.7, 8.9, 8.4, 8.6, 8.5]} 
                     color="#3b82f6" 
                     loading={loading} 
-                    suffix=" mo" 
                   />
                 </div>
               </>
@@ -748,7 +746,6 @@ export default function SalesAnalyticsPage() {
                     series={[28, 31, 35, 32, 38, 34, 29, 36, 32]} 
                     color="#8b5cf6" 
                     loading={loading} 
-                    suffix="%" 
                   />
                 </div>
               </>
@@ -873,7 +870,6 @@ export default function SalesAnalyticsPage() {
                     series={[35, 28, 18, 12, 7]} 
                     color="#8b5cf6" 
                     loading={loading} 
-                    suffix="%" 
                   />
                 </div>
               </>
