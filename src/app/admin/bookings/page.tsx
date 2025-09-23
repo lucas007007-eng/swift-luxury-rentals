@@ -32,9 +32,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   const page = Math.max(1, Number(searchParams?.page || '1'))
   const activeStatus = String(searchParams?.status || '').toLowerCase()
   const statusFilter = ['hold','confirmed','cancelled'].includes(activeStatus) ? activeStatus : null
+  const isOverdueFilter = activeStatus === 'overdue'
+  const nowForOverdue = new Date()
   const where = { 
     deletedAt: null, // Exclude soft-deleted bookings
-    ...(statusFilter ? { status: statusFilter as any } : {})
+    ...(statusFilter ? { status: statusFilter as any } : {}),
+    ...(isOverdueFilter ? { payments: { some: { purpose: 'monthly_rent', status: 'scheduled', dueAt: { lt: nowForOverdue } } } } : {})
   }
   const skip = (page - 1) * pageSize
   const [totalCount, bookings] = await Promise.all([
@@ -79,13 +82,14 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
     }
     return { ...b, depositHeld, totalNowCents, firstPaymentCents, receivedCents }
   }))
-  const [countAll, countHold, countConfirmed, countCancelled] = await Promise.all([
+  const [countAll, countHold, countConfirmed, countCancelled, countOverdue] = await Promise.all([
     prisma.booking.count(),
     prisma.booking.count({ where: { status: 'hold' } as any }),
     prisma.booking.count({ where: { status: 'confirmed' } as any }),
     prisma.booking.count({ where: { status: 'cancelled' } as any }),
+    prisma.booking.count({ where: { deletedAt: null, payments: { some: { purpose: 'monthly_rent', status: 'scheduled', dueAt: { lt: new Date() } } } } as any }),
   ])
-  const totalsGlobal = { all: countAll, hold: countHold, confirmed: countConfirmed, cancelled: countCancelled }
+  const totalsGlobal = { all: countAll, hold: countHold, confirmed: countConfirmed, cancelled: countCancelled, overdue: countOverdue }
   const pageRevenue = Math.round(bookings.reduce((s: number, b: any) => s + (Number(b.totalCents || 0) / 100), 0))
   return (
     <main className="min-h-screen bg-black text-white">
@@ -138,11 +142,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                 )}
               </div>
               {/* Inline scoreboard (reflects current view) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                 <ScorePill title="Total Booking" value={`: ${totalsGlobal.all.toLocaleString('de-DE')}`} color="emerald" href={`/admin/bookings`} active={!statusFilter} />
                 <ScorePill title="Bookings on Hold" value={`: ${totalsGlobal.hold.toLocaleString('de-DE')}`} color="amber" href={`/admin/bookings?status=hold`} active={statusFilter==='hold'} />
                 <ScorePill title="Booking Confirmed" value={`: ${totalsGlobal.confirmed.toLocaleString('de-DE')}`} color="emerald" href={`/admin/bookings?status=confirmed`} active={statusFilter==='confirmed'} />
                 <ScorePill title="Bookings Cancelled" value={`: ${totalsGlobal.cancelled.toLocaleString('de-DE')}`} color="sky" href={`/admin/bookings?status=cancelled`} active={statusFilter==='cancelled'} />
+                <ScorePill title="Overdue Payments" value={`: ${totalsGlobal.overdue.toLocaleString('de-DE')}`} color="sky" href={`/admin/bookings?status=overdue`} active={activeStatus==='overdue'} />
                 {statusFilter && (
                   <ScorePill title="Clear Filter" value="" color="sky" href={`/admin/bookings`} active={!statusFilter} />
                 )}
@@ -707,19 +712,40 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       if (overdueList.length === 0) return <span className="text-white/40 text-xs">—</span>
                       const overdueCents = overdueList.reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
                       return (
-                        <div className="rounded-md border border-red-400/40 bg-red-500/10 text-red-300 shadow-[0_0_14px_rgba(239,68,68,0.25)] p-3">
-                          <div className="flex items-center gap-2 text-xs mb-2">
-                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                            <span className="uppercase tracking-wider">Overdue Payments</span>
-                            <span className="ml-auto font-semibold text-white">€{Math.round(overdueCents/100).toLocaleString('de-DE')}</span>
-                          </div>
-                          <div className="space-y-2">
-                            {overdueList.map((p:any)=> (
-                              <div key={p.id} className="flex items-center justify-between gap-3">
-                                <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-200 border border-red-400/30 whitespace-nowrap">{formatShortDate(new Date(p.dueAt))}</span>
-                                <span className="text-sm font-semibold text-white whitespace-nowrap">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                        <div className="relative rounded-xl px-0 py-4 overflow-hidden"
+                             style={{
+                               background: `
+                                 linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
+                                 radial-gradient(circle at 30% 20%, rgba(239,68,68,0.10) 0%, transparent 50%)
+                               `,
+                               border: '1px solid rgba(239,68,68,0.4)',
+                               backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
+                               boxShadow: `
+                                 0 20px 60px rgba(0,0,0,0.9),
+                                 0 10px 30px rgba(0,0,0,0.7),
+                                 inset 0 2px 0 rgba(255,255,255,0.15),
+                                 inset 0 -1px 0 rgba(255,255,255,0.1),
+                                 0 0 40px rgba(239,68,68,0.12)
+                               `,
+                               transform: 'perspective(1000px) rotateX(1deg)',
+                               transformStyle: 'preserve-3d'
+                             }}>
+                          <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-4 px-3">
+                              <div className="flex items-center gap-2 text-sm text-red-300 font-sora">
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                <span className="uppercase tracking-wider font-semibold">Overdue Payments</span>
                               </div>
-                            ))}
+                              <span className="font-semibold text-white">€{Math.round(overdueCents/100).toLocaleString('de-DE')}</span>
+                            </div>
+                            <div className="space-y-3">
+                              {overdueList.map((p:any)=> (
+                                <div key={p.id} className="flex items-center justify-between gap-3 px-3 py-2">
+                                  <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{formatShortDate(new Date(p.dueAt))}</span>
+                                  <span className="text-lg font-bold text-white font-sora ml-auto text-right">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       )
