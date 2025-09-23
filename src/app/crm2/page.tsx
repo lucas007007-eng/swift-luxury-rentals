@@ -40,6 +40,8 @@ export default function CRM2Page() {
   const [matches, setMatches] = useState<any[]>([])
   const [dragId, setDragId] = useState<string | null>(null)
   const [form, setForm] = useState<Partial<Lead>>({ stage: 'new' })
+  const [companies, setCompanies] = useState<any[]>([])
+  const [newCompany, setNewCompany] = useState<{ name: string; domain?: string }>({ name: '' })
 
   useEffect(() => {
     const load = async () => {
@@ -51,6 +53,9 @@ export default function CRM2Page() {
         const a = await fetch('/api/crm2/activities', { cache: 'no-store' })
         const aj = await a.json()
         if (aj.ok) setActivities(aj.data || [])
+        const c = await fetch('/api/crm2/companies', { cache: 'no-store' })
+        const cj = await c.json()
+        if (cj.ok) setCompanies(cj.data || [])
       } catch (e: any) {
         setError(e?.message || 'load-failed')
       } finally {
@@ -182,7 +187,21 @@ export default function CRM2Page() {
               <input placeholder="Name" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.name||''} onChange={e=>setForm({...form, name:e.target.value})} />
               <input placeholder="Email" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.email||''} onChange={e=>setForm({...form, email:e.target.value})} />
               <input placeholder="Phone" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.phone||''} onChange={e=>setForm({...form, phone:e.target.value})} />
-              <input placeholder="Company" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.company||''} onChange={e=>setForm({...form, company:e.target.value})} />
+              <div className="grid grid-cols-3 gap-3">
+                <input placeholder="Company" className="col-span-2 w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.company||''} onChange={e=>setForm({...form, company:e.target.value})} list="crm2-company-datalist" />
+                <button type="button" onClick={async ()=>{
+                  if (!newCompany.name.trim()) return
+                  const res = await fetch('/api/crm2/companies', { method:'POST', body: JSON.stringify(newCompany) })
+                  const j = await res.json(); if (j.ok) setCompanies(prev=> [j.data, ...prev]); setNewCompany({ name: '' })
+                }} className="px-3 py-2 rounded-lg border border-zinc-400/30 text-white">Add Co</button>
+              </div>
+              <datalist id="crm2-company-datalist">
+                {companies.map(c=> <option key={c.id} value={c.name} />)}
+              </datalist>
+              <div className="grid grid-cols-2 gap-3">
+                <input placeholder="New company name" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={newCompany.name} onChange={e=>setNewCompany({ ...newCompany, name: e.target.value })} />
+                <input placeholder="domain.com (opt)" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={newCompany.domain||''} onChange={e=>setNewCompany({ ...newCompany, domain: e.target.value })} />
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <input placeholder="City" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.city||''} onChange={e=>setForm({...form, city:e.target.value})} />
                 <input placeholder="Budget (€)" type="number" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.budgetCents? String(Number(form.budgetCents)/100):''} onChange={e=>setForm({...form, budgetCents: Math.round(Number(e.target.value||0)*100)})} />
