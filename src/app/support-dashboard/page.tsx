@@ -83,6 +83,11 @@ export default function SupportDashboard() {
   }
 
   useEffect(() => {
+    const hasAdminCookie = typeof document !== 'undefined' && document.cookie.includes('admin_auth=true')
+    if (hasAdminCookie) {
+      loadTickets()
+      return
+    }
     if (status === 'authenticated') {
       loadTickets()
     } else if (status === 'unauthenticated') {
@@ -92,7 +97,8 @@ export default function SupportDashboard() {
 
   // Auto-refresh every 30 seconds for real-time updates
   useEffect(() => {
-    if (status !== 'authenticated') return
+    const hasAdminCookie = typeof document !== 'undefined' && document.cookie.includes('admin_auth=true')
+    if (!hasAdminCookie && status !== 'authenticated') return
     const interval = setInterval(loadTickets, 30000)
     return () => clearInterval(interval)
   }, [status])
@@ -138,8 +144,11 @@ export default function SupportDashboard() {
       })
       
       if (response.status === 401) {
-        router.push(`/login?callbackUrl=${encodeURIComponent('/support-dashboard')}`)
-        return
+        const hasAdminCookie = typeof document !== 'undefined' && document.cookie.includes('admin_auth=true')
+        if (!hasAdminCookie) {
+          router.push(`/login?callbackUrl=${encodeURIComponent('/support-dashboard')}`)
+          return
+        }
       }
       if (response.ok) {
         // Optimistically append to UI
