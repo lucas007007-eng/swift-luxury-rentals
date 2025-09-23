@@ -85,6 +85,9 @@ export default function CRM2Page() {
       // constrain to new 7d by setting text filter to a token unlikely to exclude results; we'll filter post-group below
       // (for MVP keep it simple; could implement true date filter in a future step)
     }
+    if (view === 'renewals45') {
+      setFilterStage('signed')
+    }
   }, [])
 
   const filteredLeads = useMemo(() => {
@@ -200,6 +203,7 @@ export default function CRM2Page() {
                 <a href="/crm2?view=offers" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Offers Out</a>
                 <a href="/crm2?view=signed" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Signed</a>
                 <a href="/crm2?view=new7" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">New 7d</a>
+                <a href="/crm2?view=renewals45" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Renewals 45d</a>
               </div>
             </div>
           </div>
