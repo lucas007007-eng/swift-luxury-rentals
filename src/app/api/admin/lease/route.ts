@@ -488,9 +488,10 @@ export async function POST(req: Request) {
     { const txt = 'Signature / Unterschrift'; const w = font.widthOfTextAtSize(txt, 9); page.drawText(txt, { x: rightX + (colWidth - 20) - w, y: 86, size: 9, font }) }
     drawText('Tenant / Mieter', rightX, 76)
 
-    let bytes: Uint8Array | undefined
+    let bytesForDataUrl: Uint8Array | null = null
     try {
-      bytes = await pdfDoc.save()
+      const bytes = await pdfDoc.save()
+      bytesForDataUrl = bytes
       fs.writeFileSync(outPath, bytes)
     } catch (err) {
       // If save still fails after sanitization, bubble the error so UI shows message
@@ -506,8 +507,8 @@ export async function POST(req: Request) {
     // Also return a data URL (helps on platforms where public file may lag a bit)
     let dataUrl: string | undefined
     try {
-      if (bytes) {
-        const b64 = Buffer.from(bytes).toString('base64')
+      if (bytesForDataUrl) {
+        const b64 = Buffer.from(bytesForDataUrl).toString('base64')
         dataUrl = `data:application/pdf;base64,${b64}`
       }
     } catch {}
