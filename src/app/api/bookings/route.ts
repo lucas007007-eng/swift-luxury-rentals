@@ -99,22 +99,15 @@ export async function POST(req: Request) {
 
     // Create/Upsert a CRM2 Lead and initial Deal from this booking
     try {
-      const lead = await prisma.lead.upsert({
-        where: { email: (user?.email || '').toLowerCase() },
-        update: {
-          name: user?.name || undefined,
-          phone: user?.phone || undefined,
-          city: (property as any)?.cityId ? undefined : undefined,
-          stage: 'application'
-        },
-        create: {
-          name: user?.name || 'Guest',
-          email: (user?.email || '').toLowerCase(),
-          phone: user?.phone || null,
-          city: String((property as any)?.city?.name || ''),
-          stage: 'application'
-        }
-      } as any)
+      const emailLower = (user?.email || '').toLowerCase()
+      let cityName = ''
+      try { if ((property as any)?.cityId) { const c = await prisma.city.findUnique({ where: { id: (property as any).cityId } }); cityName = c?.name || '' } } catch {}
+      let lead = await prisma.lead.findFirst({ where: { email: emailLower } }).catch(()=>null)
+      if (lead) {
+        await prisma.lead.update({ where: { id: lead.id }, data: { name: user?.name || undefined, phone: user?.phone || undefined, city: cityName || undefined, stage: 'application' } })
+      } else {
+        lead = await prisma.lead.create({ data: { name: user?.name || 'Guest', email: emailLower, phone: user?.phone || null, city: cityName, stage: 'application' } })
+      }
       // Create a Deal with amounts inferred from booking/payments
       const pay = await prisma.payment.findMany({ where: { bookingId: booking.id } })
       const first = pay.find(p=> p.purpose==='first_period') || pay.find(p=> p.purpose==='monthly_rent')
@@ -124,7 +117,7 @@ export async function POST(req: Request) {
       await prisma.deal.create({ data: {
         leadId: (lead as any).id,
         propertyExtId: property.extId || propertyId,
-        city: String((property as any)?.city?.name || ''),
+        city: cityName,
         termMonths,
         monthlyRateCents: first?.amountCents || 0,
         depositCents: dep?.amountCents || 0,

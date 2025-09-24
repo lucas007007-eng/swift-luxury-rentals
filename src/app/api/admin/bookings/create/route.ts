@@ -83,11 +83,13 @@ export async function GET(req: NextRequest) {
   try {
     const cityRec = property?.cityId ? await prisma.city.findUnique({ where: { id: property.cityId } }).catch(()=>null) : null
     const cityName = cityRec?.name || ''
-    const lead = await prisma.lead.upsert({
-      where: { email: (email || '').toLowerCase() },
-      update: { name: name || undefined, city: cityName || undefined, stage: 'application' },
-      create: { name: name || 'Guest', email: (email || '').toLowerCase(), city: cityName, stage: 'application' }
-    } as any)
+    const emailLower = (email || '').toLowerCase()
+    let lead = await prisma.lead.findFirst({ where: { email: emailLower } }).catch(()=>null)
+    if (lead) {
+      await prisma.lead.update({ where: { id: lead.id }, data: { name: name || undefined, city: cityName || undefined, stage: 'application' } })
+    } else {
+      lead = await prisma.lead.create({ data: { name: name || 'Guest', email: emailLower, city: cityName, stage: 'application' } })
+    }
     const pay = await prisma.payment.findMany({ where: { bookingId: booking.id } })
     const first = pay.find(p=> p.purpose==='first_period') || pay.find(p=> p.purpose==='monthly_rent')
     const dep = pay.find(p=> p.purpose==='deposit')
