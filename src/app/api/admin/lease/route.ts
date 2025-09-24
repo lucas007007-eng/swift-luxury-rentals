@@ -145,6 +145,8 @@ export async function POST(req: Request) {
     else if (monthsRounded === 1) depositMonths = 0.5
     let deposit = Math.round(monthly * depositMonths)
     if (typeof depositFromQuote === 'number') deposit = depositFromQuote
+    // Contract value: monthly * months + move-in fee (excluding deposit)
+    const contractValue = Math.round((Number(monthly) * monthsRounded) + (Number(moveInFeeFromQuote || 0)))
 
     
 
@@ -360,6 +362,7 @@ export async function POST(req: Request) {
     if (typeof moveInFeeFromQuote === 'number') {
       yL = wrapPara(`Einzugsgebühr: € ${Number(moveInFeeFromQuote).toLocaleString('de-DE')}`, leftX, yL, colWidth)
     }
+    yL = wrapPara(`Gesamtvertragswert (Miete x Monate + Einzugsgebühr): € ${contractValue.toLocaleString('de-DE')}`, leftX, yL, colWidth)
     yL = wrapPara('Die Kaution und die erste Monatsmiete sind 72 Stunden nach beiderseitiger Unterzeichnung zu zahlen.', leftX, yL, colWidth)
     drawSectionBox(leftX, s5L, yL)
     const s5R = yR; yR = wrapHeading('5. Rent and Deposit', rightX+2, yR, colWidth-4)
@@ -368,6 +371,7 @@ export async function POST(req: Request) {
     if (typeof moveInFeeFromQuote === 'number') {
       yR = wrapPara(`Move-in fee: € ${Number(moveInFeeFromQuote).toLocaleString('de-DE')}`, rightX, yR, colWidth)
     }
+    yR = wrapPara(`Total contract value (rent x months + move-in fee): € ${contractValue.toLocaleString('de-DE')}`, rightX, yR, colWidth)
     yR = wrapPara('Deposit and first monthly rent due within 72 hours of mutual signature.', rightX, yR, colWidth)
     drawSectionBox(rightX, s5R, yR)
     ensureSpace()
