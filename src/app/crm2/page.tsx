@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { createPortal } from 'react-dom'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -49,6 +50,7 @@ const TEAM_OWNERS = [
 ]
 
 export default function CRM2Page() {
+  const { data: session } = useSession()
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -85,6 +87,7 @@ export default function CRM2Page() {
   const [renewalSearch, setRenewalSearch] = useState('')
   const [renewalSort, setRenewalSort] = useState<'checkout'|'client'|'city'|'days'>('checkout')
   const [owners, setOwners] = useState<string[]>([])
+  const [myOnly, setMyOnly] = useState(false)
   const jumpToBreaches = () => {
     setFilterSLA('breach')
     setTimeout(() => {
@@ -223,14 +226,16 @@ export default function CRM2Page() {
       const slaMs = slaDays*24*60*60*1000
       return { breach: ageMs > slaMs, due: ageMs > slaMs - 24*60*60*1000 && ageMs <= slaMs }
     }
+    const myEmail = (session?.user?.email || '').toLowerCase()
     return leads.filter(l =>
       (filterStage === 'all' || l.stage === filterStage) &&
       (!filterCity || (l.city || '').toLowerCase().includes(filterCity.toLowerCase())) &&
       (!filterOwner || (l.owner || '').toLowerCase().includes(filterOwner.toLowerCase())) &&
       (!filterText || [l.name, l.email, l.phone, l.company, l.city, l.owner].some(v => (v||'').toLowerCase().includes(filterText.toLowerCase()))) &&
+      (!myOnly || ((l.owner || '').toLowerCase() === myEmail)) &&
       ((() => { const s = isBreachOrDue(l); if (filterSLA==='breach') return s.breach; if (filterSLA==='due') return s.due; return true })())
     )
-  }, [leads, filterStage, filterCity, filterOwner, filterText, filterSLA])
+  }, [leads, filterStage, filterCity, filterOwner, filterText, filterSLA, myOnly, session?.user?.email])
 
   const grouped = useMemo(() => {
     const map: Record<string, Lead[]> = {}
@@ -430,7 +435,7 @@ export default function CRM2Page() {
           </div>
           <div className="luxury-feature-card p-8">
             <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 mb-3">Filters & Actions</div>
-            <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
               <select value={filterStage} onChange={e=>setFilterStage(e.target.value)} className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded-lg px-3 py-2 text-sm text-white font-sora">
                 <option className="bg-black" value="all">All Stages</option>
                 {STAGES.map(s=> <option className="bg-black" key={s} value={s}>{s}</option>)}
@@ -447,6 +452,7 @@ export default function CRM2Page() {
                 <option className="bg-black" value="breach">Breaches</option>
                 <option className="bg-black" value="due">Due (24h)</option>
               </select>
+              <label className="flex items-center gap-2 text-sm text-zinc-300"><input type="checkbox" checked={myOnly} onChange={(e)=> setMyOnly(e.target.checked)} /> My leads</label>
             </div>
             <div className="mt-4 flex items-center justify-end">
               <button onClick={()=>setNewLeadOpen(true)} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all">New Lead</button>
