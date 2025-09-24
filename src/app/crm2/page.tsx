@@ -599,6 +599,26 @@ export default function CRM2Page() {
                           >Generate Lease</button>
                         </div>
                       )}
+                      {stage==='offer' && (
+                        <div className="mb-1 flex items-center justify-end gap-2">
+                          <button
+                            className="px-2 py-1 text-[11px] rounded border border-zinc-400/30 text-white hover:border-zinc-300/60"
+                            onClick={async (e)=>{
+                              e.stopPropagation()
+                              try {
+                                const dl = (deals || []).filter((d:any)=> d.leadId === l.id).sort((a:any,b:any)=> new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime())[0]
+                                if (!dl) { alert('No quote found for this lead'); return }
+                                const r = await fetch('/api/crm2/quotes/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ dealId: dl.id }) })
+                                const j = await r.json()
+                                if (j.ok && (j.dataUrl || j.url)) {
+                                  window.open(j.dataUrl || j.url, '_blank')
+                                } else alert('Failed to generate quote PDF')
+                              } catch { alert('Failed to generate quote PDF') }
+                            }}
+                            title="Generate quote PDF"
+                          >Quote PDF</button>
+                        </div>
+                      )}
                       <div className="flex items-center justify-between">
                         <div className="text-white font-semibold font-sora truncate">{l.name}</div>
                         <div className="text-xs text-zinc-400 ml-2">{l.company || '—'}</div>
