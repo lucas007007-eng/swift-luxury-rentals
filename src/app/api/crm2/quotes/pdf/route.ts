@@ -101,6 +101,49 @@ export async function POST(req: Request) {
     drawText(`Total contract value (rent x months + move-in): € ${contractValue.toLocaleString('de-DE')}`, 48, y, 12, bold, accent)
     y -= 34
 
+    // Right panel: Property image (or placeholder)
+    try {
+      const px = page.getWidth()-240
+      const py = 510
+      const pw = 180
+      const ph = 120
+      page.drawRectangle({ x: px, y: py, width: pw, height: ph, color: pane })
+      // Attempt to load first property image from Prisma
+      try {
+        const prop = await prisma.property.findFirst({ where: { OR: [{ extId: d.propertyExtId || '' }, { id: d.propertyExtId || '' }] }, include: { images: { orderBy: { position: 'asc' }, take: 1 } } })
+        const url = (prop?.images?.[0]?.url || '').trim()
+        if (url) {
+          const resp = await fetch(url)
+          const buf = new Uint8Array(await resp.arrayBuffer())
+          const img = url.toLowerCase().endsWith('.png') ? await pdf.embedPng(buf) : await pdf.embedJpg(buf)
+          const dims = img.scaleToFit(pw-10, ph-10)
+          page.drawImage(img, { x: px + (pw-dims.width)/2, y: py + (ph-dims.height)/2, width: dims.width, height: dims.height })
+        } else {
+          drawText('Property Image', px+12, py+ph/2-6, 10, font, silverDim)
+        }
+      } catch { drawText('Property Image', px+12, py+ph/2-6, 10, font, silverDim) }
+    } catch {}
+
+    // Price breakdown table
+    const tblX = 48
+    let ty = 520
+    drawText('Price Breakdown', tblX, ty, 12, bold, silver); ty -= 16
+    const col2 = page.getWidth()-88
+    const line = (label: string, value: string, isTotal=false) => {
+      drawText(label, tblX, ty, 11, isTotal? bold: font, isTotal? silver: silverDim)
+      const w = (isTotal? bold: font).widthOfTextAtSize(value, 11)
+      page.drawText(value, { x: col2 - w, y: ty, size: 11, font: isTotal? bold: font, color: isTotal? accent: silver })
+    }
+    line(`Monthly × ${termMonths}`, `€ ${monthly.toLocaleString('de-DE')} × ${termMonths}`)
+    ty -= 16
+    line('Move-in fee', `€ ${moveIn.toLocaleString('de-DE')}`)
+    ty -= 16
+    line('Deposit', `€ ${deposit.toLocaleString('de-DE')}`)
+    ty -= 18
+    line('Total (rent × months + move-in)', `€ ${contractValue.toLocaleString('de-DE')}`, true)
+    ty -= 8
+    page.drawRectangle({ x: tblX, y: ty, width: col2-tblX, height: 1, color: silverDim })
+
     // Notes pane
     // Move notes further down to avoid overlapping the total line
     page.drawRectangle({ x: 40, y: 340, width: page.getWidth()-80, height: 70, color: pane })
@@ -123,6 +166,20 @@ export async function POST(req: Request) {
     drawText('Date: ____________', 60, sigTop-32, 10, font, silverDim)
     drawText('Date: ____________', rightX, sigTop-32, 10, font, silverDim)
 
+    // Accept block with placeholder QR area
+    const acceptLink = `${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/crm2/quotes/accept?leadId=${encodeURIComponent(d.leadId)}&dealId=${encodeURIComponent(d.id)}`
+    page.drawRectangle({ x: page.getWidth()-260, y: 140, width: 200, height: 80, color: pane })
+    drawText('Scan to Accept', page.getWidth()-250, 206, 12, bold, silver)
+    page.drawRectangle({ x: page.getWidth()-120, y: 150, width: 60, height: 60, color: bg, borderColor: silverDim, borderWidth: 1 })
+    drawText('(QR reserved)', page.getWidth()-118, 180, 8, font, silverDim)
+    drawText(acceptLink || 'Accept URL', page.getWidth()-250, 160, 8, font, silverDim)
+
+    // Footer
+    page.drawRectangle({ x: 0, y: 28, width: page.getWidth(), height: 24, color: pane })
+    drawText('Swift Luxury GmbH • Friedrichstraße 123 • 10117 Berlin • IBAN: TBD • BIC: TBD', 48, 36, 9, font, silverDim)
+    const footerText = 'Page 1 of 1'
+    const fw = font.widthOfTextAtSize(footerText, 9)
+    page.drawText(footerText, { x: page.getWidth()-48-fw, y: 36, size: 9, font, color: silverDim })
     // Save
     let bytesForDataUrl: Uint8Array | null = null
     try {
