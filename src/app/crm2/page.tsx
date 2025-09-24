@@ -387,6 +387,7 @@ export default function CRM2Page() {
         propertyExtId: latest.propertyExtId,
         email: lead.email,
         name: lead.name,
+        phone: lead.phone,
         termMonths: latest.termMonths,
         monthlyRateCents: latest.monthlyRateCents,
         depositCents: latest.depositCents,
