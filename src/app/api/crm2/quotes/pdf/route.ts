@@ -83,6 +83,21 @@ export async function POST(req: Request) {
     drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, 476, 10, font, silverDim)
     drawText('• Quote valid for 7 days unless otherwise stated.', 48, 462, 10, font, silverDim)
 
+    // Signature area
+    const sigTop = 200
+    // Outer frame
+    page.drawRectangle({ x: 40, y: sigTop-90, width: page.getWidth()-80, height: 110, color: pane })
+    // Left: Swift Luxury signature line
+    page.drawRectangle({ x: 60, y: sigTop, width: page.getWidth()/2 - 100, height: 1, color: silver })
+    drawText('Swift Luxury — Authorized Signature', 60, sigTop-14, 10, font, silverDim)
+    // Right: Client signature line
+    const rightX = page.getWidth()/2 + 40
+    page.drawRectangle({ x: rightX, y: sigTop, width: page.getWidth()/2 - 100, height: 1, color: silver })
+    drawText('Client Signature', rightX, sigTop-14, 10, font, silverDim)
+    // Dates under signatures
+    drawText('Date: ____________', 60, sigTop-32, 10, font, silverDim)
+    drawText('Date: ____________', rightX, sigTop-32, 10, font, silverDim)
+
     // Save
     let bytesForDataUrl: Uint8Array | null = null
     try {
