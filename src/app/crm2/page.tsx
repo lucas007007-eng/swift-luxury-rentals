@@ -47,6 +47,9 @@ export default function CRM2Page() {
   const [quoteCities, setQuoteCities] = useState<string[]>([])
   const [quoteProperty, setQuoteProperty] = useState<string>('')
   const [quotePropertyOptions, setQuotePropertyOptions] = useState<{ extId: string; title: string }[]>([])
+  const [quoteStart, setQuoteStart] = useState<string>('') // yyyy-mm-dd
+  const [calOpen, setCalOpen] = useState<boolean>(false)
+  const [calCursor, setCalCursor] = useState<Date>(new Date()) // month cursor
   const [companies, setCompanies] = useState<any[]>([])
   const [newCompany, setNewCompany] = useState<{ name: string; domain?: string }>({ name: '' })
   const [filterStage, setFilterStage] = useState<string>('all')
@@ -163,6 +166,7 @@ export default function CRM2Page() {
     const load = async () => {
       if (!drawerLead) return
       setQuoteCity(drawerLead.city || '')
+      setQuoteStart('')
       try {
         const rc = await fetch('/api/crm2/options/cities', { cache: 'no-store' })
         const cj = await rc.json()
@@ -448,15 +452,46 @@ export default function CRM2Page() {
                   <option value="">Select property</option>
                   {quotePropertyOptions.map(p=> (<option key={p.extId} value={p.extId} className="bg-black">{p.title} ({p.extId})</option>))}
                 </select>
-                <input
-                  id="qb_start"
-                  type="date"
-                  aria-label="Check in"
-                  placeholder="Check in"
-                  onFocus={(e)=> (e.target as HTMLInputElement).showPicker?.()}
-                  onClick={(e)=> (e.currentTarget as HTMLInputElement).showPicker?.()}
-                  className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white"
-                />
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={()=> setCalOpen(v=> !v)}
+                    className="w-full text-left bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white hover:border-zinc-400/60"
+                  >
+                    {quoteStart ? new Date(quoteStart).toLocaleDateString('en-GB') : 'Check in'}
+                  </button>
+                  {calOpen && (
+                    <div className="absolute z-50 mt-2 w-64 rounded-xl border border-zinc-600/40 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_10px_30px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <button className="px-2 py-1 text-xs rounded border border-zinc-500/40 text-white" onClick={()=> setCalCursor(new Date(calCursor.getFullYear(), calCursor.getMonth()-1, 1))}>{'<'}</button>
+                        <div className="text-white text-sm font-semibold">{calCursor.toLocaleString('en-US',{ month:'long', year:'numeric'})}</div>
+                        <button className="px-2 py-1 text-xs rounded border border-zinc-500/40 text-white" onClick={()=> setCalCursor(new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 1))}>{'>'}</button>
+                      </div>
+                      <div className="grid grid-cols-7 gap-1 text-xs text-zinc-300">
+                        {['Mo','Tu','We','Th','Fr','Sa','Su'].map(d=> (<div key={d} className="text-center opacity-70">{d}</div>))}
+                        {(() => {
+                          const start = new Date(calCursor.getFullYear(), calCursor.getMonth(), 1)
+                          const end = new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 0)
+                          const pad = (start.getDay()+6)%7 // Monday as first
+                          const cells: any[] = []
+                          for (let i=0;i<pad;i++) cells.push(<div key={'p'+i} className="h-8" />)
+                          for (let d=1; d<=end.getDate(); d++) {
+                            const iso = new Date(calCursor.getFullYear(), calCursor.getMonth(), d).toISOString().slice(0,10)
+                            const selected = quoteStart===iso
+                            cells.push(
+                              <button
+                                key={d}
+                                onClick={()=> { setQuoteStart(iso); setCalOpen(false) }}
+                                className={`h-8 rounded flex items-center justify-center border ${selected ? 'border-zinc-300/60 bg-white/10 text-white' : 'border-zinc-600/30 hover:border-zinc-400/50 text-zinc-200'}`}
+                              >{d}</button>
+                            )
+                          }
+                          return cells
+                        })()}
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <input id="qb_term" type="number" placeholder="Term (months)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_rate" type="number" placeholder="Monthly rate (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_deposit" type="number" placeholder="Deposit (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
@@ -475,7 +510,7 @@ export default function CRM2Page() {
                     if (!propertyExtId || monthlyRateCents<=0) return alert('Property and monthly rate required')
                     try {
                       const res = await fetch('/api/crm2/deals', { method:'POST', body: JSON.stringify({
-                        leadId: drawerLead.id, propertyExtId, city, termMonths, monthlyRateCents, depositCents, moveInFeeCents
+                        leadId: drawerLead.id, propertyExtId, city, termMonths, monthlyRateCents, depositCents, moveInFeeCents, startDate: quoteStart || undefined
                       }) })
                       const j = await res.json()
                       if (j.ok) {
