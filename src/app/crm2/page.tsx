@@ -1090,6 +1090,19 @@ export default function CRM2Page() {
                         } catch { alert('Failed to send email') } }}
                       >Email Quote</a>
                       <button
+                        className="px-3 py-1 text-xs rounded border border-zinc-400/30 text-white"
+                        onClick={async ()=>{
+                          try {
+                            const r = await fetch('/api/crm2/quotes/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ dealId: q.id }) })
+                            const j = await r.json()
+                            if (j.ok && (j.dataUrl || j.url)) {
+                              const href = j.dataUrl || j.url
+                              window.open(href, '_blank')
+                            } else alert('Failed to generate quote PDF')
+                          } catch { alert('Failed to generate quote PDF') }
+                        }}
+                      >Generate PDF</button>
+                      <button
                         className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
                         onClick={async ()=>{
                           setDrawerLead(prev=> prev ? { ...prev, stage: 'signed' } : prev)
