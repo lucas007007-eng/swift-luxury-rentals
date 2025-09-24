@@ -42,6 +42,11 @@ export default function CRM2Page() {
   const [bookingPreview, setBookingPreview] = useState<{ id: string; payments?: any[] } | null>(null)
   const [dragId, setDragId] = useState<string | null>(null)
   const [form, setForm] = useState<Partial<Lead>>({ stage: 'new' })
+  // Quote builder state (drawer)
+  const [quoteCity, setQuoteCity] = useState<string>('')
+  const [quoteCities, setQuoteCities] = useState<string[]>([])
+  const [quoteProperty, setQuoteProperty] = useState<string>('')
+  const [quotePropertyOptions, setQuotePropertyOptions] = useState<{ extId: string; title: string }[]>([])
   const [companies, setCompanies] = useState<any[]>([])
   const [newCompany, setNewCompany] = useState<{ name: string; domain?: string }>({ name: '' })
   const [filterStage, setFilterStage] = useState<string>('all')
@@ -152,6 +157,31 @@ export default function CRM2Page() {
       alert('Failed to create lead')
     }
   }
+
+  // Load cities and default property options when drawer opens or lead changes
+  useEffect(() => {
+    const load = async () => {
+      if (!drawerLead) return
+      setQuoteCity(drawerLead.city || '')
+      try {
+        const rc = await fetch('/api/crm2/options/cities', { cache: 'no-store' })
+        const cj = await rc.json()
+        if (cj.ok) setQuoteCities((cj.data || []).map((c: any) => c.name))
+      } catch {}
+      const city = drawerLead.city || ''
+      if (city) {
+        try {
+          const rp = await fetch(`/api/crm2/options/properties?city=${encodeURIComponent(city)}`, { cache: 'no-store' })
+          const pj = await rp.json()
+          if (pj.ok) setQuotePropertyOptions((pj.data || []).map((p: any) => ({ extId: p.extId || p.id, title: p.title })))
+        } catch {}
+      } else {
+        setQuotePropertyOptions([])
+      }
+      setQuoteProperty('')
+    }
+    load()
+  }, [drawerLead])
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -394,9 +424,29 @@ export default function CRM2Page() {
             <div className="luxury-feature-card p-4 mt-6">
               <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Create Quote</div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <select id="qb_city" defaultValue={drawerLead.city||''} className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-3 py-2 text-sm text-white"></select>
-                <select id="qb_property" className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-3 py-2 text-sm text-white">
+                <select
+                  aria-label="Cities"
+                  value={quoteCity}
+                  onChange={async (e)=>{
+                    const val = e.target.value
+                    setQuoteCity(val)
+                    setQuoteProperty('')
+                    setQuotePropertyOptions([])
+                    try { const rp = await fetch(`/api/crm2/options/properties?city=${encodeURIComponent(val)}`, { cache: 'no-store' }); const pj = await rp.json(); if (pj.ok) setQuotePropertyOptions((pj.data||[]).map((p:any)=>({ extId: p.extId||p.id, title: p.title }))) } catch {}
+                  }}
+                  className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-3 py-2 text-sm text-white"
+                >
+                  <option value="">Cities</option>
+                  {quoteCities.map(c=> (<option key={c} value={c} className="bg-black">{c}</option>))}
+                </select>
+                <select
+                  aria-label="Property"
+                  value={quoteProperty}
+                  onChange={(e)=> setQuoteProperty(e.target.value)}
+                  className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-3 py-2 text-sm text-white"
+                >
                   <option value="">Select property</option>
+                  {quotePropertyOptions.map(p=> (<option key={p.extId} value={p.extId} className="bg-black">{p.title} ({p.extId})</option>))}
                 </select>
                 <input id="qb_start" type="date" defaultValue={new Date().toISOString().slice(0,10)} className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_term" type="number" placeholder="Term (months)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
@@ -404,36 +454,12 @@ export default function CRM2Page() {
                 <input id="qb_deposit" type="number" placeholder="Deposit (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_movein" type="number" placeholder="Move-in fee (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
               </div>
-              <script suppressHydrationWarning dangerouslySetInnerHTML={{__html: `
-                (function(){
-                  async function loadCities(){
-                    try{ const r=await fetch('/api/crm2/options/cities',{cache:'no-store'}); const j=await r.json(); if(j.ok){
-                      var sel=document.getElementById('qb_city'); if(!sel) return; sel.innerHTML='';
-                      var opt=document.createElement('option'); opt.value=''; opt.textContent='Select city'; sel.appendChild(opt);
-                      (j.data||[]).forEach(function(c){ var o=document.createElement('option'); o.value=c.name; o.textContent=c.name; sel.appendChild(o); });
-                    }}catch(e){}
-                  }
-                  async function loadProps(city){
-                    try{ const r=await fetch('/api/crm2/options/properties?city='+encodeURIComponent(city||''),{cache:'no-store'}); const j=await r.json(); if(j.ok){
-                      var sel=document.getElementById('qb_property'); if(!sel) return; sel.innerHTML='';
-                      var opt=document.createElement('option'); opt.value=''; opt.textContent='Select property'; sel.appendChild(opt);
-                      (j.data||[]).forEach(function(p){ var o=document.createElement('option'); o.value=p.extId; o.textContent=p.title+' ('+(p.extId||p.id)+')'; sel.appendChild(o); });
-                    }}catch(e){}
-                  }
-                  document.addEventListener('DOMContentLoaded', function(){
-                    var citySel=document.getElementById('qb_city'); if(citySel){
-                      loadCities().then(function(){ if(citySel.value){ loadProps(citySel.value); } });
-                      citySel.addEventListener('change', function(){ loadProps(citySel.value); });
-                    }
-                  });
-                })();
-              `}} />
               <div className="flex items-center justify-end mt-3">
                 <button
                   className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all"
                   onClick={async ()=>{
-                    const propertyExtId = (document.getElementById('qb_property') as HTMLInputElement)?.value.trim()
-                    const city = (document.getElementById('qb_city') as HTMLInputElement)?.value.trim()
+                    const propertyExtId = (quoteProperty || '').trim()
+                    const city = (quoteCity || '').trim()
                     const termMonths = Number((document.getElementById('qb_term') as HTMLInputElement)?.value || 0)
                     const monthlyRateCents = Math.round(Number((document.getElementById('qb_rate') as HTMLInputElement)?.value || 0)*100)
                     const depositCents = Math.round(Number((document.getElementById('qb_deposit') as HTMLInputElement)?.value || 0)*100)
