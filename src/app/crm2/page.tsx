@@ -279,6 +279,16 @@ export default function CRM2Page() {
     <main className="min-h-screen bg-black text-white">
       <Header forceBackground={true} />
       <div className="max-w-[2200px] mx-auto px-6 py-10 pt-28">
+        {/* In-app notifications bell */}
+        <div className="mb-3 flex items-center justify-end">
+          <InAppBell activities={activities} onSnooze={async (id)=>{
+            await fetch('/api/crm2/activities',{ method:'PATCH', body: JSON.stringify({ id, snoozeDays: 1 }) })
+            setActivities(prev=> prev.map(x=> x.id===id ? { ...x, dueAt: new Date(Date.now()+24*60*60*1000).toISOString() } : x))
+          }} onComplete={async (id)=>{
+            await fetch('/api/crm2/activities',{ method:'PATCH', body: JSON.stringify({ id, complete: true }) })
+            setActivities(prev=> prev.map(x=> x.id===id ? { ...x, completedAt: new Date().toISOString() } : x))
+          }} />
+        </div>
         {error && (
           <div className="mb-4 rounded-lg border border-red-400/40 bg-red-500/10 text-red-300 px-4 py-3 flex items-center justify-between">
             <div className="text-sm">{error}</div>
@@ -884,6 +894,40 @@ function AddActivity({ leadId, onAdd }: { leadId: string; onAdd: (row:any)=>void
         <input className="flex-1 bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-sm text-white" placeholder="Add note / task / call summary" value={content} onChange={e=>setContent(e.target.value)} />
         <button onClick={submit} className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white">Add</button>
       </div>
+    </div>
+  )
+}
+
+function InAppBell({ activities, onSnooze, onComplete }: { activities:any[]; onSnooze:(id:string)=>void; onComplete:(id:string)=>void }) {
+  const [open, setOpen] = React.useState(false)
+  const due = React.useMemo(()=>{
+    const today = new Date(); today.setHours(0,0,0,0)
+    return activities.filter(a=> !a.completedAt && a.dueAt && new Date(a.dueAt).getTime() < today.getTime()+24*60*60*1000)
+  }, [activities])
+  const count = due.length
+  return (
+    <div className="relative">
+      <button onClick={()=> setOpen(v=> !v)} className="relative px-3 py-2 rounded-lg border border-zinc-400/30 text-white">
+        🔔
+        {count>0 && <span className="absolute -top-1 -right-1 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500 text-black">{count}</span>}
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-2 w-80 rounded-xl border border-zinc-600/40 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_10px_30px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] p-3 z-50">
+          <div className="font-mono uppercase tracking-wider text-xs text-white mb-2">Due Today / Overdue</div>
+          <div className="space-y-2 max-h-80 overflow-y-auto">
+            {due.map(a=> (
+              <div key={a.id} className="flex items-center justify-between text-xs border border-zinc-700/40 rounded p-2">
+                <div className="text-zinc-300 truncate mr-2">{a.type}: {a.content}</div>
+                <div className="flex items-center gap-2">
+                  <button className="px-2 py-0.5 rounded border border-zinc-400/30 text-white" onClick={()=> onSnooze(a.id)}>Snooze</button>
+                  <button className="px-2 py-0.5 rounded border border-emerald-400/30 text-white" onClick={()=> onComplete(a.id)}>Done</button>
+                </div>
+              </div>
+            ))}
+            {count===0 && <div className="text-zinc-400 text-xs">All clear</div>}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
