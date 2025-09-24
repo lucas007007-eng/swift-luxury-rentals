@@ -344,7 +344,7 @@ export default function CRM2Page() {
       {drawerLead && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/70" onClick={()=>setDrawerLead(null)} />
-          <div className="absolute right-0 top-0 h-full w-full max-w-xl luxury-feature-card p-6 overflow-y-auto">
+          <div className="absolute right-0 top-0 h-full w-full max-w-xl luxury-feature-card p-6 overflow-y-auto pb-24">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <div className="font-mono uppercase tracking-wider text-sm text-emerald-400">Lead</div>
@@ -548,7 +548,7 @@ export default function CRM2Page() {
             </div>
 
             {/* Latest Quote */}
-            <div className="luxury-feature-card p-4 mt-6">
+            <div className="luxury-feature-card p-4 mt-6 mb-6">
               <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Latest Quote</div>
               {(() => {
                 const list = deals.filter(d=> d.leadId === drawerLead.id)
