@@ -611,7 +611,21 @@ export default function CRM2Page() {
                                 const r = await fetch('/api/crm2/quotes/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ dealId: dl.id }) })
                                 const j = await r.json()
                                 if (j.ok && (j.dataUrl || j.url)) {
-                                  window.open(j.dataUrl || j.url, '_blank')
+                                  if (j.dataUrl) {
+                                    try {
+                                      const b64 = j.dataUrl.split(',')[1] || ''
+                                      const bin = atob(b64)
+                                      const len = bin.length
+                                      const bytes = new Uint8Array(len)
+                                      for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i)
+                                      const blob = new Blob([bytes], { type: 'application/pdf' })
+                                      const url = URL.createObjectURL(blob)
+                                      window.open(url, '_blank')
+                                      setTimeout(()=> URL.revokeObjectURL(url), 10000)
+                                    } catch { window.open(j.dataUrl, '_blank') }
+                                  } else {
+                                    window.open(j.url, '_blank')
+                                  }
                                 } else alert('Failed to generate quote PDF')
                               } catch { alert('Failed to generate quote PDF') }
                             }}
@@ -1116,8 +1130,21 @@ export default function CRM2Page() {
                             const r = await fetch('/api/crm2/quotes/pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ dealId: q.id }) })
                             const j = await r.json()
                             if (j.ok && (j.dataUrl || j.url)) {
-                              const href = j.dataUrl || j.url
-                              window.open(href, '_blank')
+                              if (j.dataUrl) {
+                                try {
+                                  const b64 = j.dataUrl.split(',')[1] || ''
+                                  const bin = atob(b64)
+                                  const len = bin.length
+                                  const bytes = new Uint8Array(len)
+                                  for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i)
+                                  const blob = new Blob([bytes], { type: 'application/pdf' })
+                                  const url = URL.createObjectURL(blob)
+                                  window.open(url, '_blank')
+                                  setTimeout(()=> URL.revokeObjectURL(url), 10000)
+                                } catch { window.open(j.dataUrl, '_blank') }
+                              } else {
+                                window.open(j.url, '_blank')
+                              }
                             } else alert('Failed to generate quote PDF')
                           } catch { alert('Failed to generate quote PDF') }
                         }}
