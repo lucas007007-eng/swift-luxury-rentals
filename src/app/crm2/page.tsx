@@ -370,8 +370,11 @@ export default function CRM2Page() {
         content: `Renewal follow-up for ${row.propertyTitle || 'property'}`,
         dueAt: new Date(dueTs).toISOString()
       }) })
-      const j2 = await res2.json(); if (j2.ok) setActivities(prev=> [j2.data, ...prev])
-      alert('Reminder created')
+      const j2 = await res2.json(); if (j2.ok) {
+        setActivities(prev=> [j2.data, ...prev])
+        // mark row as reminded to show visual feedback
+        setRenewals(prev=> prev.map((r:any)=> r.id===row.id ? { ...r, __reminded: true } : r))
+      }
     } catch { alert('Failed to create reminder') }
   }
 
@@ -694,11 +697,12 @@ export default function CRM2Page() {
                       return da - db
                     })
                     .map((r:any)=> (
-                    <tr key={r.id} className="border-t border-zinc-700/40">
+                    <tr key={r.id} className={`border-t border-zinc-700/40 ${r.__reminded ? 'bg-emerald-500/5' : ''}`}>
                       <td className="px-2 py-2"><input type="checkbox" checked={!!r.__sel} onChange={(e)=> setRenewals(prev=> prev.map((x:any)=> x.id===r.id ? { ...x, __sel: e.target.checked } : x))} /></td>
                       <td className="px-2 py-2 text-zinc-200">{r.checkout ? `${new Date(r.checkout).toLocaleDateString()} (${(()=>{ const t=new Date(); t.setHours(0,0,0,0); return Math.ceil((new Date(r.checkout).getTime()-t.getTime())/(24*60*60*1000))})()}d)` : ''}</td>
                       <td className="px-2 py-2 text-zinc-300 flex items-center gap-2">
                         <span>{r.userName || r.userEmail || '—'}</span>
+                        {r.__reminded && <span className="text-emerald-300 text-[11px]">Reminder created</span>}
                         {!r.userEmail && <button className="px-2 py-0.5 text-[10px] rounded border border-emerald-400/30 text-white" onClick={async()=>{
                           const email = prompt('Email for new lead:') || ''
                           const owner = prompt('Assign owner (optional, email):') || ''
@@ -736,11 +740,13 @@ export default function CRM2Page() {
                   )}
                 </tbody>
               </table>
-              <div className="mt-3 flex items-center justify-end">
+              <div className="mt-3 flex items-center justify-end gap-2">
+                <div className="text-xs text-emerald-300" id="renewal-toast" style={{display:'none'}}>Reminders created</div>
                 <button className="px-3 py-2 text-xs rounded border border-emerald-400/30 text-white" onClick={async()=>{
                   const selected = renewals.filter((r:any)=> r.__sel)
                   if (!selected.length) { alert('Select rows first'); return }
                   for (const r of selected) { await createRenewalReminder(r) }
+                  try { const el=document.getElementById('renewal-toast'); if (el) { el.textContent = `Created ${selected.length} reminder${selected.length>1?'s':''}`; el.style.display='inline'; setTimeout(()=>{ if (el) el.style.display='none' }, 2000) } } catch {}
                 }}>Create Reminders for Selected</button>
               </div>
             </div>
