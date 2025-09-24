@@ -63,17 +63,22 @@ export async function POST(req: Request) {
     drawText('• This quote is valid for 7 days unless otherwise stated.', 60, y, 10); y -= 14
 
     // Save
-    let bytes: Uint8Array | null = null
+    let bytesForDataUrl: Uint8Array | null = null
     try {
-      bytes = await pdf.save()
+      const bytes = await pdf.save()
+      bytesForDataUrl = bytes
       fs.writeFileSync(outPath, bytes)
     } catch {
-      try { fs.mkdirSync(outDirTmp, { recursive: true }); outPath = path.join(outDirTmp, `${dealId}.pdf`); if (bytes) fs.writeFileSync(outPath, bytes) } catch {}
+      try {
+        fs.mkdirSync(outDirTmp, { recursive: true });
+        outPath = path.join(outDirTmp, `${dealId}.pdf`)
+        if (bytesForDataUrl) fs.writeFileSync(outPath, bytesForDataUrl)
+      } catch {}
     }
     const url = `/quotes/${dealId}.pdf`
     // Return also dataUrl for immediate open
     let dataUrl: string | undefined
-    try { if (bytes) dataUrl = `data:application/pdf;base64,${Buffer.from(bytes).toString('base64')}` } catch {}
+    try { if (bytesForDataUrl) dataUrl = `data:application/pdf;base64,${Buffer.from(bytesForDataUrl).toString('base64')}` } catch {}
     return NextResponse.json({ ok:true, url, dataUrl })
   } catch (e:any) {
     return NextResponse.json({ ok:false, error:String(e?.message||e) }, { status:500 })
