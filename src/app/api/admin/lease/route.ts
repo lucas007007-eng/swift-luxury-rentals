@@ -110,9 +110,12 @@ export async function POST(req: Request) {
     
 
     // Always generate a fresh dual-column PDF (not overlaying existing files)
-    const outDir = path.join(process.cwd(), 'public', 'leases')
-    fs.mkdirSync(outDir, { recursive: true })
-    const outPath = path.join(outDir, `${id}.pdf`)
+    // Attempt to write to public/leases; if not possible (e.g., Vercel), fall back to /tmp
+    const publicDir = path.join(process.cwd(), 'public', 'leases')
+    const tmpDir = path.join('/tmp', 'leases')
+    let outPath = path.join(publicDir, `${id}.pdf`)
+    let wroteToDisk = false
+    try { fs.mkdirSync(publicDir, { recursive: true }) } catch {}
 
     const mod: any = await import('pdf-lib')
     const { PDFDocument, StandardFonts, rgb } = mod
@@ -492,19 +495,33 @@ export async function POST(req: Request) {
     try {
       const bytes = await pdfDoc.save()
       bytesForDataUrl = bytes
-      fs.writeFileSync(outPath, bytes)
+      try {
+        fs.writeFileSync(outPath, bytes)
+        wroteToDisk = true
+      } catch {
+        // Try /tmp as a fallback on serverless platforms
+        try {
+          fs.mkdirSync(tmpDir, { recursive: true })
+          outPath = path.join(tmpDir, `${id}.pdf`)
+          fs.writeFileSync(outPath, bytes)
+          wroteToDisk = true
+        } catch {
+          // Ignore write errors; we'll still return a dataUrl below
+          wroteToDisk = false
+        }
+      }
     } catch (err) {
       // If save still fails after sanitization, bubble the error so UI shows message
       throw err
     }
 
     const publicPath = `/leases/${id}.pdf`
-    if (idx !== -1) {
+    if (wroteToDisk && idx !== -1) {
       bookings[idx].leasePdf = publicPath
       try { fs.writeFileSync(dataPath, JSON.stringify(bookings, null, 2), 'utf-8') } catch {}
     }
 
-    // Also return a data URL (helps on platforms where public file may lag a bit)
+    // Also return a data URL (helps on platforms where public file may lag or disk is read-only)
     let dataUrl: string | undefined
     try {
       if (bytesForDataUrl) {
