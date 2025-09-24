@@ -58,33 +58,33 @@ export async function POST(req: Request) {
     drawText('Swift Luxury — Quote', 48, 812, 18, bold, silver)
     drawText(new Date().toISOString().slice(0,10), page.getWidth()-140, 812, 10, font, silverDim)
 
-    // Lead summary card
-    page.drawRectangle({ x: 40, y: 740, width: page.getWidth()-80, height: 48, color: pane })
-    drawText(`Lead: ${lead?.name || lead?.email || 'Client'}`, 48, 762, 12, bold)
-    if (lead?.email) drawText(`Email: ${lead.email}`, 260, 762, 11)
-    if (lead?.phone) drawText(`Phone: ${lead.phone}`, 440, 762, 11)
+    // Lead summary card (lowered for better balance)
+    page.drawRectangle({ x: 40, y: 700, width: page.getWidth()-80, height: 56, color: pane })
+    drawText(`Lead: ${lead?.name || lead?.email || 'Client'}`, 48, 728, 12, bold)
+    if (lead?.email) drawText(`Email: ${lead.email}`, 260, 728, 11)
+    if (lead?.phone) drawText(`Phone: ${lead.phone}`, 440, 728, 11)
 
     // Section: Offer Details (spy-tech card)
-    let y = 720
-    page.drawRectangle({ x: 40, y: 520, width: page.getWidth()-80, height: 190, color: pane })
-    drawText('Offer Details', 48, y, 14, bold, silver); y -= 18
-    drawText(`City: ${d.city || '—'}`, 48, y, 12, font, silverDim); y -= 16
-    drawText(`Property: ${d.propertyExtId || '—'}`, 48, y, 12, font, silverDim); y -= 16
-    drawText(`Term: ${termMonths} month(s)`, 48, y, 12, font, silverDim); y -= 16
-    drawText(`Monthly rent: € ${monthly.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 16
-    drawText(`Move-in fee: € ${moveIn.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 16
-    drawText(`Deposit: € ${deposit.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 22
+    let y = 620
+    page.drawRectangle({ x: 40, y: 500, width: page.getWidth()-80, height: 220, color: pane })
+    drawText('Offer Details', 48, y, 14, bold, silver); y -= 20
+    drawText(`City: ${d.city || '—'}`, 48, y, 12, font, silverDim); y -= 18
+    drawText(`Property: ${d.propertyExtId || '—'}`, 48, y, 12, font, silverDim); y -= 18
+    drawText(`Term: ${termMonths} month(s)`, 48, y, 12, font, silverDim); y -= 18
+    drawText(`Monthly rent: € ${monthly.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 18
+    drawText(`Move-in fee: € ${moveIn.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 18
+    drawText(`Deposit: € ${deposit.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 26
     drawText(`Total contract value (rent x months + move-in): € ${contractValue.toLocaleString('de-DE')}`, 48, y, 12, bold, accent)
-    y -= 30
+    y -= 34
 
     // Notes pane
-    page.drawRectangle({ x: 40, y: 460, width: page.getWidth()-80, height: 48, color: pane })
-    drawText('Notes', 48, 492, 12, bold, silver)
-    drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, 476, 10, font, silverDim)
-    drawText('• Quote valid for 7 days unless otherwise stated.', 48, 462, 10, font, silverDim)
+    page.drawRectangle({ x: 40, y: 420, width: page.getWidth()-80, height: 70, color: pane })
+    drawText('Notes', 48, 482, 12, bold, silver)
+    drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, 466, 10, font, silverDim)
+    drawText('• Quote valid for 7 days unless otherwise stated.', 48, 452, 10, font, silverDim)
 
     // Signature area
-    const sigTop = 200
+    const sigTop = 220
     // Outer frame
     page.drawRectangle({ x: 40, y: sigTop-90, width: page.getWidth()-80, height: 110, color: pane })
     // Left: Swift Luxury signature line
