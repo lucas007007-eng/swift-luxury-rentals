@@ -42,6 +42,12 @@ const STAGE_SLA_DAYS: Record<string, number> = {
   signed: 0,
 }
 
+const TEAM_OWNERS = [
+  'ops@swiftluxury.local',
+  'agent1@swiftluxury.local',
+  'agent2@swiftluxury.local'
+]
+
 export default function CRM2Page() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
@@ -341,7 +347,11 @@ export default function CRM2Page() {
                 {STAGES.map(s=> <option className="bg-black" key={s} value={s}>{s}</option>)}
               </select>
               <input value={filterCity} onChange={e=>setFilterCity(e.target.value)} placeholder="City" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" />
-              <input value={filterOwner} onChange={e=>setFilterOwner(e.target.value)} placeholder="Owner" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" />
+              <select value={filterOwner} onChange={e=>setFilterOwner(e.target.value)} className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora">
+                <option className="bg-black" value="">All Owners</option>
+                <option className="bg-black" value="unassigned">Unassigned</option>
+                {TEAM_OWNERS.map(o=> <option className="bg-black" key={o} value={o}>{o}</option>)}
+              </select>
               <input value={filterText} onChange={e=>setFilterText(e.target.value)} placeholder="Search name/email/company" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora md:col-span-2" />
             </div>
             <div className="mt-4 flex items-center justify-end">
@@ -530,7 +540,13 @@ export default function CRM2Page() {
               }}>
                 {STAGES.map(s=> <option key={s} value={s} className="bg-black">{s}</option>)}
               </select>
-                <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.owner||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, owner: e.target.value } : prev)} placeholder="Owner email" />
+                <div className="grid grid-cols-3 gap-2">
+                  <select className="col-span-2 bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.owner||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, owner: e.target.value } : prev)}>
+                    <option className="bg-black" value="">Unassigned</option>
+                    {TEAM_OWNERS.map(o=> <option className="bg-black" key={o} value={o}>{o}</option>)}
+                  </select>
+                  <button className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white" onClick={async()=>{ const v = drawerLead.owner||''; setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, owner: v } : x)); try{ await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, owner: v }) }) } catch{} }}>Save Owner</button>
+                </div>
                 <div className="flex items-center justify-end">
                   <button className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white mr-2" onClick={async()=>{ const v = prompt('Assign owner (email):', drawerLead.owner||''); if (v!==null){ setDrawerLead(prev=> prev ? { ...prev, owner: v } : prev); setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, owner: v } : x)); try{ await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, owner: v }) }) } catch{} }} }>Assign</button>
                 </div>
