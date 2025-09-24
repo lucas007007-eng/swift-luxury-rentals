@@ -443,11 +443,11 @@ export default function CRM2Page() {
                         <span className="text-[10px] text-zinc-400">Owner: {l.owner || 'Unassigned'}</span>
                         {(() => {
                           const sla = STAGE_SLA_DAYS[l.stage] ?? 0
-                          const updatedAt = l.updatedAt ? new Date(l.updatedAt).getTime() : 0
-                          const ageHours = updatedAt ? Math.floor((Date.now() - updatedAt)/(60*60*1000)) : 0
+                          const lastStageTs = (l as any).stageHistory?.[0]?.changedAt ? new Date((l as any).stageHistory[0].changedAt).getTime() : (l.updatedAt ? new Date(l.updatedAt).getTime() : 0)
+                          const ageHours = lastStageTs ? Math.floor((Date.now() - lastStageTs)/(60*60*1000)) : 0
                           const slaHours = sla*24
-                          if (sla>0 && ageHours>slaHours) return <span className="px-2 py-0.5 text-[10px] rounded border border-red-400/40 text-red-300">SLA {ageHours - slaHours}h overdue</span>
-                          if (sla>0 && ageHours>=slaHours-1 && ageHours<slaHours) return <span className="px-2 py-0.5 text-[10px] rounded border border-amber-400/40 text-amber-300">SLA due</span>
+                          if (sla>0 && ageHours>slaHours) return <span title={`Changed ${Math.floor(ageHours)}h ago`} className="px-2 py-0.5 text-[10px] rounded border border-red-400/40 text-red-300">SLA {ageHours - slaHours}h overdue</span>
+                          if (sla>0 && ageHours>=slaHours-1 && ageHours<slaHours) return <span title={`Changed ${Math.floor(ageHours)}h ago`} className="px-2 py-0.5 text-[10px] rounded border border-amber-400/40 text-amber-300">SLA due</span>
                           return null
                         })()}
                       </div>

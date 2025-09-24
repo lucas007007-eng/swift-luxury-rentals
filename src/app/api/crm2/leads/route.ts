@@ -31,7 +31,10 @@ export async function GET() {
   try {
     const db = (prisma as any)
     if (db?.lead?.findMany) {
-      const rows = await db.lead.findMany({ orderBy: { createdAt: 'desc' } })
+      const rows = await db.lead.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: { stageHistory: { orderBy: { changedAt: 'desc' }, take: 1 } }
+      })
       return NextResponse.json({ ok: true, data: rows })
     }
   } catch {}
