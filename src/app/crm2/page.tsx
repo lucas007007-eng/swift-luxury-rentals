@@ -421,6 +421,12 @@ export default function CRM2Page() {
                 <div className="text-2xl font-bold text-white">{kpis.dueSoon}</div>
               </div>
             </div>
+            {/* SLA Legend */}
+            <div className="mt-3 flex items-center gap-4 text-xs text-zinc-300">
+              <div className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded bg-emerald-400/70"></span><span>On pace (&lt; 80%)</span></div>
+              <div className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded bg-amber-400/70"></span><span>Due (80–100%)</span></div>
+              <div className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded bg-red-500/70"></span><span>Breached (&gt; 100%)</span></div>
+            </div>
           </div>
           <div className="luxury-feature-card p-8">
             <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 mb-3">Filters & Actions</div>
