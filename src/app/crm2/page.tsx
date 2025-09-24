@@ -931,6 +931,12 @@ function AddActivity({ leadId, onAdd }: { leadId: string; onAdd: (row:any)=>void
   const [content, setContent] = React.useState('')
   const [type, setType] = React.useState('note')
   const [dueAt, setDueAt] = React.useState('')
+  const [open, setOpen] = React.useState(false)
+  const [cursor, setCursor] = React.useState<Date>(new Date())
+  const [pos, setPos] = React.useState<{ left:number; top:number } | null>(null)
+  const btnRef = React.useRef<HTMLButtonElement|null>(null)
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(()=>{ setMounted(true) }, [])
   const submit = async () => {
     if (!content.trim()) return
     try {
@@ -952,7 +958,52 @@ function AddActivity({ leadId, onAdd }: { leadId: string; onAdd: (row:any)=>void
           <option className="bg-black" value="task">task</option>
           <option className="bg-black" value="email">email</option>
         </select>
-        <input className="bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-xs text-white" placeholder="Due date (YYYY-MM-DD)" value={dueAt} onChange={e=>setDueAt(e.target.value)} />
+        <div className="col-span-2 relative">
+          <button
+            type="button"
+            ref={btnRef}
+            onClick={()=> {
+              const next = !open; setOpen(next);
+              if (next && btnRef.current) {
+                const r = btnRef.current.getBoundingClientRect();
+                setPos({ left: r.left, top: r.bottom + 8 })
+              }
+            }}
+            className="w-full text-left bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-xs text-white hover:border-zinc-400/60"
+          >
+            {dueAt ? new Date(dueAt).toLocaleDateString('en-GB') : 'Due date'}
+          </button>
+          {open && pos && mounted && createPortal((
+            <>
+              <div className="fixed inset-0 z-[999]" onClick={()=> setOpen(false)} />
+              <div className="fixed z-[1000] w-60 rounded-xl border border-zinc-600/40 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_10px_30px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] p-2" style={{ left: pos.left, top: pos.top }}>
+                <div className="flex items-center justify-between mb-1">
+                  <button className="px-2 py-0.5 text-[10px] rounded border border-zinc-500/40 text-white" onClick={()=> setCursor(new Date(cursor.getFullYear(), cursor.getMonth()-1, 1))}>{'<'}</button>
+                  <div className="text-white text-xs font-semibold">{cursor.toLocaleString('en-US',{ month:'long', year:'numeric'})}</div>
+                  <button className="px-2 py-0.5 text-[10px] rounded border border-zinc-500/40 text-white" onClick={()=> setCursor(new Date(cursor.getFullYear(), cursor.getMonth()+1, 1))}>{'>'}</button>
+                </div>
+                <div className="grid grid-cols-7 gap-1 text-[10px] text-zinc-300">
+                  {['Mo','Tu','We','Th','Fr','Sa','Su'].map(d=> (<div key={d} className="text-center opacity-70">{d}</div>))}
+                  {(() => {
+                    const start = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
+                    const end = new Date(cursor.getFullYear(), cursor.getMonth()+1, 0)
+                    const pad = (start.getDay()+6)%7
+                    const cells: any[] = []
+                    for (let i=0;i<pad;i++) cells.push(<div key={'p'+i} className="h-7" />)
+                    for (let d=1; d<=end.getDate(); d++) {
+                      const iso = new Date(cursor.getFullYear(), cursor.getMonth(), d).toISOString().slice(0,10)
+                      const selected = dueAt===iso
+                      cells.push(
+                        <button key={d} onClick={()=> { setDueAt(iso); setOpen(false) }} className={`h-7 rounded flex items-center justify-center border ${selected ? 'border-zinc-300/60 bg-white/10 text-white' : 'border-zinc-600/30 hover:border-zinc-400/50 text-zinc-200'}`}>{d}</button>
+                      )
+                    }
+                    return cells
+                  })()}
+                </div>
+              </div>
+            </>
+          ), document.body)}
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <input className="flex-1 bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-sm text-white" placeholder="Add note / task / call summary" value={content} onChange={e=>setContent(e.target.value)} />
