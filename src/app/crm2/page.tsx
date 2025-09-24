@@ -612,8 +612,21 @@ export default function CRM2Page() {
                           return (cents/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'})
                         })()}</span>
                       </div>
-                      <div className="mt-1 flex items-center justify-between">
+                      <div className="mt-1 flex items-center justify-between gap-2">
                         <span className="text-[10px] text-zinc-400">Owner: {l.owner || 'Unassigned'}</span>
+                        <button
+                          className="px-2 py-0.5 text-[11px] rounded border border-zinc-400/40 text-white hover:border-zinc-300/60"
+                          onClick={async (e)=>{
+                            e.stopPropagation()
+                            try {
+                              const r = await fetch(`/api/crm2/bookings?email=${encodeURIComponent((l.email||'').toLowerCase())}`)
+                              const j = await r.json()
+                              if (j.ok && j.data?.adminUrl) { window.open(j.data.adminUrl, '_blank') }
+                              else { alert('No booking found for this lead') }
+                            } catch { alert('Lookup failed') }
+                          }}
+                          title="Open in Admin Bookings"
+                        >Open booking</button>
                         {(() => {
                           const sla = STAGE_SLA_DAYS[l.stage] ?? 0
                           const lastStageTs = (l as any).stageHistory?.[0]?.changedAt ? new Date((l as any).stageHistory[0].changedAt).getTime() : (l.updatedAt ? new Date(l.updatedAt).getTime() : 0)
