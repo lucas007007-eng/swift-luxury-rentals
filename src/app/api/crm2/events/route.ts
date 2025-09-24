@@ -1,16 +1,10 @@
 import { NextResponse } from 'next/server'
-
-// Simple in-memory subscriber list (per server instance)
-const subscribers = new Set<ReadableStreamDefaultController>()
-
-function send(controller: ReadableStreamDefaultController, data: any) {
-  controller.enqueue(`data: ${JSON.stringify(data)}\n\n`)
-}
+import { publish, register, unregister, send } from '@/lib/crm2Events'
 
 export async function GET() {
   const stream = new ReadableStream({
     start(controller) {
-      subscribers.add(controller)
+      register(controller)
       // initial heartbeat
       send(controller, { type: 'connected', ts: Date.now() })
       const hb = setInterval(() => {
@@ -18,11 +12,11 @@ export async function GET() {
       }, 25000)
       controller.signal?.addEventListener?.('abort', () => {
         clearInterval(hb as any)
-        subscribers.delete(controller)
+        unregister(controller)
       })
     },
     cancel() {
-      subscribers.forEach(s => { try { s.close?.() } catch {} })
+      // no-op
     }
   })
   return new NextResponse(stream as any, {
@@ -33,12 +27,4 @@ export async function GET() {
     }
   })
 }
-
-// Utility for other routes to broadcast
-export function broadcast(event: any) {
-  for (const sub of Array.from(subscribers)) {
-    try { send(sub, event) } catch { subscribers.delete(sub) }
-  }
-}
-
 
