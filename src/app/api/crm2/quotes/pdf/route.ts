@@ -90,7 +90,9 @@ export async function POST(req: Request) {
 
     // Section: Offer Details (spy-tech card)
     let y = 620
-    page.drawRectangle({ x: 40, y: 500, width: page.getWidth()-80, height: 220, color: pane })
+    // Narrow left column to avoid collision with right-side image panel
+    const leftPaneWidth = page.getWidth()-300
+    page.drawRectangle({ x: 40, y: 500, width: leftPaneWidth, height: 220, color: pane })
     drawText('Offer Details', 48, y, 14, bold, silver); y -= 20
     drawText(`City: ${d.city || '—'}`, 48, y, 12, font, silverDim); y -= 18
     drawText(`Property: ${d.propertyExtId || '—'}`, 48, y, 12, font, silverDim); y -= 18
@@ -124,9 +126,11 @@ export async function POST(req: Request) {
       } catch { drawText('Property Image', px+12, py+ph/2-6, 10, font, silverDim) }
     } catch {}
 
-    // Price breakdown table
+    // Price breakdown table (relocated below image to prevent overlap)
     const tblX = 48
-    let ty = 520
+    let ty = 440
+    // background strip for readability
+    page.drawRectangle({ x: 40, y: 360, width: page.getWidth()-80, height: 90, color: pane })
     drawText('Price Breakdown', tblX, ty, 12, bold, silver); ty -= 16
     const col2 = page.getWidth()-88
     const line = (label: string, value: string, isTotal=false) => {
