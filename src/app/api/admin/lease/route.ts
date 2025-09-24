@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
     // Fallback to Prisma when JSON CRM does not have this booking
     if (!b) {
-      const pb = await prisma.booking.findUnique({ where: { id }, include: { user: true, property: true } })
+      const pb = await prisma.booking.findUnique({ where: { id }, include: { user: true, property: true, payments: true } })
       if (!pb) return NextResponse.json({ message: 'Not found' }, { status: 404 })
       const addr = String(pb.property?.address || '')
       const cityFromAddr = addr ? (addr.split(',').pop()?.trim() || '') : ''
@@ -125,12 +125,25 @@ export async function POST(req: Request) {
       }
     }
     const addressLine = prop?.location || `${b!.propertyTitle}, ${b!.city}`
-    const monthly = Number(prop?.price || 0)
+    // Prefer amounts from booking payments (created from latest CRM2 quote)
+    let monthly = Number(prop?.price || 0)
+    let depositFromQuote: number | null = null
+    let moveInFeeFromQuote: number | null = null
+    try {
+      const payments: any[] = ((pb as any)?.payments || []) as any[]
+      const firstMonthly = payments.find(p => p.purpose === 'first_period') || payments.find(p => p.purpose === 'monthly_rent')
+      const depPay = payments.find(p => p.purpose === 'deposit')
+      const mifPay = payments.find(p => p.purpose === 'move_in_fee')
+      if (firstMonthly?.amountCents) monthly = Math.round(Number(firstMonthly.amountCents)/100)
+      if (depPay?.amountCents) depositFromQuote = Math.round(Number(depPay.amountCents)/100)
+      if (mifPay?.amountCents) moveInFeeFromQuote = Math.round(Number(mifPay.amountCents)/100)
+    } catch {}
     const monthsRounded = Math.max(1, Math.ceil(nights / 30))
     let depositMonths = 1
     if (monthsRounded > 3) depositMonths = 2
     else if (monthsRounded === 1) depositMonths = 0.5
-    const deposit = Math.round(monthly * depositMonths)
+    let deposit = Math.round(monthly * depositMonths)
+    if (typeof depositFromQuote === 'number') deposit = depositFromQuote
 
     
 
@@ -343,11 +356,17 @@ export async function POST(req: Request) {
     const s5L = yL; yL = wrapHeading('5. Miete und Kaution / Rent and Deposit', leftX+2, yL, colWidth-4)
     yL = wrapPara(`Monatliche Miete: € ${Number(monthly).toLocaleString('de-DE')}`, leftX, yL, colWidth)
     yL = wrapPara(`Kaution: € ${Number(deposit).toLocaleString('de-DE')} (Regel: 0,5x für 1 Monat; 1x für <=3 Monate; 2x für >3 Monate)`, leftX, yL, colWidth)
+    if (typeof moveInFeeFromQuote === 'number') {
+      yL = wrapPara(`Einzugsgebühr: € ${Number(moveInFeeFromQuote).toLocaleString('de-DE')}`, leftX, yL, colWidth)
+    }
     yL = wrapPara('Die Kaution und die erste Monatsmiete sind 72 Stunden nach beiderseitiger Unterzeichnung zu zahlen.', leftX, yL, colWidth)
     drawSectionBox(leftX, s5L, yL)
     const s5R = yR; yR = wrapHeading('5. Rent and Deposit', rightX+2, yR, colWidth-4)
     yR = wrapPara(`Fixed monthly rent: € ${Number(monthly).toLocaleString('de-DE')}`, rightX, yR, colWidth)
     yR = wrapPara(`Deposit: € ${Number(deposit).toLocaleString('de-DE')} (0.5x for 1 month; 1x for <=3 months; 2x for >3 months)`, rightX, yR, colWidth)
+    if (typeof moveInFeeFromQuote === 'number') {
+      yR = wrapPara(`Move-in fee: € ${Number(moveInFeeFromQuote).toLocaleString('de-DE')}`, rightX, yR, colWidth)
+    }
     yR = wrapPara('Deposit and first monthly rent due within 72 hours of mutual signature.', rightX, yR, colWidth)
     drawSectionBox(rightX, s5R, yR)
     ensureSpace()
