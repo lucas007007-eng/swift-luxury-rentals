@@ -97,6 +97,43 @@ export async function POST(req: Request) {
       },
     })
 
+    // Create/Upsert a CRM2 Lead and initial Deal from this booking
+    try {
+      const lead = await prisma.lead.upsert({
+        where: { email: (user?.email || '').toLowerCase() },
+        update: {
+          name: user?.name || undefined,
+          phone: user?.phone || undefined,
+          city: (property as any)?.cityId ? undefined : undefined,
+          stage: 'application'
+        },
+        create: {
+          name: user?.name || 'Guest',
+          email: (user?.email || '').toLowerCase(),
+          phone: user?.phone || null,
+          city: String((property as any)?.city?.name || ''),
+          stage: 'application'
+        }
+      } as any)
+      // Create a Deal with amounts inferred from booking/payments
+      const pay = await prisma.payment.findMany({ where: { bookingId: booking.id } })
+      const first = pay.find(p=> p.purpose==='first_period') || pay.find(p=> p.purpose==='monthly_rent')
+      const dep = pay.find(p=> p.purpose==='deposit')
+      const mif = pay.find(p=> p.purpose==='move_in_fee')
+      const termMonths = Math.max(1, Math.round(((new Date(checkOut).getTime()-new Date(checkIn).getTime())/(30*24*60*60*1000)) ))
+      await prisma.deal.create({ data: {
+        leadId: (lead as any).id,
+        propertyExtId: property.extId || propertyId,
+        city: String((property as any)?.city?.name || ''),
+        termMonths,
+        monthlyRateCents: first?.amountCents || 0,
+        depositCents: dep?.amountCents || 0,
+        moveInFeeCents: mif?.amountCents || 0,
+        startDate: new Date(checkIn),
+        status: 'offer'
+      } })
+    } catch {}
+
     // Schedule remaining monthly payments as 'scheduled'
     try {
       const schedule = await computeMonthlySchedule({ propertyExtId: property.extId || propertyId, checkIn, checkOut })
