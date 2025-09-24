@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import authOptions from '@/lib/authOptions'
 import fs from 'fs'
 import path from 'path'
 import { publish } from '@/lib/crm2Events'
@@ -55,6 +57,14 @@ export async function POST(req: Request) {
     createdAt: now,
     updatedAt: now
   }
+  // Default owner from session if missing
+  try {
+    if (!lead.owner) {
+      const session = await getServerSession(authOptions as any)
+      const email = (session as any)?.user?.email
+      if (email) (lead as any).owner = String(email)
+    }
+  } catch {}
 
   // Basic validation
   if (!lead.name) return NextResponse.json({ ok: false, error: 'name-required' }, { status: 400 })

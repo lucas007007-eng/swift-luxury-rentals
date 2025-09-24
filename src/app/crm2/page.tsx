@@ -81,6 +81,8 @@ export default function CRM2Page() {
   const [activeTab, setActiveTab] = useState<'board'|'renewals'>('board')
   const [renewalDays, setRenewalDays] = useState<number>(45)
   const [renewals, setRenewals] = useState<any[]>([])
+  const [renewalSearch, setRenewalSearch] = useState('')
+  const [renewalSort, setRenewalSort] = useState<'checkout'|'client'|'city'>('checkout')
   const [owners, setOwners] = useState<string[]>([])
   const bcRef = React.useRef<any>(null)
 
@@ -384,6 +386,12 @@ export default function CRM2Page() {
               {[30,45,60].map(d=> (
                 <button key={d} onClick={()=> setRenewalDays(d)} className={`px-2 py-1 text-xs rounded border ${renewalDays===d ? 'border-zinc-300/60 text-white' : 'border-zinc-600/40 text-zinc-300 hover:border-zinc-500/50'}`}>{d}d</button>
               ))}
+              <input value={renewalSearch} onChange={e=> setRenewalSearch(e.target.value)} placeholder="Search client/city" className="ml-2 bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-xs text-white" />
+              <select value={renewalSort} onChange={e=> setRenewalSort(e.target.value as any)} className="bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-xs text-white">
+                <option className="bg-black" value="checkout">Checkout</option>
+                <option className="bg-black" value="client">Client</option>
+                <option className="bg-black" value="city">City</option>
+              </select>
             </div>
           )}
         </div>
@@ -466,11 +474,32 @@ export default function CRM2Page() {
                   </tr>
                 </thead>
                 <tbody>
-                  {renewals.map((r:any)=> (
+                  {renewals
+                    .filter((r:any)=> {
+                      const q = renewalSearch.toLowerCase()
+                      if (!q) return true
+                      return (r.userName||'').toLowerCase().includes(q) || (r.userEmail||'').toLowerCase().includes(q) || (r.city||'').toLowerCase().includes(q)
+                    })
+                    .sort((a:any,b:any)=> {
+                      if (renewalSort==='checkout') return new Date(a.checkout||0).getTime() - new Date(b.checkout||0).getTime()
+                      if (renewalSort==='client') return String(a.userName||a.userEmail||'').localeCompare(String(b.userName||b.userEmail||''))
+                      return String(a.city||'').localeCompare(String(b.city||''))
+                    })
+                    .map((r:any)=> (
                     <tr key={r.id} className="border-t border-zinc-700/40">
                       <td className="px-2 py-2"><input type="checkbox" checked={!!r.__sel} onChange={(e)=> setRenewals(prev=> prev.map((x:any)=> x.id===r.id ? { ...x, __sel: e.target.checked } : x))} /></td>
                       <td className="px-2 py-2 text-zinc-200">{r.checkout ? new Date(r.checkout).toLocaleDateString() : ''}</td>
-                      <td className="px-2 py-2 text-zinc-300">{r.userName || r.userEmail || '—'}</td>
+                      <td className="px-2 py-2 text-zinc-300 flex items-center gap-2">
+                        <span>{r.userName || r.userEmail || '—'}</span>
+                        {!r.userEmail && <button className="px-2 py-0.5 text-[10px] rounded border border-emerald-400/30 text-white" onClick={async()=>{
+                          const email = prompt('Email for new lead:') || ''
+                          if (!email) return
+                          try {
+                            const res = await fetch('/api/crm2/leads', { method:'POST', body: JSON.stringify({ name: r.userName||'Client', email, city: r.city||'', stage:'qualified' }) })
+                            const j = await res.json(); if (j.ok) { setLeads(prev=> [j.data, ...prev]); alert('Lead created') }
+                          } catch { alert('Failed to create lead') }
+                        }}>Create Lead</button>}
+                      </td>
                       <td className="px-2 py-2 text-zinc-300">{r.propertyTitle || '—'}</td>
                       <td className="px-2 py-2 text-zinc-300">{r.city || '—'}</td>
                       <td className="px-2 py-2 text-right">
