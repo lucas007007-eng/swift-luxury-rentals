@@ -233,6 +233,48 @@ export default function CRM2Page() {
     load()
   }, [drawerLead])
 
+  // Load renewals when tab open or window changes
+  useEffect(() => {
+    const run = async () => {
+      if (activeTab !== 'renewals') return
+      try {
+        const r = await fetch(`/api/crm2/renewals?days=${renewalDays}`, { cache: 'no-store' })
+        const j = await r.json()
+        if (j.ok) setRenewals(j.data || [])
+      } catch {}
+    }
+    run()
+  }, [activeTab, renewalDays])
+
+  async function createRenewalReminder(row: any) {
+    try {
+      // Try to find an existing lead by email
+      const email = (row.userEmail || '').toLowerCase()
+      let lead = leads.find(l => (l.email || '').toLowerCase() === email)
+      if (!lead) {
+        const res = await fetch('/api/crm2/leads', { method: 'POST', body: JSON.stringify({
+          name: row.userName || 'Client',
+          email: row.userEmail || '',
+          city: row.city || '',
+          stage: 'qualified'
+        }) })
+        const j = await res.json(); if (j.ok) { lead = j.data; setLeads(prev=> [j.data, ...prev]) }
+      }
+      if (!lead) return alert('Could not create/find lead')
+      // Reminder 14 days before checkout (or tomorrow if already past)
+      const checkoutTs = row.checkout ? new Date(row.checkout).getTime() : Date.now()
+      const dueTs = Math.max(Date.now() + 24*60*60*1000, checkoutTs - 14*24*60*60*1000)
+      const res2 = await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({
+        leadId: lead.id,
+        type: 'renewal',
+        content: `Renewal follow-up for ${row.propertyTitle || 'property'}`,
+        dueAt: new Date(dueTs).toISOString()
+      }) })
+      const j2 = await res2.json(); if (j2.ok) setActivities(prev=> [j2.data, ...prev])
+      alert('Reminder created')
+    } catch { alert('Failed to create reminder') }
+  }
+
   return (
     <main className="min-h-screen bg-black text-white">
       <Header forceBackground={true} />
@@ -290,12 +332,25 @@ export default function CRM2Page() {
           </div>
         </div>
 
+        {/* Tabs */}
+        <div className="mb-4 flex items-center gap-3">
+          <button onClick={()=> setActiveTab('board')} className={`px-3 py-2 text-sm rounded-lg border ${activeTab==='board' ? 'border-zinc-400/40 bg-zinc-800/40 text-white' : 'border-zinc-600/40 text-zinc-300 hover:border-zinc-500/50'}`}>Board</button>
+          <button onClick={()=> setActiveTab('renewals')} className={`px-3 py-2 text-sm rounded-lg border ${activeTab==='renewals' ? 'border-zinc-400/40 bg-zinc-800/40 text-white' : 'border-zinc-600/40 text-zinc-300 hover:border-zinc-500/50'}`}>Renewals</button>
+          {activeTab==='renewals' && (
+            <div className="ml-auto flex items-center gap-2">
+              {[30,45,60].map(d=> (
+                <button key={d} onClick={()=> setRenewalDays(d)} className={`px-2 py-1 text-xs rounded border ${renewalDays===d ? 'border-zinc-300/60 text-white' : 'border-zinc-600/40 text-zinc-300 hover:border-zinc-500/50'}`}>{d}d</button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Content */}
         {loading ? (
           <div className="luxury-feature-card p-8">Loading…</div>
         ) : error ? (
           <div className="luxury-feature-card p-8 text-red-300">Failed to load: {error}</div>
-        ) : (
+        ) : activeTab==='board' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {STAGES.map(stage => (
               <div
@@ -337,6 +392,39 @@ export default function CRM2Page() {
                 </div>
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="luxury-feature-card p-4">
+            <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Renewals in next {renewalDays} days</div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-zinc-300">
+                    <th className="px-2 py-2">Checkout</th>
+                    <th className="px-2 py-2">Client</th>
+                    <th className="px-2 py-2">Property</th>
+                    <th className="px-2 py-2">City</th>
+                    <th className="px-2 py-2 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {renewals.map((r:any)=> (
+                    <tr key={r.id} className="border-t border-zinc-700/40">
+                      <td className="px-2 py-2 text-zinc-200">{r.checkout ? new Date(r.checkout).toLocaleDateString() : ''}</td>
+                      <td className="px-2 py-2 text-zinc-300">{r.userName || r.userEmail || '—'}</td>
+                      <td className="px-2 py-2 text-zinc-300">{r.propertyTitle || '—'}</td>
+                      <td className="px-2 py-2 text-zinc-300">{r.city || '—'}</td>
+                      <td className="px-2 py-2 text-right">
+                        <button className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white" onClick={()=> createRenewalReminder(r)}>Create Reminder</button>
+                      </td>
+                    </tr>
+                  ))}
+                  {renewals.length===0 && (
+                    <tr><td colSpan={5} className="px-2 py-6 text-center text-zinc-400">No renewals found</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
