@@ -197,7 +197,20 @@ export default function CRM2Page() {
       const ts = l.createdAt ? new Date(l.createdAt).getTime() : 0
       return ts >= weekAgo
     }).length
-    return { total, offers, signed, newWeek }
+    // SLA breaches and due soon (within next 24h)
+    let breaches = 0
+    let dueSoon = 0
+    for (const l of leads) {
+      const slaDays = STAGE_SLA_DAYS[l.stage] ?? 0
+      if (!slaDays) continue
+      const lastStageTs = (l as any).stageHistory?.[0]?.changedAt ? new Date((l as any).stageHistory[0].changedAt).getTime() : (l.updatedAt ? new Date(l.updatedAt).getTime() : 0)
+      if (!lastStageTs) continue
+      const ageMs = Date.now() - lastStageTs
+      const slaMs = slaDays*24*60*60*1000
+      if (ageMs > slaMs) breaches++
+      else if (ageMs > slaMs - 24*60*60*1000) dueSoon++
+    }
+    return { total, offers, signed, newWeek, breaches, dueSoon }
   }, [leads])
 
   const createLead = async () => {
@@ -346,6 +359,14 @@ export default function CRM2Page() {
                 <div className="text-xs text-zinc-300">Signed</div>
                 <div className="text-2xl font-bold text-white">{kpis.signed}</div>
               </div>
+              <div className="luxury-feature-card p-3 text-center md:col-span-2">
+                <div className="text-xs text-zinc-300">SLA Breaches</div>
+                <div className="text-2xl font-bold text-white">{kpis.breaches}</div>
+              </div>
+              <div className="luxury-feature-card p-3 text-center md:col-span-2">
+                <div className="text-xs text-zinc-300">SLA Due (24h)</div>
+                <div className="text-2xl font-bold text-white">{kpis.dueSoon}</div>
+              </div>
             </div>
           </div>
           <div className="luxury-feature-card p-8">
@@ -429,6 +450,7 @@ export default function CRM2Page() {
                       draggable
                       onDragStart={()=> setDragId(l.id)}
                       className="w-full text-left rounded-lg border border-zinc-600/40 bg-black/30 p-3 hover:border-zinc-400/60 transition-colors"
+                      title={`Stage changed ${((l as any).stageHistory?.[0]?.changedAt ? new Date((l as any).stageHistory[0].changedAt) : (l.updatedAt ? new Date(l.updatedAt) : null))?.toLocaleString() || ''}`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="text-white font-semibold font-sora truncate">{l.name}</div>
