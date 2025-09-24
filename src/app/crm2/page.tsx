@@ -627,7 +627,7 @@ export default function CRM2Page() {
                         <div className="text-zinc-400 text-xs whitespace-nowrap">{a.dueAt ? new Date(a.dueAt).toLocaleDateString() : ''}</div>
                         {!a.completedAt && (
                           <>
-                            <button className="px-2 py-1 text-[10px] rounded border border-zinc-400/30 text-white" onClick={async()=>{ await fetch('/api/crm2/activities',{ method:'PATCH', body: JSON.stringify({ id: a.id, snoozeDays: 1 }) }); setActivities(prev=> prev.map(x=> x.id===a.id ? { ...x, dueAt: new Date(Date.now()+24*60*60*1000).toISOString() } : x)) }}>Snooze 1d</button>
+                            <button className="px-2 py-1 text-[10px] rounded border border-zinc-400/30 text-white" onClick={async()=>{ await fetch('/api/crm2/activities',{ method:'PATCH', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ id: a.id, snoozeDays: 1 }) }); const newDue = new Date(Date.now()+24*60*60*1000).toISOString(); setActivities(prev=> prev.map(x=> x.id===a.id ? { ...x, dueAt: newDue } : x)); alert(`Snoozed to ${new Date(newDue).toLocaleDateString()}`) }}>Snooze 1d</button>
                             <button className="px-2 py-1 text-[10px] rounded border border-emerald-400/30 text-white" onClick={async()=>{ await fetch('/api/crm2/activities',{ method:'PATCH', body: JSON.stringify({ id: a.id, complete: true }) }); setActivities(prev=> prev.map(x=> x.id===a.id ? { ...x, completedAt: new Date().toISOString() } : x)) }}>Complete</button>
                           </>
                         )}
@@ -983,7 +983,7 @@ function InAppBell({ activities, onSnooze, onComplete }: { activities:any[]; onS
               <div key={a.id} className="flex items-center justify-between text-xs border border-zinc-700/40 rounded p-2">
                 <div className="text-zinc-300 truncate mr-2">{a.type}: {a.content}</div>
                 <div className="flex items-center gap-2">
-                  <button className="px-2 py-0.5 rounded border border-zinc-400/30 text-white" onClick={()=> onSnooze(a.id)}>Snooze</button>
+                  <button className="px-2 py-0.5 rounded border border-zinc-400/30 text-white" onClick={async()=>{ await onSnooze(a.id); alert('Snoozed 1 day') }}>Snooze</button>
                   <button className="px-2 py-0.5 rounded border border-emerald-400/30 text-white" onClick={()=> onComplete(a.id)}>Done</button>
                 </div>
               </div>
