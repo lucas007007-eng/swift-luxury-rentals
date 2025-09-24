@@ -60,6 +60,10 @@ export default function CRM2Page() {
   const [filterStage, setFilterStage] = useState<string>('all')
   const [filterCity, setFilterCity] = useState<string>('')
   const [filterText, setFilterText] = useState<string>('')
+  const [activeTab, setActiveTab] = useState<'board'|'renewals'>('board')
+  const [renewalDays, setRenewalDays] = useState<number>(45)
+  const [renewals, setRenewals] = useState<any[]>([])
+  const bcRef = React.useRef<any>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -102,7 +106,24 @@ export default function CRM2Page() {
       } catch {}
     }
     es.onerror = () => { /* let browser auto-reconnect */ }
-    return () => { es.close() }
+    // Local BroadcastChannel for instant cross-tab updates
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      // @ts-ignore
+      bcRef.current = new window.BroadcastChannel('crm2')
+      bcRef.current.onmessage = (ev: any) => {
+        const msg = ev.data
+        if (!msg) return
+        if (msg.type === 'lead.updated' || msg.type === 'lead.created') {
+          const l = msg.data
+          setLeads(prev => {
+            const idx = prev.findIndex(x => x.id === l.id)
+            if (idx >= 0) { const copy = prev.slice(); copy[idx] = { ...prev[idx], ...l }; return copy }
+            return [l, ...prev]
+          })
+        }
+      }
+    }
+    return () => { try { es.close() } catch {}; try { bcRef.current?.close?.() } catch {} }
   }, [])
 
   // Handle saved view filters via URL
@@ -175,6 +196,7 @@ export default function CRM2Page() {
       const json = await res.json()
       if (json.ok) {
         setLeads(prev => [json.data, ...prev.filter(x => x.id !== temp.id)])
+        try { bcRef.current?.postMessage({ type:'lead.created', data: json.data }) } catch {}
       } else {
         setLeads(prev => prev.filter(x => x.id !== temp.id))
         alert('Failed to create lead')
@@ -288,6 +310,7 @@ export default function CRM2Page() {
                   // optimistic stage move
                   setLeads(prev=> prev.map(x=> x.id===id ? { ...x, stage } : x))
                   try { await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id, stage }) }) } catch {}
+                  try { bcRef.current?.postMessage({ type:'lead.updated', data: { id, stage } }) } catch {}
                 }}
               >
                 <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">{stage}</div>
@@ -380,6 +403,7 @@ export default function CRM2Page() {
                 setDrawerLead(prev=> prev ? { ...prev, stage } : prev)
                 setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, stage } : x))
                 try { await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, stage }) }) } catch {}
+                try { bcRef.current?.postMessage({ type:'lead.updated', data: { id: drawerLead.id, stage } }) } catch {}
               }}>
                 {STAGES.map(s=> <option key={s} value={s} className="bg-black">{s}</option>)}
               </select>
