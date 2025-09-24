@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
@@ -52,6 +53,8 @@ export default function CRM2Page() {
   const [calCursor, setCalCursor] = useState<Date>(new Date()) // month cursor
   const calBtnRef = React.useRef<HTMLButtonElement | null>(null)
   const [calPos, setCalPos] = useState<{ left: number; top: number } | null>(null)
+  const [mounted, setMounted] = useState(false)
+  useEffect(()=>{ setMounted(true) }, [])
   const [companies, setCompanies] = useState<any[]>([])
   const [newCompany, setNewCompany] = useState<{ name: string; domain?: string }>({ name: '' })
   const [filterStage, setFilterStage] = useState<string>('all')
@@ -470,7 +473,7 @@ export default function CRM2Page() {
                   >
                     {quoteStart ? new Date(quoteStart).toLocaleDateString('en-GB') : 'Check in'}
                   </button>
-                  {calOpen && calPos && (
+                  {calOpen && calPos && mounted && createPortal((
                     <>
                       <div className="fixed inset-0 z-[999]" onClick={()=> setCalOpen(false)} />
                       <div className="fixed z-[1000] w-64 rounded-xl border border-zinc-600/40 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_10px_30px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] p-3" style={{ left: calPos.left, top: calPos.top }}>
@@ -502,8 +505,7 @@ export default function CRM2Page() {
                         })()}
                       </div>
                       </div>
-                    </>
-                  )}
+                    </>), document.body)}
                 </div>
                 <input id="qb_term" type="number" placeholder="Term (months)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_rate" type="number" placeholder="Monthly rate (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
