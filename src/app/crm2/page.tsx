@@ -394,14 +394,40 @@ export default function CRM2Page() {
             <div className="luxury-feature-card p-4 mt-6">
               <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Create Quote</div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input id="qb_property" placeholder="Property extId" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
-                <input id="qb_city" placeholder="City" defaultValue={drawerLead.city||''} className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <select id="qb_city" defaultValue={drawerLead.city||''} className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-3 py-2 text-sm text-white"></select>
+                <select id="qb_property" className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-3 py-2 text-sm text-white">
+                  <option value="">Select property</option>
+                </select>
                 <input id="qb_start" type="date" defaultValue={new Date().toISOString().slice(0,10)} className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_term" type="number" placeholder="Term (months)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_rate" type="number" placeholder="Monthly rate (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_deposit" type="number" placeholder="Deposit (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_movein" type="number" placeholder="Move-in fee (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
               </div>
+              <script suppressHydrationWarning dangerouslySetInnerHTML={{__html: `
+                (function(){
+                  async function loadCities(){
+                    try{ const r=await fetch('/api/crm2/options/cities',{cache:'no-store'}); const j=await r.json(); if(j.ok){
+                      var sel=document.getElementById('qb_city'); if(!sel) return; sel.innerHTML='';
+                      var opt=document.createElement('option'); opt.value=''; opt.textContent='Select city'; sel.appendChild(opt);
+                      (j.data||[]).forEach(function(c){ var o=document.createElement('option'); o.value=c.name; o.textContent=c.name; sel.appendChild(o); });
+                    }}catch(e){}
+                  }
+                  async function loadProps(city){
+                    try{ const r=await fetch('/api/crm2/options/properties?city='+encodeURIComponent(city||''),{cache:'no-store'}); const j=await r.json(); if(j.ok){
+                      var sel=document.getElementById('qb_property'); if(!sel) return; sel.innerHTML='';
+                      var opt=document.createElement('option'); opt.value=''; opt.textContent='Select property'; sel.appendChild(opt);
+                      (j.data||[]).forEach(function(p){ var o=document.createElement('option'); o.value=p.extId; o.textContent=p.title+' ('+(p.extId||p.id)+')'; sel.appendChild(o); });
+                    }}catch(e){}
+                  }
+                  document.addEventListener('DOMContentLoaded', function(){
+                    var citySel=document.getElementById('qb_city'); if(citySel){
+                      loadCities().then(function(){ if(citySel.value){ loadProps(citySel.value); } });
+                      citySel.addEventListener('change', function(){ loadProps(citySel.value); });
+                    }
+                  });
+                })();
+              `}} />
               <div className="flex items-center justify-end mt-3">
                 <button
                   className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all"
