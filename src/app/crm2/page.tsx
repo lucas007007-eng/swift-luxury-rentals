@@ -81,6 +81,7 @@ export default function CRM2Page() {
   const [activeTab, setActiveTab] = useState<'board'|'renewals'>('board')
   const [renewalDays, setRenewalDays] = useState<number>(45)
   const [renewals, setRenewals] = useState<any[]>([])
+  const [owners, setOwners] = useState<string[]>([])
   const bcRef = React.useRef<any>(null)
 
   useEffect(() => {
@@ -149,6 +150,8 @@ export default function CRM2Page() {
     if (typeof window === 'undefined') return
     const sp = new URL(window.location.href).searchParams
     const view = sp.get('view')
+    // Load owners list
+    fetch('/api/crm2/owners').then(r=> r.json()).then(j=> { if (j.ok) setOwners((j.data||[]).map((o:any)=> o.email)) }).catch(()=>{})
     const accept = sp.get('accept')
     if (accept==='ok') {
       alert('Quote accepted. Lead advanced to Signed.')
@@ -354,7 +357,7 @@ export default function CRM2Page() {
               <select value={filterOwner} onChange={e=>setFilterOwner(e.target.value)} className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora">
                 <option className="bg-black" value="">All Owners</option>
                 <option className="bg-black" value="unassigned">Unassigned</option>
-                {TEAM_OWNERS.map(o=> <option className="bg-black" key={o} value={o}>{o}</option>)}
+                {(owners.length? owners: TEAM_OWNERS).map(o=> <option className="bg-black" key={o} value={o}>{o}</option>)}
               </select>
               <input value={filterText} onChange={e=>setFilterText(e.target.value)} placeholder="Search name/email/company" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora md:col-span-2" />
             </div>
@@ -451,6 +454,10 @@ export default function CRM2Page() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-zinc-300">
+                    <th className="px-2 py-2"><input type="checkbox" onChange={(e)=>{
+                      const checked = e.target.checked
+                      setRenewals(prev=> prev.map((r:any)=> ({ ...r, __sel: checked })))
+                    }} /></th>
                     <th className="px-2 py-2">Checkout</th>
                     <th className="px-2 py-2">Client</th>
                     <th className="px-2 py-2">Property</th>
@@ -461,6 +468,7 @@ export default function CRM2Page() {
                 <tbody>
                   {renewals.map((r:any)=> (
                     <tr key={r.id} className="border-t border-zinc-700/40">
+                      <td className="px-2 py-2"><input type="checkbox" checked={!!r.__sel} onChange={(e)=> setRenewals(prev=> prev.map((x:any)=> x.id===r.id ? { ...x, __sel: e.target.checked } : x))} /></td>
                       <td className="px-2 py-2 text-zinc-200">{r.checkout ? new Date(r.checkout).toLocaleDateString() : ''}</td>
                       <td className="px-2 py-2 text-zinc-300">{r.userName || r.userEmail || '—'}</td>
                       <td className="px-2 py-2 text-zinc-300">{r.propertyTitle || '—'}</td>
@@ -475,6 +483,13 @@ export default function CRM2Page() {
                   )}
                 </tbody>
               </table>
+              <div className="mt-3 flex items-center justify-end">
+                <button className="px-3 py-2 text-xs rounded border border-emerald-400/30 text-white" onClick={async()=>{
+                  const selected = renewals.filter((r:any)=> r.__sel)
+                  if (!selected.length) { alert('Select rows first'); return }
+                  for (const r of selected) { await createRenewalReminder(r) }
+                }}>Create Reminders for Selected</button>
+              </div>
             </div>
           </div>
         )}
@@ -549,7 +564,7 @@ export default function CRM2Page() {
                 <div className="grid grid-cols-3 gap-2">
                   <select className="col-span-2 bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.owner||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, owner: e.target.value } : prev)}>
                     <option className="bg-black" value="">Unassigned</option>
-                    {TEAM_OWNERS.map(o=> <option className="bg-black" key={o} value={o}>{o}</option>)}
+                    {(owners.length? owners: TEAM_OWNERS).map(o=> <option className="bg-black" key={o} value={o}>{o}</option>)}
                   </select>
                   <button className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white" onClick={async()=>{ const v = drawerLead.owner||''; setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, owner: v } : x)); try{ await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, owner: v }) }) } catch{} }}>Save Owner</button>
                 </div>

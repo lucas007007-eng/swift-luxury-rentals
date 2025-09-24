@@ -239,3 +239,11 @@ model Activity {
   @@index([dueAt])
   @@index([completedAt])
 }
+
+// CRM2: Team owners (for assignment)
+model Owner {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+}
