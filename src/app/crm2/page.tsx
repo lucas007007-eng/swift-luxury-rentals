@@ -50,6 +50,8 @@ export default function CRM2Page() {
   const [quoteStart, setQuoteStart] = useState<string>('') // yyyy-mm-dd
   const [calOpen, setCalOpen] = useState<boolean>(false)
   const [calCursor, setCalCursor] = useState<Date>(new Date()) // month cursor
+  const calBtnRef = React.useRef<HTMLButtonElement | null>(null)
+  const [calPos, setCalPos] = useState<{ left: number; top: number } | null>(null)
   const [companies, setCompanies] = useState<any[]>([])
   const [newCompany, setNewCompany] = useState<{ name: string; domain?: string }>({ name: '' })
   const [filterStage, setFilterStage] = useState<string>('all')
@@ -455,13 +457,23 @@ export default function CRM2Page() {
                 <div className="relative">
                   <button
                     type="button"
-                    onClick={()=> setCalOpen(v=> !v)}
+                    ref={calBtnRef}
+                    onClick={()=> {
+                      const next = !calOpen
+                      setCalOpen(next)
+                      if (next && calBtnRef.current) {
+                        const r = calBtnRef.current.getBoundingClientRect()
+                        setCalPos({ left: r.left, top: r.bottom + 8 })
+                      }
+                    }}
                     className="w-full text-left bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white hover:border-zinc-400/60"
                   >
                     {quoteStart ? new Date(quoteStart).toLocaleDateString('en-GB') : 'Check in'}
                   </button>
-                  {calOpen && (
-                    <div className="absolute z-50 mt-2 w-64 rounded-xl border border-zinc-600/40 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_10px_30px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] p-3">
+                  {calOpen && calPos && (
+                    <>
+                      <div className="fixed inset-0 z-[999]" onClick={()=> setCalOpen(false)} />
+                      <div className="fixed z-[1000] w-64 rounded-xl border border-zinc-600/40 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_10px_30px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.08)] p-3" style={{ left: calPos.left, top: calPos.top }}>
                       <div className="flex items-center justify-between mb-2">
                         <button className="px-2 py-1 text-xs rounded border border-zinc-500/40 text-white" onClick={()=> setCalCursor(new Date(calCursor.getFullYear(), calCursor.getMonth()-1, 1))}>{'<'}</button>
                         <div className="text-white text-sm font-semibold">{calCursor.toLocaleString('en-US',{ month:'long', year:'numeric'})}</div>
@@ -489,7 +501,8 @@ export default function CRM2Page() {
                           return cells
                         })()}
                       </div>
-                    </div>
+                      </div>
+                    </>
                   )}
                 </div>
                 <input id="qb_term" type="number" placeholder="Term (months)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
