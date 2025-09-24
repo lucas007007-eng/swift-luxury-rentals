@@ -31,6 +31,17 @@ const STAGES = [
   'signed'
 ] as const
 
+const STAGE_SLA_DAYS: Record<string, number> = {
+  new: 2,
+  qualified: 5,
+  viewing: 7,
+  application: 3,
+  screening: 3,
+  offer: 5,
+  lease: 3,
+  signed: 0,
+}
+
 export default function CRM2Page() {
   const [leads, setLeads] = useState<Lead[]>([])
   const [loading, setLoading] = useState(true)
@@ -60,6 +71,7 @@ export default function CRM2Page() {
   const [filterStage, setFilterStage] = useState<string>('all')
   const [filterCity, setFilterCity] = useState<string>('')
   const [filterText, setFilterText] = useState<string>('')
+  const [filterOwner, setFilterOwner] = useState<string>('')
   const [activeTab, setActiveTab] = useState<'board'|'renewals'>('board')
   const [renewalDays, setRenewalDays] = useState<number>(45)
   const [renewals, setRenewals] = useState<any[]>([])
@@ -147,9 +159,10 @@ export default function CRM2Page() {
     return leads.filter(l =>
       (filterStage === 'all' || l.stage === filterStage) &&
       (!filterCity || (l.city || '').toLowerCase().includes(filterCity.toLowerCase())) &&
-      (!filterText || [l.name, l.email, l.phone, l.company, l.city].some(v => (v||'').toLowerCase().includes(filterText.toLowerCase())))
+      (!filterOwner || (l.owner || '').toLowerCase().includes(filterOwner.toLowerCase())) &&
+      (!filterText || [l.name, l.email, l.phone, l.company, l.city, l.owner].some(v => (v||'').toLowerCase().includes(filterText.toLowerCase())))
     )
-  }, [leads, filterStage, filterCity, filterText])
+  }, [leads, filterStage, filterCity, filterOwner, filterText])
 
   const grouped = useMemo(() => {
     const map: Record<string, Lead[]> = {}
@@ -322,12 +335,13 @@ export default function CRM2Page() {
           </div>
           <div className="luxury-feature-card p-8">
             <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 mb-3">Filters & Actions</div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
               <select value={filterStage} onChange={e=>setFilterStage(e.target.value)} className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded-lg px-3 py-2 text-sm text-white font-sora">
                 <option className="bg-black" value="all">All Stages</option>
                 {STAGES.map(s=> <option className="bg-black" key={s} value={s}>{s}</option>)}
               </select>
               <input value={filterCity} onChange={e=>setFilterCity(e.target.value)} placeholder="City" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" />
+              <input value={filterOwner} onChange={e=>setFilterOwner(e.target.value)} placeholder="Owner" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" />
               <input value={filterText} onChange={e=>setFilterText(e.target.value)} placeholder="Search name/email/company" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora md:col-span-2" />
             </div>
             <div className="mt-4 flex items-center justify-end">
@@ -396,6 +410,17 @@ export default function CRM2Page() {
                       <div className="text-xs text-zinc-400 mt-1 flex items-center justify-between">
                         <span>{l.city || '—'}</span>
                         <span className="text-white">{(Number(l.budgetCents||0)/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>
+                      </div>
+                      <div className="mt-1 flex items-center justify-between">
+                        <span className="text-[10px] text-zinc-400">Owner: {l.owner || 'Unassigned'}</span>
+                        {(() => {
+                          const sla = STAGE_SLA_DAYS[l.stage] ?? 0
+                          const updatedAt = l.updatedAt ? new Date(l.updatedAt).getTime() : 0
+                          const ageDays = updatedAt ? Math.floor((Date.now() - updatedAt)/(24*60*60*1000)) : 0
+                          if (sla>0 && ageDays>sla) return <span className="px-2 py-0.5 text-[10px] rounded border border-red-400/40 text-red-300">SLA {ageDays - sla}d overdue</span>
+                          if (sla>0 && ageDays===sla) return <span className="px-2 py-0.5 text-[10px] rounded border border-amber-400/40 text-amber-300">SLA due</span>
+                          return null
+                        })()}
                       </div>
                     </button>
                   ))}
@@ -495,7 +520,7 @@ export default function CRM2Page() {
             </div>
 
             {/* Edit basics */}
-            <div className="grid grid-cols-1 gap-3 mb-6">
+              <div className="grid grid-cols-1 gap-3 mb-6">
               <select className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.stage} onChange={async e=>{
                 const stage = e.target.value
                 setDrawerLead(prev=> prev ? { ...prev, stage } : prev)
@@ -505,6 +530,10 @@ export default function CRM2Page() {
               }}>
                 {STAGES.map(s=> <option key={s} value={s} className="bg-black">{s}</option>)}
               </select>
+                <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.owner||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, owner: e.target.value } : prev)} placeholder="Owner email" />
+                <div className="flex items-center justify-end">
+                  <button className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white mr-2" onClick={async()=>{ const v = prompt('Assign owner (email):', drawerLead.owner||''); if (v!==null){ setDrawerLead(prev=> prev ? { ...prev, owner: v } : prev); setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, owner: v } : x)); try{ await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, owner: v }) }) } catch{} }} }>Assign</button>
+                </div>
               <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.name||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, name: e.target.value } : prev)} placeholder="Name" />
               <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.email||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, email: e.target.value } : prev)} placeholder="Email" />
               <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.phone||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, phone: e.target.value } : prev)} placeholder="Phone" />
@@ -749,8 +778,21 @@ export default function CRM2Page() {
                       >Edit Quote</button>
                       <a
                         className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
-                        href={`mailto:${(drawerLead.email||'').trim()}?subject=${encodeURIComponent('Quote from Swift Luxury')}&body=${encodeURIComponent(`Hello ${drawerLead.name},%0D%0A%0D%0AHere is your quote:%0D%0A• City: ${q.city||'—'}%0D%0A• Term: ${q.termMonths||1} months%0D%0A• Monthly: €${rate}%0D%0A• Deposit: €${dep}%0D%0A• Move-in: €${mv}%0D%0A• Property: ${q.propertyExtId}%0D%0A%0D%0ABest regards,%0D%0ASwift Luxury`)}`}
-                        target="_blank" rel="noopener noreferrer">Email Quote</a>
+                        href="#"
+                        onClick={async (e)=>{ e.preventDefault(); try {
+                          await fetch('/api/crm2/quotes/send', { method:'POST', body: JSON.stringify({
+                            to: (drawerLead.email||'').trim(),
+                            leadId: drawerLead.id,
+                            dealId: q.id,
+                            city: q.city,
+                            termMonths: q.termMonths,
+                            monthlyRateCents: q.monthlyRateCents,
+                            depositCents: q.depositCents,
+                            moveInFeeCents: q.moveInFeeCents
+                          }) })
+                          alert('Quote email sent (or logged in dry-run)')
+                        } catch { alert('Failed to send email') } }}
+                      >Email Quote</a>
                       <button
                         className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
                         onClick={async ()=>{
