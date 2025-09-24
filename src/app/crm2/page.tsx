@@ -78,6 +78,7 @@ export default function CRM2Page() {
   const [filterCity, setFilterCity] = useState<string>('')
   const [filterText, setFilterText] = useState<string>('')
   const [filterOwner, setFilterOwner] = useState<string>('')
+  const [filterSLA, setFilterSLA] = useState<'all'|'breach'|'due'>('all')
   const [activeTab, setActiveTab] = useState<'board'|'renewals'>('board')
   const [renewalDays, setRenewalDays] = useState<number>(45)
   const [renewals, setRenewals] = useState<any[]>([])
@@ -171,13 +172,23 @@ export default function CRM2Page() {
   }, [])
 
   const filteredLeads = useMemo(() => {
+    const isBreachOrDue = (l: any) => {
+      const slaDays = STAGE_SLA_DAYS[l.stage] ?? 0
+      if (!slaDays) return { breach:false, due:false }
+      const lastStageTs = l.stageHistory?.[0]?.changedAt ? new Date(l.stageHistory[0].changedAt).getTime() : (l.updatedAt ? new Date(l.updatedAt).getTime() : 0)
+      if (!lastStageTs) return { breach:false, due:false }
+      const ageMs = Date.now() - lastStageTs
+      const slaMs = slaDays*24*60*60*1000
+      return { breach: ageMs > slaMs, due: ageMs > slaMs - 24*60*60*1000 && ageMs <= slaMs }
+    }
     return leads.filter(l =>
       (filterStage === 'all' || l.stage === filterStage) &&
       (!filterCity || (l.city || '').toLowerCase().includes(filterCity.toLowerCase())) &&
       (!filterOwner || (l.owner || '').toLowerCase().includes(filterOwner.toLowerCase())) &&
-      (!filterText || [l.name, l.email, l.phone, l.company, l.city, l.owner].some(v => (v||'').toLowerCase().includes(filterText.toLowerCase())))
+      (!filterText || [l.name, l.email, l.phone, l.company, l.city, l.owner].some(v => (v||'').toLowerCase().includes(filterText.toLowerCase()))) &&
+      ((() => { const s = isBreachOrDue(l); if (filterSLA==='breach') return s.breach; if (filterSLA==='due') return s.due; return true })())
     )
-  }, [leads, filterStage, filterCity, filterOwner, filterText])
+  }, [leads, filterStage, filterCity, filterOwner, filterText, filterSLA])
 
   const grouped = useMemo(() => {
     const map: Record<string, Lead[]> = {}
@@ -371,7 +382,7 @@ export default function CRM2Page() {
           </div>
           <div className="luxury-feature-card p-8">
             <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 mb-3">Filters & Actions</div>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
               <select value={filterStage} onChange={e=>setFilterStage(e.target.value)} className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded-lg px-3 py-2 text-sm text-white font-sora">
                 <option className="bg-black" value="all">All Stages</option>
                 {STAGES.map(s=> <option className="bg-black" key={s} value={s}>{s}</option>)}
@@ -383,6 +394,11 @@ export default function CRM2Page() {
                 {(owners.length? owners: TEAM_OWNERS).map(o=> <option className="bg-black" key={o} value={o}>{o}</option>)}
               </select>
               <input value={filterText} onChange={e=>setFilterText(e.target.value)} placeholder="Search name/email/company" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora md:col-span-2" />
+              <select value={filterSLA} onChange={e=> setFilterSLA(e.target.value as any)} className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora">
+                <option className="bg-black" value="all">All SLA</option>
+                <option className="bg-black" value="breach">Breaches</option>
+                <option className="bg-black" value="due">Due (24h)</option>
+              </select>
             </div>
             <div className="mt-4 flex items-center justify-end">
               <button onClick={()=>setNewLeadOpen(true)} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all">New Lead</button>
