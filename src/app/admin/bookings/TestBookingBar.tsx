@@ -9,6 +9,7 @@ type Props = {}
 export default function TestBookingBar(_: Props) {
   const cityNames = Object.keys(cityProperties)
   const [name, setName] = useState<string>('John Lenon')
+  const [email, setEmail] = useState<string>('')
   const [city, setCity] = useState<string>(cityNames[0] || 'Berlin')
   const properties = useMemo(() => (cityProperties as any)[city] || [], [city])
   const [propertyId, setPropertyId] = useState<string>(properties[0]?.id || '')
@@ -27,7 +28,7 @@ export default function TestBookingBar(_: Props) {
       const res = await fetch('/api/admin/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ propertyId, checkIn, checkOut, name, email: `${name.toLowerCase().replace(/\s+/g,'.')}@example.com` })
+        body: JSON.stringify({ propertyId, checkIn, checkOut, name, email: (email || `${name.toLowerCase().replace(/\s+/g,'.')}@example.com`) })
       })
       if (res.ok) { window.location.href = '/admin/bookings' }
       else { const t = await res.text(); alert('Failed to create test booking. ' + t) }
@@ -123,8 +124,9 @@ export default function TestBookingBar(_: Props) {
 
   return (
     <div className="mt-3">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-center">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 items-center">
         <input className="bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] focus:border-emerald-400/50 focus:outline-none transition-all" value={name} onChange={e=>setName(e.target.value)} placeholder="Name" />
+        <input className="bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] focus:border-emerald-400/50 focus:outline-none transition-all" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email (optional)" />
         <select className="bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-[rgba(192,192,192,0.35)] rounded-lg px-3 py-2 text-sm text-white font-sora shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] focus:border-emerald-400/50 focus:outline-none transition-all" value={city} onChange={e=>{ setCity(e.target.value); const list=(cityProperties as any)[e.target.value]||[]; setPropertyId(list[0]?.id||'') }}>
           {cityNames.map(c => <option key={c} value={c} className="bg-black text-white">{c}</option>)}
         </select>
