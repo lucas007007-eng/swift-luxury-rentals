@@ -78,10 +78,11 @@ export async function POST(req: Request) {
     y -= 34
 
     // Notes pane
-    page.drawRectangle({ x: 40, y: 420, width: page.getWidth()-80, height: 70, color: pane })
-    drawText('Notes', 48, 482, 12, bold, silver)
-    drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, 466, 10, font, silverDim)
-    drawText('• Quote valid for 7 days unless otherwise stated.', 48, 452, 10, font, silverDim)
+    // Move notes further down to avoid overlapping the total line
+    page.drawRectangle({ x: 40, y: 340, width: page.getWidth()-80, height: 70, color: pane })
+    drawText('Notes', 48, 402, 12, bold, silver)
+    drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, 386, 10, font, silverDim)
+    drawText('• Quote valid for 7 days unless otherwise stated.', 48, 372, 10, font, silverDim)
 
     // Signature area
     const sigTop = 220
