@@ -419,12 +419,30 @@ export default function CRM2Page() {
             <div className="luxury-feature-card p-4">
               <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Activities</div>
               <div className="space-y-2">
-                {activities.filter(a=> a.leadId===drawerLead.id).map(a=> (
-                  <div key={a.id} className="flex items-center justify-between text-sm">
-                    <div className="text-zinc-300 truncate">{a.type}: {a.content}</div>
-                    <div className="text-zinc-400 text-xs whitespace-nowrap">{a.dueAt ? new Date(a.dueAt).toLocaleDateString() : ''}</div>
-                  </div>
-                ))}
+                {activities.filter(a=> a.leadId===drawerLead.id).map(a=> {
+                  const due = a.dueAt ? new Date(a.dueAt).getTime() : null
+                  const today = new Date(); today.setHours(0,0,0,0)
+                  const isOverdue = !!due && due < today.getTime() && !a.completedAt
+                  const isToday = !!due && due >= today.getTime() && due < today.getTime()+24*60*60*1000 && !a.completedAt
+                  return (
+                    <div key={a.id} className="flex items-center justify-between text-sm">
+                      <div className="text-zinc-300 truncate">
+                        {a.type}: {a.content}
+                        {isToday && <span className="ml-2 px-2 py-0.5 text-[10px] rounded border border-amber-400/40 text-amber-300">Due Today</span>}
+                        {isOverdue && <span className="ml-2 px-2 py-0.5 text-[10px] rounded border border-red-400/40 text-red-300">Overdue</span>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-zinc-400 text-xs whitespace-nowrap">{a.dueAt ? new Date(a.dueAt).toLocaleDateString() : ''}</div>
+                        {!a.completedAt && (
+                          <>
+                            <button className="px-2 py-1 text-[10px] rounded border border-zinc-400/30 text-white" onClick={async()=>{ await fetch('/api/crm2/activities',{ method:'PATCH', body: JSON.stringify({ id: a.id, snoozeDays: 1 }) }); setActivities(prev=> prev.map(x=> x.id===a.id ? { ...x, dueAt: new Date(Date.now()+24*60*60*1000).toISOString() } : x)) }}>Snooze 1d</button>
+                            <button className="px-2 py-1 text-[10px] rounded border border-emerald-400/30 text-white" onClick={async()=>{ await fetch('/api/crm2/activities',{ method:'PATCH', body: JSON.stringify({ id: a.id, complete: true }) }); setActivities(prev=> prev.map(x=> x.id===a.id ? { ...x, completedAt: new Date().toISOString() } : x)) }}>Complete</button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
               <AddActivity leadId={drawerLead.id} onAdd={(row)=> setActivities(prev=> [row, ...prev])} />
             </div>
@@ -675,6 +693,26 @@ export default function CRM2Page() {
                 </div>
               </div>
             )}
+
+            {/* Renewals Pipeline */}
+            <div className="luxury-feature-card p-4 mt-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="font-mono uppercase tracking-wider text-sm text-white">Renewals</div>
+                <div className="flex items-center gap-2">
+                  {[30,45,60].map(d=> (
+                    <button key={d} className="px-3 py-1 text-xs rounded border border-zinc-400/30 text-white" onClick={async()=>{
+                      try { const r=await fetch(`/api/crm2/renewals?days=${d}`); const j=await r.json(); if(j.ok){
+                        if (j.data && j.data.length) alert(`${j.data.length} bookings ending in ${d}d`); else alert(`No renewals in ${d}d window`)
+                      } } catch {}
+                    }}>{d}d</button>
+                  ))}
+                </div>
+              </div>
+              <button className="px-3 py-2 text-xs rounded border border-emerald-400/30 text-white" onClick={async()=>{
+                // quick create reminder activity for current lead
+                try { const due = new Date(Date.now()+45*24*60*60*1000).toISOString(); const r = await fetch('/api/crm2/activities',{ method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'renewal', content:'Follow up renewal', dueAt: due }) }); const j=await r.json(); if(j.ok) setActivities(prev=> [j.data, ...prev]) } catch {}
+              }}>Create 45d Reminder</button>
+            </div>
           </div>
         </div>
       )}

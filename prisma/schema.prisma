@@ -159,19 +159,20 @@ model TimerSession {
 
 // Minimal CRM2 lead persistence to enable saving leads in Postgres
 model Lead {
-  id           String    @id @default(cuid())
+  id           String     @id @default(cuid())
   name         String
   email        String?
   phone        String?
   company      String?
   city         String?
   budgetCents  Int?
-  stage        String    @default("new")
+  stage        String     @default("new")
   nextActionAt DateTime?
   owner        String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   Deal         Deal[]
+  Activity     Activity[]
 
   @@index([createdAt])
   @@index([stage])
@@ -220,4 +221,21 @@ model Deal {
 
   @@index([leadId])
   @@index([createdAt])
+}
+
+// CRM2: Activities with reminders
+model Activity {
+  id          String    @id @default(cuid())
+  leadId      String
+  lead        Lead      @relation(fields: [leadId], references: [id])
+  type        String    @default("note") // note|call|task|email|renewal
+  content     String
+  dueAt       DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([leadId])
+  @@index([dueAt])
+  @@index([completedAt])
 }
