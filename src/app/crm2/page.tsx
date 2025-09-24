@@ -82,7 +82,7 @@ export default function CRM2Page() {
   const [renewalDays, setRenewalDays] = useState<number>(45)
   const [renewals, setRenewals] = useState<any[]>([])
   const [renewalSearch, setRenewalSearch] = useState('')
-  const [renewalSort, setRenewalSort] = useState<'checkout'|'client'|'city'>('checkout')
+  const [renewalSort, setRenewalSort] = useState<'checkout'|'client'|'city'|'days'>('checkout')
   const [owners, setOwners] = useState<string[]>([])
   const bcRef = React.useRef<any>(null)
 
@@ -391,6 +391,7 @@ export default function CRM2Page() {
                 <option className="bg-black" value="checkout">Checkout</option>
                 <option className="bg-black" value="client">Client</option>
                 <option className="bg-black" value="city">City</option>
+                <option className="bg-black" value="days">Days to checkout</option>
               </select>
             </div>
           )}
@@ -483,12 +484,17 @@ export default function CRM2Page() {
                     .sort((a:any,b:any)=> {
                       if (renewalSort==='checkout') return new Date(a.checkout||0).getTime() - new Date(b.checkout||0).getTime()
                       if (renewalSort==='client') return String(a.userName||a.userEmail||'').localeCompare(String(b.userName||b.userEmail||''))
-                      return String(a.city||'').localeCompare(String(b.city||''))
+                      if (renewalSort==='city') return String(a.city||'').localeCompare(String(b.city||''))
+                      // days
+                      const today = new Date(); today.setHours(0,0,0,0)
+                      const da = Math.ceil((new Date(a.checkout||today).getTime() - today.getTime())/(24*60*60*1000))
+                      const db = Math.ceil((new Date(b.checkout||today).getTime() - today.getTime())/(24*60*60*1000))
+                      return da - db
                     })
                     .map((r:any)=> (
                     <tr key={r.id} className="border-t border-zinc-700/40">
                       <td className="px-2 py-2"><input type="checkbox" checked={!!r.__sel} onChange={(e)=> setRenewals(prev=> prev.map((x:any)=> x.id===r.id ? { ...x, __sel: e.target.checked } : x))} /></td>
-                      <td className="px-2 py-2 text-zinc-200">{r.checkout ? new Date(r.checkout).toLocaleDateString() : ''}</td>
+                      <td className="px-2 py-2 text-zinc-200">{r.checkout ? `${new Date(r.checkout).toLocaleDateString()} (${(()=>{ const t=new Date(); t.setHours(0,0,0,0); return Math.ceil((new Date(r.checkout).getTime()-t.getTime())/(24*60*60*1000))})()}d)` : ''}</td>
                       <td className="px-2 py-2 text-zinc-300 flex items-center gap-2">
                         <span>{r.userName || r.userEmail || '—'}</span>
                         {!r.userEmail && <button className="px-2 py-0.5 text-[10px] rounded border border-emerald-400/30 text-white" onClick={async()=>{
@@ -503,6 +509,21 @@ export default function CRM2Page() {
                       <td className="px-2 py-2 text-zinc-300">{r.propertyTitle || '—'}</td>
                       <td className="px-2 py-2 text-zinc-300">{r.city || '—'}</td>
                       <td className="px-2 py-2 text-right">
+                        {/* Inline Assign Lead (if lead exists by email) */}
+                        {(() => {
+                          const email = (r.userEmail||'').toLowerCase()
+                          const lead = leads.find(l => (l.email||'').toLowerCase()===email)
+                          if (!lead) return null
+                          return (
+                            <span className="inline-flex items-center gap-1 mr-2">
+                              <select className="bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-xs text-white" defaultValue={lead.owner||''} id={`assign-${r.id}`}>
+                                <option className="bg-black" value="">Unassigned</option>
+                                {(owners.length? owners: TEAM_OWNERS).map(o=> <option key={o} className="bg-black" value={o}>{o}</option>)}
+                              </select>
+                              <button className="px-2 py-1 text-[10px] rounded border border-zinc-400/30 text-white" onClick={async()=>{ const sel=(document.getElementById(`assign-${r.id}`) as HTMLSelectElement)?.value||''; try{ await fetch('/api/crm2/leads',{ method:'PATCH', body: JSON.stringify({ id: lead.id, owner: sel }) }); setLeads(prev=> prev.map(x=> x.id===lead.id ? { ...x, owner: sel } : x)); alert('Owner assigned'); }catch{ alert('Failed to assign') } }}>Assign</button>
+                            </span>
+                          )
+                        })()}
                         <button className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white" onClick={()=> createRenewalReminder(r)}>Create Reminder</button>
                       </td>
                     </tr>
