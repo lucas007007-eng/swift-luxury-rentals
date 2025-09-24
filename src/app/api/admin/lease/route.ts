@@ -19,8 +19,10 @@ export async function GET(req: Request) {
     try { if (fs.existsSync(publicPath)) bytes = fs.readFileSync(publicPath) } catch {}
     if (!bytes) { try { if (fs.existsSync(tmpPath)) bytes = fs.readFileSync(tmpPath) } catch {} }
     if (!bytes) return NextResponse.json({ message: 'Not found' }, { status: 404 })
-    const blob = new Blob([bytes], { type: 'application/pdf' })
-    return new Response(blob, { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${id}.pdf"` } })
+    // Convert Buffer -> Uint8Array for Response body (typed ArrayBufferView)
+    const view = new Uint8Array(bytes.byteLength)
+    view.set(bytes)
+    return new Response(view, { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${id}.pdf"` } })
   } catch (e: any) {
     return NextResponse.json({ message: 'Failed', error: String(e?.message || e) }, { status: 500 })
   }
