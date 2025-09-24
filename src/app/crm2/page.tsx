@@ -534,6 +534,21 @@ export default function CRM2Page() {
                           return null
                         })()}
                       </div>
+                      {(() => {
+                        const sla = STAGE_SLA_DAYS[l.stage] ?? 0
+                        if (!sla) return null
+                        const lastStageTs = (l as any).stageHistory?.[0]?.changedAt ? new Date((l as any).stageHistory[0].changedAt).getTime() : (l.updatedAt ? new Date(l.updatedAt).getTime() : 0)
+                        if (!lastStageTs) return null
+                        const ageMs = Date.now() - lastStageTs
+                        const slaMs = sla*24*60*60*1000
+                        const pct = Math.max(0, Math.min(100, Math.round((ageMs / slaMs) * 100)))
+                        const color = ageMs > slaMs ? 'bg-red-500/70' : (pct > 80 ? 'bg-amber-400/70' : 'bg-emerald-400/70')
+                        return (
+                          <div className="mt-1 h-1.5 bg-zinc-700/40 rounded" title={`SLA ${pct}% used`}>
+                            <div className={`h-full rounded ${color}`} style={{ width: `${pct}%` }} />
+                          </div>
+                        )
+                      })()}
                     </button>
                   ))}
                 </div>
