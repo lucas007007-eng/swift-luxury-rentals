@@ -99,7 +99,11 @@ export async function PATCH(req: Request) {
   try {
     const db = (prisma as any)
     if (db?.lead?.update) {
+      const before = await db.lead.findUnique({ where: { id } })
       const row = await db.lead.update({ where: { id }, data })
+      if (before && data.stage && before.stage !== data.stage) {
+        try { await db.leadStageHistory.create({ data: { leadId: id, fromStage: before.stage, toStage: data.stage } }) } catch {}
+      }
       try { publish({ type: 'lead.updated', data: row }) } catch {}
       return NextResponse.json({ ok: true, data: row })
     }

@@ -444,9 +444,10 @@ export default function CRM2Page() {
                         {(() => {
                           const sla = STAGE_SLA_DAYS[l.stage] ?? 0
                           const updatedAt = l.updatedAt ? new Date(l.updatedAt).getTime() : 0
-                          const ageDays = updatedAt ? Math.floor((Date.now() - updatedAt)/(24*60*60*1000)) : 0
-                          if (sla>0 && ageDays>sla) return <span className="px-2 py-0.5 text-[10px] rounded border border-red-400/40 text-red-300">SLA {ageDays - sla}d overdue</span>
-                          if (sla>0 && ageDays===sla) return <span className="px-2 py-0.5 text-[10px] rounded border border-amber-400/40 text-amber-300">SLA due</span>
+                          const ageHours = updatedAt ? Math.floor((Date.now() - updatedAt)/(60*60*1000)) : 0
+                          const slaHours = sla*24
+                          if (sla>0 && ageHours>slaHours) return <span className="px-2 py-0.5 text-[10px] rounded border border-red-400/40 text-red-300">SLA {ageHours - slaHours}h overdue</span>
+                          if (sla>0 && ageHours>=slaHours-1 && ageHours<slaHours) return <span className="px-2 py-0.5 text-[10px] rounded border border-amber-400/40 text-amber-300">SLA due</span>
                           return null
                         })()}
                       </div>
@@ -499,12 +500,13 @@ export default function CRM2Page() {
                         <span>{r.userName || r.userEmail || '—'}</span>
                         {!r.userEmail && <button className="px-2 py-0.5 text-[10px] rounded border border-emerald-400/30 text-white" onClick={async()=>{
                           const email = prompt('Email for new lead:') || ''
+                          const owner = prompt('Assign owner (optional, email):') || ''
                           if (!email) return
                           try {
-                            const res = await fetch('/api/crm2/leads', { method:'POST', body: JSON.stringify({ name: r.userName||'Client', email, city: r.city||'', stage:'qualified' }) })
-                            const j = await res.json(); if (j.ok) { setLeads(prev=> [j.data, ...prev]); alert('Lead created') }
+                            const res = await fetch('/api/crm2/leads', { method:'POST', body: JSON.stringify({ name: r.userName||'Client', email, city: r.city||'', stage:'qualified', owner }) })
+                            const j = await res.json(); if (j.ok) { setLeads(prev=> [j.data, ...prev]); alert('Lead created and assigned') }
                           } catch { alert('Failed to create lead') }
-                        }}>Create Lead</button>}
+                        }}>Create + Assign</button>}
                       </td>
                       <td className="px-2 py-2 text-zinc-300">{r.propertyTitle || '—'}</td>
                       <td className="px-2 py-2 text-zinc-300">{r.city || '—'}</td>
