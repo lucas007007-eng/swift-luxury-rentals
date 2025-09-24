@@ -114,6 +114,18 @@ export async function GET(req: NextRequest) {
       if (schedule.length > 0) {
         await prisma.payment.createMany({ data: schedule.map(it => ({ bookingId: booking.id, provider: 'offline', status: 'scheduled', purpose: 'monthly_rent', amountCents: Math.round((it.amount || 0) * 100), currency: 'EUR', dueAt: new Date(it.dueAt) })) })
       }
+    // Update lead budget (contract total) for CRM2 tile display
+    try {
+      const firstCents = Math.round((totals.firstPeriod || 0) * 100)
+      const moveInCents = Math.round((totals.moveInFee || 0) * 100)
+      const monthlyCents = schedule.reduce((s, it) => s + Math.round((it.amount || 0) * 100), 0)
+      const contractCents = firstCents + monthlyCents + moveInCents
+      const emailLower = (email || '').toLowerCase()
+      if (emailLower) {
+        const lead = await prisma.lead.findFirst({ where: { email: emailLower } }).catch(()=>null)
+        if (lead) { await prisma.lead.update({ where: { id: lead.id }, data: { budgetCents: contractCents } }) }
+      }
+    } catch {}
     } catch {}
 
     return NextResponse.json({ ok: true, booking })

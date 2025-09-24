@@ -143,6 +143,18 @@ export async function POST(req: Request) {
           }))
         })
       }
+      // Update Lead budget to total contract value (first period + all monthly + move-in fee)
+      try {
+        const firstCents = Math.round((totals.firstPeriod || 0) * 100)
+        const moveInCents = Math.round((totals.moveInFee || 0) * 100)
+        const monthlyCents = schedule.reduce((s, it) => s + Math.round((it.amount || 0) * 100), 0)
+        const contractCents = firstCents + monthlyCents + moveInCents
+        const emailLower = (user?.email || '').toLowerCase()
+        if (emailLower) {
+          const lead = await prisma.lead.findFirst({ where: { email: emailLower } }).catch(()=>null)
+          if (lead) { await prisma.lead.update({ where: { id: lead.id }, data: { budgetCents: contractCents } }) }
+        }
+      } catch {}
     } catch {}
 
     return NextResponse.json({ ok: true, booking })
