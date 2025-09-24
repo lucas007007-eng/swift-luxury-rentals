@@ -130,7 +130,8 @@ export async function POST(req: Request) {
     let depositFromQuote: number | null = null
     let moveInFeeFromQuote: number | null = null
     try {
-      const payments: any[] = ((pb as any)?.payments || []) as any[]
+      let payments: any[] = []
+      try { payments = await prisma.payment.findMany({ where: { bookingId: id } }) } catch {}
       const firstMonthly = payments.find(p => p.purpose === 'first_period') || payments.find(p => p.purpose === 'monthly_rent')
       const depPay = payments.find(p => p.purpose === 'deposit')
       const mifPay = payments.find(p => p.purpose === 'move_in_fee')
