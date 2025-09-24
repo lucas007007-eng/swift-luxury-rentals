@@ -57,9 +57,15 @@ export async function POST(req: Request) {
     let userId: string | undefined
     if (email) {
       const existing = await prisma.user.findUnique({ where: { email } }).catch(()=>null)
-      if (existing) { userId = existing.id }
+      if (existing) {
+        userId = existing.id
+        // Persist phone if provided and missing
+        if (b.phone && !existing.phone) {
+          try { await prisma.user.update({ where: { id: existing.id }, data: { phone: String(b.phone) } }) } catch {}
+        }
+      }
       else {
-        const created = await prisma.user.create({ data: { email, name: name || email.split('@')[0] } }).catch(()=>null)
+        const created = await prisma.user.create({ data: { email, name: name || email.split('@')[0], phone: b.phone ? String(b.phone) : undefined } as any }).catch(()=>null)
         if (created) userId = created.id
       }
     }

@@ -60,9 +60,11 @@ export async function POST(req: Request) {
       if (!pb) return NextResponse.json({ message: 'Not found' }, { status: 404 })
       const addr = String(pb.property?.address || '')
       const cityFromAddr = addr ? (addr.split(',').pop()?.trim() || '') : ''
+      const userEmail = pb.user?.email || ''
+      const userPhone = (pb.user as any)?.phone || ''
       b = {
         id: pb.id,
-        clientName: pb.user?.name || pb.user?.email || '—',
+        clientName: pb.user?.name || userEmail || '—',
         city: cityFromAddr || '—',
         propertyId: pb.property?.extId || pb.propertyId,
         propertyTitle: pb.property?.title || 'Property',
@@ -72,6 +74,8 @@ export async function POST(req: Request) {
         paid: (pb as any).payments ? ((pb as any).payments as any[]).some(p => p.purpose !== 'deposit' && p.status === 'received') : undefined,
         leasePdf: null,
       }
+      ;(b as any).clientEmail = userEmail
+      ;(b as any).clientPhone = userPhone
     }
 
     // Prepare lease fields (defaults; consider moving to config)
@@ -511,6 +515,13 @@ export async function POST(req: Request) {
     page.drawRectangle({ x: rightX, y: 98, width: colWidth - 20, height: 1, color: rgb(0,0,0) })
     { const txt = 'Signature / Unterschrift'; const w = font.widthOfTextAtSize(txt, 9); page.drawText(txt, { x: rightX + (colWidth - 20) - w, y: 86, size: 9, font }) }
     drawText('Tenant / Mieter', rightX, 76)
+    // Contact line under tenant signature
+    try {
+      const cEmail = (b as any).clientEmail || ''
+      const cPhone = (b as any).clientPhone || ''
+      const contactText = `Email: ${cEmail || '—'}   Phone: ${cPhone || '—'}`
+      page.drawText(contactText, { x: rightX, y: 64, size: 9, font })
+    } catch {}
 
     let bytesForDataUrl: Uint8Array | null = null
     try {
