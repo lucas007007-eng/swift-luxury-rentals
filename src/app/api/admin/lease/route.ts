@@ -19,8 +19,8 @@ export async function GET(req: Request) {
     try { if (fs.existsSync(publicPath)) bytes = fs.readFileSync(publicPath) } catch {}
     if (!bytes) { try { if (fs.existsSync(tmpPath)) bytes = fs.readFileSync(tmpPath) } catch {} }
     if (!bytes) return NextResponse.json({ message: 'Not found' }, { status: 404 })
-    const ab = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
-    return new Response(ab, { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${id}.pdf"` } })
+    const blob = new Blob([bytes], { type: 'application/pdf' })
+    return new Response(blob, { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${id}.pdf"` } })
   } catch (e: any) {
     return NextResponse.json({ message: 'Failed', error: String(e?.message || e) }, { status: 500 })
   }
