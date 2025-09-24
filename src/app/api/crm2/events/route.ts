@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { publish, register, unregister, send } from '@/lib/crm2Events'
 
 export async function GET() {
+  let cleanup: (()=>void) | null = null
   const stream = new ReadableStream({
     start(controller) {
       register(controller)
@@ -10,13 +11,10 @@ export async function GET() {
       const hb = setInterval(() => {
         try { send(controller, { type: 'heartbeat', ts: Date.now() }) } catch {}
       }, 25000)
-      controller.signal?.addEventListener?.('abort', () => {
-        clearInterval(hb as any)
-        unregister(controller)
-      })
+      cleanup = () => { clearInterval(hb as any); unregister(controller) }
     },
     cancel() {
-      // no-op
+      try { cleanup?.() } catch {}
     }
   })
   return new NextResponse(stream as any, {
