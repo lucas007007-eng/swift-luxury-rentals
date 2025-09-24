@@ -85,6 +85,26 @@ export default function CRM2Page() {
   const [renewalSearch, setRenewalSearch] = useState('')
   const [renewalSort, setRenewalSort] = useState<'checkout'|'client'|'city'|'days'>('checkout')
   const [owners, setOwners] = useState<string[]>([])
+  const jumpToBreaches = () => {
+    setFilterSLA('breach')
+    setTimeout(() => {
+      const breach = leads.find((l:any) => {
+        const slaDays = STAGE_SLA_DAYS[l.stage] ?? 0
+        if (!slaDays) return false
+        const lastStageTs = l.stageHistory?.[0]?.changedAt ? new Date(l.stageHistory[0].changedAt).getTime() : (l.updatedAt ? new Date(l.updatedAt).getTime() : 0)
+        if (!lastStageTs) return false
+        return (Date.now() - lastStageTs) > slaDays*24*60*60*1000
+      })
+      if (breach) {
+        const el = document.getElementById(`lead-${breach.id}`)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          el.classList.add('highlight-flash')
+          setTimeout(() => el.classList.remove('highlight-flash'), 2000)
+        }
+      }
+    }, 120)
+  }
   const bcRef = React.useRef<any>(null)
 
   useEffect(() => {
@@ -409,6 +429,7 @@ export default function CRM2Page() {
                 <a href="/crm2?view=renewals45" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Renewals 45d</a>
                 <a href="/api/crm2/export?type=leads" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Export Leads</a>
                 <a href="/api/crm2/export?type=activities" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Export Activities</a>
+                <button onClick={jumpToBreaches} className="px-3 py-2 text-xs rounded border border-red-400/40 text-red-300 hover:border-red-300/60">Jump to Breaches</button>
               </div>
             </div>
           </div>
@@ -466,6 +487,7 @@ export default function CRM2Page() {
                       draggable
                       onDragStart={()=> setDragId(l.id)}
                       className="w-full text-left rounded-lg border border-zinc-600/40 bg-black/30 p-3 hover:border-zinc-400/60 transition-colors"
+                      id={`lead-${l.id}`}
                       title={`Stage changed ${((l as any).stageHistory?.[0]?.changedAt ? new Date((l as any).stageHistory[0].changedAt) : (l.updatedAt ? new Date(l.updatedAt) : null))?.toLocaleString() || ''}`}
                     >
                       <div className="flex items-center justify-between">
