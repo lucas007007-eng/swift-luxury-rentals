@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { publish, register, unregister, send } from '@/lib/crm2Events'
 
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   let cleanup: (()=>void) | null = null
   const stream = new ReadableStream({
