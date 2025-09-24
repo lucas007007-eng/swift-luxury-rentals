@@ -149,6 +149,10 @@ export default function CRM2Page() {
     if (typeof window === 'undefined') return
     const sp = new URL(window.location.href).searchParams
     const view = sp.get('view')
+    const accept = sp.get('accept')
+    if (accept==='ok') {
+      alert('Quote accepted. Lead advanced to Signed.')
+    }
     if (view === 'offers') setFilterStage('offer')
     if (view === 'signed') setFilterStage('signed')
     if (view === 'new7') {
@@ -361,6 +365,8 @@ export default function CRM2Page() {
                 <a href="/crm2?view=signed" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Signed</a>
                 <a href="/crm2?view=new7" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">New 7d</a>
                 <a href="/crm2?view=renewals45" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Renewals 45d</a>
+                <a href="/api/crm2/export?type=leads" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Export Leads</a>
+                <a href="/api/crm2/export?type=activities" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Export Activities</a>
               </div>
             </div>
           </div>
