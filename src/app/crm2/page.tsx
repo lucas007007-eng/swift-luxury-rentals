@@ -84,6 +84,25 @@ export default function CRM2Page() {
       }
     }
     load()
+    // Live updates via SSE
+    const es = new EventSource('/api/crm2/events')
+    es.onmessage = (ev) => {
+      try {
+        const msg = JSON.parse(ev.data)
+        if (msg.type === 'lead.updated' || msg.type === 'lead.created') {
+          const l = msg.data
+          setLeads(prev => {
+            const idx = prev.findIndex(x => x.id === l.id)
+            if (idx >= 0) {
+              const copy = prev.slice(); copy[idx] = { ...prev[idx], ...l }; return copy
+            }
+            return [l, ...prev]
+          })
+        }
+      } catch {}
+    }
+    es.onerror = () => { /* let browser auto-reconnect */ }
+    return () => { es.close() }
   }, [])
 
   // Handle saved view filters via URL

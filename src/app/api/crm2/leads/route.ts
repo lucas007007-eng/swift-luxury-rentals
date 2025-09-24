@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import fs from 'fs'
 import path from 'path'
+import { broadcast } from '@/app/api/crm2/events/route'
 
 const storePath = path.join(process.cwd(), 'data', 'crm2-leads.json')
 
@@ -63,6 +64,7 @@ export async function POST(req: Request) {
     const db = (prisma as any)
     if (db?.lead?.create) {
       const row = await db.lead.create({ data: lead })
+      try { broadcast({ type: 'lead.created', data: row }) } catch {}
       return NextResponse.json({ ok: true, data: row })
     }
   } catch {}
@@ -71,6 +73,7 @@ export async function POST(req: Request) {
   const rows = readFallback()
   rows.unshift(lead)
   writeFallback(rows)
+  try { broadcast({ type: 'lead.created', data: lead }) } catch {}
   return NextResponse.json({ ok: true, data: lead })
 }
 
@@ -87,6 +90,7 @@ export async function PATCH(req: Request) {
     const db = (prisma as any)
     if (db?.lead?.update) {
       const row = await db.lead.update({ where: { id }, data })
+      try { broadcast({ type: 'lead.updated', data: row }) } catch {}
       return NextResponse.json({ ok: true, data: row })
     }
   } catch {}
@@ -97,6 +101,7 @@ export async function PATCH(req: Request) {
   if (idx>=0) {
     rows[idx] = { ...rows[idx], ...data }
     writeFallback(rows)
+    try { broadcast({ type: 'lead.updated', data: rows[idx] }) } catch {}
     return NextResponse.json({ ok: true, data: rows[idx] })
   }
   return NextResponse.json({ ok: false, error: 'not-found' }, { status: 404 })
