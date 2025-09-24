@@ -34,33 +34,54 @@ export async function POST(req: Request) {
     const { PDFDocument, StandardFonts, rgb } = mod
     const pdf = await PDFDocument.create()
     const page = pdf.addPage([595, 842])
+
+    // Spy theme colors
+    const bg = rgb(0.05, 0.05, 0.07)             // deep metallic black
+    const pane = rgb(0.08, 0.08, 0.1)            // card background
+    const silver = rgb(0.85, 0.86, 0.9)          // premium silver text
+    const silverDim = rgb(0.72, 0.74, 0.78)
+    const accent = rgb(0.0, 0.75, 0.55)          // emerald accent
+
     const font = await pdf.embedFont(StandardFonts.Helvetica)
     const bold = await pdf.embedFont((StandardFonts as any).HelveticaBold || StandardFonts.Helvetica)
 
-    const drawText = (t: string, x: number, y: number, size=12, f=font) => page.drawText(String(t), { x, y, size, font: f, color: rgb(0,0,0) })
+    const drawText = (t: string, x: number, y: number, size=12, f=font, color=silver) => page.drawText(String(t), { x, y, size, font: f, color })
 
-    // Header
-    drawText('Swift Luxury — Quote', 48, 800, 18, bold)
-    drawText(new Date().toISOString().slice(0,10), 480, 800, 10)
-    drawText(`Lead: ${lead?.name || lead?.email || 'Client'}`, 48, 780, 12)
-    if (lead?.email) drawText(`Email: ${lead.email}`, 48, 765, 12)
-    if (lead?.phone) drawText(`Phone: ${lead.phone}`, 48, 750, 12)
+    // Full background
+    page.drawRectangle({ x: 0, y: 0, width: page.getWidth(), height: page.getHeight(), color: bg })
+    // Header bar
+    page.drawRectangle({ x: 0, y: 800, width: page.getWidth(), height: 42, color: pane })
+    // Left accent bar
+    page.drawRectangle({ x: 0, y: 0, width: 4, height: page.getHeight(), color: accent })
 
-    // Details
-    let y = 710
-    drawText('Offer Details', 48, y, 14, bold); y -= 18
-    drawText(`City: ${d.city || '—'}`, 48, y); y -= 16
-    drawText(`Property: ${d.propertyExtId || '—'}`, 48, y); y -= 16
-    drawText(`Term: ${termMonths} month(s)`, 48, y); y -= 16
-    drawText(`Monthly rent: € ${monthly.toLocaleString('de-DE')}`, 48, y); y -= 16
-    drawText(`Move-in fee: € ${moveIn.toLocaleString('de-DE')}`, 48, y); y -= 16
-    drawText(`Deposit: € ${deposit.toLocaleString('de-DE')}`, 48, y); y -= 24
-    drawText(`Total contract value (rent x months + move-in): € ${contractValue.toLocaleString('de-DE')}`, 48, y, 12, bold)
+    // Header text
+    drawText('Swift Luxury — Quote', 48, 812, 18, bold, silver)
+    drawText(new Date().toISOString().slice(0,10), page.getWidth()-140, 812, 10, font, silverDim)
+
+    // Lead summary card
+    page.drawRectangle({ x: 40, y: 740, width: page.getWidth()-80, height: 48, color: pane })
+    drawText(`Lead: ${lead?.name || lead?.email || 'Client'}`, 48, 762, 12, bold)
+    if (lead?.email) drawText(`Email: ${lead.email}`, 260, 762, 11)
+    if (lead?.phone) drawText(`Phone: ${lead.phone}`, 440, 762, 11)
+
+    // Section: Offer Details (spy-tech card)
+    let y = 720
+    page.drawRectangle({ x: 40, y: 520, width: page.getWidth()-80, height: 190, color: pane })
+    drawText('Offer Details', 48, y, 14, bold, silver); y -= 18
+    drawText(`City: ${d.city || '—'}`, 48, y, 12, font, silverDim); y -= 16
+    drawText(`Property: ${d.propertyExtId || '—'}`, 48, y, 12, font, silverDim); y -= 16
+    drawText(`Term: ${termMonths} month(s)`, 48, y, 12, font, silverDim); y -= 16
+    drawText(`Monthly rent: € ${monthly.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 16
+    drawText(`Move-in fee: € ${moveIn.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 16
+    drawText(`Deposit: € ${deposit.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 22
+    drawText(`Total contract value (rent x months + move-in): € ${contractValue.toLocaleString('de-DE')}`, 48, y, 12, bold, accent)
     y -= 30
 
-    drawText('Notes:', 48, y, 12, bold); y -= 16
-    drawText('• Prices are in EUR. Deposit due within 72 hours of acceptance.', 60, y, 10); y -= 14
-    drawText('• This quote is valid for 7 days unless otherwise stated.', 60, y, 10); y -= 14
+    // Notes pane
+    page.drawRectangle({ x: 40, y: 460, width: page.getWidth()-80, height: 48, color: pane })
+    drawText('Notes', 48, 492, 12, bold, silver)
+    drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, 476, 10, font, silverDim)
+    drawText('• Quote valid for 7 days unless otherwise stated.', 48, 462, 10, font, silverDim)
 
     // Save
     let bytesForDataUrl: Uint8Array | null = null
