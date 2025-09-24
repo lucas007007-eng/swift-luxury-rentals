@@ -603,7 +603,14 @@ export default function CRM2Page() {
                       <div className="text-xs text-zinc-300 mt-1 truncate">{l.email || 'no-email'}{l.phone ? ` • ${l.phone}` : ''}</div>
                       <div className="text-xs text-zinc-400 mt-1 flex items-center justify-between">
                         <span>{l.city || '—'}</span>
-                        <span className="text-white">{(Number(l.budgetCents||0)/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'})}</span>
+                        <span className="text-white">{(() => {
+                          let cents = Number((l as any).budgetCents || 0)
+                          if (!cents || cents <= 0) {
+                            const dl = (deals || []).filter((d:any)=> d.leadId === l.id).sort((a:any,b:any)=> new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime())[0]
+                            if (dl) cents = Number(dl.monthlyRateCents||0) * Number(dl.termMonths||0) + Number(dl.moveInFeeCents||0)
+                          }
+                          return (cents/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'})
+                        })()}</span>
                       </div>
                       <div className="mt-1 flex items-center justify-between">
                         <span className="text-[10px] text-zinc-400">Owner: {l.owner || 'Unassigned'}</span>
