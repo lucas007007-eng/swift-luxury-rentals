@@ -187,6 +187,35 @@ export async function POST(req: NextRequest) {
       }
     })
 
+  // mirror CRM2 ingestion for POST as well
+  try {
+    const cityRec = property?.cityId ? await prisma.city.findUnique({ where: { id: property.cityId } }).catch(()=>null) : null
+    const cityName = cityRec?.name || ''
+    const emailLower = (email || '').toLowerCase()
+    let lead = await prisma.lead.findFirst({ where: { email: emailLower } }).catch(()=>null)
+    if (lead) {
+      await prisma.lead.update({ where: { id: lead.id }, data: { name: name || undefined, city: cityName || undefined, stage: 'application' } })
+    } else {
+      lead = await prisma.lead.create({ data: { name: name || 'Guest', email: emailLower, city: cityName, stage: 'application' } })
+    }
+    const pay = await prisma.payment.findMany({ where: { bookingId: booking.id } })
+    const first = pay.find(p=> p.purpose==='first_period') || pay.find(p=> p.purpose==='monthly_rent')
+    const dep = pay.find(p=> p.purpose==='deposit')
+    const mif = pay.find(p=> p.purpose==='move_in_fee')
+    const termMonths = Math.max(1, Math.round(((new Date(checkOut).getTime()-new Date(checkIn).getTime())/(30*24*60*60*1000)) ))
+    await prisma.deal.create({ data: {
+      leadId: (lead as any).id,
+      propertyExtId: property.extId || propertyId,
+      city: cityName,
+      termMonths,
+      monthlyRateCents: first?.amountCents || 0,
+      depositCents: dep?.amountCents || 0,
+      moveInFeeCents: mif?.amountCents || 0,
+      startDate: new Date(checkIn),
+      status: 'offer'
+    } })
+  } catch {}
+
     try {
       const schedule = await computeMonthlySchedule({ propertyExtId: property.extId || propertyId, checkIn, checkOut })
       if (schedule.length > 0) {
