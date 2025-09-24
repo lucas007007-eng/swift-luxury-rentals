@@ -448,7 +448,15 @@ export default function CRM2Page() {
                   <option value="">Select property</option>
                   {quotePropertyOptions.map(p=> (<option key={p.extId} value={p.extId} className="bg-black">{p.title} ({p.extId})</option>))}
                 </select>
-                <input id="qb_start" type="date" defaultValue={new Date().toISOString().slice(0,10)} className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input
+                  id="qb_start"
+                  type="date"
+                  aria-label="Check in"
+                  placeholder="Check in"
+                  onFocus={(e)=> (e.target as HTMLInputElement).showPicker?.()}
+                  onClick={(e)=> (e.currentTarget as HTMLInputElement).showPicker?.()}
+                  className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white"
+                />
                 <input id="qb_term" type="number" placeholder="Term (months)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_rate" type="number" placeholder="Monthly rate (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
                 <input id="qb_deposit" type="number" placeholder="Deposit (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
