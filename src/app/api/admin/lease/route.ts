@@ -488,8 +488,9 @@ export async function POST(req: Request) {
     { const txt = 'Signature / Unterschrift'; const w = font.widthOfTextAtSize(txt, 9); page.drawText(txt, { x: rightX + (colWidth - 20) - w, y: 86, size: 9, font }) }
     drawText('Tenant / Mieter', rightX, 76)
 
+    let bytes: Uint8Array | undefined
     try {
-      const bytes = await pdfDoc.save()
+      bytes = await pdfDoc.save()
       fs.writeFileSync(outPath, bytes)
     } catch (err) {
       // If save still fails after sanitization, bubble the error so UI shows message
@@ -502,7 +503,15 @@ export async function POST(req: Request) {
       try { fs.writeFileSync(dataPath, JSON.stringify(bookings, null, 2), 'utf-8') } catch {}
     }
 
-    return NextResponse.json({ ok: true, url: publicPath })
+    // Also return a data URL (helps on platforms where public file may lag a bit)
+    let dataUrl: string | undefined
+    try {
+      if (bytes) {
+        const b64 = Buffer.from(bytes).toString('base64')
+        dataUrl = `data:application/pdf;base64,${b64}`
+      }
+    } catch {}
+    return NextResponse.json({ ok: true, url: publicPath, dataUrl })
   } catch (e: any) {
     console.error('Lease generation error:', e)
     return NextResponse.json({ message: 'Failed to generate', error: String(e?.message || e) }, { status: 500 })

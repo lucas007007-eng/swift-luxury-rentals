@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { cityProperties } from '@/data/cityProperties'
 
 function addMonths(date: Date, months: number) {
   const d = new Date(date)
@@ -20,7 +21,37 @@ export async function POST(req: Request) {
     const startDate = b.startDate ? new Date(b.startDate) : new Date()
     if (!propertyExtId) return NextResponse.json({ ok:false, error:'property-required' }, { status: 400 })
 
-    const property = await prisma.property.findUnique({ where: { extId: propertyExtId } })
+    let property = await prisma.property.findUnique({ where: { extId: propertyExtId } })
+    // Fallback: create a minimal Property record from cityProperties so prod works without seed
+    if (!property) {
+      let meta: any = null
+      for (const c in cityProperties as any) {
+        const found = (cityProperties as any)[c]?.find?.((p: any) => p.id === propertyExtId)
+        if (found) { meta = { ...found, city: c }; break }
+      }
+      if (meta) {
+        try {
+          property = await prisma.property.create({
+            data: {
+              extId: propertyExtId,
+              title: String(meta.title || meta.name || propertyExtId),
+              address: String(meta.location || ''),
+              priceMonthly: Number(meta.price || 0),
+            } as any,
+          })
+        } catch {
+          // Try a minimal insert if model is stricter
+          try {
+            property = await prisma.property.create({
+              data: {
+                extId: propertyExtId,
+                title: String(meta.title || meta.name || propertyExtId),
+              } as any,
+            })
+          } catch {}
+        }
+      }
+    }
     if (!property) return NextResponse.json({ ok:false, error:'property-not-found' }, { status: 404 })
 
     let userId: string | undefined

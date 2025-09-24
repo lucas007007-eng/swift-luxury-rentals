@@ -396,7 +396,13 @@ export default function CRM2Page() {
       const j = await res.json(); if (!j.ok) { alert('Failed to create booking'); return }
       const bookingId = j.data?.id
       const lease = await fetch('/api/admin/lease', { method:'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ id: bookingId }) })
-      const lj = await lease.json(); if (lease.ok && lj?.url) { window.open(lj.url, '_blank') } else { alert('Failed to generate lease PDF') }
+      const lj = await lease.json();
+      if (lease.ok && (lj?.dataUrl || lj?.url)) {
+        const href = lj.dataUrl || lj.url
+        window.open(href, '_blank')
+      } else {
+        alert('Failed to generate lease PDF')
+      }
     } catch { alert('Lease generation failed') }
   }
 
