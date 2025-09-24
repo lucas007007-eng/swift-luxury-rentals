@@ -562,11 +562,16 @@ export default function CRM2Page() {
                       title={`Stage changed ${((l as any).stageHistory?.[0]?.changedAt ? new Date((l as any).stageHistory[0].changedAt) : (l.updatedAt ? new Date(l.updatedAt) : null))?.toLocaleString() || ''}`}
                     >
                       {stage==='lease' && (
-                        <div className="mb-1">
+                        <div className="mb-1 flex items-center justify-between gap-2">
                           <label className="flex items-center gap-2 text-[11px] text-zinc-300">
                             <input type="checkbox" checked={!!leaseSelected[l.id]} onChange={(e)=> setLeaseSelected(prev=> ({ ...prev, [l.id]: e.target.checked }))} />
                             Select for lease PDF
                           </label>
+                          <button
+                            className="px-2 py-1 text-[11px] rounded border border-emerald-400/30 text-white hover:border-emerald-300/60"
+                            onClick={(e)=> { e.stopPropagation(); generateLeaseForLead(l) }}
+                            title="Generate lease PDF now"
+                          >Generate Lease</button>
                         </div>
                       )}
                       <div className="flex items-center justify-between">
