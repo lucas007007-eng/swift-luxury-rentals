@@ -49,14 +49,38 @@ export async function POST(req: Request) {
 
     // Full background
     page.drawRectangle({ x: 0, y: 0, width: page.getWidth(), height: page.getHeight(), color: bg })
+    // Subtle metallic frame
+    page.drawRectangle({ x: 10, y: 10, width: page.getWidth()-20, height: page.getHeight()-20, color: undefined, borderColor: silverDim, borderWidth: 1 })
     // Header bar
     page.drawRectangle({ x: 0, y: 800, width: page.getWidth(), height: 42, color: pane })
     // Left accent bar
     page.drawRectangle({ x: 0, y: 0, width: 4, height: page.getHeight(), color: accent })
+    // Watermark (diagonal, light silver)
+    try {
+      const wm = 'SWIFT LUXURY'
+      page.drawText(wm, { x: 120, y: 320, size: 64, font: bold, color: rgb(0.22,0.24,0.28), rotate: { type: 'degrees', angle: 30 }, opacity: 0.08 })
+    } catch {}
 
     // Header text
     drawText('Swift Luxury — Quote', 48, 812, 18, bold, silver)
-    drawText(new Date().toISOString().slice(0,10), page.getWidth()-140, 812, 10, font, silverDim)
+    const todayStr = new Date().toISOString().slice(0,10)
+    drawText(todayStr, page.getWidth()-140, 812, 10, font, silverDim)
+
+    // Metadata block (top-right)
+    const metaX = page.getWidth()-240
+    const metaY = 750
+    page.drawRectangle({ x: metaX, y: metaY, width: 200, height: 70, color: pane })
+    const quoteId = `Q-${dealId.slice(0,8).toUpperCase()}`
+    const expiry = (() => { const d = new Date(); d.setDate(d.getDate()+7); return d.toISOString().slice(0,10) })()
+    drawText('Quote ID', metaX+10, metaY+52, 10, bold, silverDim)
+    drawText(quoteId, metaX+90, metaY+52, 10, font, silver)
+    drawText('Date', metaX+10, metaY+36, 10, bold, silverDim)
+    drawText(todayStr, metaX+90, metaY+36, 10, font, silver)
+    drawText('Expires', metaX+10, metaY+20, 10, bold, silverDim)
+    drawText(expiry, metaX+90, metaY+20, 10, font, silver)
+    // Placeholders for future mapping
+    drawText('Ref:', metaX+10, metaY+4, 9, bold, silverDim)
+    drawText('TBD', metaX+90, metaY+4, 9, font, silverDim)
 
     // Lead summary card (lowered for better balance)
     page.drawRectangle({ x: 40, y: 700, width: page.getWidth()-80, height: 56, color: pane })
