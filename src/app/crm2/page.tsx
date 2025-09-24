@@ -105,6 +105,28 @@ export default function CRM2Page() {
       }
     }, 120)
   }
+  const jumpToDue = () => {
+    setFilterSLA('due')
+    setTimeout(() => {
+      const dueLead = leads.find((l:any) => {
+        const slaDays = STAGE_SLA_DAYS[l.stage] ?? 0
+        if (!slaDays) return false
+        const lastStageTs = l.stageHistory?.[0]?.changedAt ? new Date(l.stageHistory[0].changedAt).getTime() : (l.updatedAt ? new Date(l.updatedAt).getTime() : 0)
+        if (!lastStageTs) return false
+        const ageMs = Date.now() - lastStageTs
+        const slaMs = slaDays*24*60*60*1000
+        return ageMs > (slaMs - 24*60*60*1000) && ageMs <= slaMs
+      })
+      if (dueLead) {
+        const el = document.getElementById(`lead-${dueLead.id}`)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          el.classList.add('highlight-flash')
+          setTimeout(() => el.classList.remove('highlight-flash'), 2000)
+        }
+      }
+    }, 120)
+  }
   const bcRef = React.useRef<any>(null)
 
   useEffect(() => {
@@ -430,6 +452,7 @@ export default function CRM2Page() {
                 <a href="/api/crm2/export?type=leads" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Export Leads</a>
                 <a href="/api/crm2/export?type=activities" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Export Activities</a>
                 <button onClick={jumpToBreaches} className="px-3 py-2 text-xs rounded border border-red-400/40 text-red-300 hover:border-red-300/60">Jump to Breaches</button>
+                <button onClick={jumpToDue} className="px-3 py-2 text-xs rounded border border-amber-400/40 text-amber-300 hover:border-amber-300/60">Jump to Due (24h)</button>
               </div>
             </div>
           </div>
