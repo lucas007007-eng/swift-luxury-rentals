@@ -37,7 +37,8 @@ export async function POST(req: Request) {
 
     // Spy theme colors
     const bg = rgb(0.05, 0.05, 0.07)             // deep metallic black
-    const pane = rgb(0.08, 0.08, 0.1)            // card background
+    // Use a single background color across the page for a uniform look
+    const pane = bg                               // card background = page background
     const silver = rgb(0.85, 0.86, 0.9)          // premium silver text
     const silverDim = rgb(0.72, 0.74, 0.78)
     const accent = rgb(0.0, 0.75, 0.55)          // emerald accent
@@ -51,8 +52,8 @@ export async function POST(req: Request) {
     page.drawRectangle({ x: 0, y: 0, width: page.getWidth(), height: page.getHeight(), color: bg })
     // Subtle metallic frame
     page.drawRectangle({ x: 10, y: 10, width: page.getWidth()-20, height: page.getHeight()-20, color: undefined, borderColor: silverDim, borderWidth: 1 })
-    // Header bar
-    page.drawRectangle({ x: 0, y: 800, width: page.getWidth(), height: 42, color: pane })
+    // Header area (same background as page)
+    page.drawRectangle({ x: 0, y: 800, width: page.getWidth(), height: 42, color: bg })
     // Left accent bar
     page.drawRectangle({ x: 0, y: 0, width: 4, height: page.getHeight(), color: accent })
     // Watermark (diagonal, light silver)
@@ -83,7 +84,7 @@ export async function POST(req: Request) {
     drawText('TBD', metaX+90, metaY+4, 9, font, silverDim)
 
     // Lead summary card (lowered for better balance)
-    page.drawRectangle({ x: 40, y: 700, width: page.getWidth()-80, height: 56, color: pane })
+    page.drawRectangle({ x: 40, y: 700, width: page.getWidth()-80, height: 56, color: bg, borderColor: silverDim, borderWidth: 1 })
     drawText(`Lead: ${lead?.name || lead?.email || 'Client'}`, 48, 728, 12, bold)
     if (lead?.email) drawText(`Email: ${lead.email}`, 260, 728, 11)
     if (lead?.phone) drawText(`Phone: ${lead.phone}`, 440, 728, 11)
@@ -92,7 +93,7 @@ export async function POST(req: Request) {
     let y = 620
     // Narrow left column to avoid collision with right-side image panel
     const leftPaneWidth = page.getWidth()-300
-    page.drawRectangle({ x: 40, y: 500, width: leftPaneWidth, height: 220, color: pane })
+    page.drawRectangle({ x: 40, y: 500, width: leftPaneWidth, height: 220, color: bg, borderColor: silverDim, borderWidth: 1 })
     drawText('Offer Details', 48, y, 14, bold, silver); y -= 20
     drawText(`City: ${d.city || '—'}`, 48, y, 12, font, silverDim); y -= 18
     drawText(`Property: ${d.propertyExtId || '—'}`, 48, y, 12, font, silverDim); y -= 18
@@ -109,7 +110,7 @@ export async function POST(req: Request) {
       const py = 510
       const pw = 180
       const ph = 120
-      page.drawRectangle({ x: px, y: py, width: pw, height: ph, color: pane })
+      page.drawRectangle({ x: px, y: py, width: pw, height: ph, color: bg, borderColor: silverDim, borderWidth: 1 })
       // Attempt to load first property image from Prisma
       try {
         const prop = await prisma.property.findFirst({ where: { OR: [{ extId: d.propertyExtId || '' }, { id: d.propertyExtId || '' }] }, include: { images: { orderBy: { position: 'asc' }, take: 1 } } })
@@ -130,7 +131,7 @@ export async function POST(req: Request) {
     const tblX = 48
     let ty = 440
     // background strip for readability
-    page.drawRectangle({ x: 40, y: 360, width: page.getWidth()-80, height: 90, color: pane })
+    page.drawRectangle({ x: 40, y: 360, width: page.getWidth()-80, height: 90, color: bg, borderColor: silverDim, borderWidth: 1 })
     drawText('Price Breakdown', tblX, ty, 12, bold, silver); ty -= 16
     const col2 = page.getWidth()-88
     const line = (label: string, value: string, isTotal=false) => {
@@ -151,7 +152,7 @@ export async function POST(req: Request) {
     // Notes pane
     // Move notes further down to avoid overlapping the total line
     // Move notes further down to avoid any overlap with pricing lines
-    page.drawRectangle({ x: 40, y: 300, width: page.getWidth()-80, height: 70, color: pane })
+    page.drawRectangle({ x: 40, y: 300, width: page.getWidth()-80, height: 70, color: bg, borderColor: silverDim, borderWidth: 1 })
     drawText('Notes', 48, 362, 12, bold, silver)
     drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, 346, 10, font, silverDim)
     drawText('• Quote valid for 7 days unless otherwise stated.', 48, 332, 10, font, silverDim)
@@ -173,14 +174,15 @@ export async function POST(req: Request) {
 
     // Accept block with placeholder QR area
     const acceptLink = `${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/crm2/quotes/accept?leadId=${encodeURIComponent(d.leadId)}&dealId=${encodeURIComponent(d.id)}`
-    page.drawRectangle({ x: page.getWidth()-260, y: 140, width: 200, height: 80, color: pane })
+    page.drawRectangle({ x: page.getWidth()-260, y: 140, width: 200, height: 80, color: bg, borderColor: silverDim, borderWidth: 1 })
     drawText('Scan to Accept', page.getWidth()-250, 206, 12, bold, silver)
     page.drawRectangle({ x: page.getWidth()-120, y: 150, width: 60, height: 60, color: bg, borderColor: silverDim, borderWidth: 1 })
     drawText('(QR reserved)', page.getWidth()-118, 180, 8, font, silverDim)
     drawText(acceptLink || 'Accept URL', page.getWidth()-250, 160, 8, font, silverDim)
 
     // Footer
-    page.drawRectangle({ x: 0, y: 28, width: page.getWidth(), height: 24, color: pane })
+    page.drawRectangle({ x: 0, y: 28, width: page.getWidth(), height: 24, color: bg })
+    page.drawRectangle({ x: 10, y: 52, width: page.getWidth()-20, height: 1, color: silverDim })
     drawText('Swift Luxury GmbH • Friedrichstraße 123 • 10117 Berlin • IBAN: TBD • BIC: TBD', 48, 36, 9, font, silverDim)
     const footerText = 'Page 1 of 1'
     const fw = font.widthOfTextAtSize(footerText, 9)
