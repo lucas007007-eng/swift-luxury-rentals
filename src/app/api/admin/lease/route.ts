@@ -7,6 +7,24 @@ import prisma from '@/lib/prisma'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+// Stream an existing lease PDF by id (reads from public or /tmp)
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id') || ''
+    if (!id) return NextResponse.json({ message: 'Missing id' }, { status: 400 })
+    const publicPath = path.join(process.cwd(), 'public', 'leases', `${id}.pdf`)
+    const tmpPath = path.join('/tmp', 'leases', `${id}.pdf`)
+    let bytes: Buffer | null = null
+    try { if (fs.existsSync(publicPath)) bytes = fs.readFileSync(publicPath) } catch {}
+    if (!bytes) { try { if (fs.existsSync(tmpPath)) bytes = fs.readFileSync(tmpPath) } catch {} }
+    if (!bytes) return NextResponse.json({ message: 'Not found' }, { status: 404 })
+    return new Response(bytes, { headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${id}.pdf"` } })
+  } catch (e: any) {
+    return NextResponse.json({ message: 'Failed', error: String(e?.message || e) }, { status: 500 })
+  }
+}
+
 type Booking = {
   id: string
   clientName: string

@@ -398,8 +398,23 @@ export default function CRM2Page() {
       const lease = await fetch('/api/admin/lease', { method:'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ id: bookingId }) })
       const lj = await lease.json();
       if (lease.ok && (lj?.dataUrl || lj?.url)) {
-        const href = lj.dataUrl || lj.url
-        window.open(href, '_blank')
+        if (lj.dataUrl) {
+          // Create a Blob and open a blob URL to avoid data: navigation issues in some in-app browsers
+          try {
+            const byteString = atob(lj.dataUrl.split(',')[1] || '')
+            const len = byteString.length
+            const bytes = new Uint8Array(len)
+            for (let i=0;i<len;i++) bytes[i] = byteString.charCodeAt(i)
+            const blob = new Blob([bytes], { type: 'application/pdf' })
+            const url = URL.createObjectURL(blob)
+            window.open(url, '_blank')
+            setTimeout(()=> URL.revokeObjectURL(url), 10000)
+          } catch {
+            window.open(lj.dataUrl, '_blank')
+          }
+        } else if (lj.url) {
+          window.open(lj.url, '_blank')
+        }
       } else {
         alert('Failed to generate lease PDF')
       }
