@@ -95,11 +95,13 @@ export async function POST(req: Request) {
     drawText('Offer Details', 48, y, 14, bold, silver); y -= 20
     drawText(`City: ${d.city || '—'}`, 48, y, 12, font, silverDim); y -= 18
     drawText(`Property: ${d.propertyExtId || '—'}`, 48, y, 12, font, silverDim); y -= 18
-    drawText(`Term: ${termMonths} month(s)`, 48, y, 12, font, silverDim); y -= 18
-    drawText(`Monthly rent: € ${monthly.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 18
+    const termLine = termMonths >= 1 ? `Term: ${termMonths} month(s) (days: TBD)` : 'Term: TBD days'
+    drawText(termLine, 48, y, 12, font, silverDim); y -= 18
+    const primaryLabel = termMonths >= 1 ? 'Monthly rent' : 'Total cost of stay'
+    drawText(`${primaryLabel}: € ${monthly.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 18
     drawText(`Move-in fee: € ${moveIn.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 18
     drawText(`Deposit: € ${deposit.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 26
-    drawText(`Total contract value (rent x months + move-in): € ${contractValue.toLocaleString('de-DE')}`, 48, y, 12, bold, accent)
+    drawText(`Total contract value: € ${contractValue.toLocaleString('de-DE')}`, 48, y, 12, bold, accent)
     y -= 34
 
     // Right panel: Property image (or placeholder)
@@ -137,13 +139,17 @@ export async function POST(req: Request) {
       const w = (isTotal? bold: font).widthOfTextAtSize(value, 11)
       page.drawText(value, { x: col2 - w, y: ty, size: 11, font: isTotal? bold: font, color: isTotal? accent: silver })
     }
-    line(`Monthly × ${termMonths}`, `€ ${monthly.toLocaleString('de-DE')} × ${termMonths}`)
+    if (termMonths >= 1) {
+      line(`Monthly × ${termMonths}`, `€ ${monthly.toLocaleString('de-DE')} × ${termMonths}`)
+    } else {
+      line('Total cost of stay', `€ ${monthly.toLocaleString('de-DE')}`)
+    }
     ty -= 16
     line('Move-in fee', `€ ${moveIn.toLocaleString('de-DE')}`)
     ty -= 16
     line('Deposit', `€ ${deposit.toLocaleString('de-DE')}`)
     ty -= 18
-    line('Total (rent × months + move-in)', `€ ${contractValue.toLocaleString('de-DE')}`, true)
+    line('Total contract value', `€ ${contractValue.toLocaleString('de-DE')}`, true)
     ty -= 8
     page.drawRectangle({ x: tblX, y: ty, width: col2-tblX, height: 1, color: silverDim })
 
