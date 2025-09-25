@@ -29,6 +29,25 @@ export async function POST(req: Request) {
     let outPath = path.join(outDirPublic, `${dealId}.pdf`)
     try { fs.mkdirSync(outDirPublic, { recursive: true }) } catch {}
 
+    // Try to resolve exact booked days from the latest booking for this lead
+    let daysBooked: number | null = null
+    try {
+      const leadEmail = (await prisma.lead.findUnique({ where: { id: d.leadId } }))?.email || lead?.email || ''
+      if (leadEmail) {
+        const user = await prisma.user.findUnique({ where: { email: leadEmail } })
+        if (user) {
+          const booking = await prisma.booking.findFirst({ where: { userId: user.id }, orderBy: { createdAt: 'desc' } })
+          if (booking) {
+            const start = new Date(booking.checkin)
+            const end = new Date(booking.checkout)
+            const day0 = (dt: Date) => new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()).getTime()
+            const diff = Math.max(0, Math.round((day0(end) - day0(start)) / (24*60*60*1000)))
+            daysBooked = diff
+          }
+        }
+      }
+    } catch {}
+
     // Create PDF (simple brand style)
     const mod: any = await import('pdf-lib')
     const { PDFDocument, StandardFonts, rgb } = mod
@@ -95,7 +114,9 @@ export async function POST(req: Request) {
     drawText('Offer Details', 48, y, 14, bold, silver); y -= 20
     drawText(`City: ${d.city || '—'}`, 48, y, 12, font, silverDim); y -= 18
     drawText(`Property: ${d.propertyExtId || '—'}`, 48, y, 12, font, silverDim); y -= 18
-    const termLine = termMonths >= 1 ? `Term: ${termMonths} month(s) (days: TBD)` : 'Term: TBD days'
+    const termLine = termMonths >= 1
+      ? `Term: ${termMonths} month(s)${daysBooked!=null ? ` (${daysBooked} days)` : ''}`
+      : (daysBooked!=null ? `Term: ${daysBooked} days` : 'Term: TBD days')
     drawText(termLine, 48, y, 12, font, silverDim); y -= 18
     const primaryLabel = termMonths >= 1 ? 'Monthly rent' : 'Total cost of stay'
     drawText(`${primaryLabel}: € ${monthly.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 18
