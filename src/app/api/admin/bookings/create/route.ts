@@ -86,9 +86,9 @@ export async function GET(req: NextRequest) {
     const emailLower = (email || '').toLowerCase()
     let lead = await prisma.lead.findFirst({ where: { email: emailLower } }).catch(()=>null)
     if (lead) {
-      await prisma.lead.update({ where: { id: lead.id }, data: { name: name || undefined, city: cityName || undefined, stage: 'application' } })
+      await prisma.lead.update({ where: { id: lead.id }, data: { name: name || undefined, city: cityName || undefined, stage: 'application', owner: emailLower || undefined } })
     } else {
-      lead = await prisma.lead.create({ data: { name: name || 'Guest', email: emailLower, city: cityName, stage: 'application' } })
+      lead = await prisma.lead.create({ data: { name: name || 'Guest', email: emailLower, city: cityName, stage: 'application', owner: emailLower } })
     }
     const pay = await prisma.payment.findMany({ where: { bookingId: booking.id } })
     const first = pay.find(p=> p.purpose==='first_period') || pay.find(p=> p.purpose==='monthly_rent')

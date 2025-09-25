@@ -87,7 +87,7 @@ export default function CRM2Page() {
   const [renewalSearch, setRenewalSearch] = useState('')
   const [renewalSort, setRenewalSort] = useState<'checkout'|'client'|'city'|'days'>('checkout')
   const [owners, setOwners] = useState<string[]>([])
-  const [myOnly, setMyOnly] = useState(false)
+  const [myOnly, setMyOnly] = useState(true)
   const [leaseSelected, setLeaseSelected] = useState<Record<string, boolean>>({})
   const jumpToBreaches = () => {
     setFilterSLA('breach')
@@ -651,6 +651,18 @@ export default function CRM2Page() {
                       </div>
                       <div className="mt-1 flex items-center justify-between gap-2">
                         <span className="text-[10px] text-zinc-400">Owner: {l.owner || 'Unassigned'}</span>
+                        {l.stage==='offer' && (()=>{
+                          // Show expiry countdown if we have a recent deal
+                          const dl = (deals || []).filter((d:any)=> d.leadId === l.id).sort((a:any,b:any)=> new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime())[0]
+                          if (!dl || !dl.createdAt) return null
+                          const created = new Date(dl.createdAt).getTime()
+                          const expires = created + 7*24*60*60*1000
+                          const msLeft = expires - Date.now()
+                          const daysLeft = Math.max(0, Math.ceil(msLeft/(24*60*60*1000)))
+                          const label = daysLeft>0 ? `${daysLeft}d left` : 'Expired'
+                          const cls = daysLeft>2 ? 'border-emerald-400/40 text-emerald-300' : daysLeft>0 ? 'border-amber-400/40 text-amber-300' : 'border-red-400/40 text-red-300'
+                          return <span className={`px-2 py-0.5 text-[10px] rounded border ${cls}`}>{label}</span>
+                        })()}
                         <button
                           className="px-2 py-0.5 text-[11px] rounded border border-zinc-400/40 text-white hover:border-zinc-300/60"
                           onClick={async (e)=>{

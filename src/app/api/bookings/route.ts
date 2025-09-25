@@ -104,9 +104,9 @@ export async function POST(req: Request) {
       try { if ((property as any)?.cityId) { const c = await prisma.city.findUnique({ where: { id: (property as any).cityId } }); cityName = c?.name || '' } } catch {}
       let lead = await prisma.lead.findFirst({ where: { email: emailLower } }).catch(()=>null)
       if (lead) {
-        await prisma.lead.update({ where: { id: lead.id }, data: { name: user?.name || undefined, phone: user?.phone || undefined, city: cityName || undefined, stage: 'application' } })
+        await prisma.lead.update({ where: { id: lead.id }, data: { name: user?.name || undefined, phone: user?.phone || undefined, city: cityName || undefined, stage: 'application', owner: (user?.email || '').toLowerCase() || undefined } })
       } else {
-        lead = await prisma.lead.create({ data: { name: user?.name || 'Guest', email: emailLower, phone: user?.phone || null, city: cityName, stage: 'application' } })
+        lead = await prisma.lead.create({ data: { name: user?.name || 'Guest', email: emailLower, phone: user?.phone || null, city: cityName, stage: 'application', owner: emailLower } })
       }
       // Create a Deal with amounts inferred from booking/payments
       const pay = await prisma.payment.findMany({ where: { bookingId: booking.id } })
