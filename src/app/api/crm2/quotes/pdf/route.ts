@@ -160,7 +160,9 @@ export async function POST(req: Request) {
       const w = (isTotal? bold: font).widthOfTextAtSize(value, 11)
       page.drawText(value, { x: col2 - w, y: ty, size: 11, font: isTotal? bold: font, color: isTotal? accent: silver })
     }
-    if (termMonths >= 1) {
+    if (daysBooked!=null && termMonths < 1) {
+      line(`${daysBooked} days`, `€ ${monthly.toLocaleString('de-DE')}`)
+    } else if (termMonths >= 1) {
       line(`Monthly × ${termMonths}`, `€ ${monthly.toLocaleString('de-DE')} × ${termMonths}`)
     } else {
       line('Total cost of stay', `€ ${monthly.toLocaleString('de-DE')}`)
