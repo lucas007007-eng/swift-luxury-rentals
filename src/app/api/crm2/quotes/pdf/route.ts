@@ -114,9 +114,9 @@ export async function POST(req: Request) {
     drawText('Offer Details', 48, y, 14, bold, silver); y -= 20
     drawText(`City: ${d.city || '—'}`, 48, y, 12, font, silverDim); y -= 18
     drawText(`Property: ${d.propertyExtId || '—'}`, 48, y, 12, font, silverDim); y -= 18
-    const termLine = termMonths >= 1
-      ? `Term: ${termMonths} month(s)${daysBooked!=null ? ` (${daysBooked} days)` : ''}`
-      : (daysBooked!=null ? `Term: ${daysBooked} days` : 'Term: TBD days')
+    const termLine = (daysBooked!=null)
+      ? `Term: ${daysBooked} days`
+      : (termMonths >= 1 ? `Term: ${termMonths} month(s)` : 'Term: TBD days')
     drawText(termLine, 48, y, 12, font, silverDim); y -= 18
     const primaryLabel = termMonths >= 1 ? 'Monthly rent' : 'Total cost of stay'
     drawText(`${primaryLabel}: € ${monthly.toLocaleString('de-DE')}`, 48, y, 12, font, silver); y -= 18
