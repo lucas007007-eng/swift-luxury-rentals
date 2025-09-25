@@ -148,7 +148,7 @@ export async function POST(req: Request) {
     page.drawRectangle({ x: tblX, y: ty, width: col2-tblX, height: 1, color: silverDim })
 
     // Notes pane (bottom-left beside accept block)
-    const notesTop = 140
+    const notesTop = 110
     drawText('Notes', 48, notesTop, 12, bold, silver)
     drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, notesTop-16, 10, font, silverDim)
     drawText('• Quote valid for 7 days unless otherwise stated.', 48, notesTop-30, 10, font, silverDim)
