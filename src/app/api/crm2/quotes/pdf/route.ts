@@ -50,8 +50,6 @@ export async function POST(req: Request) {
 
     // Full background
     page.drawRectangle({ x: 0, y: 0, width: page.getWidth(), height: page.getHeight(), color: bg })
-    // Subtle metallic frame
-    page.drawRectangle({ x: 10, y: 10, width: page.getWidth()-20, height: page.getHeight()-20, color: undefined, borderColor: silverDim, borderWidth: 1 })
     // Header area (same background as page)
     page.drawRectangle({ x: 0, y: 800, width: page.getWidth(), height: 42, color: bg })
     // Left accent bar
@@ -84,7 +82,7 @@ export async function POST(req: Request) {
     drawText('TBD', metaX+90, metaY+4, 9, font, silverDim)
 
     // Lead summary card (lowered for better balance)
-    page.drawRectangle({ x: 40, y: 700, width: page.getWidth()-80, height: 56, color: bg, borderColor: silverDim, borderWidth: 1 })
+    // Removed summary box border for cleaner look
     drawText(`Lead: ${lead?.name || lead?.email || 'Client'}`, 48, 728, 12, bold)
     if (lead?.email) drawText(`Email: ${lead.email}`, 260, 728, 11)
     if (lead?.phone) drawText(`Phone: ${lead.phone}`, 440, 728, 11)
@@ -93,7 +91,7 @@ export async function POST(req: Request) {
     let y = 620
     // Narrow left column to avoid collision with right-side image panel
     const leftPaneWidth = page.getWidth()-300
-    page.drawRectangle({ x: 40, y: 500, width: leftPaneWidth, height: 220, color: bg, borderColor: silverDim, borderWidth: 1 })
+    // Removed offer details box border for cleaner look
     drawText('Offer Details', 48, y, 14, bold, silver); y -= 20
     drawText(`City: ${d.city || '—'}`, 48, y, 12, font, silverDim); y -= 18
     drawText(`Property: ${d.propertyExtId || '—'}`, 48, y, 12, font, silverDim); y -= 18
@@ -110,7 +108,7 @@ export async function POST(req: Request) {
       const py = 510
       const pw = 180
       const ph = 120
-      page.drawRectangle({ x: px, y: py, width: pw, height: ph, color: bg, borderColor: silverDim, borderWidth: 1 })
+      // Removed image box border for cleaner look
       // Attempt to load first property image from Prisma
       try {
         const prop = await prisma.property.findFirst({ where: { OR: [{ extId: d.propertyExtId || '' }, { id: d.propertyExtId || '' }] }, include: { images: { orderBy: { position: 'asc' }, take: 1 } } })
@@ -131,7 +129,7 @@ export async function POST(req: Request) {
     const tblX = 48
     let ty = 440
     // background strip for readability
-    page.drawRectangle({ x: 40, y: 360, width: page.getWidth()-80, height: 90, color: bg, borderColor: silverDim, borderWidth: 1 })
+    // Removed breakdown box border for cleaner look
     drawText('Price Breakdown', tblX, ty, 12, bold, silver); ty -= 16
     const col2 = page.getWidth()-88
     const line = (label: string, value: string, isTotal=false) => {
@@ -153,7 +151,7 @@ export async function POST(req: Request) {
     // Move notes further down to avoid overlapping the total line
     // Move notes further down to avoid any overlap with pricing lines
     // Add extra padding above notes
-    page.drawRectangle({ x: 40, y: 260, width: page.getWidth()-80, height: 70, color: bg, borderColor: silverDim, borderWidth: 1 })
+    // Removed notes box border for cleaner look
     drawText('Notes', 48, 322, 12, bold, silver)
     drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, 306, 10, font, silverDim)
     drawText('• Quote valid for 7 days unless otherwise stated.', 48, 292, 10, font, silverDim)
@@ -175,7 +173,7 @@ export async function POST(req: Request) {
 
     // Accept block with placeholder QR area
     const acceptLink = `${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/crm2/quotes/accept?leadId=${encodeURIComponent(d.leadId)}&dealId=${encodeURIComponent(d.id)}`
-    page.drawRectangle({ x: page.getWidth()-260, y: 140, width: 200, height: 80, color: bg, borderColor: silverDim, borderWidth: 1 })
+    // Removed accept block border for cleaner look
     drawText('Scan to Accept', page.getWidth()-250, 206, 12, bold, silver)
     page.drawRectangle({ x: page.getWidth()-120, y: 150, width: 60, height: 60, color: bg, borderColor: silverDim, borderWidth: 1 })
     drawText('(QR reserved)', page.getWidth()-118, 180, 8, font, silverDim)
