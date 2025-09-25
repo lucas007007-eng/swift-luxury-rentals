@@ -147,14 +147,11 @@ export async function POST(req: Request) {
     ty -= 8
     page.drawRectangle({ x: tblX, y: ty, width: col2-tblX, height: 1, color: silverDim })
 
-    // Notes pane
-    // Move notes further down to avoid overlapping the total line
-    // Move notes further down to avoid any overlap with pricing lines
-    // Add extra padding above notes
-    // Removed notes box border for cleaner look
-    drawText('Notes', 48, 322, 12, bold, silver)
-    drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, 306, 10, font, silverDim)
-    drawText('• Quote valid for 7 days unless otherwise stated.', 48, 292, 10, font, silverDim)
+    // Notes pane (bottom-left beside accept block)
+    const notesTop = 140
+    drawText('Notes', 48, notesTop, 12, bold, silver)
+    drawText('• Prices in EUR. Deposit due within 72 hours of acceptance.', 48, notesTop-16, 10, font, silverDim)
+    drawText('• Quote valid for 7 days unless otherwise stated.', 48, notesTop-30, 10, font, silverDim)
 
     // Signature area
     const sigTop = 220
