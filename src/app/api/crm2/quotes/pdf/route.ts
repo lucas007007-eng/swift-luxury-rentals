@@ -174,10 +174,11 @@ export async function POST(req: Request) {
     // Accept block with placeholder QR area
     const acceptLink = `${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/crm2/quotes/accept?leadId=${encodeURIComponent(d.leadId)}&dealId=${encodeURIComponent(d.id)}`
     // Removed accept block border for cleaner look
-    drawText('Scan to Accept', page.getWidth()-250, 206, 12, bold, silver)
-    page.drawRectangle({ x: page.getWidth()-120, y: 150, width: 60, height: 60, color: bg, borderColor: silverDim, borderWidth: 1 })
-    drawText('(QR reserved)', page.getWidth()-118, 180, 8, font, silverDim)
-    drawText(acceptLink || 'Accept URL', page.getWidth()-250, 160, 8, font, silverDim)
+    // Move accept block lower to avoid signature overlap
+    drawText('Scan to Accept', page.getWidth()-250, 126, 12, bold, silver)
+    page.drawRectangle({ x: page.getWidth()-120, y: 70, width: 60, height: 60, color: bg, borderColor: silverDim, borderWidth: 1 })
+    drawText('(QR reserved)', page.getWidth()-118, 100, 8, font, silverDim)
+    drawText(acceptLink || 'Accept URL', page.getWidth()-250, 80, 8, font, silverDim)
 
     // Footer
     page.drawRectangle({ x: 0, y: 28, width: page.getWidth(), height: 24, color: bg })
