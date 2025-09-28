@@ -68,26 +68,66 @@ export async function POST(request: NextRequest) {
     // Replace variables in subject
     subject = replaceVariables(subject, finalTestData)
 
-    // Send test email using custom email service
-    const result = await emailService.sendCustomEmail(
-      testEmail,
-      subject,
-      testHtml
-    )
+    // Send test email using Resend directly for better analytics
+    const { Resend } = await import('resend')
+    const resend = new Resend(process.env.RESEND_API_KEY)
+
+    const emailResult = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      to: [testEmail],
+      subject: subject,
+      html: testHtml,
+      headers: {
+        'X-Test-Type': testType,
+        'X-Template-Name': template.name,
+        'X-Test-Timestamp': new Date().toISOString()
+      }
+    })
 
     // Log test email for tracking
-    console.log(`Test email sent: ${testType} test to ${testEmail} for template ${template.name}`)
+    console.log(`Test email sent:`, {
+      testType,
+      recipient: testEmail,
+      template: template.name,
+      emailId: emailResult.data?.id,
+      timestamp: new Date().toISOString()
+    })
+
+    // Get Resend analytics if available
+    let deliveryStatus = 'sent'
+    let analyticsData = null
+
+    try {
+      // Try to get email status from Resend (if API supports it)
+      if (emailResult.data?.id) {
+        // Note: Resend doesn't have a public get email API yet, but we can prepare for it
+        analyticsData = {
+          emailId: emailResult.data.id,
+          status: 'sent',
+          sentAt: new Date().toISOString(),
+          provider: 'resend'
+        }
+      }
+    } catch (analyticsError) {
+      console.log('Analytics not available:', analyticsError)
+    }
 
     return NextResponse.json({
       success: true,
       message: `${testType} test email sent successfully`,
-      emailId: result.id,
+      emailId: emailResult.data?.id,
       testData: finalTestData,
       recipientEmail: testEmail,
       templateName: template.name,
       testType,
       sentAt: new Date().toISOString(),
-      deliverabilityTips: getDeliverabilityTips(testType)
+      deliverabilityTips: getDeliverabilityTips(testType),
+      analytics: analyticsData,
+      deliveryStatus,
+      resendResponse: {
+        id: emailResult.data?.id,
+        status: emailResult.error ? 'error' : 'sent'
+      }
     })
 
   } catch (error) {

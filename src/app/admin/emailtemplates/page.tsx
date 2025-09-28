@@ -16,14 +16,18 @@ import {
 import Header from '@/components/Header'
 import EmailTemplateEditor from '@/components/EmailTemplateEditor'
 import EnhancedEmailTemplateEditor from '@/components/EnhancedEmailTemplateEditor'
+import TestEmailModal from '@/components/TestEmailModal'
+import EmailAnalyticsDashboard from '@/components/EmailAnalyticsDashboard'
 import { EmailTemplateConfig, DEFAULT_TEMPLATES } from '@/types/email-templates'
 
 export default function EmailTemplatesAdmin() {
   const [templates, setTemplates] = useState<EmailTemplateConfig[]>(DEFAULT_TEMPLATES)
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplateConfig | null>(null)
-  const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list')
+  const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview' | 'analytics'>('list')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [showTestModal, setShowTestModal] = useState(false)
+  const [testTemplate, setTestTemplate] = useState<EmailTemplateConfig | null>(null)
 
   const categories = [
     { value: 'all', label: 'All Templates' },
@@ -71,6 +75,11 @@ export default function EmailTemplatesAdmin() {
   const handlePreviewTemplate = (template: EmailTemplateConfig) => {
     setSelectedTemplate(template)
     setViewMode('preview')
+  }
+
+  const handleTestTemplate = (template: EmailTemplateConfig) => {
+    setTestTemplate(template)
+    setShowTestModal(true)
   }
 
   const handleDuplicateTemplate = (template: EmailTemplateConfig) => {
@@ -122,6 +131,32 @@ export default function EmailTemplatesAdmin() {
     />
   }
 
+  if (viewMode === 'analytics') {
+    return (
+      <div className="min-h-screen bg-black">
+        <Header />
+        
+        <div className="pt-20 pb-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-4xl font-bold text-white">
+                📊 Email Analytics
+              </h1>
+              <button
+                onClick={() => setViewMode('list')}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+              >
+                Back to Templates
+              </button>
+            </div>
+            
+            <EmailAnalyticsDashboard />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-black">
       <Header />
@@ -145,14 +180,26 @@ export default function EmailTemplatesAdmin() {
                 </p>
               </div>
               
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg"
-              >
-                <PlusIcon className="w-5 h-5" />
-                Create New Template
-              </motion.button>
+              <div className="flex items-center gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewMode('analytics')}
+                  className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg"
+                >
+                  <ChartBarIcon className="w-5 h-5" />
+                  Analytics
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg"
+                >
+                  <PlusIcon className="w-5 h-5" />
+                  Create New Template
+                </motion.button>
+              </div>
             </div>
           </motion.div>
 
@@ -338,6 +385,14 @@ export default function EmailTemplatesAdmin() {
                 <div className="px-6 py-4 bg-gray-900/50 border-t border-gray-800">
                   <div className="flex items-center gap-2">
                     <button
+                      onClick={() => handleTestTemplate(template)}
+                      className="flex items-center gap-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
+                    >
+                      <EnvelopeIcon className="w-4 h-4" />
+                      Test
+                    </button>
+                    
+                    <button
                       onClick={() => handlePreviewTemplate(template)}
                       className="flex items-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
                     >
@@ -404,6 +459,18 @@ export default function EmailTemplatesAdmin() {
           )}
         </div>
       </div>
+
+      {/* Test Email Modal */}
+      {testTemplate && (
+        <TestEmailModal
+          isOpen={showTestModal}
+          onClose={() => {
+            setShowTestModal(false)
+            setTestTemplate(null)
+          }}
+          template={testTemplate}
+        />
+      )}
     </div>
   )
 }
