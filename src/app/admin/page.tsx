@@ -85,7 +85,7 @@ export default function AdminDashboard() {
         else if (j === 3) suffix = 'rd'
       }
       const yy = String(y).slice(2)
-      return `${months[m-1]} ${d}${suffix}, ${yy}'`
+      return `${months[m-1]} ${d}${suffix}, ${yy}`
     } catch { return iso }
   }
   return (
