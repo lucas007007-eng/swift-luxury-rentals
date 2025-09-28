@@ -14,7 +14,7 @@ import {
   SwatchIcon,
   EnvelopeIcon,
   Bars3Icon,
-  SpaceBarIcon,
+  RectangleStackIcon,
   ShareIcon,
   Cog6ToothIcon
 } from '@heroicons/react/24/outline'
