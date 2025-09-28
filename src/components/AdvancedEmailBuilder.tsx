@@ -495,14 +495,14 @@ export default function AdvancedEmailBuilder({
             <div className="border-t border-gray-200 pt-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Email Settings</h3>
               
-              <div className="space-y-4">
+              <div className="space-y-4 email-editor">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Subject Line</label>
                   <input
                     type="text"
                     value={activeTemplate.subject}
                     onChange={(e) => setActiveTemplate(prev => ({ ...prev, subject: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900"
                     placeholder="Email subject"
                   />
                 </div>
@@ -516,7 +516,7 @@ export default function AdvancedEmailBuilder({
                       ...prev,
                       styling: { ...prev.styling, primaryColor: e.target.value }
                     }))}
-                    className="w-full h-10 border border-gray-300 rounded"
+                    className="w-full h-10 border border-gray-300 rounded bg-white"
                   />
                 </div>
               </div>

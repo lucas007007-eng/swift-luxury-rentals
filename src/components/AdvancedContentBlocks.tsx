@@ -615,7 +615,7 @@ export function AdvancedBlockEditor({ block, onUpdate, onDelete }: AdvancedBlock
 
       {/* Block Editor */}
       {isExpanded && (
-        <div className="p-4 bg-white">
+        <div className="p-4 bg-white email-editor">
           {renderBlockEditor()}
         </div>
       )}

@@ -1026,6 +1026,20 @@ html {
   width: 100%;
 }
 
+/* Email template editor specific overrides */
+.email-editor input,
+.email-editor textarea,
+.email-editor select {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.email-editor input::placeholder,
+.email-editor textarea::placeholder {
+  color: #6b7280 !important;
+}
+
 .glass-menu select option {
   background: hsl(220deg 25% 8%);
   color: #fff;

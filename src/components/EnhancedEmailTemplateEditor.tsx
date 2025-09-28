@@ -84,7 +84,7 @@ export default function EnhancedEmailTemplateEditor({
 
       case 'content':
         return (
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-6 email-editor">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Basic Settings */}
               <div className="bg-gray-50 border rounded-xl p-6">
@@ -199,7 +199,7 @@ export default function EnhancedEmailTemplateEditor({
 
       case 'variables':
         return (
-          <div className="p-6">
+          <div className="p-6 email-editor">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-gray-900">Template Variables</h3>
               <button
@@ -220,7 +220,7 @@ export default function EnhancedEmailTemplateEditor({
 
       case 'styling':
         return (
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-6 email-editor">
             <h3 className="text-xl font-semibold text-gray-900">Global Template Styling</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -321,7 +321,7 @@ export default function EnhancedEmailTemplateEditor({
 
       case 'preview':
         return (
-          <div className="p-6">
+          <div className="p-6 email-editor">
             <div className="text-center mb-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Template Preview</h3>
               <p className="text-gray-600">
