@@ -249,7 +249,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Development Tools CTAs */}
-        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Skill Tree CTA */}
           <div
             className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-yellow-400/30 bg-[linear-gradient(165deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(234,179,8,0.15),inset_0_1px_0_rgba(255,255,255,0.14)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
@@ -281,6 +281,33 @@ export default function AdminDashboard() {
                 <div className="text-zinc-300 mt-1 text-sm">Page Edits, Operating Manual, Engineering Playbooks, Saved Prompts, Repo Map, Week Plan.</div>
                 <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-orange-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-orange-400/40 transition-all">Open DevOps →</div>
               </div>
+            </div>
+          </div>
+          
+          {/* Email Templates CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-cyan-400/30 bg-[linear-gradient(195deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(6,182,212,0.15),inset_0_1px_0_rgba(255,255,255,0.16)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
+            onClick={() => router.push('/admin/emailtemplates')}
+            role="link"
+            aria-label="Click to access email templates"
+          >
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-cyan-400 font-sora">Communications</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Email Templates</div>
+                <div className="text-zinc-300 mt-1 text-sm">Klaviyo-style email builder with drag-and-drop, analytics, and test features.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-cyan-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-cyan-400/40 transition-all">
+                  <span className="mr-2">📧</span>
+                  Open Email Builder →
+                </div>
+              </div>
+            </div>
+            
+            {/* Spy-tech animated background effect */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-4 right-4 w-8 h-8 border border-cyan-400/30 rounded-full animate-pulse"></div>
+              <div className="absolute bottom-4 left-4 w-6 h-6 border border-cyan-400/20 rounded animate-spin" style={{ animationDuration: '3s' }}></div>
+              <div className="absolute top-1/2 right-8 w-1 h-8 bg-gradient-to-b from-cyan-400/30 to-transparent animate-pulse" style={{ animationDelay: '1s' }}></div>
             </div>
           </div>
           
