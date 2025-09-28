@@ -284,7 +284,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           
-          {/* Email Templates CTA */
+          {/* Email Templates CTA */}
           <div
             className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-cyan-400/30 bg-[linear-gradient(195deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(6,182,212,0.15),inset_0_1px_0_rgba(255,255,255,0.16)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/admin/emailtemplates')}
