@@ -17,15 +17,31 @@ export async function POST(req: NextRequest) {
     const { Webhook } = await import('svix')
     const wh = new Webhook(secret)
     const event = wh.verify(payload, headers) as any
-
-    // Minimal processing – extend to store analytics if needed
     const type = String(event?.type || '')
-    const data = event?.data
+    const data = event?.data || {}
 
-    // Example: mark conversation message delivered/opened in future
-    // TODO: integrate with Message records if we store resend message IDs
+    try {
+      const { PrismaClient } = await import('@prisma/client')
+      const prisma = new PrismaClient()
+      const msgId = data?.id || data?.message?.id || data?.email?.id
+      if (msgId) {
+        const set: any = {}
+        const now = new Date()
+        if (type.endsWith('.delivered')) { set.status = 'delivered'; set.deliveredAt = now }
+        else if (type.endsWith('.opened')) { set.status = 'opened'; set.openedAt = now }
+        else if (type.endsWith('.clicked')) { set.status = 'clicked'; set.clickedAt = now }
+        else if (type.endsWith('.bounced')) { set.status = 'bounced'; set.bouncedAt = now }
+        else if (type.endsWith('.complained')) { set.status = 'complained'; set.complainedAt = now }
+        else if (type.endsWith('.failed')) { set.status = 'failed'; set.failedAt = now }
+        if (Object.keys(set).length > 0) {
+          await (prisma as any).message.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
+        }
+      }
+      await prisma.$disconnect()
+    } catch (e) {
+      console.error('Resend webhook prisma error', e)
+    }
 
-    // Acknowledge
     return NextResponse.json({ ok: true, type })
   } catch (e) {
     console.error('Resend webhook error', e)

@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     const msgs = await (prisma as any).message.findMany({
       where: { conversationId },
       orderBy: { createdAt: 'asc' },
-      select: { id: true, direction: true, fromEmail: true, fromName: true, text: true, html: true, createdAt: true }
+      select: { id: true, direction: true, fromEmail: true, fromName: true, text: true, html: true, createdAt: true, status: true, deliveredAt: true, openedAt: true, clickedAt: true }
     })
     return NextResponse.json(msgs)
   } catch (e) {

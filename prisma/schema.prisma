@@ -326,6 +326,15 @@ model Message {
   html           String?
   messageId      String?      @unique
   inReplyTo      String?
+  provider       String?      // resend|postmark|smtp
+  providerId     String?      @unique
+  status         String?      // queued|sent|delivered|opened|clicked|bounced|failed|complained
+  deliveredAt    DateTime?
+  openedAt       DateTime?
+  clickedAt      DateTime?
+  bouncedAt      DateTime?
+  complainedAt   DateTime?
+  failedAt       DateTime?
   createdAt      DateTime     @default(now())
   attachments    Attachment[]
 

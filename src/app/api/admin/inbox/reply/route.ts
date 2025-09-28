@@ -51,7 +51,10 @@ export async function POST(req: NextRequest) {
           toEmail,
           subject: conv.subject || 'Re: your request',
           text,
-          messageId: (result as any)?.id || undefined
+          messageId: (result as any)?.id || undefined,
+          provider: 'resend',
+          providerId: (result as any)?.id || undefined,
+          status: 'sent'
         }
       })
       await (prisma as any).conversation.update({ where: { id: conversationId }, data: { lastMessageAt: new Date() } })

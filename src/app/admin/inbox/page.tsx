@@ -17,6 +17,10 @@ type Message = {
   text?: string
   html?: string
   createdAt: string
+  status?: string
+  deliveredAt?: string
+  openedAt?: string
+  clickedAt?: string
 }
 
 export default function InboxPage() {
@@ -77,7 +81,14 @@ export default function InboxPage() {
             <div className="flex-1 p-4 space-y-4 overflow-y-auto">
               {messages.map(m => (
                 <div key={m.id} className={`p-3 rounded-lg border ${m.direction==='outbound'?'border-green-700 bg-green-900/10':'border-gray-700 bg-gray-900/40'}`}>
-                  <div className="text-xs text-gray-400 mb-1">{m.fromName||m.fromEmail} • {new Date(m.createdAt).toLocaleString()}</div>
+                  <div className="text-xs text-gray-400 mb-1 flex items-center gap-2">
+                    <span>{m.fromName||m.fromEmail} • {new Date(m.createdAt).toLocaleString()}</span>
+                    {m.status && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] border border-gray-600 text-gray-300">
+                        {m.status}
+                      </span>
+                    )}
+                  </div>
                   <div className="whitespace-pre-wrap text-gray-100 text-sm">{m.text || ''}</div>
                 </div>
               ))}
