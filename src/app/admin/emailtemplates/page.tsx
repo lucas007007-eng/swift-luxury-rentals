@@ -184,6 +184,8 @@ export default function EmailTemplatesAdmin() {
             // Reload from server to ensure DB persistence is reflected
             const latest = await loadEmailTemplates()
             setTemplates(latest.templates)
+            // Keep editing; refresh the selected template in place
+            setSelectedTemplate(updatedTemplate)
             console.log(`Template saved via ${result.method}`)
           } else {
             alert('Failed to save template: ' + (result.error || 'Unknown error'))
@@ -192,8 +194,6 @@ export default function EmailTemplatesAdmin() {
           console.error('Save error:', error)
           alert('Failed to save template')
         }
-        setViewMode('list')
-        setSelectedTemplate(null)
       }}
       onCancel={() => {
         setViewMode('list')

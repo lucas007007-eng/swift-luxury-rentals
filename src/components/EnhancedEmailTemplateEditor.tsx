@@ -35,6 +35,8 @@ export default function EnhancedEmailTemplateEditor({
   const [editedTemplate, setEditedTemplate] = useState<EmailTemplateConfig>({ ...template })
   const [showTestEmailModal, setShowTestEmailModal] = useState(false)
   const [showSaveModal, setShowSaveModal] = useState(false)
+  const [showLeaveModal, setShowLeaveModal] = useState(false)
+  const [dirty, setDirty] = useState(false)
 
   // Convert template to drag-drop format
   const [dragDropTemplate, setDragDropTemplate] = useState<DragDropTemplate>({
@@ -63,6 +65,7 @@ export default function EnhancedEmailTemplateEditor({
 
   const handleDragDropSave = (updatedTemplate: DragDropTemplate) => {
     setDragDropTemplate(updatedTemplate)
+    setDirty(true)
     // Convert back to original format and update editedTemplate
     // This is where we'd convert the drag-drop format back to the original template format
   }
@@ -396,11 +399,14 @@ export default function EnhancedEmailTemplateEditor({
                 Test Email
               </button>
               <button
-                onClick={onCancel}
+                onClick={() => {
+                  if (dirty) setShowLeaveModal(true)
+                  else onCancel()
+                }}
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <XMarkIcon className="w-4 h-4" />
-                Cancel
+                Return
               </button>
               <button
                 onClick={() => handleSave(editedTemplate)}
@@ -454,6 +460,44 @@ export default function EnhancedEmailTemplateEditor({
         templateName={editedTemplate.name}
         onRefresh={handleSaveComplete}
       />
+
+      {/* Leave Without Saving Modal */}
+      {showLeaveModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowLeaveModal(false)} />
+          <div className="relative bg-gradient-to-br from-gray-900 to-black border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h3 className="text-xl font-bold text-white mb-2">Unsaved changes</h3>
+            <p className="text-gray-300 mb-4">Do you want to save before leaving the editor?</p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black rounded-lg"
+                onClick={() => {
+                  setShowLeaveModal(false)
+                  setShowSaveModal(true)
+                }}
+              >
+                Save and exit
+              </button>
+              <button
+                className="px-4 py-2 border border-gray-500 text-gray-200 rounded-lg hover:bg-gray-800"
+                onClick={() => setShowLeaveModal(false)}
+              >
+                Go back to editor
+              </button>
+              <button
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+                onClick={() => {
+                  setShowLeaveModal(false)
+                  setDirty(false)
+                  onCancel()
+                }}
+              >
+                Leave without saving
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
