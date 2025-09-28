@@ -166,7 +166,7 @@ export default function AdvancedEmailBuilder({
   }
 
   const moveBlock = (blockId: string, direction: 'up' | 'down') => {
-    setEmailStructure(prev => {
+    setEmailStructure((prev: EmailStructure): EmailStructure => {
       const blocks = [...prev.body.blocks]
       const index = blocks.findIndex(b => b.id === blockId)
       
