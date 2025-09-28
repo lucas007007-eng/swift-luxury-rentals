@@ -1005,34 +1005,31 @@ export default function AdvancedEmailBuilder({
           {renderEmailPreview()}
         </div>
 
-        {/* Right Sidebar - Property Editor */}
-        {selectedBlock && (
-          <div className="w-80 bg-white border-l border-gray-200 p-6 overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Block Properties</h3>
-              <button
-                onClick={() => setSelectedBlock(null)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ×
-              </button>
-            </div>
+        {/* Right Sidebar - Property Editor (always visible) */}
+        <div className="w-96 bg-white border-l border-gray-200 p-6 overflow-y-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Block Properties</h3>
+          </div>
 
-            {(() => {
-              const block = emailStructure.body.blocks.find(b => b.id === selectedBlock)
-              return block ? (
+          {emailStructure.body.blocks.length > 0 ? (
+            <div className="space-y-4">
+              {emailStructure.body.blocks.map((block) => (
                 <AdvancedBlockEditor
+                  key={block.id}
                   block={block as any}
-                  onUpdate={(updatedBlock) => updateBlock(selectedBlock, updatedBlock)}
+                  defaultExpanded={block.id === selectedBlock || selectedBlock === null}
+                  onUpdate={(updatedBlock) => updateBlock(block.id, updatedBlock)}
                   onDelete={() => {
-                    deleteBlock(selectedBlock)
-                    setSelectedBlock(null)
+                    deleteBlock(block.id)
+                    if (selectedBlock === block.id) setSelectedBlock(null)
                   }}
                 />
-              ) : null
-            })()}
-          </div>
-        )}
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">Select a block or add one from the left.</p>
+          )}
+        </div>
       </div>
 
       {/* Test Email Modal */}

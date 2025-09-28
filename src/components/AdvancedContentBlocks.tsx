@@ -270,10 +270,11 @@ interface AdvancedBlockEditorProps {
   block: AdvancedEmailBlock
   onUpdate: (block: AdvancedEmailBlock) => void
   onDelete: () => void
+  defaultExpanded?: boolean
 }
 
-export function AdvancedBlockEditor({ block, onUpdate, onDelete }: AdvancedBlockEditorProps) {
-  const [isExpanded, setIsExpanded] = useState(false)
+export function AdvancedBlockEditor({ block, onUpdate, onDelete, defaultExpanded }: AdvancedBlockEditorProps) {
+  const [isExpanded, setIsExpanded] = useState(!!defaultExpanded)
 
   const updateBlockContent = (updates: any) => {
     onUpdate({
