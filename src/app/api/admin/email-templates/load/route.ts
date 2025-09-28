@@ -9,14 +9,14 @@ export async function GET(request: NextRequest) {
       const { PrismaClient } = await import('@prisma/client')
       const prisma = new PrismaClient()
 
-      const dbTemplates = await prisma.emailTemplate.findMany({
+      const dbTemplates = await (prisma as any).emailTemplate.findMany({
         orderBy: { updatedAt: 'desc' }
       })
 
       await prisma.$disconnect()
 
       if (dbTemplates.length > 0) {
-        const templates: EmailTemplateConfig[] = dbTemplates.map(dbTemplate => {
+        const templates: EmailTemplateConfig[] = (dbTemplates as any[]).map((dbTemplate: any) => {
           // Parse the JSON template data
           const templateData = dbTemplate.templateData as any
           return {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
             description: dbTemplate.description || '',
             category: dbTemplate.category as any,
             subject: dbTemplate.subject,
-            preheader: dbTemplate.preheader,
+            preheader: dbTemplate.preheader ?? undefined,
             isActive: dbTemplate.isActive,
             lastModified: dbTemplate.updatedAt.toISOString(),
             variables: templateData.variables || [],

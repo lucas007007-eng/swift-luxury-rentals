@@ -18,14 +18,15 @@ export async function POST(request: NextRequest) {
       const { PrismaClient } = await import('@prisma/client')
       const prisma = new PrismaClient()
 
-      const savedTemplate = await prisma.emailTemplate.upsert({
+      const savedTemplate = await (prisma as any).emailTemplate.upsert({
         where: { templateId: template.id },
         update: {
           name: template.name,
           description: template.description,
           category: template.category,
           subject: template.subject,
-          preheader: template.preheader,
+          // store null in DB when preheader is unset to avoid empty strings
+          preheader: template.preheader ?? null,
           isActive: template.isActive,
           templateData: template as any,
           updatedAt: new Date()
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
           description: template.description || '',
           category: template.category,
           subject: template.subject,
-          preheader: template.preheader,
+          preheader: template.preheader ?? null,
           isActive: template.isActive,
           templateData: template as any
         }
