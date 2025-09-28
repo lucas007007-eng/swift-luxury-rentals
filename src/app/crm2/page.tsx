@@ -89,6 +89,44 @@ export default function CRM2Page() {
   const [owners, setOwners] = useState<string[]>([])
   const [myOnly, setMyOnly] = useState(true)
   const [leaseSelected, setLeaseSelected] = useState<Record<string, boolean>>({})
+  const [selected, setSelected] = useState<Record<string, boolean>>({})
+
+  // Derived selections
+  const selectedIds = Object.entries(selected).filter(([, v]) => v).map(([k]) => k)
+
+  // Simple lead score (0-100): combines value and urgency
+  const getLeadScore = (l: any): number => {
+    try {
+      // Monetary value from latest deal or budget
+      const dl = (deals || [])
+        .filter((d: any) => d.leadId === l.id)
+        .sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())[0]
+      const dealValueCents = dl ? Number(dl.monthlyRateCents || 0) * Math.max(1, Number(dl.termMonths || 1)) : 0
+      const budgetCents = Number(l.budgetCents || 0)
+      const valueCents = Math.max(dealValueCents, budgetCents)
+      // Normalize value to 0..60 (e.g., €0..€50k scaled)
+      const valueScore = Math.max(0, Math.min(60, Math.round((valueCents / 100) / 50000 * 60)))
+      // Urgency from SLA consumption -> 0..40
+      const slaDays = STAGE_SLA_DAYS[l.stage] ?? 0
+      let urgencyScore = 0
+      if (slaDays > 0) {
+        const lastStageTs = (l as any).stageHistory?.[0]?.changedAt
+          ? new Date((l as any).stageHistory[0].changedAt).getTime()
+          : (l.updatedAt ? new Date(l.updatedAt).getTime() : 0)
+        if (lastStageTs) {
+          const ageMs = Date.now() - lastStageTs
+          const slaMs = slaDays * 24 * 60 * 60 * 1000
+          const pct = Math.max(0, Math.min(150, Math.round((ageMs / slaMs) * 100)))
+          // Map 0..100% -> 0..30, 100..150% -> 30..40
+          urgencyScore = pct <= 100 ? Math.round(pct * 0.3) : 30 + Math.round((pct - 100) * 0.2)
+          urgencyScore = Math.max(0, Math.min(40, urgencyScore))
+        }
+      }
+      return Math.max(0, Math.min(100, valueScore + urgencyScore))
+    } catch {
+      return 0
+    }
+  }
   const jumpToBreaches = () => {
     setFilterSLA('breach')
     setTimeout(() => {
@@ -215,7 +253,31 @@ export default function CRM2Page() {
     if (view === 'renewals45') {
       setFilterStage('signed')
     }
+    // Parse direct filters from URL (?owner=&city=&stage=&sla=&my=1)
+    const qOwner = sp.get('owner') || ''
+    const qCity = sp.get('city') || ''
+    const qStage = sp.get('stage') || ''
+    const qSla = sp.get('sla') || ''
+    const qMy = sp.get('my') || ''
+    if (qOwner) setFilterOwner(qOwner)
+    if (qCity) setFilterCity(qCity)
+    if (qStage) setFilterStage(qStage)
+    if (qSla === 'breach' || qSla === 'due') setFilterSLA(qSla as any)
+    if (qMy === '1') setMyOnly(true)
   }, [])
+
+  // Keep URL in sync with current filters
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const url = new URL(window.location.href)
+    const set = (k: string, v: string) => { if (v) url.searchParams.set(k, v); else url.searchParams.delete(k) }
+    set('owner', filterOwner || '')
+    set('city', filterCity || '')
+    set('stage', filterStage !== 'all' ? filterStage : '')
+    set('sla', filterSLA !== 'all' ? filterSLA : '')
+    if (myOnly) url.searchParams.set('my', '1'); else url.searchParams.delete('my')
+    window.history.replaceState(null, '', url.toString())
+  }, [filterOwner, filterCity, filterStage, filterSLA, myOnly])
 
   const filteredLeads = useMemo(() => {
     const isBreachOrDue = (l: any) => {
@@ -514,8 +576,36 @@ export default function CRM2Page() {
               </select>
               <label className="flex items-center gap-2 text-sm text-zinc-300"><input type="checkbox" checked={myOnly} onChange={(e)=> setMyOnly(e.target.checked)} /> My leads</label>
             </div>
-            <div className="mt-4 flex items-center justify-end">
+            <div className="mt-4 flex items-center justify-end gap-2">
               <button onClick={()=>setNewLeadOpen(true)} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all">New Lead</button>
+              {selectedIds.length>0 && (
+                <>
+                  <button
+                    className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white"
+                    onClick={async ()=>{
+                      const newOwner = prompt('Assign owner (email) to selected:') || ''
+                      if (!newOwner) return
+                      for (const id of selectedIds) {
+                        try { await fetch('/api/crm2/leads', { method: 'PATCH', body: JSON.stringify({ id, owner: newOwner }) }) } catch {}
+                      }
+                      setLeads(prev => prev.map(l => selected[l.id] ? { ...l, owner: newOwner } : l))
+                      setSelected({})
+                    }}
+                  >Assign Owner</button>
+                  <button
+                    className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white"
+                    onClick={async ()=>{
+                      const newStage = prompt('Change stage to (new,qualified,viewing,application,screening,offer,lease,signed):') || ''
+                      if (!newStage) return
+                      for (const id of selectedIds) {
+                        try { await fetch('/api/crm2/leads', { method: 'PATCH', body: JSON.stringify({ id, stage: newStage }) }) } catch {}
+                      }
+                      setLeads(prev => prev.map(l => selected[l.id] ? { ...l, stage: newStage } : l))
+                      setSelected({})
+                    }}
+                  >Change Stage</button>
+                </>
+              )}
               <div className="ml-3 flex items-center gap-2">
                 <a href="/crm2?view=offers" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Offers Out</a>
                 <a href="/crm2?view=signed" className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white">Signed</a>
@@ -582,10 +672,14 @@ export default function CRM2Page() {
                       onClick={()=>setDrawerLead(l)}
                       draggable
                       onDragStart={()=> setDragId(l.id)}
-                      className="w-full text-left rounded-lg border border-zinc-600/40 bg-black/30 p-3 hover:border-zinc-400/60 transition-colors"
+                      className={`w-full text-left rounded-lg border ${selected[l.id] ? 'border-zinc-300/70' : 'border-zinc-600/40'} bg-black/30 p-3 hover:border-zinc-400/60 transition-colors`}
                       id={`lead-${l.id}`}
                       title={`Stage changed ${((l as any).stageHistory?.[0]?.changedAt ? new Date((l as any).stageHistory[0].changedAt) : (l.updatedAt ? new Date(l.updatedAt) : null))?.toLocaleString() || ''}`}
                     >
+                      <div className="mb-2 flex items-center gap-2 text-[11px] text-zinc-300">
+                        <input type="checkbox" checked={!!selected[l.id]} onChange={(e)=> setSelected(prev=> ({ ...prev, [l.id]: e.target.checked }))} onClick={(e)=> e.stopPropagation()} />
+                        <span>Select</span>
+                      </div>
                       {stage==='lease' && (
                         <div className="mb-1 flex items-center justify-between gap-2">
                           <label className="flex items-center gap-2 text-[11px] text-zinc-300">
@@ -635,7 +729,12 @@ export default function CRM2Page() {
                       )}
                       <div className="flex items-center justify-between">
                         <div className="text-white font-semibold font-sora truncate">{l.name}</div>
-                        <div className="text-xs text-zinc-400 ml-2">{l.company || '—'}</div>
+                        <div className="text-xs text-zinc-400 ml-2 flex items-center gap-2">
+                          <span>{l.company || '—'}</span>
+                          <span className="px-1.5 py-0.5 rounded border border-zinc-500/40 text-[10px] text-zinc-300" title="Lead Score">
+                            {getLeadScore(l)}
+                          </span>
+                        </div>
                       </div>
                       <div className="text-xs text-zinc-300 mt-1 truncate">{l.email || 'no-email'}{l.phone ? ` • ${l.phone}` : ''}</div>
                       <div className="text-xs text-zinc-400 mt-1 flex items-center justify-between">
