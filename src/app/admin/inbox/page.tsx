@@ -7,6 +7,7 @@ type Conversation = {
   subject: string
   status: string
   lastMessageAt: string
+  assigneeId?: string | null
 }
 
 type Message = {
@@ -29,8 +30,13 @@ export default function InboxPage() {
   const [messages, setMessages] = useState<Message[]>([])
   const [reply, setReply] = useState('')
   const [filter, setFilter] = useState<'all'|'awaiting'>('all')
+  const [agents, setAgents] = useState<{ id: string; email: string; name?: string }[]>([])
+  const [bulk, setBulk] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
+    ;(async()=>{
+      try { const res = await fetch('/api/admin/inbox/agents'); if(res.ok) setAgents(await res.json()) } catch {}
+    })()
     ;(async () => {
       const params = new URLSearchParams()
       params.set('list', '1')
@@ -89,7 +95,24 @@ export default function InboxPage() {
                 <button onClick={()=>setFilter('awaiting')} className={`text-xs px-2 py-1 rounded ${filter==='awaiting'?'bg-gray-800 text-gray-100 border border-gray-600':'text-gray-400'}`}>Awaiting Reply</button>
               </div>
             </div>
-            <div className="max-h-[70vh] overflow-y-auto divide-y divide-gray-800">
+            <div className="p-2 flex items-center justify-between gap-2 border-b border-gray-800">
+              <div className="text-xs text-gray-400">Bulk:</div>
+              <div className="flex items-center gap-2">
+                <button onClick={async()=>{
+                  const ids = Object.keys(bulk).filter(k=>bulk[k])
+                  for (const id of ids) await fetch('/api/admin/inbox/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({conversationId:id})})
+                  setBulk({})
+                }} className="text-xs px-2 py-1 rounded border border-gray-600 text-gray-200 hover:bg-gray-800">Mark Read</button>
+                <button onClick={async()=>{
+                  const ids = Object.keys(bulk).filter(k=>bulk[k])
+                  for (const id of ids) await fetch('/api/admin/inbox/close',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({conversationId:id,open:false})})
+                  setBulk({})
+                  const res = await fetch('/api/admin/inbox/messages?list=1')
+                  if(res.ok) setConversations(await res.json())
+                }} className="text-xs px-2 py-1 rounded border border-red-600 text-red-300 hover:bg-red-900/20">Close</button>
+              </div>
+            </div>
+            <div className="max-h-[65vh] overflow-y-auto divide-y divide-gray-800">
               {conversations
                 .filter(c=>{
                   if (filter==='all') return true
@@ -97,10 +120,25 @@ export default function InboxPage() {
                   return true
                 })
                 .map(c => (
-                <button key={c.id} onClick={() => setSelected(c.id)} className={`w-full text-left p-4 hover:bg-gray-800/60 ${selected===c.id?'bg-gray-800/80':''}`}>
-                  <div className="text-gray-100 font-semibold">{c.subject}</div>
-                  <div className="text-xs text-gray-400">{new Date(c.lastMessageAt).toLocaleString()} • {c.status}</div>
-                </button>
+                <div key={c.id} className={`w-full text-left p-3 hover:bg-gray-800/60 ${selected===c.id?'bg-gray-800/80':''}`}>
+                  <div className="flex items-center justify-between">
+                    <div onClick={() => setSelected(c.id)} className="cursor-pointer">
+                      <div className="text-gray-100 font-semibold">{c.subject}</div>
+                      <div className="text-xs text-gray-400">{new Date(c.lastMessageAt).toLocaleString()} • {c.status}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input type="checkbox" checked={!!bulk[c.id]} onChange={(e)=>setBulk({...bulk,[c.id]:e.target.checked})} />
+                      <select value={c.assigneeId||''} onChange={async(e)=>{
+                        await fetch('/api/admin/inbox/assign',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({conversationId:c.id,assigneeId:e.target.value||null})})
+                        const res = await fetch('/api/admin/inbox/messages?list=1')
+                        if(res.ok) setConversations(await res.json())
+                      }} className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-1 py-0.5">
+                        <option value="">Unassigned</option>
+                        {agents.map(a=> <option key={a.id} value={a.id}>{a.name||a.email}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

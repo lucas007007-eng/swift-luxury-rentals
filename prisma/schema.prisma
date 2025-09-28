@@ -306,6 +306,7 @@ model Conversation {
   updatedAt     DateTime    @updatedAt
   closedAt      DateTime?
   agentLastReadAt DateTime?
+  closeReason   String?
   messages      Message[]
   participants  Participant[]
 

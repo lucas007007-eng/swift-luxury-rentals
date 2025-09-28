@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
           subject: true,
           status: true,
           lastMessageAt: true,
+          assigneeId: true,
           messages: {
             select: { direction: true, createdAt: true },
             orderBy: { createdAt: 'desc' },
@@ -29,6 +30,7 @@ export async function GET(req: NextRequest) {
         subject: r.subject,
         status: r.status,
         lastMessageAt: r.lastMessageAt,
+        assigneeId: r.assigneeId || null,
         lastMessageDirection: r.messages?.[0]?.direction || null
       }))
       const filtered = mapped.filter((r: any) => {
