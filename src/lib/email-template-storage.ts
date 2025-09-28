@@ -26,9 +26,8 @@ async function loadFromDatabase(): Promise<EmailTemplateConfig[] | null> {
     const response = await fetch('/api/admin/email-templates/load')
     if (!response.ok) return null
     const data = await response.json()
-    // Only accept DB-loaded templates; otherwise, allow localStorage fallback
-    if (!data || data.method !== 'database') return null
-    return data.templates
+    // Accept any templates the API returns (database or defaults)
+    return Array.isArray(data?.templates) ? data.templates : null
     return null
   } catch (error) {
     console.error('Database load failed:', error)
