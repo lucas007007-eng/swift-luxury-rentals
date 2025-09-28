@@ -158,7 +158,7 @@ export default function TestEmailModal({ isOpen, onClose, template }: TestEmailM
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto email-editor"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
@@ -178,7 +178,7 @@ export default function TestEmailModal({ isOpen, onClose, template }: TestEmailM
               </div>
 
               {/* Content */}
-              <div className="p-6 space-y-6">
+              <div className="p-6 space-y-6 email-editor text-gray-900">
                 
                 {/* Email Input */}
                 <div>
@@ -190,7 +190,7 @@ export default function TestEmailModal({ isOpen, onClose, template }: TestEmailM
                     value={testEmail}
                     onChange={(e) => setTestEmail(e.target.value)}
                     placeholder="Enter email address to send test"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900 placeholder-gray-500"
                   />
                   {error && (
                     <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
@@ -336,18 +336,18 @@ export default function TestEmailModal({ isOpen, onClose, template }: TestEmailM
                 {/* Template Info */}
                 <div className="bg-gray-50 rounded-xl p-4">
                   <h3 className="font-semibold text-gray-900 mb-2">Template Details</h3>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2 text-sm text-gray-900">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Template:</span>
-                      <span className="font-medium">{template.name}</span>
+                      <span className="font-medium text-gray-900">{template.name}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subject:</span>
-                      <span className="font-medium">{template.subject}</span>
+                      <span className="font-medium text-gray-900">{template.subject}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Category:</span>
-                      <span className="font-medium capitalize">{template.category}</span>
+                      <span className="font-medium text-gray-900 capitalize">{template.category}</span>
                     </div>
                   </div>
                 </div>
