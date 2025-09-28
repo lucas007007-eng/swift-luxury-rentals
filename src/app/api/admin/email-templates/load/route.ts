@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       await prisma.$disconnect()
 
       if (dbTemplates.length > 0) {
-        const templates: EmailTemplateConfig[] = (dbTemplates as any[]).map((dbTemplate: any) => {
+        const dbMapped: EmailTemplateConfig[] = (dbTemplates as any[]).map((dbTemplate: any) => {
           // Parse the JSON template data
           const templateData = dbTemplate.templateData as any
           return {
@@ -34,13 +34,19 @@ export async function GET(request: NextRequest) {
           }
         })
 
-        console.log(`Loaded ${templates.length} templates from database`)
-        
+        // Union: start with defaults, override/append DB items by id
+        const byId = new Map<string, EmailTemplateConfig>()
+        for (const t of DEFAULT_TEMPLATES) byId.set(t.id, t)
+        for (const t of dbMapped) byId.set(t.id, t)
+        const combined = Array.from(byId.values())
+
+        console.log(`Loaded ${dbMapped.length} templates from database; returning ${combined.length} combined with defaults`)
+
         return NextResponse.json({
           success: true,
-          templates,
-          method: 'database',
-          count: templates.length
+          templates: combined,
+          method: 'database+defaults',
+          count: combined.length
         })
       }
 
