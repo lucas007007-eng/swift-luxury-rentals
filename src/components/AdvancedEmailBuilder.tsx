@@ -1073,7 +1073,7 @@ export default function AdvancedEmailBuilder({
       <TestEmailModal
         isOpen={showTestModal}
         onClose={() => setShowTestModal(false)}
-        template={activeTemplate}
+        template={serializeToTemplate()}
       />
 
       {/* Save Template Modal */}
