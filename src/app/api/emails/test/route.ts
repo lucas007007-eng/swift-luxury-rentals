@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     const { Resend } = await import('resend')
     const resend = new Resend(process.env.RESEND_API_KEY)
 
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+    const fromAddress = process.env.RESEND_FROM_EMAIL || 'newsletters@phantomproperties.co'
     const replyTo = process.env.RESEND_REPLY_TO_EMAIL || fromAddress
 
     const emailResult = await resend.emails.send({
@@ -160,7 +160,6 @@ function generateTestEmailHtml(
   testData: Record<string, any>,
   testType: 'design' | 'deliverability' | 'spam'
 ): string {
-  const testBanner = getTestBanner(testType)
   
   const baseHtml = `
     <!DOCTYPE html>
@@ -171,7 +170,6 @@ function generateTestEmailHtml(
       <title>${template.subject}</title>
     </head>
     <body style="font-family: ${template.styling.fontFamily}; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); color: #ffffff; margin: 0; padding: 0;">
-      ${testBanner}
       
       <div style="max-width: 600px; margin: 0 auto; background-color: #000000;">
         
@@ -274,37 +272,7 @@ function sanitizeSubjectForDeliverability(subject: string): string {
   return withoutEmoji.replace(/\b([A-Z]{6,})\b/g, (m) => m.charAt(0) + m.slice(1).toLowerCase())
 }
 
-// Generate test banner based on test type
-function getTestBanner(testType: string): string {
-  const banners = {
-    design: {
-      bg: '#3B82F6',
-      text: '🎨 DESIGN TEST EMAIL',
-      desc: 'This is a test email to check design and layout'
-    },
-    deliverability: {
-      bg: '#10B981',
-      text: '📬 DELIVERABILITY TEST',
-      desc: 'This email tests inbox placement and deliverability'
-    },
-    spam: {
-      bg: '#EF4444',
-      text: '🚨 SPAM FILTER TEST',
-      desc: 'This email tests spam filter performance'
-    }
-  }
-
-  const banner = banners[testType as keyof typeof banners] || banners.design
-
-  return `
-    <div style="background-color: ${banner.bg}; color: white; padding: 10px 20px; text-align: center; font-size: 14px; font-weight: 600;">
-      ${banner.text}
-      <div style="font-size: 12px; font-weight: normal; margin-top: 5px; opacity: 0.9;">
-        ${banner.desc}
-      </div>
-    </div>
-  `
-}
+// Removed prominent test banner to avoid spam triggers
 
 // Generate section HTML
 function generateSectionHtml(section: any, testData: Record<string, any>, styling: any): string {
