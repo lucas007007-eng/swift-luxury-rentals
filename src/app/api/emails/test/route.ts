@@ -199,7 +199,7 @@ function generateTestEmailHtml(
       ${template.preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;visibility:hidden;">${replaceVariables(template.preheader, testData)}</div>`: ''}
       <div style="max-width:600px;margin:0 auto;background-color:#000000;">
         <div style="text-align:center;padding:30px 20px;border-bottom:2px solid ${template.styling.primaryColor};background:${header.backgroundColor};color:${header.textColor}">
-          <h1 style="margin:0;font-size:28px;color:${template.styling.primaryColor};${header.textShadow?'text-shadow:0 2px 4px rgba(0,0,0,0.7)':''}">${template.content.header.icon||''} ${replaceVariables(header.title||template.content.header.title, testData)}</h1>
+          <h1 style="margin:0;font-size:28px;color:${template.styling.primaryColor};${header.textShadow?'text-shadow:0 2px 4px rgba(0,0,0,0.7)':''}">${replaceVariables(header.title||template.content.header.title, testData)}</h1>
           ${header.subtitle?`<p style="margin:10px 0 0 0;color:${template.styling.secondaryColor};font-weight:600">${replaceVariables(header.subtitle, testData)}</p>`:''}
         </div>
         <div style="background-color:#0a0a0a;padding:30px 20px;border-left:3px solid ${template.styling.primaryColor};margin:20px 0;">
@@ -208,6 +208,9 @@ function generateTestEmailHtml(
         <div style="background-color:#0a0a0a;padding:20px;text-align:center;border-top:1px solid #333;">
           <p style="color:#666;font-size:12px;margin:0;">${footer.companyInfo}</p>
           <p style="color:#555;font-size:10px;margin:10px 0 0 0;">${replaceVariables(footer.contactInfo, testData)}</p>
+          <div style="margin-top:14px;text-align:center;">
+            <a href="https://www.phantomproperties.co/unsubscribe" style="display:inline-block;background:#1f2937;color:#ffffff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600">Unsubscribe</a>
+          </div>
         </div>
       </div>
     </body>
@@ -236,7 +239,7 @@ function generateTestEmailHtml(
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); padding: 30px 20px; text-align: center; border-bottom: 2px solid ${template.styling.primaryColor};">
           <h1 style="color: ${template.styling.primaryColor}; font-size: 28px; margin: 0; text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);">
-            ${template.content.header.icon} ${replaceVariables(template.content.header.title, testData)}
+            ${replaceVariables(template.content.header.title, testData)}
           </h1>
           ${template.content.header.subtitle ? `
             <p style="color: ${template.styling.secondaryColor}; margin: 10px 0 0 0; font-weight: 600;">
@@ -276,6 +279,9 @@ function generateTestEmailHtml(
           <p style="color: #555; font-size: 10px; margin: 10px 0 0 0;">
             ${replaceVariables(template.content.footer.contactInfo, testData)}
           </p>
+          <div style="margin-top:14px;text-align:center;">
+            <a href="https://www.phantomproperties.co/unsubscribe" style="display:inline-block;background:#1f2937;color:#ffffff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600">Unsubscribe</a>
+          </div>
         </div>
       </div>
     </body>
