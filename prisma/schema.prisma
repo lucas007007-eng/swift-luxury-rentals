@@ -294,3 +294,62 @@ model Unsubscribe {
   @@index([email])
   @@index([createdAt])
 }
+
+// In-app Inbox (Helpdesk) models
+model Conversation {
+  id            String      @id @default(cuid())
+  subject       String
+  status        String      @default("open") // open|pending|closed
+  assigneeId    String?
+  lastMessageAt DateTime    @default(now())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  messages      Message[]
+  participants  Participant[]
+
+  @@index([status])
+  @@index([lastMessageAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  direction      String       // inbound|outbound|note
+  fromEmail      String
+  fromName       String?
+  toEmail        String
+  cc             String?
+  bcc            String?
+  subject        String?
+  text           String?
+  html           String?
+  messageId      String?      @unique
+  inReplyTo      String?
+  createdAt      DateTime     @default(now())
+  attachments    Attachment[]
+
+  @@index([conversationId])
+  @@index([createdAt])
+}
+
+model Attachment {
+  id         String   @id @default(cuid())
+  message    Message  @relation(fields: [messageId], references: [id])
+  messageId  String
+  filename   String
+  mime       String
+  size       Int
+  url        String?
+}
+
+model Participant {
+  id             String       @id @default(cuid())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  email          String
+  name           String?
+  role           String       @default("customer") // customer|agent
+
+  @@index([conversationId])
+}
