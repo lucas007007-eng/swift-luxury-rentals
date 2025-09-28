@@ -73,7 +73,10 @@ export interface TemplateCondition {
   value: any
 }
 
-// Default template configurations
+// Import pre-made templates
+import { PREMADE_EMAIL_TEMPLATES } from '@/data/premade-email-templates'
+
+// Default template configurations (keeping existing + adding pre-made)
 export const DEFAULT_TEMPLATES: EmailTemplateConfig[] = [
   {
     id: 'welcome',
@@ -271,5 +274,8 @@ export const DEFAULT_TEMPLATES: EmailTemplateConfig[] = [
         unsubscribeLink: false
       }
     }
-  }
+  },
+  
+  // Add all pre-made templates
+  ...PREMADE_EMAIL_TEMPLATES
 ]

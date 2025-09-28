@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { EmailTemplateConfig } from '@/types/email-templates'
 import DragDropEmailBuilder, { EmailTemplate as DragDropTemplate } from './DragDropEmailBuilder'
+import AdvancedEmailBuilder from './AdvancedEmailBuilder'
 import TestEmailModal from './TestEmailModal'
 
 interface EnhancedEmailTemplateEditorProps {
@@ -350,18 +351,14 @@ export default function EnhancedEmailTemplateEditor({
 
   if (activeTab === 'builder') {
     return (
-      <div className="h-screen">
-        <DragDropEmailBuilder
-          template={dragDropTemplate}
-          onSave={(template) => {
-            handleDragDropSave(template)
-            // Convert and save the original template format
-            onSave({ ...editedTemplate, lastModified: new Date().toISOString() })
-          }}
-          onPreview={handleDragDropPreview}
-          onTestEmail={() => setShowTestEmailModal(true)}
-        />
-      </div>
+      <AdvancedEmailBuilder
+        template={editedTemplate}
+        onSave={(template) => {
+          setEditedTemplate(template)
+          onSave({ ...template, lastModified: new Date().toISOString() })
+        }}
+        onCancel={onCancel}
+      />
     )
   }
 
