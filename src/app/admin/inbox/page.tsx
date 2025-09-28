@@ -32,10 +32,14 @@ export default function InboxPage() {
   const [filter, setFilter] = useState<'all'|'awaiting'>('all')
   const [agents, setAgents] = useState<{ id: string; email: string; name?: string }[]>([])
   const [bulk, setBulk] = useState<Record<string, boolean>>({})
+  const [canned, setCanned] = useState<{ id?: string; title: string; body: string; variables?: string }[]>([])
 
   useEffect(() => {
     ;(async()=>{
       try { const res = await fetch('/api/admin/inbox/agents'); if(res.ok) setAgents(await res.json()) } catch {}
+    })()
+    ;(async()=>{
+      try { const res = await fetch('/api/admin/inbox/canned'); if(res.ok) setCanned(await res.json()) } catch {}
     })()
     ;(async () => {
       const params = new URLSearchParams()
@@ -168,8 +172,24 @@ export default function InboxPage() {
                 </div>
               ))}
             </div>
-            <div className="border-t border-gray-800 p-3 flex items-center gap-2">
-              <textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Type your reply..." className="flex-1 bg-gray-800 text-gray-100 rounded-lg p-3 border border-gray-700 focus:outline-none" rows={3} />
+            <div className="border-t border-gray-800 p-3 flex items-start gap-2">
+              <div className="flex flex-col gap-2 w-full">
+                <div className="flex items-center gap-2">
+                  <select onChange={(e)=>{
+                    const id = e.target.value
+                    const tpl = canned.find(c=>String(c.id||c.title)===id)
+                    if (!tpl) return
+                    let text = tpl.body
+                    // lightweight variable hints
+                    text = text.replace(/\{\{name\}\}/g,'Customer')
+                    setReply(prev => (prev ? (prev + '\n\n' + text) : text))
+                  }} className="bg-gray-800 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1">
+                    <option value="">Insert canned…</option>
+                    {canned.map(c=> <option key={String(c.id||c.title)} value={String(c.id||c.title)}>{c.title}</option>)}
+                  </select>
+                </div>
+                <textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Type your reply..." className="flex-1 bg-gray-800 text-gray-100 rounded-lg p-3 border border-gray-700 focus:outline-none" rows={3} />
+              </div>
               <button onClick={sendReply} className="px-4 py-2 rounded-lg bg-gradient-to-r from-gray-100 to-gray-400 text-black font-semibold hover:from-white hover:to-gray-300">Send</button>
             </div>
           </div>

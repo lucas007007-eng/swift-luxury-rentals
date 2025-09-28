@@ -366,3 +366,13 @@ model Participant {
 
   @@index([conversationId])
 }
+
+// Canned replies for inbox
+model CannedReply {
+  id         String   @id @default(cuid())
+  title      String
+  body       String   @db.Text
+  variables  String?  // comma-separated variable keys like {{name}},{{bookingId}}
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

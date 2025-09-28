@@ -56,6 +56,18 @@ export async function POST(req: NextRequest) {
       }
     })
 
+    // Optional Slack notification
+    try {
+      const slackUrl = process.env.SLACK_WEBHOOK_URL
+      if (slackUrl) {
+        await fetch(slackUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: `📥 New inbound email from ${fromEmail}: ${subject}` })
+        })
+      }
+    } catch {}
+
     await prisma.$disconnect()
     return NextResponse.json({ success: true })
   } catch (e) {
