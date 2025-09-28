@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     const { Resend } = await import('resend')
     const resend = new Resend(process.env.RESEND_API_KEY)
 
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'newsletters@phantomproperties.co'
+    const fromAddress = process.env.RESEND_FROM_EMAIL || 'updates@phantomproperties.co'
     const replyTo = process.env.RESEND_REPLY_TO_EMAIL || fromAddress
 
     const emailResult = await resend.emails.send({
