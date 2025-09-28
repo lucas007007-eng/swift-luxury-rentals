@@ -56,17 +56,11 @@ export async function POST(request: NextRequest) {
     let testHtml = generateTestEmailHtml(template, finalTestData, testType)
     let testText = generateTestEmailText(template, finalTestData)
     
-    // Add test email headers for different test types
-    let subject = template.subject
-    if (testType === 'spam') {
-      subject = `[SPAM TEST] ${template.subject}`
-    } else if (testType === 'deliverability') {
-      // Keep subject as-is but sanitize for deliverability (remove emojis and excessive caps)
-      subject = sanitizeSubjectForDeliverability(template.subject)
-    } else {
-      // Design test: avoid spammy prefixes; keep original for visual checks
-      subject = template.subject
-    }
+    // Subject for tests: never add prefixes; only sanitize for deliverability
+    let subject =
+      testType === 'deliverability'
+        ? sanitizeSubjectForDeliverability(template.subject)
+        : template.subject
 
     // Replace variables in subject
     subject = replaceVariables(subject, finalTestData)
@@ -86,9 +80,6 @@ export async function POST(request: NextRequest) {
       text: testText,
       replyTo: replyTo,
       headers: {
-        'X-Test-Type': testType,
-        'X-Template-Name': template.name,
-        'X-Test-Timestamp': new Date().toISOString(),
         // Include unsubscribe URL for client recognition
         'List-Unsubscribe': '<https://www.phantomproperties.co/unsubscribe>',
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
