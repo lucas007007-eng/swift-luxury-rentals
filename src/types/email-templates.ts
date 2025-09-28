@@ -61,7 +61,7 @@ export interface TemplateContent {
 
 export interface TemplateSection {
   id: string
-  type: 'text' | 'info-card' | 'data-table' | 'image' | 'divider' | 'button'
+  type: 'text' | 'info-card' | 'data-table' | 'image' | 'divider' | 'button' | 'custom-blocks'
   content: any
   styling?: Partial<TemplateStyling>
   conditions?: TemplateCondition[]

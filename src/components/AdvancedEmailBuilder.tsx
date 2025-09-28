@@ -480,6 +480,32 @@ export default function AdvancedEmailBuilder({
     )
   }
 
+  // Convert the current builder state back into the template shape for persistence
+  const serializeToTemplate = (): EmailTemplateConfig => {
+    const serializedSections = [...(activeTemplate.content.body.sections || [])]
+      .filter((s: any) => s.type !== 'custom-blocks')
+    serializedSections.push({
+      id: 'builder-blocks',
+      type: 'custom-blocks',
+      content: {
+        header: emailStructure.header,
+        blocks: emailStructure.body.blocks,
+        footer: emailStructure.footer
+      }
+    })
+
+    return {
+      ...activeTemplate,
+      content: {
+        ...activeTemplate.content,
+        body: {
+          ...activeTemplate.content.body,
+          sections: serializedSections
+        }
+      }
+    }
+  }
+
   if (activeView === 'templates') {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -1016,7 +1042,7 @@ export default function AdvancedEmailBuilder({
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
         templateName={activeTemplate.name}
-        onRefresh={() => onSave(activeTemplate)}
+        onRefresh={() => onSave(serializeToTemplate())}
       />
     </div>
   )
