@@ -39,8 +39,8 @@ export default function AdvancedEmailBuilder({
   const [showTestModal, setShowTestModal] = useState(false)
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null)
 
-  // Email structure state
-  const [emailStructure, setEmailStructure] = useState({
+  // Email structure state - simplified for type safety
+  const [emailStructure, setEmailStructure] = useState<any>({
     header: {
       showLogo: true,
       title: activeTemplate.content.header.title,
