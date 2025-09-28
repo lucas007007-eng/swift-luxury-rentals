@@ -43,8 +43,9 @@ export default function CannedManager() {
         {/* Luxury feature card header */}
         <div className="luxury-feature-card p-6 md:p-8 mb-8">
           <div className="flex items-center justify-between">
-            <button onClick={()=>router.push('/admin/inbox')} className="px-4 py-2 rounded-xl border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white hover:scale-105 transition-all duration-300">← Return</button>
+            <button onClick={()=>router.push('/admin/inbox')} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300">← Return</button>
             <div className="text-center">
+              <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Communications</div>
               <h1 className="text-3xl md:text-4xl font-bold heading-sora text-white">Canned Replies</h1>
               <p className="text-zinc-300 text-sm md:text-base">Elite Email Templates & Variables</p>
             </div>
@@ -57,7 +58,7 @@ export default function CannedManager() {
         <div className="max-w-[1600px] mx-auto px-6 pb-10">
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             {/* Create / edit */}
-            <div className="xl:col-span-2 rounded-2xl border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(135deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.15)] p-6">
+            <div className="xl:col-span-2 luxury-feature-card p-6">
               <div className="text-sm font-mono uppercase tracking-wider text-emerald-400 mb-4">Create New Template</div>
               <input value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})} placeholder="Title" className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-cyan-500/40" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -66,11 +67,11 @@ export default function CannedManager() {
               </div>
               <textarea value={draft.body} onChange={e=>setDraft({...draft,body:e.target.value})} placeholder="Body" rows={8} className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-cyan-500/30" />
               <div className="flex items-center gap-2">
-                <button onClick={save} className="px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-400 to-emerald-400 text-black font-extrabold shadow-[0_8px_30px_rgba(16,185,129,0.25)] hover:from-cyan-300 hover:to-emerald-300 transition-all">Save Reply</button>
+                <button onClick={save} className="inline-flex items-center px-6 py-3 rounded-lg text-black font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_8px_25px_rgba(16,185,129,0.35)] hover:from-emerald-300 hover:to-cyan-300 hover:scale-105 transition-all duration-300">Save Reply</button>
               </div>
             </div>
             {/* Variables cheat sheet */}
-            <div className="rounded-2xl border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(135deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.15)] p-6">
+            <div className="luxury-feature-card p-6">
               <div className="text-sm font-mono uppercase tracking-wider text-cyan-400 mb-4">Variables Cheat Sheet</div>
               <div className="space-y-1.5">
                 {variables.map(v => (
@@ -79,14 +80,14 @@ export default function CannedManager() {
                       <div className="font-mono text-cyan-300 text-sm">{v.key}</div>
                       <div className="text-xs text-zinc-400">{v.desc}</div>
                     </div>
-                    <button onClick={()=>copy(v.key)} className="text-xs px-3 py-1.5 rounded-lg border border-cyan-400/30 bg-cyan-500/10 text-cyan-200 hover:bg-cyan-500/20 transition-all">Copy</button>
+                    <button onClick={()=>copy(v.key)} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300">Copy</button>
                   </div>
                 ))}
               </div>
               <div className="text-xs text-zinc-400 mt-4 p-3 rounded-lg border border-white/10 bg-white/5">💡 Tip: list vars used in the input above (comma‑separated) to help teammates discover them.</div>
             </div>
             {/* Existing list */}
-            <div className="xl:col-span-3 rounded-2xl border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(135deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.15)] p-6">
+            <div className="xl:col-span-3 luxury-feature-card p-6">
               <div className="text-sm font-mono uppercase tracking-wider text-amber-400 mb-4">Existing Templates</div>
               <div className="space-y-2">
                 {rows.map(r => (

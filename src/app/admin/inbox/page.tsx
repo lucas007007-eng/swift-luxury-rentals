@@ -112,8 +112,9 @@ export default function InboxPage() {
         {/* Luxury feature card header */}
         <div className="luxury-feature-card p-6 md:p-8 mb-8">
           <div className="flex items-center justify-between">
-            <button onClick={()=>router.push('/admin')} className="px-4 py-2 rounded-xl border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white hover:scale-105 transition-all duration-300">← Return</button>
+            <button onClick={()=>router.push('/admin')} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300">← Return</button>
             <div className="text-center">
+              <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Communications</div>
               <h1 className="text-3xl md:text-4xl font-bold heading-sora text-white">Inbox Command</h1>
               <p className="text-zinc-300 text-sm md:text-base">Elite Customer Communications</p>
             </div>
@@ -126,7 +127,7 @@ export default function InboxPage() {
         <div className="max-w-[1600px] mx-auto px-6 pb-10">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Conversation list */}
-          <div className="lg:col-span-1 rounded-2xl border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(135deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.15)]">
+          <div className="lg:col-span-1 luxury-feature-card relative">
             <div className="p-4 border-b border-white/10 text-sm text-zinc-300">
               <div className="flex flex-wrap items-center gap-2">
                 <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search…" className="bg-black/40 text-white text-xs border border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500/40" />
@@ -150,14 +151,14 @@ export default function InboxPage() {
                   const filters = { q, status, assignee, from: dateFrom, to: dateTo, tags }
                   await fetch('/api/admin/inbox/views', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, filters }) })
                   alert('View saved')
-                }} className="text-xs px-3 py-2 rounded-lg border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-all">Save View</button>
+                }} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300">Save View</button>
                 <ApplyViews onApply={(f)=>{
                   setQ(f.q||''); setStatus(f.status||''); setAssignee(f.assignee||''); setDateFrom(f.from||''); setDateTo(f.to||''); setTags(f.tags||'')
                 }} />
                 <div className="ml-auto flex items-center gap-2">
-                  <button onClick={()=>setFilter('all')} className={`text-xs px-3 py-2 rounded-lg ${filter==='all'?'bg-white/10 text-white border border-white/20':'text-zinc-400 hover:text-white'} transition-all`}>All</button>
-                  <button onClick={()=>setFilter('awaiting')} className={`text-xs px-3 py-2 rounded-lg ${filter==='awaiting'?'bg-white/10 text-white border border-white/20':'text-zinc-400 hover:text-white'} transition-all`}>Awaiting</button>
-                  <a href="/admin/inbox/canned" className="text-xs px-3 py-2 rounded-lg border border-cyan-400/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition-all">Manage Canned</a>
+                  <button onClick={()=>setFilter('all')} className={`inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border transition-all duration-300 ${filter==='all'?'border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105':'border-zinc-400/30 text-zinc-400 hover:text-white hover:border-zinc-300/40'}`}>All</button>
+                  <button onClick={()=>setFilter('awaiting')} className={`inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border transition-all duration-300 ${filter==='awaiting'?'border-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105':'border-zinc-400/30 text-zinc-400 hover:text-white hover:border-zinc-300/40'}`}>Awaiting</button>
+                  <a href="/admin/inbox/canned" className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300">Manage Canned</a>
                 </div>
               </div>
             </div>
@@ -168,7 +169,7 @@ export default function InboxPage() {
                   const ids = Object.keys(bulk).filter(k=>bulk[k])
                   for (const id of ids) await fetch('/api/admin/inbox/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({conversationId:id})})
                   setBulk({})
-                }} className="text-xs px-3 py-1.5 rounded-lg border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-all">Mark Read</button>
+                }} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300">Mark Read</button>
                 <button onClick={async()=>{
                   const ids = Object.keys(bulk).filter(k=>bulk[k])
                   const reason = prompt('Close reason?') || ''
@@ -176,7 +177,7 @@ export default function InboxPage() {
                   setBulk({})
                   const res = await fetch('/api/admin/inbox/messages?list=1')
                   if(res.ok) setConversations(await res.json())
-                }} className="text-xs px-3 py-1.5 rounded-lg border border-red-400/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all">Close</button>
+                }} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-red-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-red-400/50 transition-all duration-300">Close</button>
               </div>
             </div>
             <div className="max-h-[60vh] overflow-y-auto">
@@ -211,13 +212,13 @@ export default function InboxPage() {
           </div>
 
           {/* Thread */}
-          <div className="lg:col-span-2 rounded-2xl border border-[rgba(192,192,192,0.35)] bg-[linear-gradient(135deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.15)] flex flex-col">
+          <div className="lg:col-span-2 luxury-feature-card flex flex-col relative overflow-hidden">
             <div className="p-4 border-b border-white/10 text-sm text-zinc-300 flex items-center justify-between">
               <span>Thread</span>
               <div className="flex items-center gap-2">
-                <button onClick={markRead} className="text-xs px-3 py-1.5 rounded-lg border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-all">Mark Read</button>
-                <button onClick={()=>toggleClosed(false)} className="text-xs px-3 py-1.5 rounded-lg border border-cyan-400/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition-all">Open</button>
-                <button onClick={()=>toggleClosed(true)} className="text-xs px-3 py-1.5 rounded-lg border border-red-400/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all">Close</button>
+                <button onClick={markRead} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300">Mark Read</button>
+                <button onClick={()=>toggleClosed(false)} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300">Open</button>
+                <button onClick={()=>toggleClosed(true)} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-red-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-red-400/50 transition-all duration-300">Close</button>
               </div>
             </div>
             <div className="flex-1 p-4 space-y-4 overflow-y-auto">
@@ -250,13 +251,13 @@ export default function InboxPage() {
                     <option value="">Insert canned…</option>
                     {canned.map(c=> <option key={String(c.id||c.title)} value={String(c.id||c.title)}>{c.title}</option>)}
                   </select>
-                  <button onClick={suggestReply} className="text-xs px-3 py-2 rounded-lg border border-amber-400/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition-all">Suggested reply (AI)</button>
+                  <button onClick={suggestReply} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-amber-400/50 transition-all duration-300">AI Suggest</button>
                 </div>
                 {/* Quick tag editor */}
                 <TagEditor conversationId={selected} />
                 <textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Type your reply..." className="flex-1 bg-black/40 text-white rounded-lg p-3 border border-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-500/40" rows={3} />
               </div>
-              <button onClick={sendReply} className="px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-400 to-emerald-400 text-black font-extrabold shadow-[0_8px_30px_rgba(16,185,129,0.25)] hover:from-cyan-300 hover:to-emerald-300 transition-all">Send</button>
+              <button onClick={sendReply} className="inline-flex items-center px-6 py-3 rounded-lg text-black font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_8px_25px_rgba(16,185,129,0.35)] hover:from-emerald-300 hover:to-cyan-300 hover:scale-105 transition-all duration-300">Send Reply</button>
             </div>
           </div>
         </div>
@@ -290,7 +291,7 @@ function TagEditor({ conversationId }: { conversationId: string | null }) {
         const arr = tags.split(',').map(s=>s.trim()).filter(Boolean)
         await fetch('/api/admin/inbox/tags', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ conversationId, tags: arr }) })
         setTags('')
-      }} className="text-xs px-3 py-2 rounded-lg border border-cyan-400/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition-all">Add Tags</button>
+      }} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300">Add Tags</button>
     </div>
   )
 }
