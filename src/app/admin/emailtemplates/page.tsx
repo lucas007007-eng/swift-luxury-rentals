@@ -15,6 +15,7 @@ import {
 } from '@heroicons/react/24/outline'
 import Header from '@/components/Header'
 import EmailTemplateEditor from '@/components/EmailTemplateEditor'
+import EnhancedEmailTemplateEditor from '@/components/EnhancedEmailTemplateEditor'
 import { EmailTemplateConfig, DEFAULT_TEMPLATES } from '@/types/email-templates'
 
 export default function EmailTemplatesAdmin() {
@@ -97,7 +98,7 @@ export default function EmailTemplatesAdmin() {
   }
 
   if (viewMode === 'edit' && selectedTemplate) {
-    return <EmailTemplateEditor 
+    return <EnhancedEmailTemplateEditor 
       template={selectedTemplate} 
       onSave={(updatedTemplate) => {
         setTemplates(templates.map(t => t.id === updatedTemplate.id ? updatedTemplate : t))
