@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { 
+import {
   PlusIcon,
   PhotoIcon,
   DocumentTextIcon,
@@ -16,7 +16,8 @@ import {
   Bars3Icon,
   RectangleStackIcon,
   ShareIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline'
 import { EmailTemplateConfig } from '@/types/email-templates'
 import { AdvancedBlockEditor, ADVANCED_BLOCK_TEMPLATES, TemplateGallery } from './AdvancedContentBlocks'
