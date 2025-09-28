@@ -98,7 +98,7 @@ export default function EnhancedEmailTemplateEditor({
                       type="text"
                       value={editedTemplate.name}
                       onChange={(e) => setEditedTemplate(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                     />
                   </div>
                   
@@ -110,7 +110,7 @@ export default function EnhancedEmailTemplateEditor({
                       value={editedTemplate.description}
                       onChange={(e) => setEditedTemplate(prev => ({ ...prev, description: e.target.value }))}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                     />
                   </div>
                   
@@ -158,7 +158,7 @@ export default function EnhancedEmailTemplateEditor({
                       type="text"
                       value={editedTemplate.subject}
                       onChange={(e) => setEditedTemplate(prev => ({ ...prev, subject: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                       placeholder="Use {{variableName}} for dynamic content"
                     />
                   </div>
@@ -171,7 +171,7 @@ export default function EnhancedEmailTemplateEditor({
                       type="text"
                       value={editedTemplate.preheader || ''}
                       onChange={(e) => setEditedTemplate(prev => ({ ...prev, preheader: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
                       placeholder="Preview text shown in email clients"
                     />
                   </div>
@@ -246,7 +246,7 @@ export default function EnhancedEmailTemplateEditor({
                           ...prev,
                           styling: { ...prev.styling, primaryColor: e.target.value }
                         }))}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500"
                       />
                     </div>
                   </div>
@@ -270,7 +270,7 @@ export default function EnhancedEmailTemplateEditor({
                           ...prev,
                           styling: { ...prev.styling, secondaryColor: e.target.value }
                         }))}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500"
                       />
                     </div>
                   </div>
