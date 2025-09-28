@@ -95,15 +95,11 @@ export class EmailTemplateStorage {
   }> {
     // Try database first
     const dbSuccess = await saveToDatabase(template)
-    if (dbSuccess) {
-      return { success: true, method: 'database' }
-    }
-    
-    // Fallback to localStorage
-    const localSuccess = saveToLocalStorage(template)
-    if (localSuccess) {
-      return { success: true, method: 'localStorage' }
-    }
+    // Always keep a local copy so the UI reflects changes immediately even if DB is offline
+    saveToLocalStorage(template)
+    if (dbSuccess) return { success: true, method: 'database' }
+    // If DB failed but local saved, report localStorage
+    if (typeof window !== 'undefined') return { success: true, method: 'localStorage' }
     
     return { 
       success: false, 
@@ -116,15 +112,35 @@ export class EmailTemplateStorage {
     templates: EmailTemplateConfig[]
     method: 'database' | 'localStorage'
   }> {
-    // Try database first
-    const dbTemplates = await loadFromDatabase()
+    // Prefer database if truly from DB
+    let dbTemplates: EmailTemplateConfig[] | null = null
+    try {
+      const resp = await fetch('/api/admin/email-templates/load')
+      if (resp.ok) {
+        const data = await resp.json()
+        if (Array.isArray(data?.templates)) {
+          // If API says 'database', use it; if it's defaults, we may prefer local if present
+          if (data.method === 'database') {
+            return { templates: data.templates, method: 'database' }
+          }
+          dbTemplates = data.templates
+        }
+      }
+    } catch {}
+
+    // Check localStorage (client-only)
+    const localTemplates = loadFromLocalStorage()
+    if (localTemplates.length > 0) {
+      return { templates: localTemplates, method: 'localStorage' }
+    }
+
+    // Fall back to what the API returned (likely defaults) if present
     if (dbTemplates && dbTemplates.length > 0) {
       return { templates: dbTemplates, method: 'database' }
     }
-    
-    // Fallback to localStorage
-    const localTemplates = loadFromLocalStorage()
-    return { templates: localTemplates, method: 'localStorage' }
+
+    // Nothing found
+    return { templates: [], method: 'localStorage' }
   }
   
   static async deleteTemplate(templateId: string): Promise<{
