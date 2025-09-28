@@ -20,15 +20,35 @@ import EnhancedEmailTemplateEditor from '@/components/EnhancedEmailTemplateEdito
 import TestEmailModal from '@/components/TestEmailModal'
 import EmailAnalyticsDashboard from '@/components/EmailAnalyticsDashboard'
 import { EmailTemplateConfig, DEFAULT_TEMPLATES } from '@/types/email-templates'
+import { saveEmailTemplate, loadEmailTemplates, deleteEmailTemplate } from '@/lib/email-template-storage'
 
 export default function EmailTemplatesAdmin() {
-  const [templates, setTemplates] = useState<EmailTemplateConfig[]>(DEFAULT_TEMPLATES)
+  const [templates, setTemplates] = useState<EmailTemplateConfig[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplateConfig | null>(null)
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview' | 'analytics'>('list')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [showTestModal, setShowTestModal] = useState(false)
   const [testTemplate, setTestTemplate] = useState<EmailTemplateConfig | null>(null)
+
+  // Load templates on component mount
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        const result = await loadEmailTemplates()
+        setTemplates(result.templates)
+        console.log(`Loaded ${result.templates.length} templates via ${result.method}`)
+      } catch (error) {
+        console.error('Failed to load templates:', error)
+        setTemplates(DEFAULT_TEMPLATES)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    loadTemplates()
+  }, [])
 
   const categories = [
     { value: 'all', label: 'All Templates' },
@@ -45,6 +65,24 @@ export default function EmailTemplatesAdmin() {
     const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory
     return matchesSearch && matchesCategory
   })
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black">
+        <Header />
+        <div className="pt-20 pb-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center py-20">
+              <div className="animate-spin w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <h2 className="text-xl font-semibold text-white mb-2">Loading Email Templates</h2>
+              <p className="text-gray-400">Decrypting template database...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const getCategoryColor = (category: string) => {
     const colors = {
@@ -93,25 +131,64 @@ export default function EmailTemplatesAdmin() {
     setTemplates([...templates, newTemplate])
   }
 
-  const handleDeleteTemplate = (templateId: string) => {
+  const handleDeleteTemplate = async (templateId: string) => {
     if (confirm('Are you sure you want to delete this template?')) {
-      setTemplates(templates.filter(t => t.id !== templateId))
+      try {
+        const result = await deleteEmailTemplate(templateId)
+        if (result.success) {
+          setTemplates(templates.filter(t => t.id !== templateId))
+          console.log(`Template deleted via ${result.method}`)
+        } else {
+          alert('Failed to delete template')
+        }
+      } catch (error) {
+        console.error('Delete error:', error)
+        alert('Failed to delete template')
+      }
     }
   }
 
-  const handleToggleActive = (templateId: string) => {
-    setTemplates(templates.map(t => 
-      t.id === templateId 
-        ? { ...t, isActive: !t.isActive, lastModified: new Date().toISOString() }
-        : t
-    ))
+  const handleToggleActive = async (templateId: string) => {
+    const template = templates.find(t => t.id === templateId)
+    if (!template) return
+    
+    const updatedTemplate = { 
+      ...template, 
+      isActive: !template.isActive, 
+      lastModified: new Date().toISOString() 
+    }
+    
+    try {
+      const result = await saveEmailTemplate(updatedTemplate)
+      if (result.success) {
+        setTemplates(templates.map(t => t.id === templateId ? updatedTemplate : t))
+        console.log(`Template status updated via ${result.method}`)
+      } else {
+        alert('Failed to update template status')
+      }
+    } catch (error) {
+      console.error('Toggle error:', error)
+      alert('Failed to update template status')
+    }
   }
 
   if (viewMode === 'edit' && selectedTemplate) {
     return <EnhancedEmailTemplateEditor 
       template={selectedTemplate} 
-      onSave={(updatedTemplate) => {
-        setTemplates(templates.map(t => t.id === updatedTemplate.id ? updatedTemplate : t))
+      onSave={async (updatedTemplate) => {
+        try {
+          const result = await saveEmailTemplate(updatedTemplate)
+          if (result.success) {
+            // Update local state
+            setTemplates(templates.map(t => t.id === updatedTemplate.id ? updatedTemplate : t))
+            console.log(`Template saved via ${result.method}`)
+          } else {
+            alert('Failed to save template: ' + (result.error || 'Unknown error'))
+          }
+        } catch (error) {
+          console.error('Save error:', error)
+          alert('Failed to save template')
+        }
         setViewMode('list')
         setSelectedTemplate(null)
       }}
