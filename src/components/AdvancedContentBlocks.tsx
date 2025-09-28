@@ -34,16 +34,99 @@ export interface AdvancedEmailBlock {
   }
 }
 
-// Font options
+// Comprehensive Font options - All popular fonts
 export const FONT_OPTIONS = [
+  // Brand & Modern Sans-Serif
   { value: 'Sora, sans-serif', label: 'Sora (Brand Font)' },
+  { value: 'Inter, sans-serif', label: 'Inter' },
+  { value: 'Roboto, sans-serif', label: 'Roboto' },
+  { value: 'Open Sans, sans-serif', label: 'Open Sans' },
+  { value: 'Lato, sans-serif', label: 'Lato' },
+  { value: 'Montserrat, sans-serif', label: 'Montserrat' },
+  { value: 'Poppins, sans-serif', label: 'Poppins' },
+  { value: 'Nunito, sans-serif', label: 'Nunito' },
+  { value: 'Source Sans Pro, sans-serif', label: 'Source Sans Pro' },
+  { value: 'Fira Sans, sans-serif', label: 'Fira Sans' },
+  
+  // Classic Sans-Serif
   { value: 'Arial, sans-serif', label: 'Arial' },
   { value: 'Helvetica, sans-serif', label: 'Helvetica' },
+  { value: 'Helvetica Neue, sans-serif', label: 'Helvetica Neue' },
+  { value: 'Verdana, sans-serif', label: 'Verdana' },
+  { value: 'Tahoma, sans-serif', label: 'Tahoma' },
+  { value: 'Geneva, sans-serif', label: 'Geneva' },
+  { value: 'Lucida Grande, sans-serif', label: 'Lucida Grande' },
+  { value: 'Segoe UI, sans-serif', label: 'Segoe UI' },
+  { value: 'system-ui, sans-serif', label: 'System UI' },
+  
+  // Serif Fonts
   { value: 'Georgia, serif', label: 'Georgia' },
   { value: '"Times New Roman", serif', label: 'Times New Roman' },
+  { value: 'Times, serif', label: 'Times' },
+  { value: 'Garamond, serif', label: 'Garamond' },
+  { value: 'Baskerville, serif', label: 'Baskerville' },
+  { value: 'Caslon, serif', label: 'Caslon' },
+  { value: 'Book Antiqua, serif', label: 'Book Antiqua' },
+  { value: 'Palatino, serif', label: 'Palatino' },
+  { value: 'Cambria, serif', label: 'Cambria' },
+  { value: 'Minion Pro, serif', label: 'Minion Pro' },
+  
+  // Google Fonts - Popular
+  { value: 'Playfair Display, serif', label: 'Playfair Display' },
+  { value: 'Merriweather, serif', label: 'Merriweather' },
+  { value: 'Lora, serif', label: 'Lora' },
+  { value: 'Crimson Text, serif', label: 'Crimson Text' },
+  { value: 'EB Garamond, serif', label: 'EB Garamond' },
+  { value: 'Libre Baskerville, serif', label: 'Libre Baskerville' },
+  { value: 'Cormorant Garamond, serif', label: 'Cormorant Garamond' },
+  
+  // Google Fonts - Sans-Serif
+  { value: 'Raleway, sans-serif', label: 'Raleway' },
+  { value: 'Oswald, sans-serif', label: 'Oswald' },
+  { value: 'Ubuntu, sans-serif', label: 'Ubuntu' },
+  { value: 'PT Sans, sans-serif', label: 'PT Sans' },
+  { value: 'Dosis, sans-serif', label: 'Dosis' },
+  { value: 'Cabin, sans-serif', label: 'Cabin' },
+  { value: 'Muli, sans-serif', label: 'Muli' },
+  { value: 'Quicksand, sans-serif', label: 'Quicksand' },
+  { value: 'Work Sans, sans-serif', label: 'Work Sans' },
+  { value: 'Rubik, sans-serif', label: 'Rubik' },
+  { value: 'Karla, sans-serif', label: 'Karla' },
+  { value: 'Hind, sans-serif', label: 'Hind' },
+  
+  // Display & Decorative
+  { value: 'Bebas Neue, sans-serif', label: 'Bebas Neue' },
+  { value: 'Lobster, cursive', label: 'Lobster' },
+  { value: 'Dancing Script, cursive', label: 'Dancing Script' },
+  { value: 'Pacifico, cursive', label: 'Pacifico' },
+  { value: 'Great Vibes, cursive', label: 'Great Vibes' },
+  { value: 'Amatic SC, sans-serif', label: 'Amatic SC' },
+  { value: 'Comfortaa, sans-serif', label: 'Comfortaa' },
+  { value: 'Righteous, sans-serif', label: 'Righteous' },
+  
+  // Monospace Fonts
   { value: '"Courier New", monospace', label: 'Courier New' },
-  { value: 'Verdana, sans-serif', label: 'Verdana' },
-  { value: 'Tahoma, sans-serif', label: 'Tahoma' }
+  { value: 'Monaco, monospace', label: 'Monaco' },
+  { value: 'Menlo, monospace', label: 'Menlo' },
+  { value: 'Consolas, monospace', label: 'Consolas' },
+  { value: 'SF Mono, monospace', label: 'SF Mono' },
+  { value: 'Fira Code, monospace', label: 'Fira Code' },
+  { value: 'Source Code Pro, monospace', label: 'Source Code Pro' },
+  { value: 'JetBrains Mono, monospace', label: 'JetBrains Mono' },
+  
+  // Luxury & Premium Fonts
+  { value: 'Didot, serif', label: 'Didot (Luxury)' },
+  { value: 'Bodoni MT, serif', label: 'Bodoni MT (Luxury)' },
+  { value: 'Optima, sans-serif', label: 'Optima (Premium)' },
+  { value: 'Avenir, sans-serif', label: 'Avenir (Premium)' },
+  { value: 'Futura, sans-serif', label: 'Futura (Modern)' },
+  { value: 'Gotham, sans-serif', label: 'Gotham (Professional)' },
+  
+  // System Fonts
+  { value: '-apple-system, sans-serif', label: 'Apple System Font' },
+  { value: 'BlinkMacSystemFont, sans-serif', label: 'Blink Mac System' },
+  { value: '"Segoe UI", sans-serif', label: 'Segoe UI (Windows)' },
+  { value: 'Ubuntu, sans-serif', label: 'Ubuntu (Linux)' }
 ]
 
 // Font size options

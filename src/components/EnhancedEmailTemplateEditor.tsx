@@ -17,6 +17,7 @@ import { EmailTemplateConfig } from '@/types/email-templates'
 import DragDropEmailBuilder, { EmailTemplate as DragDropTemplate } from './DragDropEmailBuilder'
 import AdvancedEmailBuilder from './AdvancedEmailBuilder'
 import TestEmailModal from './TestEmailModal'
+import { FONT_OPTIONS } from './AdvancedContentBlocks'
 
 interface EnhancedEmailTemplateEditorProps {
   template: EmailTemplateConfig
@@ -290,11 +291,11 @@ export default function EnhancedEmailTemplateEditor({
                       }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900"
                     >
-                      <option value="'Sora', sans-serif">Sora (Brand Font)</option>
-                      <option value="Arial, sans-serif">Arial</option>
-                      <option value="'Helvetica Neue', sans-serif">Helvetica Neue</option>
-                      <option value="Georgia, serif">Georgia</option>
-                      <option value="'Times New Roman', serif">Times New Roman</option>
+                      {FONT_OPTIONS.map(font => (
+                        <option key={font.value} value={font.value}>
+                          {font.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   
