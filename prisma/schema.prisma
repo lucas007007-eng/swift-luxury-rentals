@@ -327,7 +327,7 @@ model Message {
   messageId      String?      @unique
   inReplyTo      String?
   provider       String?      // resend|postmark|smtp
-  providerId     String?      @unique
+  providerId     String?
   status         String?      // queued|sent|delivered|opened|clicked|bounced|failed|complained
   deliveredAt    DateTime?
   openedAt       DateTime?
@@ -340,6 +340,7 @@ model Message {
 
   @@index([conversationId])
   @@index([createdAt])
+  @@index([provider, providerId])
 }
 
 model Attachment {
