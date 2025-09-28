@@ -1,10 +1,12 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 type Row = { id?: string; title: string; body: string; category?: string; variables?: string }
 
 export default function CannedManager() {
+  const router = useRouter()
   const [rows, setRows] = useState<Row[]>([])
   const [draft, setDraft] = useState<Row>({ title: '', body: '', category: '', variables: '' })
 
@@ -36,43 +38,51 @@ export default function CannedManager() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
-      <h1 className="text-2xl font-bold mb-4">Canned Replies</h1>
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div className="min-h-screen bg-black text-white px-6 pt-14 pb-6">
+      <div className="flex items-center justify-between mb-3">
+        <button onClick={()=>router.push('/admin/inbox')} className="px-3 py-1.5 rounded-lg border border-gray-700 text-gray-200 hover:bg-gray-800">Return</button>
+        <h1 className="text-xl font-bold">Canned Replies</h1>
+        <span />
+      </div>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         {/* Create / edit */}
-        <div className="xl:col-span-2 border border-gray-700 rounded-xl p-4">
-          <div className="text-sm text-gray-300 mb-2">Create New</div>
-          <input value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})} placeholder="Title" className="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded px-2 py-1 mb-2" />
-          <input value={draft.category} onChange={e=>setDraft({...draft,category:e.target.value})} placeholder="Category (optional)" className="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded px-2 py-1 mb-2" />
-          <input value={draft.variables} onChange={e=>setDraft({...draft,variables:e.target.value})} placeholder="Variables e.g. name,bookingId" className="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded px-2 py-1 mb-2" />
-          <textarea value={draft.body} onChange={e=>setDraft({...draft,body:e.target.value})} placeholder="Body" rows={8} className="w-full bg-gray-900 text-gray-200 border border-gray-700 rounded px-2 py-2 mb-2" />
-          <button onClick={save} className="px-3 py-1.5 rounded bg-gray-200 text-black font-semibold">Save</button>
+        <div className="xl:col-span-2 border border-gray-800 rounded-xl p-3 bg-gradient-to-b from-gray-950 to-gray-900">
+          <div className="text-xs text-gray-300 mb-2">Create New</div>
+          <input value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})} placeholder="Title" className="w-full bg-gray-950 text-gray-200 border border-gray-800 rounded px-2 py-1 mb-2" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+            <input value={draft.category} onChange={e=>setDraft({...draft,category:e.target.value})} placeholder="Category (optional)" className="w-full bg-gray-950 text-gray-200 border border-gray-800 rounded px-2 py-1" />
+            <input value={draft.variables} onChange={e=>setDraft({...draft,variables:e.target.value})} placeholder="Variables e.g. name,bookingId" className="w-full bg-gray-950 text-gray-200 border border-gray-800 rounded px-2 py-1" />
+          </div>
+          <textarea value={draft.body} onChange={e=>setDraft({...draft,body:e.target.value})} placeholder="Body" rows={6} className="w-full bg-gray-950 text-gray-200 border border-gray-800 rounded px-2 py-2 mb-2" />
+          <div className="flex items-center gap-2">
+            <button onClick={save} className="px-3 py-1.5 rounded bg-gray-200 text-black font-semibold">Save</button>
+          </div>
         </div>
         {/* Variables cheat sheet */}
-        <div className="border border-gray-700 rounded-xl p-4 bg-gradient-to-b from-gray-950 to-gray-900">
-          <div className="text-sm text-gray-300 mb-2">Variables Cheat Sheet</div>
-          <div className="space-y-2">
+        <div className="border border-gray-800 rounded-xl p-3 bg-gradient-to-b from-gray-950 to-gray-900">
+          <div className="text-xs text-gray-300 mb-2">Variables Cheat Sheet</div>
+          <div className="space-y-1.5">
             {variables.map(v => (
               <div key={v.key} className="flex items-center justify-between gap-2 border border-gray-800 rounded px-2 py-1">
                 <div>
-                  <div className="font-mono text-cyan-300 text-sm">{v.key}</div>
-                  <div className="text-xs text-gray-400">{v.desc}</div>
+                  <div className="font-mono text-cyan-300 text-xs">{v.key}</div>
+                  <div className="text-[11px] text-gray-400">{v.desc}</div>
                 </div>
-                <button onClick={()=>copy(v.key)} className="text-xs px-2 py-1 rounded border border-cyan-600 text-cyan-300 hover:bg-cyan-900/20">Copy</button>
+                <button onClick={()=>copy(v.key)} className="text-[11px] px-2 py-0.5 rounded border border-cyan-600 text-cyan-300 hover:bg-cyan-900/20">Copy</button>
               </div>
             ))}
           </div>
-          <div className="text-xs text-gray-400 mt-3">Tip: list vars used in the input above (comma‑separated) to help teammates discover them.</div>
+          <div className="text-[11px] text-gray-400 mt-2">Tip: list vars used in the input above (comma‑separated) to help teammates discover them.</div>
         </div>
         {/* Existing list */}
-        <div className="xl:col-span-3 border border-gray-700 rounded-xl p-4">
-          <div className="text-sm text-gray-300 mb-2">Existing</div>
-          <div className="space-y-3">
+        <div className="xl:col-span-3 border border-gray-800 rounded-xl p-3 bg-gradient-to-b from-gray-950 to-gray-900">
+          <div className="text-xs text-gray-300 mb-2">Existing</div>
+          <div className="space-y-2">
             {rows.map(r => (
-              <div key={String(r.id||r.title)} className="border border-gray-700 rounded p-3">
-                <div className="font-semibold">{r.title} {r.category ? <span className="text-xs text-gray-400">({r.category})</span> : null}</div>
-                {r.variables ? <div className="text-xs text-gray-400">vars: {r.variables}</div> : null}
-                <pre className="whitespace-pre-wrap text-gray-200 text-sm mt-2">{r.body}</pre>
+              <div key={String(r.id||r.title)} className="border border-gray-800 rounded p-2">
+                <div className="font-semibold text-sm">{r.title} {r.category ? <span className="text-[11px] text-gray-400">({r.category})</span> : null}</div>
+                {r.variables ? <div className="text-[11px] text-gray-400">vars: {r.variables}</div> : null}
+                <pre className="whitespace-pre-wrap text-gray-200 text-xs mt-1.5">{r.body}</pre>
               </div>
             ))}
           </div>
