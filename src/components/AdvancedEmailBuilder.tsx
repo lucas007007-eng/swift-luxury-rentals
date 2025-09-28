@@ -922,7 +922,6 @@ export default function AdvancedEmailBuilder({
               </div>
             </div>
           </div>
-        </div>
 
         {/* Main Canvas */}
         <div className="flex-1 p-6 overflow-y-auto bg-gray-100">
