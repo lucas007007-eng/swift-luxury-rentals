@@ -280,3 +280,17 @@ model EmailTemplate {
   @@index([isActive])
   @@index([updatedAt])
 }
+
+// Email Unsubscribe tracking
+model Unsubscribe {
+  id         String   @id @default(cuid())
+  email      String
+  reason     String?
+  source     String?  // link, header, admin
+  createdAt  DateTime @default(now())
+  templateId String?  // optional reference to templateId
+  ip         String?
+
+  @@index([email])
+  @@index([createdAt])
+}

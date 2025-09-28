@@ -89,8 +89,8 @@ export async function POST(request: NextRequest) {
         'X-Test-Type': testType,
         'X-Template-Name': template.name,
         'X-Test-Timestamp': new Date().toISOString(),
-        // These can help some providers recognize safe mail; adjust to valid endpoints if you add them
-        'List-Unsubscribe': '<mailto:unsubscribe@phantomproperties.co?subject=unsubscribe>',
+        // Include unsubscribe URL for client recognition
+        'List-Unsubscribe': '<https://www.phantomproperties.co/unsubscribe>',
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
       }
     })

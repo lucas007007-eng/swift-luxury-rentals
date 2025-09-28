@@ -488,7 +488,7 @@ export default function AdvancedEmailBuilder({
           }}
         >
           <p className="mb-2">{emailStructure.footer.companyInfo}</p>
-          <p>{emailStructure.footer.contactInfo}</p>
+          <p>{emailStructure.footer.contactInfo} · <a href="/unsubscribe" style={{ color: '#f59e0b' }}>Unsubscribe</a></p>
         </div>
       </div>
     )
