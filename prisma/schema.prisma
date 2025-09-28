@@ -307,6 +307,7 @@ model Conversation {
   closedAt      DateTime?
   agentLastReadAt DateTime?
   closeReason   String?
+  tags          String[]    @default([])
   messages      Message[]
   participants  Participant[]
 
@@ -372,7 +373,17 @@ model CannedReply {
   id         String   @id @default(cuid())
   title      String
   body       String   @db.Text
+  category   String?
   variables  String?  // comma-separated variable keys like {{name}},{{bookingId}}
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+// Saved inbox views (stored filters)
+model SavedView {
+  id        String   @id @default(cuid())
+  name      String
+  filters   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

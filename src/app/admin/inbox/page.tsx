@@ -33,6 +33,12 @@ export default function InboxPage() {
   const [agents, setAgents] = useState<{ id: string; email: string; name?: string }[]>([])
   const [bulk, setBulk] = useState<Record<string, boolean>>({})
   const [canned, setCanned] = useState<{ id?: string; title: string; body: string; variables?: string }[]>([])
+  const [q, setQ] = useState('')
+  const [status, setStatus] = useState('')
+  const [assignee, setAssignee] = useState('')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [tags, setTags] = useState('')
 
   useEffect(() => {
     ;(async()=>{
@@ -46,10 +52,16 @@ export default function InboxPage() {
       params.set('list', '1')
       params.set('filter', filter)
       params.set('sort', 'newest')
+      if (q) params.set('q', q)
+      if (status) params.set('status', status)
+      if (assignee) params.set('assignee', assignee)
+      if (dateFrom) params.set('from', dateFrom)
+      if (dateTo) params.set('to', dateTo)
+      if (tags) params.set('tags', tags)
       const res = await fetch(`/api/admin/inbox/messages?${params.toString()}`)
       if (res.ok) setConversations(await res.json())
     })()
-  }, [filter])
+  }, [filter, q, status, assignee, dateFrom, dateTo, tags])
 
   useEffect(() => {
     if (!selected) return
@@ -92,11 +104,26 @@ export default function InboxPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Conversation list */}
           <div className="lg:col-span-1 border border-gray-700 rounded-xl bg-gradient-to-b from-gray-950 to-gray-900">
-            <div className="p-3 border-b border-gray-800 text-sm text-gray-400 flex items-center justify-between">
-              <span>Conversations</span>
-              <div className="flex items-center gap-2">
-                <button onClick={()=>setFilter('all')} className={`text-xs px-2 py-1 rounded ${filter==='all'?'bg-gray-800 text-gray-100 border border-gray-600':'text-gray-400'}`}>All</button>
-                <button onClick={()=>setFilter('awaiting')} className={`text-xs px-2 py-1 rounded ${filter==='awaiting'?'bg-gray-800 text-gray-100 border border-gray-600':'text-gray-400'}`}>Awaiting Reply</button>
+            <div className="p-3 border-b border-gray-800 text-sm text-gray-400">
+              <div className="flex flex-wrap items-center gap-2">
+                <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search…" className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1" />
+                <select value={status} onChange={e=>setStatus(e.target.value)} className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1">
+                  <option value="">Status</option>
+                  <option value="open">Open</option>
+                  <option value="pending">Pending</option>
+                  <option value="closed">Closed</option>
+                </select>
+                <select value={assignee} onChange={e=>setAssignee(e.target.value)} className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1">
+                  <option value="">Assignee</option>
+                  {agents.map(a=> <option key={a.id} value={a.id}>{a.name||a.email}</option>)}
+                </select>
+                <input type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)} className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1" />
+                <input type="date" value={dateTo} onChange={e=>setDateTo(e.target.value)} className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1" />
+                <input value={tags} onChange={e=>setTags(e.target.value)} placeholder="tags,comma,separated" className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1" />
+                <div className="ml-auto flex items-center gap-2">
+                  <button onClick={()=>setFilter('all')} className={`text-xs px-2 py-1 rounded ${filter==='all'?'bg-gray-800 text-gray-100 border border-gray-600':'text-gray-400'}`}>All</button>
+                  <button onClick={()=>setFilter('awaiting')} className={`text-xs px-2 py-1 rounded ${filter==='awaiting'?'bg-gray-800 text-gray-100 border border-gray-600':'text-gray-400'}`}>Awaiting</button>
+                </div>
               </div>
             </div>
             <div className="p-2 flex items-center justify-between gap-2 border-b border-gray-800">
@@ -109,7 +136,8 @@ export default function InboxPage() {
                 }} className="text-xs px-2 py-1 rounded border border-gray-600 text-gray-200 hover:bg-gray-800">Mark Read</button>
                 <button onClick={async()=>{
                   const ids = Object.keys(bulk).filter(k=>bulk[k])
-                  for (const id of ids) await fetch('/api/admin/inbox/close',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({conversationId:id,open:false})})
+                  const reason = prompt('Close reason?') || ''
+                  for (const id of ids) await fetch('/api/admin/inbox/close',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({conversationId:id,open:false,reason})})
                   setBulk({})
                   const res = await fetch('/api/admin/inbox/messages?list=1')
                   if(res.ok) setConversations(await res.json())
