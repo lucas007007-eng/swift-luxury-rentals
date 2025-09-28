@@ -51,7 +51,8 @@ export async function POST(request: NextRequest) {
         success: true,
         method: 'database',
         templateId: savedTemplate.id,
-        message: 'Template saved to database successfully'
+        message: 'Template saved to database successfully',
+        template: template
       })
 
     } catch (dbError) {
@@ -62,7 +63,8 @@ export async function POST(request: NextRequest) {
         success: true,
         method: 'localStorage',
         message: 'Template saved to localStorage (database unavailable)',
-        fallback: true
+        fallback: true,
+        template: template
       })
     }
 

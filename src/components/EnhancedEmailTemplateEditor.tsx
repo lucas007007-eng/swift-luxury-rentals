@@ -366,7 +366,8 @@ export default function EnhancedEmailTemplateEditor({
       <AdvancedEmailBuilder
         template={editedTemplate}
         onSave={(template) => {
-          handleSave(template)
+          // Persist immediately when saving from the visual builder
+          onSave({ ...template, lastModified: new Date().toISOString() })
         }}
         onCancel={onCancel}
       />

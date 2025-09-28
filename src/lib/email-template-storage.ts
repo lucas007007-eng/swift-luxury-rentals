@@ -11,7 +11,10 @@ async function saveToDatabase(template: EmailTemplateConfig): Promise<boolean> {
       },
       body: JSON.stringify(template),
     })
-    return response.ok
+    if (!response.ok) return false
+    // Only treat as DB success if server confirms database method
+    const data = await response.json().catch(() => null)
+    return data && data.method === 'database'
   } catch (error) {
     console.error('Database save failed:', error)
     return false
@@ -21,10 +24,11 @@ async function saveToDatabase(template: EmailTemplateConfig): Promise<boolean> {
 async function loadFromDatabase(): Promise<EmailTemplateConfig[] | null> {
   try {
     const response = await fetch('/api/admin/email-templates/load')
-    if (response.ok) {
-      const data = await response.json()
-      return data.templates
-    }
+    if (!response.ok) return null
+    const data = await response.json()
+    // Only accept DB-loaded templates; otherwise, allow localStorage fallback
+    if (!data || data.method !== 'database') return null
+    return data.templates
     return null
   } catch (error) {
     console.error('Database load failed:', error)
