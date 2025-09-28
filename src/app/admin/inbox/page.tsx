@@ -99,6 +99,13 @@ export default function InboxPage() {
     if (res.ok) setConversations(await res.json())
   }
 
+  async function suggestReply() {
+    if (!selected) return
+    const res = await fetch(`/api/admin/inbox/suggest?conversationId=${selected}`)
+    const data = await res.json().catch(()=>null)
+    if (res.ok && data?.suggestion) setReply(data.suggestion)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-gray-200">
       <div className="max-w-7xl mx-auto px-6 pt-16 pb-6">
@@ -233,7 +240,10 @@ export default function InboxPage() {
                     <option value="">Insert canned…</option>
                     {canned.map(c=> <option key={String(c.id||c.title)} value={String(c.id||c.title)}>{c.title}</option>)}
                   </select>
+                  <button onClick={suggestReply} className="text-xs px-2 py-1 rounded border border-emerald-600 text-emerald-300 hover:bg-emerald-900/20">Suggested reply (AI)</button>
                 </div>
+                {/* Quick tag editor */}
+                <TagEditor conversationId={selected} />
                 <textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Type your reply..." className="flex-1 bg-gray-800 text-gray-100 rounded-lg p-3 border border-gray-700 focus:outline-none" rows={3} />
               </div>
               <button onClick={sendReply} className="px-4 py-2 rounded-lg bg-gradient-to-r from-gray-100 to-gray-400 text-black font-semibold hover:from-white hover:to-gray-300">Send</button>
@@ -256,6 +266,21 @@ function ApplyViews({ onApply }: { onApply: (filters: any) => void }) {
       <option value="">Views</option>
       {views.map(v=> <option key={v.id} value={v.id}>{v.name}</option>)}
     </select>
+  )
+}
+
+function TagEditor({ conversationId }: { conversationId: string | null }) {
+  const [tags, setTags] = React.useState<string>('')
+  if (!conversationId) return null
+  return (
+    <div className="flex items-center gap-2">
+      <input value={tags} onChange={e=>setTags(e.target.value)} placeholder="add tags…" className="bg-gray-800 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1" />
+      <button onClick={async()=>{
+        const arr = tags.split(',').map(s=>s.trim()).filter(Boolean)
+        await fetch('/api/admin/inbox/tags', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ conversationId, tags: arr }) })
+        setTags('')
+      }} className="text-xs px-2 py-1 rounded border border-cyan-600 text-cyan-300 hover:bg-cyan-900/20">Add Tags</button>
+    </div>
   )
 }
 
