@@ -8,7 +8,7 @@ import {
   LinkIcon,
   MinusIcon,
   ShareIcon,
-  SpaceBarIcon,
+  RectangleStackIcon,
   Bars3Icon,
   ChevronUpIcon,
   ChevronDownIcon,
@@ -142,7 +142,7 @@ export const ADVANCED_BLOCK_TEMPLATES = [
   },
   {
     type: 'spacer',
-    icon: SpaceBarIcon,
+    icon: RectangleStackIcon,
     label: 'Spacer',
     category: 'layout',
     defaultContent: {

@@ -11,7 +11,8 @@ import {
   ClockIcon,
   CheckCircleIcon,
   XCircleIcon,
-  DocumentDuplicateIcon
+  DocumentDuplicateIcon,
+  ChartBarIcon
 } from '@heroicons/react/24/outline'
 import Header from '@/components/Header'
 import EmailTemplateEditor from '@/components/EmailTemplateEditor'
