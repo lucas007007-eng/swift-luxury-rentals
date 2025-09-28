@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 type Conversation = {
   id: string
@@ -25,6 +26,7 @@ type Message = {
 }
 
 export default function InboxPage() {
+  const router = useRouter()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selected, setSelected] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -99,8 +101,12 @@ export default function InboxPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-gray-200">
-      <div className="max-w-7xl mx-auto p-6">
-        <h1 className="text-3xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-gray-100 to-gray-400">Inbox</h1>
+      <div className="max-w-7xl mx-auto px-6 pt-16 pb-6">
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={()=>router.push('/admin')} className="px-3 py-1.5 rounded-lg border border-gray-700 text-gray-200 hover:bg-gray-800">Return</button>
+          <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-gray-100 to-gray-400">Inbox</h1>
+          <span />
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Conversation list */}
           <div className="lg:col-span-1 border border-gray-700 rounded-xl bg-gradient-to-b from-gray-950 to-gray-900">
