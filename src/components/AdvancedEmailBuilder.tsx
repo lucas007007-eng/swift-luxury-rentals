@@ -463,6 +463,263 @@ export default function AdvancedEmailBuilder({
         <div className="w-80 bg-white border-r border-gray-200 p-6 overflow-y-auto">
           <div className="space-y-6">
             
+            {/* Header & Footer Editor */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Email Structure</h3>
+              
+              {/* Header Editor */}
+              <div className="mb-6 p-4 border border-gray-200 rounded-xl bg-gray-50">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  📧 Header Settings
+                </h4>
+                <div className="space-y-3 email-editor">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input
+                      type="text"
+                      value={emailStructure.header.title}
+                      onChange={(e) => setEmailStructure(prev => ({
+                        ...prev,
+                        header: { ...prev.header, title: e.target.value }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white text-gray-900"
+                      placeholder="Email header title"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
+                    <input
+                      type="text"
+                      value={emailStructure.header.subtitle || ''}
+                      onChange={(e) => setEmailStructure(prev => ({
+                        ...prev,
+                        header: { ...prev.header, subtitle: e.target.value }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white text-gray-900"
+                      placeholder="Optional subtitle"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={emailStructure.header.backgroundColor}
+                        onChange={(e) => setEmailStructure(prev => ({
+                          ...prev,
+                          header: { ...prev.header, backgroundColor: e.target.value }
+                        }))}
+                        className="w-8 h-8 border border-gray-300 rounded"
+                      />
+                      <input
+                        type="text"
+                        value={emailStructure.header.backgroundColor}
+                        onChange={(e) => setEmailStructure(prev => ({
+                          ...prev,
+                          header: { ...prev.header, backgroundColor: e.target.value }
+                        }))}
+                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs bg-white text-gray-900"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Text Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={emailStructure.header.textColor}
+                        onChange={(e) => setEmailStructure(prev => ({
+                          ...prev,
+                          header: { ...prev.header, textColor: e.target.value }
+                        }))}
+                        className="w-8 h-8 border border-gray-300 rounded"
+                      />
+                      <input
+                        type="text"
+                        value={emailStructure.header.textColor}
+                        onChange={(e) => setEmailStructure(prev => ({
+                          ...prev,
+                          header: { ...prev.header, textColor: e.target.value }
+                        }))}
+                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs bg-white text-gray-900"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="showLogo"
+                      checked={emailStructure.header.showLogo}
+                      onChange={(e) => setEmailStructure(prev => ({
+                        ...prev,
+                        header: { ...prev.header, showLogo: e.target.checked }
+                      }))}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <label htmlFor="showLogo" className="text-sm text-gray-700">
+                      Show Logo
+                    </label>
+                  </div>
+                  
+                  {/* Header Presets */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Style Presets</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => setEmailStructure(prev => ({
+                          ...prev,
+                          header: {
+                            ...prev.header,
+                            backgroundColor: '#f59e0b',
+                            textColor: '#000000',
+                            title: 'BERLIN LUXE RENTALS'
+                          }
+                        }))}
+                        className="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs rounded transition-colors"
+                      >
+                        Luxury Gold
+                      </button>
+                      <button
+                        onClick={() => setEmailStructure(prev => ({
+                          ...prev,
+                          header: {
+                            ...prev.header,
+                            backgroundColor: '#000000',
+                            textColor: '#f59e0b',
+                            title: 'MISSION BRIEFING'
+                          }
+                        }))}
+                        className="px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs rounded transition-colors"
+                      >
+                        Spy-Tech
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer Editor */}
+              <div className="mb-6 p-4 border border-gray-200 rounded-xl bg-gray-50">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  🦶 Footer Settings
+                </h4>
+                <div className="space-y-3 email-editor">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Company Info</label>
+                    <textarea
+                      value={emailStructure.footer.companyInfo}
+                      onChange={(e) => setEmailStructure(prev => ({
+                        ...prev,
+                        footer: { ...prev.footer, companyInfo: e.target.value }
+                      }))}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white text-gray-900"
+                      placeholder="Company name and address"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Contact Info</label>
+                    <textarea
+                      value={emailStructure.footer.contactInfo}
+                      onChange={(e) => setEmailStructure(prev => ({
+                        ...prev,
+                        footer: { ...prev.footer, contactInfo: e.target.value }
+                      }))}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white text-gray-900"
+                      placeholder="Phone, email, website"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Background Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={emailStructure.footer.backgroundColor}
+                        onChange={(e) => setEmailStructure(prev => ({
+                          ...prev,
+                          footer: { ...prev.footer, backgroundColor: e.target.value }
+                        }))}
+                        className="w-8 h-8 border border-gray-300 rounded"
+                      />
+                      <input
+                        type="text"
+                        value={emailStructure.footer.backgroundColor}
+                        onChange={(e) => setEmailStructure(prev => ({
+                          ...prev,
+                          footer: { ...prev.footer, backgroundColor: e.target.value }
+                        }))}
+                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs bg-white text-gray-900"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Text Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={emailStructure.footer.textColor}
+                        onChange={(e) => setEmailStructure(prev => ({
+                          ...prev,
+                          footer: { ...prev.footer, textColor: e.target.value }
+                        }))}
+                        className="w-8 h-8 border border-gray-300 rounded"
+                      />
+                      <input
+                        type="text"
+                        value={emailStructure.footer.textColor}
+                        onChange={(e) => setEmailStructure(prev => ({
+                          ...prev,
+                          footer: { ...prev.footer, textColor: e.target.value }
+                        }))}
+                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs bg-white text-gray-900"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Footer Presets */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Quick Presets</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => setEmailStructure(prev => ({
+                          ...prev,
+                          footer: {
+                            ...prev.footer,
+                            companyInfo: 'Berlin Luxe Rentals | Unter den Linden 77, 10117 Berlin',
+                            contactInfo: '24/7 Support: +49 (30) 1234-5678 | info@phantomproperties.co'
+                          }
+                        }))}
+                        className="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs rounded transition-colors"
+                      >
+                        Business
+                      </button>
+                      <button
+                        onClick={() => setEmailStructure(prev => ({
+                          ...prev,
+                          footer: {
+                            ...prev.footer,
+                            companyInfo: 'Berlin Luxe Rentals | VIP Services',
+                            contactInfo: 'Concierge: concierge@phantomproperties.co'
+                          }
+                        }))}
+                        className="px-2 py-1 bg-purple-100 hover:bg-purple-200 text-purple-800 text-xs rounded transition-colors"
+                      >
+                        VIP
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             {/* Block Categories */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Content Blocks</h3>
