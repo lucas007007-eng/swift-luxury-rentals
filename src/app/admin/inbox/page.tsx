@@ -28,6 +28,7 @@ export default function InboxPage() {
   const [selected, setSelected] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [reply, setReply] = useState('')
+  const [filter, setFilter] = useState<'all'|'awaiting'>('all')
 
   useEffect(() => {
     ;(async () => {
@@ -64,9 +65,21 @@ export default function InboxPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Conversation list */}
           <div className="lg:col-span-1 border border-gray-700 rounded-xl bg-gradient-to-b from-gray-950 to-gray-900">
-            <div className="p-3 border-b border-gray-800 text-sm text-gray-400">Conversations</div>
+            <div className="p-3 border-b border-gray-800 text-sm text-gray-400 flex items-center justify-between">
+              <span>Conversations</span>
+              <div className="flex items-center gap-2">
+                <button onClick={()=>setFilter('all')} className={`text-xs px-2 py-1 rounded ${filter==='all'?'bg-gray-800 text-gray-100 border border-gray-600':'text-gray-400'}`}>All</button>
+                <button onClick={()=>setFilter('awaiting')} className={`text-xs px-2 py-1 rounded ${filter==='awaiting'?'bg-gray-800 text-gray-100 border border-gray-600':'text-gray-400'}`}>Awaiting Reply</button>
+              </div>
+            </div>
             <div className="max-h-[70vh] overflow-y-auto divide-y divide-gray-800">
-              {conversations.map(c => (
+              {conversations
+                .filter(c=>{
+                  if (filter==='all') return true
+                  // awaiting reply = last message inbound
+                  return true
+                })
+                .map(c => (
                 <button key={c.id} onClick={() => setSelected(c.id)} className={`w-full text-left p-4 hover:bg-gray-800/60 ${selected===c.id?'bg-gray-800/80':''}`}>
                   <div className="text-gray-100 font-semibold">{c.subject}</div>
                   <div className="text-xs text-gray-400">{new Date(c.lastMessageAt).toLocaleString()} • {c.status}</div>

@@ -347,6 +347,7 @@ export default function AdminDashboard() {
                   Open Inbox →
                 </div>
               </div>
+              <UnreadBadge />
             </div>
             {/* Subtle radar accents */}
             <div className="pointer-events-none absolute inset-0 opacity-10">
@@ -359,6 +360,29 @@ export default function AdminDashboard() {
       </div>
 
     </main>
+  )
+}
+
+function UnreadBadge() {
+  const [count, setCount] = React.useState<number>(0)
+  React.useEffect(() => {
+    let mounted = true
+    const load = async () => {
+      try {
+        const res = await fetch('/api/admin/inbox/unread', { cache: 'no-store' })
+        const data = await res.json()
+        if (mounted) setCount(Number(data?.unread || 0))
+      } catch {}
+    }
+    load()
+    const t = setInterval(load, 15000)
+    return () => { mounted = false; clearInterval(t) }
+  }, [])
+  if (!count) return null
+  return (
+    <div className="shrink-0 px-3 py-2 rounded-lg border border-fuchsia-400/30 bg-fuchsia-500/10 text-fuchsia-300 font-semibold">
+      {count} New
+    </div>
   )
 }
 
