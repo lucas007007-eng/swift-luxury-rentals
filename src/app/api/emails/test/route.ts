@@ -152,7 +152,69 @@ function generateTestEmailHtml(
   testData: Record<string, any>,
   testType: 'design' | 'deliverability' | 'spam'
 ): string {
-  
+  // If builder custom blocks exist, render from them for an exact preview
+  const custom = (template.content.body.sections || []).find((s: any) => s.type === 'custom-blocks') as any
+  if (custom && custom.content && Array.isArray(custom.content.blocks)) {
+    const header = custom.content.header || {
+      backgroundColor: template.styling.primaryColor,
+      textColor: '#ffffff',
+      title: template.content.header.title,
+      subtitle: template.content.header.subtitle,
+      showLogo: true,
+      textShadow: false
+    }
+    const footer = custom.content.footer || template.content.footer
+    const blocks = custom.content.blocks as any[]
+
+    const blockHtml = blocks.map((block: any) => {
+      switch (block.type) {
+        case 'heading':
+          return `<h2 style="margin:0 0 12px 0;font-size:${block.content?.fontSize||'24px'};font-weight:${block.content?.fontWeight||'600'};color:${block.content?.color||'#ffffff'};font-family:${block.styling?.fontFamily||template.styling.fontFamily};text-align:${block.styling?.textAlign||'left'}">${block.content?.text||''}</h2>`
+        case 'text':
+          return `<p style="margin:0 0 16px 0;font-size:${block.styling?.fontSize||'16px'};font-weight:${block.styling?.fontWeight||'400'};color:${block.styling?.color||'#cccccc'};font-family:${block.styling?.fontFamily||template.styling.fontFamily};line-height:1.6;text-align:${block.styling?.textAlign||'left'}">${block.content?.text||''}</p>`
+        case 'image':
+          return `<div style="text-align:${block.styling?.textAlign||'center'};margin:12px 0"><img src="${block.content?.src||''}" alt="${block.content?.alt||''}" style="width:${block.content?.width||'100%'};height:${block.content?.height||'auto'};border-radius:${block.styling?.borderRadius||'0px'}" /></div>`
+        case 'button':
+          return `<div style="text-align:${block.styling?.textAlign||'center'};margin:16px 0"><a href="${block.content?.link||'#'}" style="display:inline-block;background:${block.content?.backgroundColor||template.styling.primaryColor};color:${block.content?.textColor||'#000'};padding:${block.content?.padding||'12px 24px'};border-radius:${block.content?.borderRadius||'6px'};text-decoration:none;font-size:${block.content?.fontSize||'16px'};font-weight:${block.content?.fontWeight||'600'}">${block.content?.text||'Click'}</a></div>`
+        case 'divider':
+          return `<hr style="height:${block.content?.height||'2px'};background:${block.content?.color||'#333'};border:none;margin:12px 0" />`
+        case 'spacer':
+          return `<div style="height:${block.content?.height||'20px'}"></div>`
+        case 'list':
+          return `<div style="margin:12px 0"><h3 style="margin:0 0 8px 0;color:${block.content?.titleColor||template.styling.primaryColor}">${block.content?.title||''}</h3><ul style="margin:0;padding-left:20px;color:${block.content?.color||'#cccccc'}">${(block.content?.items||[]).map((it: string)=>`<li>${it}</li>`).join('')}</ul></div>`
+        default:
+          return ''
+      }
+    }).join('')
+
+    const baseHtmlCustom = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>${template.subject}</title>
+    </head>
+    <body style="font-family:${template.styling.fontFamily};background:linear-gradient(135deg,#000,#1a1a1a);color:#ffffff;margin:0;padding:0;">
+      ${template.preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;visibility:hidden;">${replaceVariables(template.preheader, testData)}</div>`: ''}
+      <div style="max-width:600px;margin:0 auto;background-color:#000000;">
+        <div style="text-align:center;padding:30px 20px;border-bottom:2px solid ${template.styling.primaryColor};background:${header.backgroundColor};color:${header.textColor}">
+          <h1 style="margin:0;font-size:28px;color:${template.styling.primaryColor};${header.textShadow?'text-shadow:0 2px 4px rgba(0,0,0,0.7)':''}">${template.content.header.icon||''} ${replaceVariables(header.title||template.content.header.title, testData)}</h1>
+          ${header.subtitle?`<p style="margin:10px 0 0 0;color:${template.styling.secondaryColor};font-weight:600">${replaceVariables(header.subtitle, testData)}</p>`:''}
+        </div>
+        <div style="background-color:#0a0a0a;padding:30px 20px;border-left:3px solid ${template.styling.primaryColor};margin:20px 0;">
+          ${blockHtml}
+        </div>
+        <div style="background-color:#0a0a0a;padding:20px;text-align:center;border-top:1px solid #333;">
+          <p style="color:#666;font-size:12px;margin:0;">${footer.companyInfo}</p>
+          <p style="color:#555;font-size:10px;margin:10px 0 0 0;">${replaceVariables(footer.contactInfo, testData)}</p>
+        </div>
+      </div>
+    </body>
+    </html>`
+    return baseHtmlCustom
+  }
+
   const baseHtml = `
     <!DOCTYPE html>
     <html>
