@@ -52,17 +52,20 @@ export async function POST(request: NextRequest) {
 
     const finalTestData = { ...defaultTestData, ...testData }
 
-    // Generate test email HTML based on template
+    // Generate test email HTML and plain-text based on template
     let testHtml = generateTestEmailHtml(template, finalTestData, testType)
+    let testText = generateTestEmailText(template, finalTestData)
     
     // Add test email headers for different test types
     let subject = template.subject
-    if (testType === 'deliverability') {
-      subject = `[DELIVERABILITY TEST] ${template.subject}`
-    } else if (testType === 'spam') {
+    if (testType === 'spam') {
       subject = `[SPAM TEST] ${template.subject}`
+    } else if (testType === 'deliverability') {
+      // Keep subject as-is but sanitize for deliverability (remove emojis and excessive caps)
+      subject = sanitizeSubjectForDeliverability(template.subject)
     } else {
-      subject = `[DESIGN TEST] ${template.subject}`
+      // Design test: avoid spammy prefixes; keep original for visual checks
+      subject = template.subject
     }
 
     // Replace variables in subject
@@ -72,15 +75,23 @@ export async function POST(request: NextRequest) {
     const { Resend } = await import('resend')
     const resend = new Resend(process.env.RESEND_API_KEY)
 
+    const fromAddress = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+    const replyTo = process.env.RESEND_REPLY_TO_EMAIL || fromAddress
+
     const emailResult = await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
+      from: fromAddress,
       to: [testEmail],
       subject: subject,
       html: testHtml,
+      text: testText,
+      reply_to: replyTo,
       headers: {
         'X-Test-Type': testType,
         'X-Template-Name': template.name,
-        'X-Test-Timestamp': new Date().toISOString()
+        'X-Test-Timestamp': new Date().toISOString(),
+        // These can help some providers recognize safe mail; adjust to valid endpoints if you add them
+        'List-Unsubscribe': '<mailto:unsubscribe@phantomproperties.co?subject=unsubscribe>',
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
       }
     })
 
@@ -127,7 +138,8 @@ export async function POST(request: NextRequest) {
       resendResponse: {
         id: emailResult.data?.id,
         status: emailResult.error ? 'error' : 'sent'
-      }
+      },
+      warnings: !process.env.RESEND_FROM_EMAIL ? ['Using fallback from address onboarding@resend.dev; verify your sending domain for best deliverability.'] : []
     })
 
   } catch (error) {
@@ -213,6 +225,52 @@ function generateTestEmailHtml(
   `
 
   return baseHtml
+}
+
+// Generate a plain-text alternative for better deliverability
+function generateTestEmailText(
+  template: EmailTemplateConfig,
+  data: Record<string, any>
+): string {
+  const lines: string[] = []
+  lines.push(`${replaceVariables(template.content.header.title, data)}`)
+  if (template.content.header.subtitle) {
+    lines.push(`${replaceVariables(template.content.header.subtitle, data)}`)
+  }
+  lines.push('')
+  lines.push(replaceVariables(template.content.body.greeting, data))
+  lines.push('')
+  lines.push(replaceVariables(template.content.body.mainMessage, data))
+  lines.push('')
+  for (const section of template.content.body.sections) {
+    if (section.type === 'info-card' && section.content?.items) {
+      for (const item of section.content.items) {
+        lines.push(`- ${replaceVariables(item, data)}`)
+      }
+      lines.push('')
+    }
+    if (section.type === 'data-table' && section.content?.data) {
+      for (const row of section.content.data) {
+        lines.push(`${row.label}: ${replaceVariables(row.value, data)}`)
+      }
+      lines.push('')
+    }
+  }
+  if (template.content.body.callToAction) {
+    lines.push('')
+    lines.push(`${template.content.body.callToAction.text}: ${template.content.body.callToAction.url}`)
+  }
+  lines.push('')
+  lines.push(template.content.footer.companyInfo)
+  lines.push(template.content.footer.contactInfo)
+  return lines.join('\n')
+}
+
+// Sanitize subject to avoid common spam triggers (remove emojis and excessive caps)
+function sanitizeSubjectForDeliverability(subject: string): string {
+  const withoutEmoji = subject.replace(/[\p{Emoji_Presentation}\p{Emoji}\uFE0F]/gu, '')
+  // Reduce long ALL CAPS words
+  return withoutEmoji.replace(/\b([A-Z]{6,})\b/g, (m) => m.charAt(0) + m.slice(1).toLowerCase())
 }
 
 // Generate test banner based on test type
