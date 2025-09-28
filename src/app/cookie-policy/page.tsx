@@ -17,7 +17,7 @@ export default function CookiePolicyPage() {
           <div className="space-y-5 max-w-5xl mx-auto">
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
               <h2 className="text-lg font-semibold mb-2">1. Introduction</h2>
-              <p className="text-gray-300">This Cookie Policy explains how Swift Luxury GmbH ("Swift Luxury", "we", "our") uses cookies and similar technologies on our website and services. It should be read together with our Privacy Policy.</p>
+              <p className="text-gray-300">This Cookie Policy explains how Phantom Properties GmbH ("Phantom Properties", "we", "our") uses cookies and similar technologies on our website and services. It should be read together with our Privacy Policy.</p>
             </div>
 
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">

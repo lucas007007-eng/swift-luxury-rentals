@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   const to = String(b.to||'').trim()
   const link = `${process.env.NEXT_PUBLIC_BASE_URL || ''}/api/crm2/quotes/accept?leadId=${encodeURIComponent(b.leadId||'')}&dealId=${encodeURIComponent(b.dealId||'')}`
   if (!to) return NextResponse.json({ ok:false, error:'to-required' }, { status:400 })
-  const subject = 'Your Swift Luxury Quote'
+  const subject = 'Your Phantom Properties Quote'
   const html = `
     <div style="font-family:Inter,Arial,sans-serif;color:#111">
       <h2>Your Quote</h2>

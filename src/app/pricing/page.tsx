@@ -25,7 +25,7 @@ export default function PricingPage() {
     {
       step: 3,
       title: 'Book and Pay Securely',
-      description: 'Swift Luxury charges a one-time Tenant Protection fee of 25%-40% of the first month\'s rent (minimum €175). We protect your payment until move-in.',
+      description: 'Phantom Properties charges a one-time Tenant Protection fee of 25%-40% of the first month\'s rent (minimum €175). We protect your payment until move-in.',
       cost: 'Tenant Protection Fee',
       features: ['Secure payment processing', 'Crypto & card payments', '48-hour protection', 'Full refund guarantee']
     },
@@ -80,7 +80,7 @@ export default function PricingPage() {
               Pricing & Protection
             </h1>
             <p className="text-xl text-gray-300 max-w-4xl mx-auto">
-              Learn about the benefits of using Swift Luxury for your European luxury rental needs
+              Learn about the benefits of using Phantom Properties for your European luxury rental needs
             </p>
           </motion.div>
         </div>
@@ -162,14 +162,14 @@ export default function PricingPage() {
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-6">Frequently Asked Questions</h2>
-            <p className="text-gray-400">Everything you need to know about Swift Luxury pricing</p>
+            <p className="text-gray-400">Everything you need to know about Phantom Properties pricing</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
               <h3 className="text-xl font-bold text-white mb-4">What do I need to pay to confirm my booking?</h3>
               <p className="text-gray-300 leading-relaxed">
-                You pay the first month's rent plus our one-time Swift Luxury service fee. We safeguard your payment and only transfer it to the landlord 48 hours after you move in, giving you time to ensure everything matches the listing.
+                You pay the first month's rent plus our one-time Phantom Properties service fee. We safeguard your payment and only transfer it to the landlord 48 hours after you move in, giving you time to ensure everything matches the listing.
               </p>
             </div>
 
@@ -190,7 +190,7 @@ export default function PricingPage() {
             <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800">
               <h3 className="text-xl font-bold text-white mb-4">Do you accept cryptocurrency?</h3>
               <p className="text-gray-300 leading-relaxed">
-                Yes! Swift Luxury is the first platform to accept cryptocurrency for luxury rental payments. We support Bitcoin, Ethereum, USDT, and traditional credit cards with instant conversion and direct landlord payment.
+                Yes! Phantom Properties accepts cryptocurrency for luxury rental payments. We support Bitcoin, Ethereum, USDT, and traditional credit cards with instant conversion and direct landlord payment.
               </p>
             </div>
           </div>

@@ -59,9 +59,9 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center space-x-3 mb-6">
               <div className="w-8 h-8 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg drop-shadow-lg">SL</span>
+                <span className="text-white font-bold text-lg drop-shadow-lg">PP</span>
               </div>
-              <span className="font-sora font-bold text-xl tracking-wide">Swift Luxury</span>
+              <span className="font-sora font-bold text-xl tracking-wide">Phantom Properties</span>
             </Link>
             <p className="text-gray-300 mb-6">
               Making Rentals Easy with One Platform for Every Duration.
@@ -108,7 +108,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-400/20 pt-8 flex flex-col sm:flex-row justify-between items-center">
           <div className="text-gray-300 text-sm mb-4 sm:mb-0 font-medium">
-            <p>© 2025 Swift Luxury. All rights reserved.</p>
+            <p>© 2025 Phantom Properties. All rights reserved.</p>
           </div>
           <div className="text-gray-300 text-sm font-medium">
             <p>Berlin, renting made easy.</p>

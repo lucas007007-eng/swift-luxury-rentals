@@ -75,12 +75,12 @@ export async function POST(req: Request) {
     page.drawRectangle({ x: 0, y: 0, width: 4, height: page.getHeight(), color: accent })
     // Watermark (diagonal, light silver)
     try {
-      const wm = 'SWIFT LUXURY'
+      const wm = 'PHANTOM PROPERTIES'
       page.drawText(wm, { x: 120, y: 320, size: 64, font: bold, color: rgb(0.22,0.24,0.28), rotate: { type: 'degrees', angle: 30 }, opacity: 0.08 })
     } catch {}
 
     // Header text
-    drawText('Swift Luxury — Quote', 48, 812, 18, bold, silver)
+    drawText('Phantom Properties — Quote', 48, 812, 18, bold, silver)
     const todayStr = new Date().toISOString().slice(0,10)
     drawText(todayStr, page.getWidth()-140, 812, 10, font, silverDim)
 
@@ -186,9 +186,9 @@ export async function POST(req: Request) {
     const sigTop = 220
     // Outer frame
     page.drawRectangle({ x: 40, y: sigTop-90, width: page.getWidth()-80, height: 110, color: pane })
-    // Left: Swift Luxury signature line
+    // Left: Phantom Properties signature line
     page.drawRectangle({ x: 60, y: sigTop, width: page.getWidth()/2 - 100, height: 1, color: silver })
-    drawText('Swift Luxury — Authorized Signature', 60, sigTop-14, 10, font, silverDim)
+    drawText('Phantom Properties — Authorized Signature', 60, sigTop-14, 10, font, silverDim)
     // Right: Client signature line
     const rightX = page.getWidth()/2 + 40
     page.drawRectangle({ x: rightX, y: sigTop, width: page.getWidth()/2 - 100, height: 1, color: silver })
@@ -209,7 +209,7 @@ export async function POST(req: Request) {
     // Footer
     page.drawRectangle({ x: 0, y: 28, width: page.getWidth(), height: 24, color: bg })
     page.drawRectangle({ x: 10, y: 52, width: page.getWidth()-20, height: 1, color: silverDim })
-    drawText('Swift Luxury GmbH • Friedrichstraße 123 • 10117 Berlin • IBAN: TBD • BIC: TBD', 48, 36, 9, font, silverDim)
+    drawText('Phantom Properties GmbH • Friedrichstraße 123 • 10117 Berlin • IBAN: TBD • BIC: TBD', 48, 36, 9, font, silverDim)
     const footerText = 'Page 1 of 1'
     const fw = font.widthOfTextAtSize(footerText, 9)
     page.drawText(footerText, { x: page.getWidth()-48-fw, y: 36, size: 9, font, color: silverDim })

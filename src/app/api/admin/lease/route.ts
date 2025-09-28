@@ -79,7 +79,7 @@ export async function POST(req: Request) {
     }
 
     // Prepare lease fields (defaults; consider moving to config)
-    const company = 'Swift Luxury GmbH'
+    const company = 'Phantom Properties GmbH'
     const companyRepresentative = 'Authorized Representative'
     const companyAddrStreet = 'Friedrichstraße 123'
     const companyAddrPostalCity = '10117 Berlin'

@@ -17,20 +17,20 @@ const baseUrl = (() => {
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
-  title: 'Swift Luxury - Premium Rentals in Berlin',
-  description: 'Discover luxury rental properties in Berlin. Short-term, month-to-month, and long-term rentals made easy with Swift Luxury',
+  title: 'Phantom Properties - Premium Rentals in Berlin',
+  description: 'Discover luxury rental properties in Berlin. Short-term, month-to-month, and long-term rentals made easy with Phantom Properties',
   keywords: 'Berlin rentals, luxury apartments, short-term rentals, long-term rentals, furnished apartments Berlin',
   openGraph: {
-    title: 'Swift Luxury - Premium Rentals in Berlin',
-    description: 'Discover luxury rental properties in Berlin. Short-term, month-to-month, and long-term rentals made easy with Swift Luxury',
+    title: 'Phantom Properties - Premium Rentals in Berlin',
+    description: 'Discover luxury rental properties in Berlin. Short-term, month-to-month, and long-term rentals made easy with Phantom Properties',
     url: baseUrl,
-    siteName: 'Swift Luxury',
+    siteName: 'Phantom Properties',
     images: [
       {
         url: '/images/berlin-illustration.png',
         width: 1200,
         height: 630,
-        alt: 'Swift Luxury Rentals',
+        alt: 'Phantom Properties Rentals',
       },
     ],
     locale: 'en_US',

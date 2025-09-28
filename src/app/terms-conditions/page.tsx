@@ -16,12 +16,12 @@ export default function TermsConditions() {
           <div className="space-y-5 max-w-5xl mx-auto">
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
               <h2 className="text-lg font-semibold mb-2">1. Introduction</h2>
-              <p className="text-gray-300">These Terms and Conditions (the “Terms”) govern your use of Swift Luxury’s platform and services for discovering and booking furnished rentals (the “Services”). By using the Services, you agree to these Terms.</p>
+              <p className="text-gray-300">These Terms and Conditions (the “Terms”) govern your use of Phantom Properties’ platform and services for discovering and booking furnished rentals (the “Services”). By using the Services, you agree to these Terms.</p>
             </div>
 
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
               <h2 className="text-lg font-semibold mb-2">2. Parties</h2>
-              <p className="text-gray-300">“Swift Luxury”, “we”, “us”, or “our” refers to Swift Luxury GmbH. “You” or “Guest” refers to the user accessing or using our Services.</p>
+              <p className="text-gray-300">“Phantom Properties”, “we”, “us”, or “our” refers to Phantom Properties GmbH. “You” or “Guest” refers to the user accessing or using our Services.</p>
             </div>
 
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
@@ -59,7 +59,7 @@ export default function TermsConditions() {
 
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
               <h2 className="text-lg font-semibold mb-2">8. Liability</h2>
-              <p className="text-gray-300">To the maximum extent permitted by law, Swift Luxury is not liable for indirect, incidental, or consequential damages. Our aggregate liability will not exceed the total fees you paid to Swift Luxury for the booking at issue.</p>
+              <p className="text-gray-300">To the maximum extent permitted by law, Phantom Properties is not liable for indirect, incidental, or consequential damages. Our aggregate liability will not exceed the total fees you paid to Phantom Properties for the booking at issue.</p>
             </div>
 
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
@@ -79,7 +79,7 @@ export default function TermsConditions() {
 
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
               <h2 className="text-lg font-semibold mb-2">12. Contact</h2>
-              <p className="text-gray-300">Swift Luxury GmbH, Berlin, Germany. For questions, contact us at support@swiftluxury.eu.</p>
+              <p className="text-gray-300">Phantom Properties GmbH, Berlin, Germany. For questions, contact us at support@phantomproperties.co.</p>
             </div>
           </div>
         </div>

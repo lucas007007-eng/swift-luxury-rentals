@@ -16,18 +16,18 @@ export type EditablePage = {
 const PAGE_OVERRIDE_KEY = 'site-pages'
 
 const defaultPages: EditablePage[] = [
-  { slug: 'home', route: '/', displayName: 'Home', seoTitle: 'Swift Luxury — Premium Rentals in Berlin', seoDescription: 'Luxury serviced apartments. Month-to-month and longer stays.' },
-  { slug: 'properties', route: '/properties', displayName: 'Properties', seoTitle: 'Luxury Properties — Swift Luxury', seoDescription: 'Explore our curated luxury apartments across Europe.' },
-  { slug: 'city', route: '/city/[cityName]', displayName: 'City Page', seoTitle: 'City Rentals — Swift Luxury', seoDescription: 'Find furnished rentals in your destination city.' },
-  { slug: 'property', route: '/property/[id]', displayName: 'Property Detail', seoTitle: 'Property — Swift Luxury', seoDescription: 'See photos, amenities, availability, and pricing.' },
-  { slug: 'about', route: '/about', displayName: 'About', seoTitle: 'About Swift Luxury', seoDescription: 'About our service and promise.' },
-  { slug: 'contact', route: '/contact', displayName: 'Contact', seoTitle: 'Contact Swift Luxury', seoDescription: 'Get in touch with our team.' },
-  { slug: 'pricing', route: '/pricing', displayName: 'Pricing', seoTitle: 'Pricing — Swift Luxury', seoDescription: 'Transparent pricing for monthly stays.' },
-  { slug: 'corporate', route: '/corporate-rentals', displayName: 'Corporate Rentals', seoTitle: 'Corporate Rentals — Swift Luxury', seoDescription: 'Flexible housing for teams and executives.' },
-  { slug: 'list', route: '/list-your-property', displayName: 'List Your Property', seoTitle: 'List Your Property — Swift Luxury', seoDescription: 'Partner with us to host your property.' },
-  { slug: 'privacy', route: '/privacy', displayName: 'Privacy Policy', seoTitle: 'Privacy Policy — Swift Luxury', seoDescription: 'How we handle your data.' },
-  { slug: 'terms', route: '/terms', displayName: 'Terms of Service', seoTitle: 'Terms — Swift Luxury', seoDescription: 'Legal terms and conditions.' },
-  { slug: 'cookies', route: '/cookie-policy', displayName: 'Cookie Policy', seoTitle: 'Cookie Policy — Swift Luxury', seoDescription: 'Cookies and tracking technologies.' },
+  { slug: 'home', route: '/', displayName: 'Home', seoTitle: 'Phantom Properties — Premium Rentals in Berlin', seoDescription: 'Luxury serviced apartments. Month-to-month and longer stays.' },
+  { slug: 'properties', route: '/properties', displayName: 'Properties', seoTitle: 'Luxury Properties — Phantom Properties', seoDescription: 'Explore our curated luxury apartments across Europe.' },
+  { slug: 'city', route: '/city/[cityName]', displayName: 'City Page', seoTitle: 'City Rentals — Phantom Properties', seoDescription: 'Find furnished rentals in your destination city.' },
+  { slug: 'property', route: '/property/[id]', displayName: 'Property Detail', seoTitle: 'Property — Phantom Properties', seoDescription: 'See photos, amenities, availability, and pricing.' },
+  { slug: 'about', route: '/about', displayName: 'About', seoTitle: 'About Phantom Properties', seoDescription: 'About our service and promise.' },
+  { slug: 'contact', route: '/contact', displayName: 'Contact', seoTitle: 'Contact Phantom Properties', seoDescription: 'Get in touch with our team.' },
+  { slug: 'pricing', route: '/pricing', displayName: 'Pricing', seoTitle: 'Pricing — Phantom Properties', seoDescription: 'Transparent pricing for monthly stays.' },
+  { slug: 'corporate', route: '/corporate-rentals', displayName: 'Corporate Rentals', seoTitle: 'Corporate Rentals — Phantom Properties', seoDescription: 'Flexible housing for teams and executives.' },
+  { slug: 'list', route: '/list-your-property', displayName: 'List Your Property', seoTitle: 'List Your Property — Phantom Properties', seoDescription: 'Partner with us to host your property.' },
+  { slug: 'privacy', route: '/privacy', displayName: 'Privacy Policy', seoTitle: 'Privacy Policy — Phantom Properties', seoDescription: 'How we handle your data.' },
+  { slug: 'terms', route: '/terms', displayName: 'Terms of Service', seoTitle: 'Terms — Phantom Properties', seoDescription: 'Legal terms and conditions.' },
+  { slug: 'cookies', route: '/cookie-policy', displayName: 'Cookie Policy', seoTitle: 'Cookie Policy — Phantom Properties', seoDescription: 'Cookies and tracking technologies.' },
 ]
 
 function toIndex(pages: EditablePage[]) {

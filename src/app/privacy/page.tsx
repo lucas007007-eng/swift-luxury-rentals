@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
           <div className="space-y-5 max-w-5xl mx-auto">
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
               <h2 className="text-lg font-semibold mb-2">1. Who we are</h2>
-              <p className="text-gray-300">This Privacy Policy explains how Swift Luxury GmbH (Germany) and Swift Luxury Ltd (England) (together, “Swift Luxury”, “we”, “us”) collect, use, share, and protect your data when you use our websites, apps, and services to browse, list, or book furnished rentals.</p>
+              <p className="text-gray-300">This Privacy Policy explains how Phantom Properties GmbH (Germany) and Phantom Properties Ltd (England) (together, “Phantom Properties”, “we”, “us”) collect, use, share, and protect your data when you use our websites, apps, and services to browse, list, or book furnished rentals.</p>
             </div>
 
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
@@ -94,7 +94,7 @@ export default function PrivacyPolicyPage() {
 
             <div className="rounded-2xl border border-gray-800 bg-gray-900 text-gray-100 p-6 shadow-sm">
               <h2 className="text-lg font-semibold mb-2">13. Contact</h2>
-              <p className="text-gray-300">For privacy queries: Swift Luxury GmbH, Berlin, Germany and Swift Luxury Ltd, London, England. Email: privacy@swiftluxury.eu</p>
+              <p className="text-gray-300">For privacy queries: Phantom Properties GmbH, Berlin, Germany and Phantom Properties Ltd, London, England. Email: privacy@phantomproperties.co</p>
             </div>
           </div>
         </div>

@@ -42,10 +42,10 @@ const Header: React.FC<HeaderProps> = ({ forceBackground = false }) => {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-10 h-10 md:w-8 md:h-8 bg-white/20 backdrop-blur-md border border-white/30 rounded-lg flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl md:text-lg drop-shadow-lg">SL</span>
+              <span className="text-white font-bold text-xl md:text-lg drop-shadow-lg">PP</span>
             </div>
             <span className="font-sora font-bold text-xl md:text-xl text-white tracking-wide">
-              Swift Luxury
+              Phantom Properties
             </span>
           </Link>
 
