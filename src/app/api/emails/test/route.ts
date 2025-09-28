@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       subject: subject,
       html: testHtml,
       text: testText,
-      reply_to: replyTo,
+      replyTo: replyTo,
       headers: {
         'X-Test-Type': testType,
         'X-Template-Name': template.name,
