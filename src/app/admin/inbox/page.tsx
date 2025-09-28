@@ -62,6 +62,19 @@ export default function InboxPage() {
     }
   }
 
+  async function markRead() {
+    if (!selected) return
+    await fetch('/api/admin/inbox/read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conversationId: selected }) })
+  }
+
+  async function toggleClosed(open: boolean) {
+    if (!selected) return
+    await fetch('/api/admin/inbox/close', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ conversationId: selected, open }) })
+    // refresh list
+    const res = await fetch('/api/admin/inbox/messages?list=1')
+    if (res.ok) setConversations(await res.json())
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-gray-200">
       <div className="max-w-7xl mx-auto p-6">
@@ -94,7 +107,14 @@ export default function InboxPage() {
 
           {/* Thread */}
           <div className="lg:col-span-2 border border-gray-700 rounded-xl bg-gradient-to-b from-gray-950 to-gray-900 flex flex-col">
-            <div className="p-3 border-b border-gray-800 text-sm text-gray-400">Thread</div>
+            <div className="p-3 border-b border-gray-800 text-sm text-gray-400 flex items-center justify-between">
+              <span>Thread</span>
+              <div className="flex items-center gap-2">
+                <button onClick={markRead} className="text-xs px-2 py-1 rounded border border-gray-600 text-gray-200 hover:bg-gray-800">Mark Read</button>
+                <button onClick={()=>toggleClosed(false)} className="text-xs px-2 py-1 rounded border border-emerald-600 text-emerald-300 hover:bg-emerald-900/20">Open</button>
+                <button onClick={()=>toggleClosed(true)} className="text-xs px-2 py-1 rounded border border-red-600 text-red-300 hover:bg-red-900/20">Close</button>
+              </div>
+            </div>
             <div className="flex-1 p-4 space-y-4 overflow-y-auto">
               {messages.map(m => (
                 <div key={m.id} className={`p-3 rounded-lg border ${m.direction==='outbound'?'border-green-700 bg-green-900/10':'border-gray-700 bg-gray-900/40'}`}>

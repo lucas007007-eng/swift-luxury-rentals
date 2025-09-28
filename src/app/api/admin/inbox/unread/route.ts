@@ -7,16 +7,18 @@ export async function GET() {
     // Unread = last message inbound in open conversations
     const rows = await (prisma as any).conversation.findMany({
       where: { status: { in: ['open','pending'] } },
-      select: { id: true },
+      select: { id: true, agentLastReadAt: true },
     })
     let unread = 0
     for (const r of rows) {
       const last = await (prisma as any).message.findFirst({
         where: { conversationId: r.id },
         orderBy: { createdAt: 'desc' },
-        select: { direction: true }
+        select: { direction: true, createdAt: true }
       })
-      if (last?.direction === 'inbound') unread++
+      if (last?.direction === 'inbound') {
+        if (!r.agentLastReadAt || new Date(last.createdAt) > new Date(r.agentLastReadAt)) unread++
+      }
     }
     await prisma.$disconnect()
     return NextResponse.json({ unread })
