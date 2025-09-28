@@ -199,7 +199,7 @@ function generateTestEmailHtml(
       ${template.preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;visibility:hidden;">${replaceVariables(template.preheader, testData)}</div>`: ''}
       <div style="max-width:600px;margin:0 auto;background-color:#000000;">
         <div style="text-align:center;padding:30px 20px;border-bottom:2px solid ${template.styling.primaryColor};background:${header.backgroundColor};color:${header.textColor}">
-          <h1 style="margin:0;font-size:28px;color:${template.styling.primaryColor};${header.textShadow?'text-shadow:0 2px 4px rgba(0,0,0,0.7)':''}">${replaceVariables(header.title||template.content.header.title, testData)}</h1>
+          <h1 style="margin:0;font-size:28px;color:${header.textColor || '#ffffff'};${header.textShadow?'text-shadow:0 2px 4px rgba(0,0,0,0.7)':''}">${replaceVariables(header.title||template.content.header.title, testData)}</h1>
           ${header.subtitle?`<p style="margin:10px 0 0 0;color:${template.styling.secondaryColor};font-weight:600">${replaceVariables(header.subtitle, testData)}</p>`:''}
         </div>
         <div style="background-color:#0a0a0a;padding:30px 20px;border-left:3px solid ${template.styling.primaryColor};margin:20px 0;">
@@ -238,7 +238,7 @@ function generateTestEmailHtml(
         
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); padding: 30px 20px; text-align: center; border-bottom: 2px solid ${template.styling.primaryColor};">
-          <h1 style="color: ${template.styling.primaryColor}; font-size: 28px; margin: 0; text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);">
+          <h1 style="color: #ffffff; font-size: 28px; margin: 0; text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);">
             ${replaceVariables(template.content.header.title, testData)}
           </h1>
           ${template.content.header.subtitle ? `
