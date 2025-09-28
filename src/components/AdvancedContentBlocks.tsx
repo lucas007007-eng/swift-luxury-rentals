@@ -18,7 +18,7 @@ import {
 // Enhanced Block Types
 export interface AdvancedEmailBlock {
   id: string
-  type: 'text' | 'heading' | 'image' | 'button' | 'divider' | 'social' | 'spacer' | 'columns'
+  type: 'text' | 'heading' | 'image' | 'button' | 'divider' | 'social' | 'spacer' | 'columns' | 'list'
   content: any
   styling: {
     padding: string
@@ -166,6 +166,22 @@ export const ADVANCED_BLOCK_TEMPLATES = [
       fontWeight: '700',
       color: '#f59e0b',
       textAlign: 'left'
+    }
+  },
+  {
+    type: 'list',
+    icon: DocumentTextIcon,
+    label: 'Bullet List',
+    category: 'text',
+    defaultContent: {
+      title: 'Your VIP Access Includes:',
+      items: [
+        'Priority booking on premium properties',
+        '24/7 AI-powered concierge support',
+        'Advanced property controls via mobile app'
+      ],
+      color: '#cccccc',
+      titleColor: '#f59e0b'
     }
   },
   {
@@ -447,6 +463,94 @@ export function AdvancedBlockEditor({ block, onUpdate, onDelete }: AdvancedBlock
                   <option value="center">Center</option>
                   <option value="right">Right</option>
                 </select>
+              </div>
+            </div>
+          </div>
+        )
+
+      case 'list':
+        return (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">List Title</label>
+              <input
+                type="text"
+                value={block.content.title || ''}
+                onChange={(e) => updateBlockContent({ title: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                placeholder="Your VIP Access Includes:"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Items</label>
+              {(block.content.items || []).map((item: string, idx: number) => (
+                <div key={idx} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={item}
+                    onChange={(e) => {
+                      const items = [...(block.content.items || [])]
+                      items[idx] = e.target.value
+                      updateBlockContent({ items })
+                    }}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                    placeholder={`Item ${idx + 1}`}
+                  />
+                  <button
+                    onClick={() => {
+                      const items = [...(block.content.items || [])]
+                      items.splice(idx, 1)
+                      updateBlockContent({ items })
+                    }}
+                    className="px-2 rounded bg-red-100 text-red-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={() => updateBlockContent({ items: [...(block.content.items || []), ''] })}
+                className="mt-1 px-3 py-1 bg-blue-100 text-blue-700 rounded"
+              >
+                Add Item
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Title Color</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={block.content.titleColor || '#f59e0b'}
+                    onChange={(e) => updateBlockContent({ titleColor: e.target.value })}
+                    className="w-12 h-10 border border-gray-300 rounded"
+                  />
+                  <input
+                    type="text"
+                    value={block.content.titleColor || '#f59e0b'}
+                    onChange={(e) => updateBlockContent({ titleColor: e.target.value })}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Text Color</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={block.content.color || '#cccccc'}
+                    onChange={(e) => updateBlockContent({ color: e.target.value })}
+                    className="w-12 h-10 border border-gray-300 rounded"
+                  />
+                  <input
+                    type="text"
+                    value={block.content.color || '#cccccc'}
+                    onChange={(e) => updateBlockContent({ color: e.target.value })}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                  />
+                </div>
               </div>
             </div>
           </div>

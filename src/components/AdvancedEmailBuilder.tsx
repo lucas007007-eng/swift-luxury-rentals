@@ -83,8 +83,11 @@ export default function AdvancedEmailBuilder({
       textShadow: true
     },
     body: {
-      blocks: [
-        {
+      blocks: (() => {
+        const initialBlocks: any[] = []
+
+        // Heading from greeting
+        initialBlocks.push({
           id: 'greeting',
           type: 'heading',
           content: {
@@ -98,8 +101,10 @@ export default function AdvancedEmailBuilder({
             margin: '0px',
             textAlign: 'left'
           }
-        },
-        {
+        })
+
+        // Main message text
+        initialBlocks.push({
           id: 'main-message',
           type: 'text',
           content: {
@@ -114,8 +119,54 @@ export default function AdvancedEmailBuilder({
             textAlign: 'left',
             fontFamily: activeTemplate.styling.fontFamily
           }
+        })
+
+        // Map first info-card section to a list block
+        const infoCard = (activeTemplate.content.body.sections || []).find((s: any) => s.type === 'info-card')
+        if (infoCard) {
+          initialBlocks.push({
+            id: 'vip-list',
+            type: 'list',
+            content: {
+              title: infoCard.content?.title || 'Your VIP Access Includes:',
+              items: infoCard.content?.items || [],
+              color: '#cccccc',
+              titleColor: activeTemplate.styling.primaryColor
+            },
+            styling: {
+              padding: '20px',
+              margin: '10px 0',
+              textAlign: 'left'
+            }
+          })
         }
-      ]
+
+        // Map callToAction to a button block
+        const cta = activeTemplate.content.body.callToAction
+        if (cta) {
+          initialBlocks.push({
+            id: 'cta-button',
+            type: 'button',
+            content: {
+              text: cta.text,
+              link: cta.url,
+              backgroundColor: activeTemplate.styling.primaryColor,
+              textColor: '#000000',
+              borderRadius: '6px',
+              padding: '12px 24px',
+              fontSize: '16px',
+              fontWeight: '600'
+            },
+            styling: {
+              padding: '20px',
+              margin: '10px 0',
+              textAlign: 'center'
+            }
+          })
+        }
+
+        return initialBlocks
+      })()
     },
     footer: {
       companyInfo: activeTemplate.content.footer.companyInfo,
@@ -331,6 +382,21 @@ export default function AdvancedEmailBuilder({
                 >
                   {block.content.text}
                 </p>
+              )}
+
+              {block.type === 'list' && (
+                <div>
+                  {block.content.title && (
+                    <h3 style={{ color: block.content.titleColor || activeTemplate.styling.primaryColor, marginBottom: '10px', fontWeight: 700 }}>
+                      {block.content.title}
+                    </h3>
+                  )}
+                  <ul style={{ color: block.content.color || '#cccccc', paddingLeft: '20px', lineHeight: 1.6 }}>
+                    {(block.content.items || []).map((item: string, idx: number) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
 
               {block.type === 'image' && (
