@@ -40,8 +40,11 @@ export default function AdvancedEmailBuilder({
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop')
   const [showTestModal, setShowTestModal] = useState(false)
   const [showSaveModal, setShowSaveModal] = useState(false)
+  const [showLeaveModal, setShowLeaveModal] = useState(false)
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null)
   const [expandedSection, setExpandedSection] = useState<'header' | 'footer' | null>(null)
+  const [isDirty, setIsDirty] = useState(false)
+  const didMountRef = React.useRef(false)
 
   // Email structure state - properly typed
   interface EmailStructure {
@@ -180,6 +183,12 @@ export default function AdvancedEmailBuilder({
       textColor: '#666666'
     }
   })
+
+  // Mark dirty after first render when structure or template-level fields change
+  React.useEffect(() => {
+    if (didMountRef.current) setIsDirty(true)
+    else didMountRef.current = true
+  }, [emailStructure, activeTemplate.subject, activeTemplate.styling?.primaryColor])
 
   const addBlock = (blockType: string) => {
     const blockTemplate = ADVANCED_BLOCK_TEMPLATES.find(t => t.type === blockType)
@@ -584,10 +593,13 @@ export default function AdvancedEmailBuilder({
               Test Email
             </button>
             <button
-              onClick={onCancel}
+              onClick={() => {
+                if (isDirty) setShowLeaveModal(true)
+                else onCancel()
+              }}
               className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              Cancel
+              Return
             </button>
             <button
               onClick={() => setShowSaveModal(true)}
@@ -1046,6 +1058,45 @@ export default function AdvancedEmailBuilder({
         templateName={activeTemplate.name}
         onRefresh={() => onSave(serializeToTemplate())}
       />
+
+      {/* Leave Without Saving Modal */}
+      {showLeaveModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowLeaveModal(false)} />
+          <div className="relative bg-gradient-to-br from-gray-900 to-black border border-gray-700 rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h3 className="text-xl font-bold text-white mb-2">Unsaved changes</h3>
+            <p className="text-gray-300 mb-4">Do you want to save before returning to templates?</p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-black rounded-lg"
+                onClick={() => {
+                  setShowLeaveModal(false)
+                  onSave(serializeToTemplate())
+                  onCancel()
+                }}
+              >
+                Save and return
+              </button>
+              <button
+                className="px-4 py-2 border border-gray-500 text-gray-200 rounded-lg hover:bg-gray-800"
+                onClick={() => setShowLeaveModal(false)}
+              >
+                Go back to editor
+              </button>
+              <button
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+                onClick={() => {
+                  setShowLeaveModal(false)
+                  setIsDirty(false)
+                  onCancel()
+                }}
+              >
+                Leave without saving
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
