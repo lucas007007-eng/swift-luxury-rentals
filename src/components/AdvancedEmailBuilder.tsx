@@ -21,6 +21,7 @@ import {
 import { EmailTemplateConfig } from '@/types/email-templates'
 import { AdvancedBlockEditor, ADVANCED_BLOCK_TEMPLATES, TemplateGallery } from './AdvancedContentBlocks'
 import TestEmailModal from './TestEmailModal'
+import SaveTemplateModal from './SaveTemplateModal'
 
 interface AdvancedEmailBuilderProps {
   template: EmailTemplateConfig
@@ -37,6 +38,7 @@ export default function AdvancedEmailBuilder({
   const [activeView, setActiveView] = useState<'builder' | 'templates' | 'settings'>('builder')
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop')
   const [showTestModal, setShowTestModal] = useState(false)
+  const [showSaveModal, setShowSaveModal] = useState(false)
   const [selectedBlock, setSelectedBlock] = useState<string | null>(null)
 
   // Email structure state - properly typed
@@ -447,7 +449,7 @@ export default function AdvancedEmailBuilder({
               Cancel
             </button>
             <button
-              onClick={() => onSave(activeTemplate)}
+              onClick={() => setShowSaveModal(true)}
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
               Save Template
@@ -569,6 +571,14 @@ export default function AdvancedEmailBuilder({
         isOpen={showTestModal}
         onClose={() => setShowTestModal(false)}
         template={activeTemplate}
+      />
+
+      {/* Save Template Modal */}
+      <SaveTemplateModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        templateName={activeTemplate.name}
+        onRefresh={() => onSave(activeTemplate)}
       />
     </div>
   )

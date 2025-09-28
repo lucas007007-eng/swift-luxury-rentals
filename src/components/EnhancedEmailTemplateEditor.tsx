@@ -17,6 +17,7 @@ import { EmailTemplateConfig } from '@/types/email-templates'
 import DragDropEmailBuilder, { EmailTemplate as DragDropTemplate } from './DragDropEmailBuilder'
 import AdvancedEmailBuilder from './AdvancedEmailBuilder'
 import TestEmailModal from './TestEmailModal'
+import SaveTemplateModal from './SaveTemplateModal'
 import { FONT_OPTIONS } from './AdvancedContentBlocks'
 
 interface EnhancedEmailTemplateEditorProps {
@@ -33,6 +34,7 @@ export default function EnhancedEmailTemplateEditor({
   const [activeTab, setActiveTab] = useState<'builder' | 'content' | 'variables' | 'styling' | 'preview'>('builder')
   const [editedTemplate, setEditedTemplate] = useState<EmailTemplateConfig>({ ...template })
   const [showTestEmailModal, setShowTestEmailModal] = useState(false)
+  const [showSaveModal, setShowSaveModal] = useState(false)
 
   // Convert template to drag-drop format
   const [dragDropTemplate, setDragDropTemplate] = useState<DragDropTemplate>({
@@ -68,6 +70,15 @@ export default function EnhancedEmailTemplateEditor({
   const handleDragDropPreview = (template: DragDropTemplate) => {
     // Generate preview from drag-drop template
     console.log('Preview template:', template)
+  }
+
+  const handleSave = (template: EmailTemplateConfig) => {
+    setEditedTemplate(template)
+    setShowSaveModal(true)
+  }
+
+  const handleSaveComplete = () => {
+    onSave({ ...editedTemplate, lastModified: new Date().toISOString() })
   }
 
   const renderTabContent = () => {
@@ -355,8 +366,7 @@ export default function EnhancedEmailTemplateEditor({
       <AdvancedEmailBuilder
         template={editedTemplate}
         onSave={(template) => {
-          setEditedTemplate(template)
-          onSave({ ...template, lastModified: new Date().toISOString() })
+          handleSave(template)
         }}
         onCancel={onCancel}
       />
@@ -392,7 +402,7 @@ export default function EnhancedEmailTemplateEditor({
                 Cancel
               </button>
               <button
-                onClick={() => onSave({ ...editedTemplate, lastModified: new Date().toISOString() })}
+                onClick={() => handleSave(editedTemplate)}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
               >
                 <CheckIcon className="w-4 h-4" />
@@ -434,6 +444,14 @@ export default function EnhancedEmailTemplateEditor({
         isOpen={showTestEmailModal}
         onClose={() => setShowTestEmailModal(false)}
         template={editedTemplate}
+      />
+
+      {/* Save Template Modal */}
+      <SaveTemplateModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        templateName={editedTemplate.name}
+        onRefresh={handleSaveComplete}
       />
     </div>
   )
