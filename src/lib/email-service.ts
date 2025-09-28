@@ -38,8 +38,27 @@ export class EmailService {
     subject: string
     html: string
     replyTo?: string
+    templateId?: string
   }) {
     try {
+      // Suppression: skip emails for unsubscribed recipients
+      try {
+        const { PrismaClient } = await import('@prisma/client')
+        const prisma = new PrismaClient()
+        const recipients = Array.isArray(options.to) ? options.to : [options.to]
+        const suppressed = await (prisma as any).unsubscribe.findMany({
+          where: { email: { in: recipients } },
+          select: { email: true }
+        })
+        await prisma.$disconnect()
+        if (suppressed.length > 0) {
+          console.log('Suppressed emails (unsubscribed):', suppressed.map(s => s.email))
+          return { success: true, id: undefined }
+        }
+      } catch (e) {
+        console.error('Suppression check failed (continuing send):', e)
+      }
+
       const result = await resend.emails.send({
         from: FROM_EMAIL,
         to: Array.isArray(options.to) ? options.to : [options.to],
