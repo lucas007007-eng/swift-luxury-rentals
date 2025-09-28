@@ -169,19 +169,22 @@ export default function AdvancedEmailBuilder({
     setEmailStructure((prev: EmailStructure) => {
       const blocks = [...prev.body.blocks]
       const index = blocks.findIndex(b => b.id === blockId)
-      
+
       if (index === -1) return prev
-      
+
       const newIndex = direction === 'up' ? index - 1 : index + 1
       if (newIndex < 0 || newIndex >= blocks.length) return prev
-      
-      [blocks[index], blocks[newIndex]] = [blocks[newIndex], blocks[index]]
-      
+
+      // Swap blocks
+      const temp = blocks[index]
+      blocks[index] = blocks[newIndex]
+      blocks[newIndex] = temp
+
       return {
         ...prev,
         body: {
           ...prev.body,
-          blocks
+          blocks: blocks as any[]
         }
       }
     })

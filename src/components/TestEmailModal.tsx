@@ -116,7 +116,9 @@ export default function TestEmailModal({ isOpen, onClose, template }: TestEmailM
           emailId: result.emailId,
           testType: result.testType,
           sentAt: result.sentAt,
-          deliverabilityTips: result.deliverabilityTips || []
+          deliverabilityTips: result.deliverabilityTips || [],
+          deliveryStatus: result.deliveryStatus || 'sent',
+          resendResponse: result.resendResponse || { id: result.emailId, status: 'sent' }
         })
       } else {
         setError(result.error || 'Failed to send test email')
