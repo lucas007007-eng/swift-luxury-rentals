@@ -188,7 +188,7 @@ export default function AdvancedEmailBuilder({
   React.useEffect(() => {
     if (didMountRef.current) setIsDirty(true)
     else didMountRef.current = true
-  }, [emailStructure, activeTemplate.subject, activeTemplate.styling?.primaryColor])
+  }, [emailStructure, activeTemplate.subject, activeTemplate.preheader, activeTemplate.styling?.primaryColor])
 
   const addBlock = (blockType: string) => {
     const blockTemplate = ADVANCED_BLOCK_TEMPLATES.find(t => t.type === blockType)
@@ -980,6 +980,31 @@ export default function AdvancedEmailBuilder({
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Email Settings</h3>
               
               <div className="space-y-4 email-editor">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Preheader Text</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={activeTemplate.preheader || ''}
+                      onChange={(e) => setActiveTemplate(prev => ({ ...prev, preheader: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="Short preview text that appears next to the subject"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const fallback = emailStructure.body.blocks.find(b => b.type === 'text')?.content?.text
+                          || emailStructure.body.blocks.find(b => b.type === 'heading')?.content?.text
+                          || ''
+                        setActiveTemplate(prev => ({ ...prev, preheader: fallback?.toString().slice(0, 140) }))
+                      }}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-xs text-gray-700 hover:bg-gray-50"
+                    >
+                      Use from content
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Aim for 40–90 characters. We’ll inject it as hidden preview text.</p>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Subject Line</label>
                   <input

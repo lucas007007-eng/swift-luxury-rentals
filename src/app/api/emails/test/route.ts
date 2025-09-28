@@ -162,6 +162,12 @@ function generateTestEmailHtml(
       <title>${template.subject}</title>
     </head>
     <body style="font-family: ${template.styling.fontFamily}; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); color: #ffffff; margin: 0; padding: 0;">
+      <!-- Hidden Preheader -->
+      ${template.preheader ? `
+      <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;visibility:hidden;">
+        ${replaceVariables(template.preheader, testData)}
+      </div>
+      ` : ''}
       
       <div style="max-width: 600px; margin: 0 auto; background-color: #000000;">
         
