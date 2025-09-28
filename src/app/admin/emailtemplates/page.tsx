@@ -161,7 +161,9 @@ export default function EmailTemplatesAdmin() {
     try {
       const result = await saveEmailTemplate(updatedTemplate)
       if (result.success) {
-        setTemplates(templates.map(t => t.id === templateId ? updatedTemplate : t))
+        // Reload from server to ensure DB state is reflected
+        const latest = await loadEmailTemplates()
+        setTemplates(latest.templates)
         console.log(`Template status updated via ${result.method}`)
       } else {
         alert('Failed to update template status')
@@ -179,8 +181,9 @@ export default function EmailTemplatesAdmin() {
         try {
           const result = await saveEmailTemplate(updatedTemplate)
           if (result.success) {
-            // Update local state
-            setTemplates(templates.map(t => t.id === updatedTemplate.id ? updatedTemplate : t))
+            // Reload from server to ensure DB persistence is reflected
+            const latest = await loadEmailTemplates()
+            setTemplates(latest.templates)
             console.log(`Template saved via ${result.method}`)
           } else {
             alert('Failed to save template: ' + (result.error || 'Unknown error'))
