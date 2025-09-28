@@ -4,15 +4,40 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const listOnly = searchParams.get('list')
   const conversationId = searchParams.get('conversationId')
+  const filter = searchParams.get('filter') || 'all'
+  const sort = searchParams.get('sort') || 'newest'
   const { PrismaClient } = await import('@prisma/client')
   const prisma = new PrismaClient()
   try {
     if (listOnly) {
       const rows = await (prisma as any).conversation.findMany({
-        orderBy: { lastMessageAt: 'desc' },
-        select: { id: true, subject: true, status: true, lastMessageAt: true }
+        orderBy: { lastMessageAt: sort === 'oldest' ? 'asc' : 'desc' },
+        select: {
+          id: true,
+          subject: true,
+          status: true,
+          lastMessageAt: true,
+          messages: {
+            select: { direction: true, createdAt: true },
+            orderBy: { createdAt: 'desc' },
+            take: 1
+          }
+        }
       })
-      return NextResponse.json(rows)
+      const mapped = rows.map((r: any) => ({
+        id: r.id,
+        subject: r.subject,
+        status: r.status,
+        lastMessageAt: r.lastMessageAt,
+        lastMessageDirection: r.messages?.[0]?.direction || null
+      }))
+      const filtered = mapped.filter((r: any) => {
+        if (filter === 'awaiting') {
+          return (r.status === 'open' || r.status === 'pending') && r.lastMessageDirection === 'inbound'
+        }
+        return true
+      })
+      return NextResponse.json(filtered)
     }
     if (!conversationId) return NextResponse.json({ error: 'conversationId required' }, { status: 400 })
     const msgs = await (prisma as any).message.findMany({

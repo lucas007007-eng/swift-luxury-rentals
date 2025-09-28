@@ -32,10 +32,14 @@ export default function InboxPage() {
 
   useEffect(() => {
     ;(async () => {
-      const res = await fetch('/api/admin/inbox/messages?list=1')
+      const params = new URLSearchParams()
+      params.set('list', '1')
+      params.set('filter', filter)
+      params.set('sort', 'newest')
+      const res = await fetch(`/api/admin/inbox/messages?${params.toString()}`)
       if (res.ok) setConversations(await res.json())
     })()
-  }, [])
+  }, [filter])
 
   useEffect(() => {
     if (!selected) return
