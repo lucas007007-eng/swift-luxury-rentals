@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     const basicFrom = process.env.RESEND_FROM_EMAIL || 'updates@phantomproperties.co'
     const fromAddress = `Phantom Properties <${basicFrom}>`
-    const replyTo = process.env.RESEND_REPLY_TO_EMAIL || fromAddress
+    const replyTo = process.env.RESEND_REPLY_TO || fromAddress
 
     const emailResult = await resend.emails.send({
       from: fromAddress,
