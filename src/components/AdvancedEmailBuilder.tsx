@@ -507,34 +507,9 @@ export default function AdvancedEmailBuilder({
         <div className="w-80 bg-white border-r border-gray-200 p-6 overflow-y-auto">
           <div className="space-y-6">
             
-              
-              {['text', 'media', 'interactive', 'layout'].map(category => (
-                <div key={category} className="mb-6">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3 capitalize">{category}</h4>
-                  <div className="space-y-2">
-                    {ADVANCED_BLOCK_TEMPLATES
-                      .filter(block => block.category === category)
-                      .map((block) => {
-                        const Icon = block.icon
-                        return (
-                          <button
-                            key={block.type}
-                            onClick={() => addBlock(block.type)}
-                            className="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors text-left"
-                          >
-                            <Icon className="w-5 h-5 text-gray-600 flex-shrink-0" />
-                            <span className="text-sm font-medium text-gray-700">
-                              {block.label}
-                            </span>
-                          </button>
-                        )
-                      })}
-                  </div>
-                </div>
-              ))}
             </div>
 
-            {/* Collapsible Header Settings */}
+            {/* Collapsible Header Settings (independent box) */}
             <div>
               <button
                 onClick={() => setExpandedSection(expandedSection === 'header' ? null : 'header')}
@@ -727,7 +702,7 @@ export default function AdvancedEmailBuilder({
               )}
             </div>
 
-            {/* Collapsible Footer Settings */}
+            {/* Collapsible Footer Settings (independent box) */}
             <div>
               <button
                 onClick={() => setExpandedSection(expandedSection === 'footer' ? null : 'footer')}
