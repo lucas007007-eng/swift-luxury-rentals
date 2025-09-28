@@ -120,9 +120,21 @@ export default function InboxPage() {
                 <input type="date" value={dateFrom} onChange={e=>setDateFrom(e.target.value)} className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1" />
                 <input type="date" value={dateTo} onChange={e=>setDateTo(e.target.value)} className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1" />
                 <input value={tags} onChange={e=>setTags(e.target.value)} placeholder="tags,comma,separated" className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1" />
+                {/* Save / Apply Views */}
+                <button onClick={async()=>{
+                  const name = prompt('Save view as:')
+                  if (!name) return
+                  const filters = { q, status, assignee, from: dateFrom, to: dateTo, tags }
+                  await fetch('/api/admin/inbox/views', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, filters }) })
+                  alert('View saved')
+                }} className="text-xs px-2 py-1 rounded border border-gray-600 text-gray-200 hover:bg-gray-800">Save View</button>
+                <ApplyViews onApply={(f)=>{
+                  setQ(f.q||''); setStatus(f.status||''); setAssignee(f.assignee||''); setDateFrom(f.from||''); setDateTo(f.to||''); setTags(f.tags||'')
+                }} />
                 <div className="ml-auto flex items-center gap-2">
                   <button onClick={()=>setFilter('all')} className={`text-xs px-2 py-1 rounded ${filter==='all'?'bg-gray-800 text-gray-100 border border-gray-600':'text-gray-400'}`}>All</button>
                   <button onClick={()=>setFilter('awaiting')} className={`text-xs px-2 py-1 rounded ${filter==='awaiting'?'bg-gray-800 text-gray-100 border border-gray-600':'text-gray-400'}`}>Awaiting</button>
+                  <a href="/admin/inbox/canned" className="text-xs px-2 py-1 rounded border border-cyan-600 text-cyan-300 hover:bg-cyan-900/20">Manage Canned</a>
                 </div>
               </div>
             </div>
@@ -224,6 +236,20 @@ export default function InboxPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+function ApplyViews({ onApply }: { onApply: (filters: any) => void }) {
+  const [views, setViews] = React.useState<any[]>([])
+  React.useEffect(()=>{ (async()=>{ try{ const r=await fetch('/api/admin/inbox/views'); if(r.ok) setViews(await r.json()) }catch{} })() },[])
+  return (
+    <select onChange={(e)=>{
+      const v = views.find(x=>x.id===e.target.value)
+      if (v) onApply(v.filters || {})
+    }} className="bg-gray-900 text-gray-200 text-xs border border-gray-700 rounded px-2 py-1">
+      <option value="">Views</option>
+      {views.map(v=> <option key={v.id} value={v.id}>{v.name}</option>)}
+    </select>
   )
 }
 
