@@ -52,7 +52,7 @@ export class EmailService {
         })
         await prisma.$disconnect()
         if (suppressed.length > 0) {
-          console.log('Suppressed emails (unsubscribed):', suppressed.map(s => s.email))
+          console.log('Suppressed emails (unsubscribed):', suppressed.map((s: { email: string }) => s.email))
           return { success: true, id: undefined }
         }
       } catch (e) {
