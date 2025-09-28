@@ -118,8 +118,8 @@ export async function POST(request: NextRequest) {
       { 
         success: true, 
         message: 'Email sent successfully',
-        emailId: emailData.data?.id,
-        confirmationId: confirmationEmail.data?.id
+        emailId: emailData.id,
+        confirmationId: confirmationEmail.id
       },
       { status: 200 }
     )
