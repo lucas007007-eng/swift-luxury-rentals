@@ -33,7 +33,8 @@ import {
   EyeIcon,
   DevicePhoneMobileIcon,
   ComputerDesktopIcon,
-  SwatchIcon
+  SwatchIcon,
+  EnvelopeIcon
 } from '@heroicons/react/24/outline'
 
 // Email Block Types
@@ -89,12 +90,14 @@ interface DragDropEmailBuilderProps {
   template: EmailTemplate
   onSave: (template: EmailTemplate) => void
   onPreview: (template: EmailTemplate) => void
+  onTestEmail?: (template: EmailTemplate) => void
 }
 
 export default function DragDropEmailBuilder({ 
   template, 
   onSave, 
-  onPreview 
+  onPreview,
+  onTestEmail 
 }: DragDropEmailBuilderProps) {
   const [activeTemplate, setActiveTemplate] = useState<EmailTemplate>(template)
   const [selectedElement, setSelectedElement] = useState<{ type: string; id: string } | null>(null)
@@ -396,6 +399,15 @@ export default function DragDropEmailBuilder({
           </div>
           
           <div className="flex items-center gap-3">
+            {onTestEmail && (
+              <button
+                onClick={() => onTestEmail(activeTemplate)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+              >
+                <EnvelopeIcon className="w-4 h-4" />
+                Test Email
+              </button>
+            )}
             <button
               onClick={() => onPreview(activeTemplate)}
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"

@@ -10,10 +10,12 @@ import {
   Cog6ToothIcon,
   CheckIcon,
   XMarkIcon,
-  PhotoIcon
+  PhotoIcon,
+  EnvelopeIcon
 } from '@heroicons/react/24/outline'
 import { EmailTemplateConfig } from '@/types/email-templates'
 import DragDropEmailBuilder, { EmailTemplate as DragDropTemplate } from './DragDropEmailBuilder'
+import TestEmailModal from './TestEmailModal'
 
 interface EnhancedEmailTemplateEditorProps {
   template: EmailTemplateConfig
@@ -28,6 +30,7 @@ export default function EnhancedEmailTemplateEditor({
 }: EnhancedEmailTemplateEditorProps) {
   const [activeTab, setActiveTab] = useState<'builder' | 'content' | 'variables' | 'styling' | 'preview'>('builder')
   const [editedTemplate, setEditedTemplate] = useState<EmailTemplateConfig>({ ...template })
+  const [showTestEmailModal, setShowTestEmailModal] = useState(false)
 
   // Convert template to drag-drop format
   const [dragDropTemplate, setDragDropTemplate] = useState<DragDropTemplate>({
@@ -356,6 +359,7 @@ export default function EnhancedEmailTemplateEditor({
             onSave({ ...editedTemplate, lastModified: new Date().toISOString() })
           }}
           onPreview={handleDragDropPreview}
+          onTestEmail={() => setShowTestEmailModal(true)}
         />
       </div>
     )
@@ -375,6 +379,13 @@ export default function EnhancedEmailTemplateEditor({
             </div>
             
             <div className="flex gap-3">
+              <button
+                onClick={() => setShowTestEmailModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+              >
+                <EnvelopeIcon className="w-4 h-4" />
+                Test Email
+              </button>
               <button
                 onClick={onCancel}
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -419,6 +430,13 @@ export default function EnhancedEmailTemplateEditor({
       <div className="max-w-7xl mx-auto">
         {renderTabContent()}
       </div>
+
+      {/* Test Email Modal */}
+      <TestEmailModal
+        isOpen={showTestEmailModal}
+        onClose={() => setShowTestEmailModal(false)}
+        template={editedTemplate}
+      />
     </div>
   )
 }
