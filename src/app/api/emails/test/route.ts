@@ -268,7 +268,8 @@ function generateTestEmailText(
 
 // Sanitize subject to avoid common spam triggers (remove emojis and excessive caps)
 function sanitizeSubjectForDeliverability(subject: string): string {
-  const withoutEmoji = subject.replace(/[\p{Emoji_Presentation}\p{Emoji}\uFE0F]/gu, '')
+  // Remove non-ASCII characters (approximate emoji removal without Unicode property escapes)
+  const withoutEmoji = subject.replace(/[^\x00-\x7F]/g, '')
   // Reduce long ALL CAPS words
   return withoutEmoji.replace(/\b([A-Z]{6,})\b/g, (m) => m.charAt(0) + m.slice(1).toLowerCase())
 }
