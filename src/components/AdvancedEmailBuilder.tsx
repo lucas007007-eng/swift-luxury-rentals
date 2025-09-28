@@ -71,8 +71,13 @@ export default function AdvancedEmailBuilder({
     }
   }
 
+  // If template has previously saved custom blocks, load them
+  const savedBlocksSection: any | undefined = (activeTemplate.content.body.sections || []).find(
+    (s: any) => s.type === 'custom-blocks'
+  )
+
   const [emailStructure, setEmailStructure] = useState<EmailStructure>({
-    header: {
+    header: savedBlocksSection?.content?.header || {
       showLogo: true,
       title: activeTemplate.content.header.title,
       subtitle: activeTemplate.content.header.subtitle,
@@ -83,7 +88,7 @@ export default function AdvancedEmailBuilder({
       textShadow: true
     },
     body: {
-      blocks: (() => {
+      blocks: savedBlocksSection?.content?.blocks || (() => {
         const initialBlocks: any[] = []
 
         // Heading from greeting
@@ -168,7 +173,7 @@ export default function AdvancedEmailBuilder({
         return initialBlocks
       })()
     },
-    footer: {
+    footer: savedBlocksSection?.content?.footer || {
       companyInfo: activeTemplate.content.footer.companyInfo,
       contactInfo: activeTemplate.content.footer.contactInfo,
       backgroundColor: '#0a0a0a',
