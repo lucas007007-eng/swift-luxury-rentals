@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         }
         else if (type === 'email.opened' || type.endsWith('.opened')) { 
           set.status = 'opened'; set.openedAt = now 
-          console.log('👁️ Email opened:', msgId)
+          console.log('👁️ Email opened:', msgId, 'setting openedAt to:', now.toISOString())
         }
         else if (type === 'email.clicked' || type.endsWith('.clicked')) { 
           set.status = 'clicked'; set.clickedAt = now 
@@ -70,6 +70,15 @@ export async function POST(req: NextRequest) {
           // Update email analytics
           const emailUpdate = await (prisma as any).emailSent.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
           console.log(`✅ Updated ${msgUpdate.count} messages, ${emailUpdate.count} analytics records`)
+          
+          // Verify the update worked
+          if (emailUpdate.count > 0) {
+            const updatedRecord = await (prisma as any).emailSent.findFirst({ 
+              where: { provider: 'resend', providerId: msgId },
+              select: { status: true, deliveredAt: true, openedAt: true, clickedAt: true }
+            })
+            console.log('🔍 Record after update:', updatedRecord)
+          }
           
           // Set a timestamp for analytics to detect changes
           try {
