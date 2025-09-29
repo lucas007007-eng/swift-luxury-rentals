@@ -11,40 +11,7 @@ export default function EmailAnalyticsPage() {
 
   useEffect(() => {
     loadAnalytics()
-    
-    // Smart refresh: wait 5 minutes after first webhook activity, then refresh once
-    let refreshTimer: NodeJS.Timeout | null = null
-    
-    const checkForUpdates = () => {
-      if (typeof window === 'undefined' || document.hidden) return
-      
-      const lastWebhookUpdate = (global as any).__lastAnalyticsUpdate || 0
-      const lastCheck = (window as any).__lastAnalyticsCheck || 0
-      
-      // If there's been webhook activity since our last check
-      if (lastWebhookUpdate > lastCheck) {
-        console.log('🔔 Webhook activity detected, scheduling refresh in 5 minutes...')
-        ;(window as any).__lastAnalyticsCheck = lastWebhookUpdate
-        
-        // Clear any existing timer
-        if (refreshTimer) clearTimeout(refreshTimer)
-        
-        // Set 5-minute timer for single refresh
-        refreshTimer = setTimeout(() => {
-          console.log('📊 Refreshing analytics after webhook activity...')
-          loadAnalytics()
-          refreshTimer = null
-        }, 5 * 60 * 1000) // 5 minutes
-      }
-    }
-    
-    // Check for webhook activity every 10 seconds
-    const interval = setInterval(checkForUpdates, 10000)
-    
-    return () => {
-      clearInterval(interval)
-      if (refreshTimer) clearTimeout(refreshTimer)
-    }
+    // Only refresh manually via the refresh button - no auto-refresh loops
   }, [])
 
   const loadAnalytics = async () => {
