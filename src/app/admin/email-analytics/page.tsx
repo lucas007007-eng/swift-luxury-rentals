@@ -11,8 +11,21 @@ export default function EmailAnalyticsPage() {
   useEffect(() => {
     (async () => {
       try {
+        console.log('Fetching email analytics...')
         const res = await fetch('/api/admin/analytics/email')
-        if (res.ok) setData(await res.json())
+        console.log('Response status:', res.status)
+        if (res.ok) {
+          const result = await res.json()
+          console.log('Analytics data received:', result)
+          setData(result)
+        } else {
+          const errorText = await res.text()
+          console.error('Analytics API error:', res.status, errorText)
+          setData({ error: `API Error ${res.status}: ${errorText}` })
+        }
+      } catch (e) {
+        console.error('Analytics fetch error:', e)
+        setData({ error: `Network error: ${e}` })
       } finally {
         setLoading(false)
       }
@@ -115,12 +128,18 @@ export default function EmailAnalyticsPage() {
             {/* Debug info - always show */}
             <div className="mt-4 p-3 rounded-lg bg-black/40 border border-white/10">
               <div className="text-xs text-zinc-400 mb-2">Debug Info:</div>
-              {data ? (
+              {loading ? (
+                <div className="text-xs text-yellow-300">Loading analytics...</div>
+              ) : data ? (
                 <>
                   <div className="text-xs text-white">Total emails ever: {data.debug?.totalEverSent || 0}</div>
                   <div className="text-xs text-white">Recent emails: {JSON.stringify(data.debug?.recentEmails || [], null, 2)}</div>
                   <div className="text-xs text-white">Filtering since: {data.debug?.last30Days || 'unknown'}</div>
-                  <div className="text-xs text-cyan-300">API Response: {JSON.stringify(data, null, 2)}</div>
+                  {data.error && <div className="text-xs text-red-300">Error: {data.error}</div>}
+                  <details className="mt-2">
+                    <summary className="text-xs text-cyan-300 cursor-pointer">Full API Response</summary>
+                    <pre className="text-xs text-gray-300 mt-1 whitespace-pre-wrap">{JSON.stringify(data, null, 2)}</pre>
+                  </details>
                 </>
               ) : (
                 <div className="text-xs text-red-300">No data received from API</div>
