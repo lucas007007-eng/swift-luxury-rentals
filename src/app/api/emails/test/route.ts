@@ -73,12 +73,12 @@ export async function POST(request: NextRequest) {
     const fromAddress = `Phantom Properties <${basicFrom}>`
     const replyTo = process.env.RESEND_REPLY_TO || fromAddress
 
-    // Replace placeholder with actual tracking after we get email ID
+    // First, send without tracking to get email ID
     const emailResult = await resend.emails.send({
       from: fromAddress,
       to: [testEmail],
       subject: subject,
-      html: testHtml.replace('EMAIL_ID_PLACEHOLDER', 'temp-' + Date.now()), // Temporary ID for first send
+      html: testHtml.replace(/EMAIL_ID_PLACEHOLDER/g, 'temp-' + Date.now()),
       text: testText,
       replyTo: replyTo,
       headers: {
@@ -92,6 +92,9 @@ export async function POST(request: NextRequest) {
         { name: 'template', value: template.id }
       ]
     })
+
+    // Log the email ID for tracking
+    console.log('📧 Test email sent with ID:', emailResult.data?.id)
 
     // Log test email for tracking and analytics
     try {
@@ -207,7 +210,7 @@ function generateTestEmailHtml(
         case 'button':
           const buttonLink = block.content?.link || '#'
           const trackedLink = buttonLink.startsWith('http') ? 
-            `https://www.phantomproperties.co/api/track/engagement?id=${emailResult.data?.id || 'unknown'}&action=click&redirect=${encodeURIComponent(buttonLink)}` : 
+            `https://www.phantomproperties.co/api/track/engagement?id=EMAIL_ID_PLACEHOLDER&action=click&redirect=${encodeURIComponent(buttonLink)}` : 
             buttonLink
           return `<div style="text-align:${block.styling?.textAlign||'center'};margin:16px 0"><a href="${trackedLink}" style="display:inline-block;background:${block.content?.backgroundColor||template.styling.primaryColor};color:${block.content?.textColor||'#000'};padding:${block.content?.padding||'12px 24px'};border-radius:${block.content?.borderRadius||'6px'};text-decoration:none;font-size:${block.content?.fontSize||'16px'};font-weight:${block.content?.fontWeight||'600'}">${block.content?.text||'Click'}</a></div>`
         case 'divider':
