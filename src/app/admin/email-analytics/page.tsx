@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from 'recharts'
 
 export default function EmailAnalyticsPage() {
   const router = useRouter()
@@ -90,28 +91,79 @@ export default function EmailAnalyticsPage() {
           <MetricCard title="Click Rate" value={data?.rates?.clickRate || 0} suffix="%" color="purple" loading={loading} />
         </div>
 
-        {/* Charts row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="luxury-feature-card p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Daily Email Activity (Last 7 Days)</h3>
-            <div className="space-y-3">
-              {loading ? (
-                <div className="text-zinc-400">Loading...</div>
-              ) : (
-                (data?.dailyStats || []).map((day: any) => (
-                  <div key={day.date} className="flex items-center justify-between p-3 rounded-lg border border-white/10 bg-white/5">
-                    <div className="text-sm text-white">{new Date(day.date).toLocaleDateString()}</div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-xs text-cyan-300">Sent: {day.sent}</span>
-                      <span className="text-xs text-emerald-300">Delivered: {day.delivered}</span>
-                      <span className="text-xs text-amber-300">Opened: {day.opened}</span>
-                    </div>
-                  </div>
-                ))
-              )}
+        {/* Main Chart - Animated like Resend */}
+        <div className="luxury-feature-card p-6 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-white">Email Activity Timeline</h3>
+            <div className="flex items-center gap-4 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-cyan-400"></div>
+                <span className="text-zinc-300">Sent</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+                <span className="text-zinc-300">Delivered</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                <span className="text-zinc-300">Opened</span>
+              </div>
             </div>
           </div>
+          <div className="h-64">
+            {loading ? (
+              <div className="flex items-center justify-center h-full text-zinc-400">Loading chart...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data?.dailyStats || []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#9CA3AF"
+                    fontSize={12}
+                    tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  />
+                  <YAxis stroke="#9CA3AF" fontSize={12} />
+                  <Area 
+                    type="monotone" 
+                    dataKey="sent" 
+                    stackId="1"
+                    stroke="#06B6D4" 
+                    fill="#06B6D4" 
+                    fillOpacity={0.1}
+                    strokeWidth={2}
+                    animationDuration={1500}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="delivered" 
+                    stackId="2"
+                    stroke="#10B981" 
+                    fill="#10B981" 
+                    fillOpacity={0.2}
+                    strokeWidth={2}
+                    animationDuration={1500}
+                    animationDelay={200}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="opened" 
+                    stackId="3"
+                    stroke="#F59E0B" 
+                    fill="#F59E0B" 
+                    fillOpacity={0.2}
+                    strokeWidth={2}
+                    animationDuration={1500}
+                    animationDelay={400}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
 
+        {/* Secondary metrics row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div className="luxury-feature-card p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Performance by Category</h3>
             <div className="space-y-3">
@@ -125,6 +177,48 @@ export default function EmailAnalyticsPage() {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+
+          <div className="luxury-feature-card p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Deliverability Breakdown</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-zinc-300">Delivered</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-24 bg-gray-800 rounded-full h-2">
+                    <div 
+                      className="bg-emerald-400 h-2 rounded-full transition-all duration-1000"
+                      style={{ width: `${data?.rates?.deliveryRate || 0}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-emerald-300 font-semibold text-sm w-12 text-right">{data?.rates?.deliveryRate || 0}%</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-zinc-300">Opened</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-24 bg-gray-800 rounded-full h-2">
+                    <div 
+                      className="bg-amber-400 h-2 rounded-full transition-all duration-1000"
+                      style={{ width: `${data?.rates?.openRate || 0}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-amber-300 font-semibold text-sm w-12 text-right">{data?.rates?.openRate || 0}%</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-zinc-300">Clicked</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-24 bg-gray-800 rounded-full h-2">
+                    <div 
+                      className="bg-purple-400 h-2 rounded-full transition-all duration-1000"
+                      style={{ width: `${data?.rates?.clickRate || 0}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-purple-300 font-semibold text-sm w-12 text-right">{data?.rates?.clickRate || 0}%</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -185,6 +279,16 @@ export default function EmailAnalyticsPage() {
 }
 
 function MetricCard({ title, value, suffix = '', color, loading }: { title: string; value: number; suffix?: string; color: string; loading: boolean }) {
+  const [animatedValue, setAnimatedValue] = React.useState(0)
+  
+  React.useEffect(() => {
+    if (loading) return
+    const timer = setTimeout(() => {
+      setAnimatedValue(value)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [value, loading])
+  
   const colorMap: Record<string, string> = {
     cyan: 'border-cyan-400/30 text-cyan-300',
     emerald: 'border-emerald-400/30 text-emerald-300',
@@ -193,11 +297,43 @@ function MetricCard({ title, value, suffix = '', color, loading }: { title: stri
   }
   
   return (
-    <div className={`luxury-feature-card p-6 border ${colorMap[color] || 'border-white/30'}`}>
+    <div className={`luxury-feature-card p-6 border ${colorMap[color] || 'border-white/30'} relative overflow-hidden`}>
       <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">{title}</div>
-      <div className="text-2xl font-bold text-white">
-        {loading ? '—' : `${value.toLocaleString()}${suffix}`}
+      <div className="text-3xl font-bold text-white">
+        {loading ? (
+          <div className="animate-pulse">—</div>
+        ) : (
+          <CountUp value={animatedValue} suffix={suffix} />
+        )}
       </div>
+      {/* Subtle animated background */}
+      <div className={`absolute inset-0 opacity-5 bg-gradient-to-r ${
+        color === 'cyan' ? 'from-cyan-400' : 
+        color === 'emerald' ? 'from-emerald-400' : 
+        color === 'amber' ? 'from-amber-400' : 'from-purple-400'
+      } to-transparent`}></div>
     </div>
   )
+}
+
+function CountUp({ value, suffix = '' }: { value: number; suffix?: string }) {
+  const [current, setCurrent] = React.useState(0)
+  
+  React.useEffect(() => {
+    const duration = 1000
+    const steps = 30
+    const increment = value / steps
+    const stepDuration = duration / steps
+    
+    let step = 0
+    const timer = setInterval(() => {
+      step++
+      setCurrent(Math.min(value, Math.round(increment * step)))
+      if (step >= steps) clearInterval(timer)
+    }, stepDuration)
+    
+    return () => clearInterval(timer)
+  }, [value])
+  
+  return <span>{current.toLocaleString()}{suffix}</span>
 }

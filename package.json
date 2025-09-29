@@ -52,6 +52,7 @@
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.48.2",
     "react-qr-code": "^2.0.18",
+    "recharts": "^3.2.1",
     "resend": "^6.1.0",
     "svix": "^1.76.1",
     "tailwind-merge": "^2.1.0",
