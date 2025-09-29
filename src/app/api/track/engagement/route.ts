@@ -15,28 +15,31 @@ export async function GET(req: NextRequest) {
       console.log(`📊 Engagement tracking: ${action} for email ${emailId}`)
       
       if (action === 'view' || action === 'open') {
-        // Try multiple ways to find and update the email record
-        const result = await (prisma as any).emailSent.updateMany({
-          where: { providerId: emailId },
-          data: { 
-            openedAt: new Date(),
-            status: 'opened'
-          }
-        })
-        
-        // If no match on providerId, try by temporary ID pattern
-        if (result.count === 0 && emailId.startsWith('temp-')) {
-          const tempId = emailId
-          const result2 = await (prisma as any).emailSent.updateMany({
-            where: { providerId: tempId },
+        // For temp IDs, find the most recent email without openedAt set
+        if (emailId.startsWith('temp-')) {
+          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
+          const result = await (prisma as any).emailSent.updateMany({
+            where: { 
+              sentAt: { gte: fiveMinutesAgo },
+              openedAt: null,
+              category: 'test'
+            },
             data: { 
               openedAt: new Date(),
               status: 'opened'
             }
           })
-          console.log(`✅ Email marked as opened via temp ID (${result2.count} records updated)`)
+          console.log(`✅ Email marked as opened via recent lookup (${result.count} records updated)`)
         } else {
-          console.log(`✅ Email marked as opened via engagement tracking (${result.count} records updated)`)
+          // Try exact providerId match
+          const result = await (prisma as any).emailSent.updateMany({
+            where: { providerId: emailId },
+            data: { 
+              openedAt: new Date(),
+              status: 'opened'
+            }
+          })
+          console.log(`✅ Email marked as opened via providerId (${result.count} records updated)`)
         }
       }
       
