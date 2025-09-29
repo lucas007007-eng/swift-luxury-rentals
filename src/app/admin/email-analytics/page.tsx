@@ -112,15 +112,20 @@ export default function EmailAnalyticsPage() {
                 </tbody>
               </table>
             </div>
-            {/* Debug info */}
-            {data?.debug && (
-              <div className="mt-4 p-3 rounded-lg bg-black/40 border border-white/10">
-                <div className="text-xs text-zinc-400 mb-2">Debug Info:</div>
-                <div className="text-xs text-white">Total emails ever: {data.debug.totalEverSent}</div>
-                <div className="text-xs text-white">Recent emails: {JSON.stringify(data.debug.recentEmails, null, 2)}</div>
-                <div className="text-xs text-white">Filtering since: {data.debug.last30Days}</div>
-              </div>
-            )}
+            {/* Debug info - always show */}
+            <div className="mt-4 p-3 rounded-lg bg-black/40 border border-white/10">
+              <div className="text-xs text-zinc-400 mb-2">Debug Info:</div>
+              {data ? (
+                <>
+                  <div className="text-xs text-white">Total emails ever: {data.debug?.totalEverSent || 0}</div>
+                  <div className="text-xs text-white">Recent emails: {JSON.stringify(data.debug?.recentEmails || [], null, 2)}</div>
+                  <div className="text-xs text-white">Filtering since: {data.debug?.last30Days || 'unknown'}</div>
+                  <div className="text-xs text-cyan-300">API Response: {JSON.stringify(data, null, 2)}</div>
+                </>
+              ) : (
+                <div className="text-xs text-red-300">No data received from API</div>
+              )}
+            </div>
           </div>
       </div>
     </main>
