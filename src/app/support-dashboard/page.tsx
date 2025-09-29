@@ -103,8 +103,6 @@ export default function SupportDashboard() {
     return () => clearInterval(interval)
   }, [status])
 
-  // Remove mock fallback in production to avoid confusion
-
   const filteredTickets = tickets.filter(ticket => 
     filterStatus === 'all' || ticket.status === filterStatus
   )
