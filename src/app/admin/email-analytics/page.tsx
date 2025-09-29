@@ -9,28 +9,31 @@ export default function EmailAnalyticsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    (async () => {
-      try {
-        console.log('Fetching email analytics...')
-        const res = await fetch('/api/admin/analytics/email')
-        console.log('Response status:', res.status)
-        if (res.ok) {
-          const result = await res.json()
-          console.log('Analytics data received:', result)
-          setData(result)
-        } else {
-          const errorText = await res.text()
-          console.error('Analytics API error:', res.status, errorText)
-          setData({ error: `API Error ${res.status}: ${errorText}` })
-        }
-      } catch (e) {
-        console.error('Analytics fetch error:', e)
-        setData({ error: `Network error: ${e}` })
-      } finally {
-        setLoading(false)
-      }
-    })()
+    loadAnalytics()
   }, [])
+
+  const loadAnalytics = async () => {
+    setLoading(true)
+    try {
+      console.log('Fetching email analytics...')
+      const res = await fetch('/api/admin/analytics/email', { cache: 'no-store' })
+      console.log('Response status:', res.status)
+      if (res.ok) {
+        const result = await res.json()
+        console.log('Analytics data received:', result)
+        setData(result)
+      } else {
+        const errorText = await res.text()
+        console.error('Analytics API error:', res.status, errorText)
+        setData({ error: `API Error ${res.status}: ${errorText}` })
+      }
+    } catch (e) {
+      console.error('Analytics fetch error:', e)
+      setData({ error: `Network error: ${e}` })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -44,7 +47,7 @@ export default function EmailAnalyticsPage() {
           </div>
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => window.location.reload()} 
+              onClick={loadAnalytics} 
               className="inline-flex items-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300"
             >
               🔄 Refresh
