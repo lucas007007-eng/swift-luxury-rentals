@@ -25,18 +25,40 @@ export async function GET() {
     const enriched = await Promise.all(properties.map(async (p: any) => {
       const financials = p.financials || {}
       
-      // Get detailed financial breakdown for each property
+      // Get detailed financial breakdown for each property (current month)
       const currentMonth = new Date()
       const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
       const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
 
-      const [currentMonthRevenue, currentMonthExpenses, recurringExpenses, fixedExpenses] = await Promise.all([
+      const [manualRevenue, bookingRevenue, currentMonthExpenses, recurringExpenses, fixedExpensesInMonth] = await Promise.all([
+        // Manual revenue entries for current month
         (prisma as any).revenue.aggregate({
           where: {
             propertyId: p.id,
             date: { gte: monthStart, lte: monthEnd }
           },
           _sum: { amount: true }
+        }),
+        // Revenue from confirmed bookings with payments in current month
+        (prisma as any).booking.findMany({
+          where: {
+            propertyId: p.id,
+            status: 'confirmed',
+            payments: {
+              some: {
+                status: 'received',
+                receivedAt: { gte: monthStart, lte: monthEnd }
+              }
+            }
+          },
+          include: {
+            payments: {
+              where: {
+                status: 'received',
+                receivedAt: { gte: monthStart, lte: monthEnd }
+              }
+            }
+          }
         }),
         (prisma as any).expense.aggregate({
           where: {
@@ -49,23 +71,31 @@ export async function GET() {
           where: {
             propertyId: p.id,
             isRecurring: true,
-            recurringType: 'monthly'
+            recurringType: 'monthly',
+            createdAt: { lte: monthEnd }
           },
           _sum: { amount: true }
         }),
         (prisma as any).expense.aggregate({
           where: {
             propertyId: p.id,
-            isRecurring: false
+            isRecurring: false,
+            date: { gte: monthStart, lte: monthEnd }
           },
           _sum: { amount: true }
         })
       ])
 
-      const monthlyRevenue = currentMonthRevenue._sum?.amount || 0
+      // Calculate total revenue (manual + booking payments)
+      const manualRevenueAmount = manualRevenue._sum?.amount || 0
+      const bookingRevenueAmount = bookingRevenue.reduce((sum: number, booking: any) => {
+        return sum + booking.payments.reduce((paySum: number, payment: any) => paySum + (payment.amountCents / 100), 0)
+      }, 0)
+      const monthlyRevenue = manualRevenueAmount + bookingRevenueAmount
+
       const recurringMonthly = recurringExpenses._sum?.amount || 0
-      const currentMonthExp = currentMonthExpenses._sum?.amount || 0
-      const totalMonthlyExp = currentMonthExp + recurringMonthly
+      const fixedExpensesAmount = fixedExpensesInMonth._sum?.amount || 0
+      const totalMonthlyExp = fixedExpensesAmount + recurringMonthly
       const netProfit = monthlyRevenue - totalMonthlyExp
       const roi = financials.totalInvestment > 0 ? ((netProfit * 12 / financials.totalInvestment) * 100) : 0
 
@@ -76,9 +106,9 @@ export async function GET() {
         totalRevenue: financials.totalRevenue || 0,
         totalExpenses: financials.totalExpenses || 0,
         monthlyRevenue: Math.round(monthlyRevenue),
-        fixedExpenses: Math.round(fixedExpenses._sum?.amount || 0),
+        fixedExpenses: Math.round(fixedExpensesAmount),
         recurringMonthly: Math.round(recurringMonthly),
-        currentMonthExpenses: Math.round(currentMonthExp),
+        currentMonthExpenses: Math.round(currentMonthExpenses._sum?.amount || 0),
         totalMonthlyExpenses: Math.round(totalMonthlyExp),
         netProfit: Math.round(netProfit),
         roi: Math.round(roi * 10) / 10
