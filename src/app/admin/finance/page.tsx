@@ -187,12 +187,15 @@ export default function FinancePage() {
                       <span className="text-amber-300 font-semibold text-sm">€{(property.recurringMonthly || 0).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <div>
-                        <span className="text-zinc-400 text-xs">Total Expenses {new Date().toLocaleDateString('en-US', { month: 'long' })}</span>
-                        <div className="text-xs text-red-200 mt-1">Fixed + Monthly Expenses</div>
-                      </div>
+                      <span className="text-zinc-400 text-xs">Total Expenses {new Date().toLocaleDateString('en-US', { month: 'long' })}</span>
                       <span className="text-red-300 font-semibold text-sm">€{((property.fixedExpenses || 0) + (property.recurringMonthly || 0)).toLocaleString()}</span>
                     </div>
+                    <div className="text-center">
+                      <span className="text-xs text-red-200">Fixed + Monthly Expenses</span>
+                    </div>
+                    
+                    {/* Spacer */}
+                    <div className="border-t border-white/10 my-3"></div>
                     <div className="flex justify-between">
                       <span className="text-zinc-400 text-xs">Investor Fee ({((property.investorFeeRate || 0.75) * 100).toFixed(0)}%)</span>
                       <span className="text-orange-300 font-semibold text-sm">
@@ -241,3 +244,4 @@ export default function FinancePage() {
     </main>
   )
 }
+
