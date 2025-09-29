@@ -239,117 +239,60 @@ export default function EmailTemplatesAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
-      <Header />
+    <main className="min-h-screen bg-black text-white">
+      <div className="luxury-feature-card p-6 md:p-8 mb-8">
+        <div className="flex items-center justify-between">
+          <a
+            href="/admin"
+            className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
+          >
+            ← Return
+          </a>
+          <div className="text-center">
+            <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Templates</div>
+            <h1 className="text-3xl md:text-4xl font-bold heading-sora text-white">Email Templates</h1>
+            <p className="text-zinc-300 text-sm md:text-base">Design & Manage Email Communications</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setViewMode('analytics')}
+              className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-purple-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-purple-400/50 transition-all duration-300"
+            >
+              <ChartBarIcon className="w-4 h-4 mr-2" />
+              Analytics
+            </button>
+            <button className="inline-flex items-center px-4 py-2 rounded-lg text-black font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_8px_25px_rgba(16,185,129,0.35)] hover:from-emerald-300 hover:to-cyan-300 hover:scale-105 transition-all duration-300">
+              <PlusIcon className="w-4 h-4 mr-2" />
+              Create New
+            </button>
+          </div>
+        </div>
+      </div>
       
-      <div className="pt-32 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Header Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <a
-                href="/admin"
-                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
-              >
-                ← Return to Admin
-              </a>
-              <div className="flex items-center gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setViewMode('analytics')}
-                  className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg"
-                >
-                  <ChartBarIcon className="w-5 h-5" />
-                  Analytics
-                </motion.button>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-black px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg"
-                >
-                  <PlusIcon className="w-5 h-5" />
-                  Create New Template
-                </motion.button>
-              </div>
-            </div>
-            <div className="text-center">
-              <h1 className="text-4xl font-bold text-white mb-2">
-                📧 Email Templates
-              </h1>
-              <p className="text-gray-400">
-                Design and manage your email templates with spy-tech precision
-              </p>
-            </div>
-          </motion.div>
+      <div className="max-w-[1600px] mx-auto px-6 pb-10">
 
-          {/* Stats Cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-          >
-            <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm">Total Templates</p>
-                  <p className="text-2xl font-bold text-white">{templates.length}</p>
-                </div>
-                <EnvelopeIcon className="w-8 h-8 text-amber-500" />
-              </div>
-            </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="luxury-feature-card p-6 border border-cyan-400/30">
+            <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Total Templates</div>
+            <div className="text-3xl font-bold text-white">{templates.length}</div>
+          </div>
+          <div className="luxury-feature-card p-6 border border-emerald-400/30">
+            <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Active Templates</div>
+            <div className="text-3xl font-bold text-white">{templates.filter(t => t.isActive).length}</div>
+          </div>
+          <div className="luxury-feature-card p-6 border border-amber-400/30">
+            <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Categories</div>
+            <div className="text-3xl font-bold text-white">{new Set(templates.map(t => t.category)).size}</div>
+          </div>
+          <div className="luxury-feature-card p-6 border border-purple-400/30">
+            <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Last Updated</div>
+            <div className="text-lg font-bold text-white">{new Date(Math.max(...templates.map(t => new Date(t.lastModified).getTime()))).toLocaleDateString()}</div>
+          </div>
+        </div>
 
-            <div className="bg-gradient-to-br from-green-900/20 to-black border border-green-800/30 rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm">Active Templates</p>
-                  <p className="text-2xl font-bold text-green-400">
-                    {templates.filter(t => t.isActive).length}
-                  </p>
-                </div>
-                <CheckCircleIcon className="w-8 h-8 text-green-500" />
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-blue-900/20 to-black border border-blue-800/30 rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm">Categories</p>
-                  <p className="text-2xl font-bold text-blue-400">
-                    {new Set(templates.map(t => t.category)).size}
-                  </p>
-                </div>
-                <div className="text-2xl">📋</div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-900/20 to-black border border-purple-800/30 rounded-xl p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-400 text-sm">Last Updated</p>
-                  <p className="text-sm font-semibold text-purple-400">
-                    {new Date(Math.max(...templates.map(t => new Date(t.lastModified).getTime()))).toLocaleDateString()}
-                  </p>
-                </div>
-                <ClockIcon className="w-8 h-8 text-purple-500" />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Filters and Search */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl p-6 mb-8"
-          >
+        {/* Filters and Search */}
+        <div className="luxury-feature-card p-6 mb-8">
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Search */}
               <div className="flex-1">
@@ -358,7 +301,7 @@ export default function EmailTemplatesAdmin() {
                   placeholder="Search templates..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                  className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
                 />
               </div>
               
@@ -367,7 +310,7 @@ export default function EmailTemplatesAdmin() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full bg-black border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                  className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
                 >
                   {categories.map(category => (
                     <option key={category.value} value={category.value}>
@@ -377,35 +320,27 @@ export default function EmailTemplatesAdmin() {
                 </select>
               </div>
             </div>
-          </motion.div>
+        </div>
 
-          {/* Templates Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-          >
-            {filteredTemplates.map((template, index) => (
-              <motion.div
-                key={template.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl overflow-hidden hover:border-amber-500/50 transition-colors group flex flex-col h-full"
-              >
-                {/* Template Header */}
-                <div className="p-6 border-b border-gray-800">
+        {/* Templates Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredTemplates.map((template, index) => (
+            <div
+              key={template.id}
+              className="luxury-feature-card flex flex-col h-full"
+            >
+              {/* Template Header */}
+              <div className="p-6 border-b border-white/10">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="text-2xl">
                         {getCategoryIcon(template.category)}
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-white group-hover:text-amber-400 transition-colors">
+                        <h3 className="text-lg font-semibold text-white">
                           {template.name}
                         </h3>
-                        <p className="text-sm text-gray-400 mt-1">
+                        <p className="text-sm text-zinc-400 mt-1">
                           {template.description}
                         </p>
                       </div>
@@ -467,96 +402,91 @@ export default function EmailTemplatesAdmin() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="px-4 py-3 bg-gray-900/50 border-t border-gray-800">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2">
-                    <button
-                      onClick={() => handleTestTemplate(template)}
-                      className="flex items-center justify-center gap-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
-                    >
-                      <EnvelopeIcon className="w-4 h-4" />
-                      <span className="hidden sm:inline">Test</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handlePreviewTemplate(template)}
-                      className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
-                    >
-                      <EyeIcon className="w-4 h-4" />
-                      <span className="hidden sm:inline">Preview</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handleEditTemplate(template)}
-                      className="flex items-center justify-center gap-1 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs rounded-lg transition-colors"
-                    >
-                      <PencilIcon className="w-4 h-4" />
-                      <span className="hidden sm:inline">Edit</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handleDuplicateTemplate(template)}
-                      className="flex items-center justify-center gap-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-lg transition-colors"
-                    >
-                      <DocumentDuplicateIcon className="w-4 h-4" />
-                      <span className="hidden sm:inline">Copy</span>
-                    </button>
-                    
-                    <button
-                      onClick={() => handleToggleActive(template.id)}
-                      className={`flex items-center justify-center gap-1 px-3 py-2 text-xs rounded-lg transition-colors ${
-                        template.isActive 
-                          ? 'bg-red-600 hover:bg-red-700 text-white' 
-                          : 'bg-green-600 hover:bg-green-700 text-white'
-                      }`}
-                    >
-                      {template.isActive ? (
-                        <>
-                          <XCircleIcon className="w-4 h-4" />
-                          <span className="hidden sm:inline">Disable</span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircleIcon className="w-4 h-4" />
-                          <span className="hidden sm:inline">Enable</span>
-                        </>
-                      )}
-                    </button>
-                    
-                    <button
-                      onClick={() => handleDeleteTemplate(template.id)}
-                      className="flex items-center justify-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg transition-colors"
-                    >
-                      <TrashIcon className="w-4 h-4" />
-                      <span className="hidden sm:inline">Delete</span>
-                    </button>
-                  </div>
+              {/* Action Buttons - Bookings style */}
+              <div className="px-4 py-3 bg-black/20 border-t border-white/10">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2">
+                  <button
+                    onClick={() => handleTestTemplate(template)}
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300"
+                  >
+                    <EnvelopeIcon className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Test</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => handlePreviewTemplate(template)}
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300"
+                  >
+                    <EyeIcon className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Preview</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => handleEditTemplate(template)}
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-amber-400/50 transition-all duration-300"
+                  >
+                    <PencilIcon className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Edit</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => handleDuplicateTemplate(template)}
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-purple-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-purple-400/50 transition-all duration-300"
+                  >
+                    <DocumentDuplicateIcon className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Copy</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => handleToggleActive(template.id)}
+                    className={`inline-flex items-center justify-center px-3 py-2 rounded-lg text-white font-semibold text-xs border transition-all duration-300 ${
+                      template.isActive 
+                        ? 'border-red-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-red-400/50' 
+                        : 'border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50'
+                    }`}
+                  >
+                    {template.isActive ? (
+                      <>
+                        <XCircleIcon className="w-4 h-4" />
+                        <span className="hidden sm:inline ml-1">Disable</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircleIcon className="w-4 h-4" />
+                        <span className="hidden sm:inline ml-1">Enable</span>
+                      </>
+                    )}
+                  </button>
+                  
+                  <button
+                    onClick={() => handleDeleteTemplate(template.id)}
+                    className="inline-flex items-center justify-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-red-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-red-400/50 transition-all duration-300"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Delete</span>
+                  </button>
                 </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {filteredTemplates.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <EnvelopeIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-400 mb-2">
-                No templates found
-              </h3>
-              <p className="text-gray-500">
-                {searchTerm || selectedCategory !== 'all' 
-                  ? 'Try adjusting your search or filters'
-                  : 'Get started by creating your first email template'
-                }
-              </p>
-            </motion.div>
-          )}
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
 
+        {filteredTemplates.length === 0 && (
+          <div className="luxury-feature-card p-8 text-center">
+            <EnvelopeIcon className="w-16 h-16 text-zinc-600 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-zinc-400 mb-2">
+              No templates found
+            </h3>
+            <p className="text-zinc-500">
+              {searchTerm || selectedCategory !== 'all' 
+                ? 'Try adjusting your search or filters'
+                : 'Get started by creating your first email template'
+              }
+            </p>
+          </div>
+        )}
+      </div>
+      
       {/* Test Email Modal */}
       {testTemplate && (
         <TestEmailModal
@@ -568,7 +498,7 @@ export default function EmailTemplatesAdmin() {
           template={testTemplate}
         />
       )}
-    </div>
+    </main>
   )
 }
 
