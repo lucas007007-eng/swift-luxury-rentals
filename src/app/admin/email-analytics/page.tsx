@@ -25,17 +25,22 @@ export default function EmailAnalyticsPage() {
   }, [])
 
   const loadAnalytics = async () => {
+    console.log('🔄 Manual refresh triggered')
     setLoading(true)
     try {
       console.log('Fetching email analytics...')
-      const res = await fetch('/api/admin/analytics/email', { cache: 'no-store' })
+      const timestamp = Date.now()
+      const res = await fetch(`/api/admin/analytics/email?t=${timestamp}`, { 
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      })
       console.log('Response status:', res.status)
-        if (res.ok) {
-          const result = await res.json()
-          console.log('Analytics data received:', result)
-          setData(result)
-          setLastUpdated(new Date())
-        } else {
+      if (res.ok) {
+        const result = await res.json()
+        console.log('Analytics data received:', result)
+        setData(result)
+        setLastUpdated(new Date())
+      } else {
         const errorText = await res.text()
         console.error('Analytics API error:', res.status, errorText)
         setData({ error: `API Error ${res.status}: ${errorText}` })
