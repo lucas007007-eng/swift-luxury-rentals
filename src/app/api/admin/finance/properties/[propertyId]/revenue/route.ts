@@ -21,6 +21,9 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       orderBy: { date: 'desc' }
     })
 
+    console.log(`💰 Looking for revenue in ${new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`)
+    console.log(`📅 Date range: ${monthStart.toISOString()} to ${monthEnd.toISOString()}`)
+
     // Get confirmed bookings that had payments in this month
     const bookingRevenues = await (prisma as any).booking.findMany({
       where: {
@@ -43,6 +46,8 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
         }
       }
     })
+
+    console.log(`🏨 Found ${bookingRevenues.length} bookings with payments in selected month`)
 
     // Convert booking payments to revenue format
     const bookingRevenueEntries = bookingRevenues.flatMap((booking: any) => 
