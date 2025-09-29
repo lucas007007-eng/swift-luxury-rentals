@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest, { params }: { params: { propertyId: string } }) {
   try {
+    const { searchParams } = new URL(req.url)
+    const month = parseInt(searchParams.get('month') || new Date().getMonth().toString())
+    const year = parseInt(searchParams.get('year') || new Date().getFullYear().toString())
+    
     const { PrismaClient } = await import('@prisma/client')
     const prisma = new PrismaClient()
 
@@ -72,10 +76,9 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       value: item._sum?.amount || 0
     }))
 
-    // Calculate monthly averages properly
-    const currentMonth = new Date()
-    const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
-    const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
+    // Calculate for selected month
+    const monthStart = new Date(year, month, 1)
+    const monthEnd = new Date(year, month + 1, 0)
 
     // Current month's actual revenue and expenses + fixed vs recurring breakdown
     const [currentMonthRevenue, currentMonthExpenses, recurringExpenses, fixedExpenses] = await Promise.all([

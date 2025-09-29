@@ -12,14 +12,19 @@ export default function PropertyAccountingPage() {
   const propertyId = params?.propertyId as string
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth())
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
 
   useEffect(() => {
     if (propertyId) loadPropertyFinancials()
-  }, [propertyId])
+  }, [propertyId, selectedMonth, selectedYear])
 
   const loadPropertyFinancials = async () => {
     try {
-      const res = await fetch(`/api/admin/finance/properties/${propertyId}`)
+      const params = new URLSearchParams()
+      params.set('month', selectedMonth.toString())
+      params.set('year', selectedYear.toString())
+      const res = await fetch(`/api/admin/finance/properties/${propertyId}?${params.toString()}`)
       if (res.ok) setData(await res.json())
     } catch (e) {
       console.error('Failed to load property financials:', e)
@@ -48,6 +53,34 @@ export default function PropertyAccountingPage() {
             <p className="text-zinc-300 text-sm">Complete Financial Analysis</p>
           </div>
           <div className="flex items-center gap-3">
+            {/* Bond-style Month Selector */}
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)]">
+              <button 
+                onClick={() => {
+                  const newMonth = selectedMonth === 0 ? 11 : selectedMonth - 1
+                  const newYear = selectedMonth === 0 ? selectedYear - 1 : selectedYear
+                  setSelectedMonth(newMonth)
+                  setSelectedYear(newYear)
+                }}
+                className="text-amber-400 hover:text-amber-300 transition-colors px-2 py-1 rounded hover:bg-amber-500/10"
+              >
+                ←
+              </button>
+              <div className="text-white font-semibold text-sm min-w-[120px] text-center">
+                {new Date(selectedYear, selectedMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </div>
+              <button 
+                onClick={() => {
+                  const newMonth = selectedMonth === 11 ? 0 : selectedMonth + 1
+                  const newYear = selectedMonth === 11 ? selectedYear + 1 : selectedYear
+                  setSelectedMonth(newMonth)
+                  setSelectedYear(newYear)
+                }}
+                className="text-amber-400 hover:text-amber-300 transition-colors px-2 py-1 rounded hover:bg-amber-500/10"
+              >
+                →
+              </button>
+            </div>
             <button className="inline-flex items-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300">
               📊 Reports
             </button>
@@ -85,7 +118,7 @@ export default function PropertyAccountingPage() {
             <div className="text-xs text-amber-300 mt-1">Per month</div>
           </div>
           <div className="luxury-feature-card p-4 border border-red-400/30">
-            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Total Expenses {new Date().toLocaleDateString('en-US', { month: 'long' })}</div>
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Total Expenses {new Date(selectedYear, selectedMonth).toLocaleDateString('en-US', { month: 'long' })}</div>
             <div className="text-xl font-bold text-white">
               {loading ? '—' : `€${((data?.fixedExpenses || 0) + (data?.recurringMonthly || 0)).toLocaleString()}`}
             </div>
