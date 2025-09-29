@@ -15,14 +15,27 @@ export default function FinancePage() {
   }, [])
 
   const loadPortfolioData = async () => {
+    setLoading(true)
     try {
+      console.log('📊 Loading portfolio data...')
       const [portfolioRes, propertiesRes] = await Promise.all([
-        fetch('/api/admin/finance/portfolio'),
-        fetch('/api/admin/finance/properties')
+        fetch('/api/admin/finance/portfolio', { cache: 'no-store' }),
+        fetch('/api/admin/finance/properties', { cache: 'no-store' })
       ])
       
-      if (portfolioRes.ok) setPortfolioData(await portfolioRes.json())
-      if (propertiesRes.ok) setProperties(await propertiesRes.json())
+      console.log('Portfolio response:', portfolioRes.status)
+      console.log('Properties response:', propertiesRes.status)
+      
+      if (portfolioRes.ok) {
+        const portfolioData = await portfolioRes.json()
+        console.log('Portfolio data:', portfolioData)
+        setPortfolioData(portfolioData)
+      }
+      if (propertiesRes.ok) {
+        const propertiesData = await propertiesRes.json()
+        console.log('Properties data:', propertiesData)
+        setProperties(propertiesData)
+      }
     } catch (e) {
       console.error('Failed to load finance data:', e)
     } finally {
