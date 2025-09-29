@@ -112,34 +112,26 @@ export default function EmailAnalyticsPage() {
                   <Area 
                     type="monotone" 
                     dataKey="sent" 
-                    stackId="1"
                     stroke="#06B6D4" 
                     fill="#06B6D4" 
                     fillOpacity={0.1}
                     strokeWidth={2}
-                    animationDuration={1500}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="delivered" 
-                    stackId="2"
                     stroke="#10B981" 
                     fill="#10B981" 
                     fillOpacity={0.2}
                     strokeWidth={2}
-                    animationDuration={1500}
-                    animationDelay={200}
                   />
                   <Area 
                     type="monotone" 
                     dataKey="opened" 
-                    stackId="3"
                     stroke="#F59E0B" 
                     fill="#F59E0B" 
                     fillOpacity={0.2}
                     strokeWidth={2}
-                    animationDuration={1500}
-                    animationDelay={400}
                   />
                 </AreaChart>
               </ResponsiveContainer>
