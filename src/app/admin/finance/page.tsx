@@ -153,22 +153,30 @@ export default function FinancePage() {
                     </div>
                   </div>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-zinc-400 text-sm">Investment</span>
-                      <span className="text-white font-semibold">€{(property.totalInvestment || 0).toLocaleString()}</span>
+                      <span className="text-zinc-400 text-xs">Investment</span>
+                      <span className="text-white font-semibold text-sm">€{(property.totalInvestment || 0).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-400 text-sm">Monthly Revenue</span>
-                      <span className="text-emerald-300 font-semibold">€{(property.monthlyRevenue || 0).toLocaleString()}</span>
+                      <span className="text-zinc-400 text-xs">Monthly Revenue</span>
+                      <span className="text-emerald-300 font-semibold text-sm">€{(property.monthlyRevenue || 0).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-400 text-sm">Monthly Expenses</span>
-                      <span className="text-amber-300 font-semibold">€{(property.monthlyExpenses || 0).toLocaleString()}</span>
+                      <span className="text-zinc-400 text-xs">Fixed Expenses</span>
+                      <span className="text-orange-300 font-semibold text-sm">€{(property.fixedExpenses || 0).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-400 text-sm">Net Profit</span>
-                      <span className={`font-semibold ${(property.netProfit || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <span className="text-zinc-400 text-xs">Recurring Monthly</span>
+                      <span className="text-amber-300 font-semibold text-sm">€{(property.recurringMonthly || 0).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400 text-xs">Total Monthly</span>
+                      <span className="text-red-300 font-semibold text-sm">€{(property.totalMonthlyExpenses || 0).toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400 text-xs">Net Profit</span>
+                      <span className={`font-semibold text-sm ${(property.netProfit || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                         €{(property.netProfit || 0).toLocaleString()}
                       </span>
                     </div>
