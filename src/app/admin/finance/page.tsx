@@ -36,7 +36,7 @@ export default function FinancePage() {
       console.log('📊 Loading portfolio data...')
       const [portfolioRes, propertiesRes] = await Promise.all([
         fetch('/api/admin/finance/portfolio', { cache: 'no-store' }),
-        fetch('/api/admin/finance/properties', { cache: 'no-store' })
+        fetch('/api/admin/finance/properties', { cache: 'no-store' })https://www.phantomproperties.co/admin/properties/cmfpqgfg90002l504tmjbv1l8/accounting/expenses
       ])
       
       console.log('Portfolio response:', portfolioRes.status)
@@ -187,8 +187,11 @@ export default function FinancePage() {
                       <span className="text-amber-300 font-semibold text-sm">€{(property.recurringMonthly || 0).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-400 text-xs">Total Monthly</span>
-                      <span className="text-red-300 font-semibold text-sm">€{(property.totalMonthlyExpenses || 0).toLocaleString()}</span>
+                      <span className="text-zinc-400 text-xs">Total Expenses {new Date().toLocaleDateString('en-US', { month: 'long' })}</span>
+                      <span className="text-red-300 font-semibold text-sm">€{((property.fixedExpenses || 0) + (property.recurringMonthly || 0)).toLocaleString()}</span>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-xs text-red-200">Fixed + Monthly</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-zinc-400 text-xs">Net Profit</span>
