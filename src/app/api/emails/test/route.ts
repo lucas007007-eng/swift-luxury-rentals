@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     try {
       const { PrismaClient } = await import('@prisma/client')
       const prisma = new PrismaClient()
-      await (prisma as any).emailSent.create({
+      const savedEmail = await (prisma as any).emailSent.create({
         data: {
           provider: 'resend',
           providerId: emailResult.data?.id || null,
@@ -105,9 +105,11 @@ export async function POST(request: NextRequest) {
           sentAt: new Date()
         }
       })
+      console.log('✅ Test email saved to analytics:', savedEmail.id)
       await prisma.$disconnect()
     } catch (e) {
-      console.error('Failed to log test email to analytics:', e)
+      console.error('❌ Failed to log test email to analytics:', e)
+      // Continue with test anyway - don't fail the test email send
     }
 
     console.log(`Test email sent:`, {

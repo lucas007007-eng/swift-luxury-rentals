@@ -93,7 +93,13 @@ export async function GET() {
       rates: { deliveryRate: 0, openRate: 0, clickRate: 0, bounceRate: 0 },
       byCategory: [],
       byTemplate: [],
-      dailyStats: []
+      dailyStats: [],
+      debug: { 
+        error: e?.message || String(e),
+        totalEverSent: 'error',
+        recentEmails: [],
+        last30Days: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+      }
     })
   }
 }
