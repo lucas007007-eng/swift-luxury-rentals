@@ -20,6 +20,8 @@ export async function POST(req: NextRequest) {
     const type = String(event?.type || '')
     const data = event?.data || {}
 
+    console.log('🔔 Resend webhook received:', { type, emailId: data?.id })
+
     try {
       const { PrismaClient } = await import('@prisma/client')
       const prisma = new PrismaClient()
@@ -27,22 +29,46 @@ export async function POST(req: NextRequest) {
       if (msgId) {
         const set: any = {}
         const now = new Date()
-        if (type.endsWith('.delivered')) { set.status = 'delivered'; set.deliveredAt = now }
-        else if (type.endsWith('.opened')) { set.status = 'opened'; set.openedAt = now }
-        else if (type.endsWith('.clicked')) { set.status = 'clicked'; set.clickedAt = now }
-        else if (type.endsWith('.bounced')) { set.status = 'bounced'; set.bouncedAt = now }
-        else if (type.endsWith('.complained')) { set.status = 'complained'; set.complainedAt = now }
-        else if (type.endsWith('.failed')) { set.status = 'failed'; set.failedAt = now }
+        if (type === 'email.delivered' || type.endsWith('.delivered')) { 
+          set.status = 'delivered'; set.deliveredAt = now 
+          console.log('📧 Email delivered:', msgId)
+        }
+        else if (type === 'email.opened' || type.endsWith('.opened')) { 
+          set.status = 'opened'; set.openedAt = now 
+          console.log('👁️ Email opened:', msgId)
+        }
+        else if (type === 'email.clicked' || type.endsWith('.clicked')) { 
+          set.status = 'clicked'; set.clickedAt = now 
+          console.log('🔗 Email clicked:', msgId)
+        }
+        else if (type === 'email.bounced' || type.endsWith('.bounced')) { 
+          set.status = 'bounced'; set.bouncedAt = now 
+          console.log('⚠️ Email bounced:', msgId)
+        }
+        else if (type === 'email.complained' || type.endsWith('.complained')) { 
+          set.status = 'complained'; set.complainedAt = now 
+          console.log('🚫 Email complained:', msgId)
+        }
+        else if (type === 'email.failed' || type.endsWith('.failed')) { 
+          set.status = 'failed'; set.failedAt = now 
+          console.log('❌ Email failed:', msgId)
+        }
+        
         if (Object.keys(set).length > 0) {
           // Update inbox messages
-          await (prisma as any).message.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
+          const msgUpdate = await (prisma as any).message.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
           // Update email analytics
-          await (prisma as any).emailSent.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
+          const emailUpdate = await (prisma as any).emailSent.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
+          console.log(`✅ Updated ${msgUpdate.count} messages, ${emailUpdate.count} analytics records`)
+        } else {
+          console.log('ℹ️ Unknown event type:', type)
         }
+      } else {
+        console.log('⚠️ No email ID found in webhook data')
       }
       await prisma.$disconnect()
     } catch (e) {
-      console.error('Resend webhook prisma error', e)
+      console.error('❌ Resend webhook prisma error', e)
     }
 
     return NextResponse.json({ ok: true, type })
