@@ -287,7 +287,27 @@ export default function AdminDashboard() {
             </div>
           </div>
           
-          {/* Email Templates CTA */}
+          {/* Support Tickets CTA moved here */}
+          <div
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-purple-400/30 bg-[linear-gradient(185deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(168,85,247,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
+            onClick={() => router.push('/support-dashboard')}
+            role="link"
+            aria-label="Click to access support tickets"
+          >
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-purple-400 font-sora">Support</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Support Tickets</div>
+                <div className="text-zinc-300 mt-1 text-sm">Manage tenant communications and support requests.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-purple-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-purple-400/40 transition-all">Open Support →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom row: Email Templates + Inbox + Email Analytics */}
+        <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Email Templates CTA moved here */}
           <div
             className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-cyan-400/30 bg-[linear-gradient(195deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(6,182,212,0.15),inset_0_1px_0_rgba(255,255,255,0.16)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
             onClick={() => router.push('/admin/emailtemplates')}
@@ -311,26 +331,6 @@ export default function AdminDashboard() {
               <div className="absolute top-4 right-4 w-8 h-8 border border-cyan-400/30 rounded-full animate-pulse"></div>
               <div className="absolute bottom-4 left-4 w-6 h-6 border border-cyan-400/20 rounded animate-spin" style={{ animationDuration: '3s' }}></div>
               <div className="absolute top-1/2 right-8 w-1 h-8 bg-gradient-to-b from-cyan-400/30 to-transparent animate-pulse" style={{ animationDelay: '1s' }}></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom row: Inbox + Support Tickets + Email Analytics */}
-        <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Support Tickets CTA moved here */}
-          <div
-            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-purple-400/30 bg-[linear-gradient(185deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(168,85,247,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
-            onClick={() => router.push('/support-dashboard')}
-            role="link"
-            aria-label="Click to access support tickets"
-          >
-            <div className="flex items-center justify-between gap-6">
-              <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-purple-400 font-sora">Support</div>
-                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Support Tickets</div>
-                <div className="text-zinc-300 mt-1 text-sm">Manage tenant communications and support requests.</div>
-                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-purple-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-purple-400/40 transition-all">Open Support →</div>
-              </div>
             </div>
           </div>
           {/* Inbox CTA (spy-style) moved here next to Support */}
