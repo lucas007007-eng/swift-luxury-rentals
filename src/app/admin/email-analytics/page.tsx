@@ -42,7 +42,13 @@ export default function EmailAnalyticsPage() {
             <h1 className="text-3xl md:text-4xl font-bold heading-sora text-white">Email Analytics</h1>
             <p className="text-zinc-300 text-sm md:text-base">Deliverability, Opens, Clicks & Performance</p>
           </div>
-          <div className="w-20 flex justify-end">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => window.location.reload()} 
+              className="inline-flex items-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300"
+            >
+              🔄 Refresh
+            </button>
             <div className="text-2xl">📊</div>
           </div>
         </div>

@@ -9,14 +9,7 @@ export async function GET() {
     const last30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
     const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
     
-    // Try to sync recent emails with Resend (if they have individual email API)
-    try {
-      const { Resend } = await import('resend')
-      const resend = new Resend(process.env.RESEND_API_KEY)
-      // Note: Resend doesn't currently have a public get emails API, but webhooks should handle this
-    } catch (e) {
-      console.log('Resend sync skipped:', e)
-    }
+    console.log('📊 Analytics API called at:', now.toISOString())
     
     // Overall stats
     const [totalSent, totalDelivered, totalOpened, totalClicked, totalBounced] = await Promise.all([
