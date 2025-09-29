@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
     try {
       const { PrismaClient } = await import('@prisma/client')
       const prisma = new PrismaClient()
-      // Try multiple paths to find the email ID
-      const msgId = data?.id || data?.email_id || data?.email?.id || data?.message?.id || event?.id
+      // Extract email ID from Resend webhook format
+      const msgId = data?.email_id || data?.id || data?.email?.id || data?.message?.id || event?.id
       if (msgId) {
         const set: any = {}
         const now = new Date()
