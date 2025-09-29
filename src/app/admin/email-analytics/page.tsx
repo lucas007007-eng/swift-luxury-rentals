@@ -12,14 +12,30 @@ export default function EmailAnalyticsPage() {
   useEffect(() => {
     loadAnalytics()
     
-    // Auto-refresh every 30 seconds to catch webhook updates
+    // Auto-refresh every 5 seconds to catch webhook updates quickly
     const interval = setInterval(() => {
       if (!document.hidden) { // Only refresh if tab is visible
         loadAnalytics()
       }
-    }, 30000)
+    }, 5000)
     
-    return () => clearInterval(interval)
+    // Also check for immediate updates (faster response to webhooks)
+    const fastCheck = setInterval(() => {
+      if (!document.hidden && typeof window !== 'undefined') {
+        const lastUpdate = (window as any).__lastAnalyticsCheck || 0
+        const now = Date.now()
+        if (now - lastUpdate > 2000) { // Don't spam refresh
+          ;(window as any).__lastAnalyticsCheck = now
+          // Quick check if we should refresh (could add more logic here)
+          loadAnalytics()
+        }
+      }
+    }, 2000)
+    
+    return () => {
+      clearInterval(interval)
+      clearInterval(fastCheck)
+    }
   }, [])
 
   const loadAnalytics = async () => {
