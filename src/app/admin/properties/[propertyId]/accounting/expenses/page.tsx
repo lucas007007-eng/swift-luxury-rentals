@@ -106,7 +106,7 @@ export default function PropertyExpensesPage() {
           recurringType: 'monthly',
           status: 'pending'
         })
-        loadExpenses() // Refresh list
+        loadExpenses()
         alert('✅ Expense added successfully!')
       } else {
         alert('❌ Failed to add expense')
