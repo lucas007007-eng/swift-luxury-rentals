@@ -58,7 +58,13 @@ export default function FinancePage() {
             <h1 className="text-3xl md:text-4xl font-bold heading-sora text-white">Finance Command</h1>
             <p className="text-zinc-300 text-sm md:text-base">Elite Property Portfolio Management</p>
           </div>
-          <div className="w-20 flex justify-end">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={loadPortfolioData}
+              className="inline-flex items-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300"
+            >
+              🔄 Refresh
+            </button>
             <div className="text-2xl">💎</div>
           </div>
         </div>
@@ -177,6 +183,15 @@ export default function FinancePage() {
                 </Link>
               ))
             )}
+          </div>
+          
+          {/* Debug section */}
+          <div className="mt-6 p-4 rounded-lg bg-black/40 border border-white/10">
+            <div className="text-xs text-zinc-400 mb-2">Debug Info:</div>
+            <div className="text-xs text-white">Loading: {loading ? 'true' : 'false'}</div>
+            <div className="text-xs text-white">Portfolio data: {JSON.stringify(portfolioData, null, 2)}</div>
+            <div className="text-xs text-white">Properties count: {properties.length}</div>
+            <div className="text-xs text-white">Properties: {JSON.stringify(properties.slice(0, 2), null, 2)}</div>
           </div>
         </div>
       </div>
