@@ -191,7 +191,7 @@ export default function FinancePage() {
                       <span className="text-red-300 font-semibold text-sm">€{((property.fixedExpenses || 0) + (property.recurringMonthly || 0)).toLocaleString()}</span>
                     </div>
                     <div className="text-center">
-                      <span className="text-xs text-red-200">Fixed + Monthly</span>
+                      <span className="text-xs text-red-200">Fixed + Monthly Expenses</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-zinc-400 text-xs">Investor Fee ({((property.investorFeeRate || 0.75) * 100).toFixed(0)}%)</span>

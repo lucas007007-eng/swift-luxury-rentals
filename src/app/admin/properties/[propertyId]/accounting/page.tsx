@@ -148,7 +148,7 @@ export default function PropertyAccountingPage() {
             <div className="text-xl font-bold text-white">
               {loading ? '—' : `€${((data?.fixedExpenses || 0) + (data?.recurringMonthly || 0)).toLocaleString()}`}
             </div>
-            <div className="text-xs text-red-300 mt-1">Fixed + Monthly</div>
+            <div className="text-xs text-red-300 mt-1">Fixed + Monthly Expenses</div>
           </div>
           <div className="luxury-feature-card p-4 border border-orange-400/30">
             <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Investor Fee</div>
