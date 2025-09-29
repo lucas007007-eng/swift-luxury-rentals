@@ -72,9 +72,40 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       value: item._sum?.amount || 0
     }))
 
-    // Calculate ROI
-    const monthlyRevenue = monthlyData.reduce((sum, m) => sum + m.revenue, 0) / 12
-    const monthlyExpenses = monthlyData.reduce((sum, m) => sum + m.expenses, 0) / 12
+    // Calculate monthly averages properly
+    const currentMonth = new Date()
+    const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
+    const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
+
+    // Current month's actual revenue and expenses
+    const [currentMonthRevenue, currentMonthExpenses, recurringExpenses] = await Promise.all([
+      (prisma as any).revenue.aggregate({
+        where: {
+          propertyId: params.propertyId,
+          date: { gte: monthStart, lte: monthEnd }
+        },
+        _sum: { amount: true }
+      }),
+      (prisma as any).expense.aggregate({
+        where: {
+          propertyId: params.propertyId,
+          date: { gte: monthStart, lte: monthEnd }
+        },
+        _sum: { amount: true }
+      }),
+      // Get monthly recurring expenses
+      (prisma as any).expense.aggregate({
+        where: {
+          propertyId: params.propertyId,
+          isRecurring: true,
+          recurringType: 'monthly'
+        },
+        _sum: { amount: true }
+      })
+    ])
+
+    const monthlyRevenue = currentMonthRevenue._sum?.amount || 0
+    const monthlyExpenses = (currentMonthExpenses._sum?.amount || 0) + (recurringExpenses._sum?.amount || 0)
     const annualProfit = (monthlyRevenue - monthlyExpenses) * 12
     const roi = financials.totalInvestment > 0 ? (annualProfit / financials.totalInvestment) * 100 : 0
 
@@ -86,7 +117,12 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       monthlyExpenses: Math.round(monthlyExpenses),
       roi: Math.round(roi * 10) / 10,
       monthlyData,
-      investmentBreakdown: breakdown
+      investmentBreakdown: breakdown,
+      debug: {
+        currentMonthExpenses: currentMonthExpenses._sum?.amount || 0,
+        recurringMonthlyExpenses: recurringExpenses._sum?.amount || 0,
+        totalMonthlyCalculated: monthlyExpenses
+      }
     })
   } catch (e) {
     console.error('Property financials error:', e)
