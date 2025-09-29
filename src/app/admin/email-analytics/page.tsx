@@ -12,29 +12,14 @@ export default function EmailAnalyticsPage() {
   useEffect(() => {
     loadAnalytics()
     
-    // Set up real-time updates via SSE
-    const eventSource = new EventSource('/api/admin/analytics/email/events')
-    
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        if (data.type === 'update') {
-          console.log('📡 Real-time update received:', data)
-          // Reload analytics when webhook events are received
-          loadAnalytics()
-        }
-      } catch (e) {
-        console.log('SSE parse error:', e)
+    // Auto-refresh every 30 seconds to catch webhook updates
+    const interval = setInterval(() => {
+      if (!document.hidden) { // Only refresh if tab is visible
+        loadAnalytics()
       }
-    }
+    }, 30000)
     
-    eventSource.onerror = (error) => {
-      console.log('SSE connection error:', error)
-    }
-    
-    return () => {
-      eventSource.close()
-    }
+    return () => clearInterval(interval)
   }, [])
 
   const loadAnalytics = async () => {

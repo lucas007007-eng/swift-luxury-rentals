@@ -62,16 +62,11 @@ export async function POST(req: NextRequest) {
           const emailUpdate = await (prisma as any).emailSent.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
           console.log(`✅ Updated ${msgUpdate.count} messages, ${emailUpdate.count} analytics records`)
           
-          // Trigger real-time analytics update
+          // Set a timestamp for analytics to detect changes
           try {
-            const controller = (global as any).__analyticsController
-            if (controller) {
-              const encoder = new TextEncoder()
-              controller.enqueue(encoder.encode(`data: {"type":"update","event":"${type}","emailId":"${msgId}"}\n\n`))
-              console.log('📡 Real-time analytics update sent')
-            }
+            ;(global as any).__lastAnalyticsUpdate = Date.now()
           } catch (e) {
-            console.log('📡 Analytics update failed:', e)
+            console.log('Analytics timestamp update failed:', e)
           }
         } else {
           console.log('ℹ️ Unknown event type:', type)
