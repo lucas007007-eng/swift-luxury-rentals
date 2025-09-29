@@ -312,8 +312,8 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Bottom row: Inbox + Support Tickets */}
-        <div className="mb-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Bottom row: Inbox + Support Tickets + Email Analytics */}
+        <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Support Tickets CTA moved here */}
           <div
             className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-purple-400/30 bg-[linear-gradient(185deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(168,85,247,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
@@ -353,6 +353,26 @@ export default function AdminDashboard() {
             <div className="pointer-events-none absolute inset-0 opacity-10">
               <div className="absolute top-6 right-6 w-10 h-10 rounded-full border border-fuchsia-400/30 animate-ping" />
               <div className="absolute bottom-6 left-8 w-6 h-6 rounded border border-fuchsia-400/20 animate-spin" style={{ animationDuration: '5s' }} />
+            </div>
+          </div>
+          
+          {/* Email Analytics CTA */}
+          <div
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-pink-400/30 bg-[linear-gradient(210deg,#0a0a0a_0%,#171717_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_18px_rgba(236,72,153,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
+            onClick={() => router.push('/admin/email-analytics')}
+            role="link"
+            aria-label="Click to access email analytics"
+          >
+            <div className="flex items-center justify-between gap-6">
+              <div>
+                <div className="font-mono uppercase tracking-wider text-sm text-pink-400 font-sora">Analytics</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Email Analytics</div>
+                <div className="text-zinc-300 mt-1 text-sm">Deliverability, opens, clicks & performance.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-pink-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-pink-400/40 transition-all">
+                  <span className="mr-2">📊</span>
+                  Open Analytics →
+                </div>
+              </div>
             </div>
           </div>
         </div>

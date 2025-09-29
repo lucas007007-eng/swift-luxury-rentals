@@ -379,6 +379,32 @@ model CannedReply {
   updatedAt  DateTime @updatedAt
 }
 
+// Email analytics tracking
+model EmailSent {
+  id           String    @id @default(cuid())
+  provider     String    // resend|postmark|smtp
+  providerId   String?   
+  templateId   String?   // reference to EmailTemplate.templateId
+  toEmail      String
+  toName       String?
+  fromEmail    String
+  subject      String
+  category     String?   // signup|booking|payment|reminder|marketing
+  status       String    @default("sent") // sent|delivered|opened|clicked|bounced|failed|complained
+  deliveredAt  DateTime?
+  openedAt     DateTime?
+  clickedAt    DateTime?
+  bouncedAt    DateTime?
+  complainedAt DateTime?
+  failedAt     DateTime?
+  sentAt       DateTime  @default(now())
+  
+  @@index([toEmail])
+  @@index([category])
+  @@index([status])
+  @@index([sentAt])
+}
+
 // Saved inbox views (stored filters)
 model SavedView {
   id        String   @id @default(cuid())

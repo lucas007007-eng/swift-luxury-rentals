@@ -222,6 +222,7 @@ export default function InboxPage() {
               </div>
             </div>
             <div className="flex-1 p-4 space-y-4 overflow-y-auto">
+              {selected && <CustomerTimeline conversationId={selected} />}
               {messages.map(m => (
                 <div key={m.id} className={`p-4 rounded-xl border ${m.direction==='outbound'?'border-emerald-400/30 bg-emerald-500/10':'border-white/10 bg-white/5'} shadow-[0_4px_12px_rgba(0,0,0,0.3)]`}>
                   <div className="text-xs text-zinc-400 mb-2 flex items-center gap-2">
@@ -292,6 +293,62 @@ function TagEditor({ conversationId }: { conversationId: string | null }) {
         await fetch('/api/admin/inbox/tags', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ conversationId, tags: arr }) })
         setTags('')
       }} className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300">Add Tags</button>
+    </div>
+  )
+}
+
+function CustomerTimeline({ conversationId }: { conversationId: string }) {
+  const [timeline, setTimeline] = React.useState<any>(null)
+  const [email, setEmail] = React.useState<string>('')
+  
+  React.useEffect(() => {
+    if (!conversationId) return
+    ;(async () => {
+      try {
+        // Get customer email from conversation
+        const convRes = await fetch(`/api/admin/inbox/messages?conversationId=${conversationId}`)
+        if (!convRes.ok) return
+        const msgs = await convRes.json()
+        const customerMsg = msgs.find((m: any) => m.direction === 'inbound')
+        if (!customerMsg) return
+        
+        const customerEmail = customerMsg.fromEmail
+        setEmail(customerEmail)
+        
+        const timelineRes = await fetch(`/api/admin/customers/${encodeURIComponent(customerEmail)}/timeline`)
+        if (timelineRes.ok) {
+          const data = await timelineRes.json()
+          setTimeline(data)
+        }
+      } catch {}
+    })()
+  }, [conversationId])
+  
+  if (!timeline) return null
+  
+  return (
+    <div className="mb-4 p-4 rounded-xl border border-amber-400/30 bg-amber-500/10">
+      <div className="text-sm font-semibold text-amber-300 mb-2">Customer Timeline - {email}</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div>
+          <div className="text-zinc-400">Conversations</div>
+          <div className="text-white font-semibold">{timeline.conversations?.length || 0}</div>
+        </div>
+        <div>
+          <div className="text-zinc-400">Bookings</div>
+          <div className="text-white font-semibold">{timeline.bookings?.length || 0}</div>
+        </div>
+        <div>
+          <div className="text-zinc-400">Emails Sent</div>
+          <div className="text-white font-semibold">{timeline.emails?.length || 0}</div>
+        </div>
+      </div>
+      {timeline.bookings?.length > 0 && (
+        <div className="mt-3 text-xs">
+          <div className="text-zinc-400">Latest Booking:</div>
+          <div className="text-emerald-300">{timeline.bookings[0]?.property?.title} • {timeline.bookings[0]?.status} • €{Math.round((timeline.bookings[0]?.totalCents || 0) / 100)}</div>
+        </div>
+      )}
     </div>
   )
 }
