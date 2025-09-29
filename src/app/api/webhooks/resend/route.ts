@@ -34,7 +34,10 @@ export async function POST(req: NextRequest) {
         else if (type.endsWith('.complained')) { set.status = 'complained'; set.complainedAt = now }
         else if (type.endsWith('.failed')) { set.status = 'failed'; set.failedAt = now }
         if (Object.keys(set).length > 0) {
+          // Update inbox messages
           await (prisma as any).message.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
+          // Update email analytics
+          await (prisma as any).emailSent.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
         }
       }
       await prisma.$disconnect()

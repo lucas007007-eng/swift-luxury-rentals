@@ -87,7 +87,29 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Log test email for tracking
+    // Log test email for tracking and analytics
+    try {
+      const { PrismaClient } = await import('@prisma/client')
+      const prisma = new PrismaClient()
+      await (prisma as any).emailSent.create({
+        data: {
+          provider: 'resend',
+          providerId: emailResult.data?.id || null,
+          templateId: template.id,
+          toEmail: testEmail,
+          toName: testName || null,
+          fromEmail: fromEmail,
+          subject: sanitizedSubject,
+          category: 'test',
+          status: 'sent',
+          sentAt: new Date()
+        }
+      })
+      await prisma.$disconnect()
+    } catch (e) {
+      console.error('Failed to log test email to analytics:', e)
+    }
+
     console.log(`Test email sent:`, {
       testType,
       recipient: testEmail,
