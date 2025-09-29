@@ -54,6 +54,14 @@ export async function GET() {
       })
     }
     
+    // Debug: check total emails ever sent
+    const totalEverSent = await (prisma as any).emailSent.count()
+    const recentEmails = await (prisma as any).emailSent.findMany({ 
+      orderBy: { sentAt: 'desc' }, 
+      take: 5,
+      select: { id: true, toEmail: true, subject: true, status: true, sentAt: true, provider: true, providerId: true }
+    })
+    
     await prisma.$disconnect()
     
     const deliveryRate = totalSent > 0 ? Math.round((totalDelivered / totalSent) * 100) : 0
@@ -66,7 +74,8 @@ export async function GET() {
       rates: { deliveryRate, openRate, clickRate, bounceRate },
       byCategory,
       byTemplate,
-      dailyStats
+      dailyStats,
+      debug: { totalEverSent, recentEmails, last30Days: last30Days.toISOString() }
     })
   } catch (e) {
     console.error('Email analytics error', e)

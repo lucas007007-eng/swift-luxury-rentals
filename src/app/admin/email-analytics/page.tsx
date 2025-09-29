@@ -84,35 +84,44 @@ export default function EmailAnalyticsPage() {
         </div>
 
         {/* Template performance */}
-        <div className="luxury-feature-card p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Template Performance</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 text-zinc-300 text-sm">Template</th>
-                  <th className="text-right py-3 text-zinc-300 text-sm">Sent</th>
-                  <th className="text-right py-3 text-zinc-300 text-sm">Avg Open Time</th>
-                  <th className="text-right py-3 text-zinc-300 text-sm">Avg Click Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr><td colSpan={4} className="py-6 text-zinc-400 text-center">Loading...</td></tr>
-                ) : (
-                  (data?.byTemplate || []).map((tpl: any) => (
-                    <tr key={tpl.templateId} className="border-b border-white/5">
-                      <td className="py-3 text-white">{tpl.templateId}</td>
-                      <td className="py-3 text-right text-emerald-300">{tpl._count.id}</td>
-                      <td className="py-3 text-right text-amber-300">{tpl._avg.openedAt ? '~2h' : '—'}</td>
-                      <td className="py-3 text-right text-purple-300">{tpl._avg.clickedAt ? '~5h' : '—'}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+          <div className="luxury-feature-card p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Template Performance</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    <th className="text-left py-3 text-zinc-300 text-sm">Template</th>
+                    <th className="text-right py-3 text-zinc-300 text-sm">Sent</th>
+                    <th className="text-right py-3 text-zinc-300 text-sm">Avg Open Time</th>
+                    <th className="text-right py-3 text-zinc-300 text-sm">Avg Click Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr><td colSpan={4} className="py-6 text-zinc-400 text-center">Loading...</td></tr>
+                  ) : (
+                    (data?.byTemplate || []).map((tpl: any) => (
+                      <tr key={tpl.templateId} className="border-b border-white/5">
+                        <td className="py-3 text-white">{tpl.templateId}</td>
+                        <td className="py-3 text-right text-emerald-300">{tpl._count.id}</td>
+                        <td className="py-3 text-right text-amber-300">{tpl._avg.openedAt ? '~2h' : '—'}</td>
+                        <td className="py-3 text-right text-purple-300">{tpl._avg.clickedAt ? '~5h' : '—'}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {/* Debug info */}
+            {data?.debug && (
+              <div className="mt-4 p-3 rounded-lg bg-black/40 border border-white/10">
+                <div className="text-xs text-zinc-400 mb-2">Debug Info:</div>
+                <div className="text-xs text-white">Total emails ever: {data.debug.totalEverSent}</div>
+                <div className="text-xs text-white">Recent emails: {JSON.stringify(data.debug.recentEmails, null, 2)}</div>
+                <div className="text-xs text-white">Filtering since: {data.debug.last30Days}</div>
+              </div>
+            )}
           </div>
-        </div>
       </div>
     </main>
   )
