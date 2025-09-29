@@ -8,10 +8,20 @@ export default function EmailAnalyticsPage() {
   const router = useRouter()
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   useEffect(() => {
     loadAnalytics()
-    // Only refresh manually via the refresh button - no auto-refresh loops
+    
+    // Auto-refresh every 15 minutes like Resend
+    const interval = setInterval(() => {
+      if (!document.hidden) {
+        console.log('📊 15-minute auto-refresh triggered')
+        loadAnalytics()
+      }
+    }, 15 * 60 * 1000) // 15 minutes
+    
+    return () => clearInterval(interval)
   }, [])
 
   const loadAnalytics = async () => {
@@ -20,11 +30,12 @@ export default function EmailAnalyticsPage() {
       console.log('Fetching email analytics...')
       const res = await fetch('/api/admin/analytics/email', { cache: 'no-store' })
       console.log('Response status:', res.status)
-      if (res.ok) {
-        const result = await res.json()
-        console.log('Analytics data received:', result)
-        setData(result)
-      } else {
+        if (res.ok) {
+          const result = await res.json()
+          console.log('Analytics data received:', result)
+          setData(result)
+          setLastUpdated(new Date())
+        } else {
         const errorText = await res.text()
         console.error('Analytics API error:', res.status, errorText)
         setData({ error: `API Error ${res.status}: ${errorText}` })
@@ -46,6 +57,11 @@ export default function EmailAnalyticsPage() {
             <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Analytics</div>
             <h1 className="text-3xl md:text-4xl font-bold heading-sora text-white">Email Analytics</h1>
             <p className="text-zinc-300 text-sm md:text-base">Deliverability, Opens, Clicks & Performance</p>
+            {lastUpdated && (
+              <p className="text-zinc-400 text-xs mt-1">
+                Data is updated every 15 minutes. Last updated {lastUpdated.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })}.
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <button 
