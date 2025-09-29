@@ -34,12 +34,11 @@ export async function GET() {
       _count: { id: true }
     })
     
-    // By template
+    // By template - simple count only since _avg doesn't work on timestamps
     const byTemplate = await (prisma as any).emailSent.groupBy({
       by: ['templateId'],
       where: { sentAt: { gte: last30Days }, templateId: { not: null } },
-      _count: { id: true },
-      _avg: { openedAt: true, clickedAt: true }
+      _count: { id: true }
     })
     
     // Daily chart data (last 7 days)

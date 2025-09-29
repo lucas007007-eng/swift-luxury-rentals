@@ -117,8 +117,8 @@ export default function EmailAnalyticsPage() {
                       <tr key={tpl.templateId} className="border-b border-white/5">
                         <td className="py-3 text-white">{tpl.templateId}</td>
                         <td className="py-3 text-right text-emerald-300">{tpl._count.id}</td>
-                        <td className="py-3 text-right text-amber-300">{tpl._avg.openedAt ? '~2h' : '—'}</td>
-                        <td className="py-3 text-right text-purple-300">{tpl._avg.clickedAt ? '~5h' : '—'}</td>
+                        <td className="py-3 text-right text-amber-300">—</td>
+                        <td className="py-3 text-right text-purple-300">—</td>
                       </tr>
                     ))
                   )}
