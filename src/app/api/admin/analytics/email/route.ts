@@ -95,7 +95,7 @@ export async function GET() {
       byTemplate: [],
       dailyStats: [],
       debug: { 
-        error: e?.message || String(e),
+        error: e instanceof Error ? e.message : String(e),
         totalEverSent: 'error',
         recentEmails: [],
         last30Days: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
