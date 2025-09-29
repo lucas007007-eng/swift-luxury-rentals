@@ -15,21 +15,32 @@ export async function GET(req: NextRequest) {
       console.log(`📊 Engagement tracking: ${action} for email ${emailId}`)
       
       if (action === 'view' || action === 'open') {
-        // For temp IDs, find the most recent email without openedAt set
+        // For temp IDs, find the most recent email and mark as opened
         if (emailId.startsWith('temp-')) {
-          const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
-          const result = await (prisma as any).emailSent.updateMany({
+          const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000)
+          
+          // First, find the most recent test email without openedAt
+          const recentEmail = await (prisma as any).emailSent.findFirst({
             where: { 
-              sentAt: { gte: fiveMinutesAgo },
+              sentAt: { gte: tenMinutesAgo },
               openedAt: null,
               category: 'test'
             },
-            data: { 
-              openedAt: new Date(),
-              status: 'opened'
-            }
+            orderBy: { sentAt: 'desc' }
           })
-          console.log(`✅ Email marked as opened via recent lookup (${result.count} records updated)`)
+          
+          if (recentEmail) {
+            await (prisma as any).emailSent.update({
+              where: { id: recentEmail.id },
+              data: { 
+                openedAt: new Date(),
+                status: 'opened'
+              }
+            })
+            console.log(`✅ Email marked as opened via recent lookup (email ${recentEmail.id})`)
+          } else {
+            console.log(`❌ No recent test email found to mark as opened`)
+          }
         } else {
           // Try exact providerId match
           const result = await (prisma as any).emailSent.updateMany({
