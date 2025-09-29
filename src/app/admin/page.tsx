@@ -91,7 +91,7 @@ export default function AdminDashboard() {
   return (
     <main className="min-h-screen bg-black text-white flex flex-col">
       <Header forceBackground={true} />
-      <div className="flex-1 flex items-center justify-center pt-8 pb-16">
+      <div className="flex-1 flex items-center justify-center pt-20 pb-16">
         <div className="max-w-[1800px] mx-auto px-6 py-8 w-full">
         {/* Ultra-Premium Header Section */}
         <div className="luxury-feature-card mb-8 p-8">
