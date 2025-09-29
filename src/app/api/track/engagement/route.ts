@@ -15,15 +15,29 @@ export async function GET(req: NextRequest) {
       console.log(`📊 Engagement tracking: ${action} for email ${emailId}`)
       
       if (action === 'view' || action === 'open') {
-        // Mark as opened via engagement (more reliable than pixel)
-        await (prisma as any).emailSent.updateMany({
+        // Try multiple ways to find and update the email record
+        const result = await (prisma as any).emailSent.updateMany({
           where: { providerId: emailId },
           data: { 
             openedAt: new Date(),
             status: 'opened'
           }
         })
-        console.log('✅ Email marked as opened via engagement tracking')
+        
+        // If no match on providerId, try by temporary ID pattern
+        if (result.count === 0 && emailId.startsWith('temp-')) {
+          const tempId = emailId
+          const result2 = await (prisma as any).emailSent.updateMany({
+            where: { providerId: tempId },
+            data: { 
+              openedAt: new Date(),
+              status: 'opened'
+            }
+          })
+          console.log(`✅ Email marked as opened via temp ID (${result2.count} records updated)`)
+        } else {
+          console.log(`✅ Email marked as opened via engagement tracking (${result.count} records updated)`)
+        }
       }
       
       if (action === 'click') {
