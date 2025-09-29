@@ -12,6 +12,22 @@ export default function FinancePage() {
 
   useEffect(() => {
     loadPortfolioData()
+    
+    // Auto-refresh when investments/expenses are added
+    const interval = setInterval(() => {
+      if (typeof window !== 'undefined' && !document.hidden) {
+        const lastUpdate = (global as any).__financeLastUpdate || 0
+        const lastCheck = (window as any).__financeLastCheck || 0
+        
+        if (lastUpdate > lastCheck) {
+          console.log('🔄 Finance data updated, refreshing portfolio...')
+          ;(window as any).__financeLastCheck = lastUpdate
+          loadPortfolioData()
+        }
+      }
+    }, 2000) // Check every 2 seconds
+    
+    return () => clearInterval(interval)
   }, [])
 
   const loadPortfolioData = async () => {

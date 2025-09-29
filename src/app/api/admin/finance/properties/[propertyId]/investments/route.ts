@@ -78,6 +78,10 @@ export async function POST(req: NextRequest, { params }: { params: { propertyId:
       data: { totalInvestment: total._sum?.amount || 0 }
     })
 
+    // Set global cache invalidation timestamp for portfolio refresh
+    ;(global as any).__financeLastUpdate = Date.now()
+    console.log('💎 Investment added, portfolio cache invalidated')
+
     await prisma.$disconnect()
     return NextResponse.json(investment)
   } catch (e) {
