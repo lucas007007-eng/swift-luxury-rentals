@@ -11,13 +11,13 @@ export async function GET() {
     
     console.log('📊 Analytics API called at:', now.toISOString())
     
-    // Overall stats
+    // Overall stats - calculate like Resend metrics
     const [totalSent, totalDelivered, totalOpened, totalClicked, totalBounced] = await Promise.all([
       (prisma as any).emailSent.count({ where: { sentAt: { gte: last30Days } } }),
-      (prisma as any).emailSent.count({ where: { sentAt: { gte: last30Days }, status: { in: ['delivered','opened','clicked'] } } }),
-      (prisma as any).emailSent.count({ where: { sentAt: { gte: last30Days }, status: { in: ['opened','clicked'] } } }),
-      (prisma as any).emailSent.count({ where: { sentAt: { gte: last30Days }, status: 'clicked' } }),
-      (prisma as any).emailSent.count({ where: { sentAt: { gte: last30Days }, status: { in: ['bounced','failed'] } } }),
+      (prisma as any).emailSent.count({ where: { sentAt: { gte: last30Days }, deliveredAt: { not: null } } }),
+      (prisma as any).emailSent.count({ where: { sentAt: { gte: last30Days }, openedAt: { not: null } } }),
+      (prisma as any).emailSent.count({ where: { sentAt: { gte: last30Days }, clickedAt: { not: null } } }),
+      (prisma as any).emailSent.count({ where: { sentAt: { gte: last30Days }, OR: [{ bouncedAt: { not: null } }, { failedAt: { not: null } }] } }),
     ])
     
     // By category
@@ -43,8 +43,8 @@ export async function GET() {
       
       const [sent, delivered, opened] = await Promise.all([
         (prisma as any).emailSent.count({ where: { sentAt: { gte: dayStart, lt: dayEnd } } }),
-        (prisma as any).emailSent.count({ where: { sentAt: { gte: dayStart, lt: dayEnd }, status: { in: ['delivered','opened','clicked'] } } }),
-        (prisma as any).emailSent.count({ where: { sentAt: { gte: dayStart, lt: dayEnd }, status: { in: ['opened','clicked'] } } }),
+        (prisma as any).emailSent.count({ where: { sentAt: { gte: dayStart, lt: dayEnd }, deliveredAt: { not: null } } }),
+        (prisma as any).emailSent.count({ where: { sentAt: { gte: dayStart, lt: dayEnd }, openedAt: { not: null } } }),
       ])
       
       dailyStats.push({
@@ -65,9 +65,10 @@ export async function GET() {
     
     await prisma.$disconnect()
     
+    // Calculate rates like Resend metrics
     const deliveryRate = totalSent > 0 ? Math.round((totalDelivered / totalSent) * 100) : 0
-    const openRate = totalDelivered > 0 ? Math.round((totalOpened / totalDelivered) * 100) : 0
-    const clickRate = totalOpened > 0 ? Math.round((totalClicked / totalOpened) * 100) : 0
+    const openRate = totalSent > 0 ? Math.round((totalOpened / totalSent) * 100) : 0  // Opens as % of total sent
+    const clickRate = totalSent > 0 ? Math.round((totalClicked / totalSent) * 100) : 0  // Clicks as % of total sent
     const bounceRate = totalSent > 0 ? Math.round((totalBounced / totalSent) * 100) : 0
     
     return NextResponse.json({
