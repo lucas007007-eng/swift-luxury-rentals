@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
           toEmail: testEmail,
           toName: defaultTestData.customerName || null,
           fromEmail: basicFrom,
-          subject: sanitizedSubject,
+          subject: subject,
           category: 'test',
           status: 'sent',
           sentAt: new Date()
