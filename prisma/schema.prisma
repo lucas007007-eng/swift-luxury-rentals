@@ -413,3 +413,94 @@ model SavedView {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// Property-centric accounting models
+model PropertyFinancials {
+  id               String   @id @default(cuid())
+  propertyId       String   @unique
+  totalInvestment  Float    @default(0)
+  totalRevenue     Float    @default(0)
+  totalExpenses    Float    @default(0)
+  netProfit        Float    @default(0)
+  breakEvenDate    DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  property         Property @relation(fields: [propertyId], references: [id])
+  expenses         Expense[]
+  revenues         Revenue[]
+  investments      Investment[]
+  
+  @@index([propertyId])
+}
+
+model Expense {
+  id               String   @id @default(cuid())
+  propertyId       String
+  categoryId       String
+  amount           Float
+  description      String
+  date             DateTime
+  receiptUrl       String?
+  isRecurring      Boolean  @default(false)
+  recurringType    String?  // monthly|quarterly|yearly
+  status           String   @default("pending") // pending|approved|paid
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  property         PropertyFinancials @relation(fields: [propertyId], references: [propertyId])
+  category         ExpenseCategory @relation(fields: [categoryId], references: [id])
+  
+  @@index([propertyId])
+  @@index([date])
+  @@index([categoryId])
+}
+
+model Revenue {
+  id               String   @id @default(cuid())
+  propertyId       String
+  type             String   // rental|deposit|cleaning|utilities|damages|fees
+  amount           Float
+  description      String
+  date             DateTime
+  invoiceNumber    String?
+  paymentStatus    String   @default("pending") // pending|paid|overdue
+  paymentMethod    String?  // bank|stripe|cash
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  property         PropertyFinancials @relation(fields: [propertyId], references: [propertyId])
+  
+  @@index([propertyId])
+  @@index([date])
+  @@index([paymentStatus])
+}
+
+model Investment {
+  id               String   @id @default(cuid())
+  propertyId       String
+  category         String   // furniture|appliances|renovation|technology|marketing|legal
+  item             String
+  amount           Float
+  purchaseDate     DateTime
+  supplier         String?
+  warrantyExpiry   DateTime?
+  depreciationRate Float?   @default(0.2) // 20% per year default
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  property         PropertyFinancials @relation(fields: [propertyId], references: [propertyId])
+  
+  @@index([propertyId])
+  @@index([category])
+  @@index([purchaseDate])
+}
+
+model ExpenseCategory {
+  id               String   @id @default(cuid())
+  name             String   @unique
+  type             String   // setup|renovation|fixed|recurring|operational|guest
+  description      String?
+  
+  expenses         Expense[]
+}
