@@ -151,20 +151,17 @@ export default function SupportDashboard() {
         }
       }
       if (response.ok) {
-        // Optimistically append to UI
         const optimistic = {
           id: `optimistic-${Date.now()}`,
           from: 'admin' as const,
           message: newMessage.trim(),
-          timestamp: new Date().toISOString(),
+          timestamp: new Date().toISOString()
         }
         setTickets(prev => prev.map(t => t.id === selectedTicket.id ? { ...t, messages: [...t.messages, optimistic], updatedAt: new Date().toISOString() } : t))
         setSelectedTicket(prev => prev ? { ...prev, messages: [...prev.messages, optimistic], updatedAt: new Date().toISOString() } : null)
-        // Reload tickets to get fresh data
         loadTickets()
         setNewMessage('')
         
-        // Trigger cache invalidation for tenant dashboard
         try {
           await fetch('/api/cache/invalidate', {
             method: 'POST',
