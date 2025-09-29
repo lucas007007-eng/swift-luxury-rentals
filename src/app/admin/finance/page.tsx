@@ -84,9 +84,30 @@ export default function FinancePage() {
         <div className="luxury-feature-card p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-white">Property Portfolio</h2>
-            <button className="inline-flex items-center px-4 py-2 rounded-lg text-black font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_8px_25px_rgba(16,185,129,0.35)] hover:from-emerald-300 hover:to-cyan-300 hover:scale-105 transition-all duration-300">
-              Add Property
-            </button>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/admin/finance/sync', { method: 'POST' })
+                    const result = await res.json()
+                    if (res.ok) {
+                      alert(`✅ ${result.message}`)
+                      loadPortfolioData() // Refresh data
+                    } else {
+                      alert('❌ Sync failed')
+                    }
+                  } catch (e) {
+                    alert('❌ Sync failed')
+                  }
+                }}
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300"
+              >
+                🔄 Sync Properties
+              </button>
+              <button className="inline-flex items-center px-4 py-2 rounded-lg text-black font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_8px_25px_rgba(16,185,129,0.35)] hover:from-emerald-300 hover:to-cyan-300 hover:scale-105 transition-all duration-300">
+                Add Property
+              </button>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
