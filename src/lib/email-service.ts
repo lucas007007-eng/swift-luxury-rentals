@@ -19,7 +19,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 // Email configuration
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'updates@phantomproperties.co'
 const FROM_FRIENDLY = `Phantom Properties <${FROM_EMAIL}>`
-const REPLY_TO_EMAIL = process.env.RESEND_REPLY_TO || 'info@phantomproperties.dev'
+const REPLY_TO_EMAIL = process.env.RESEND_REPLY_TO || 'replies@phantomproperties.co'
 
 export class EmailService {
   private static instance: EmailService
