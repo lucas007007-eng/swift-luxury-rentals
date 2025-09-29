@@ -81,14 +81,35 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
     const monthEnd = new Date(year, month + 1, 0)
 
     // Selected month's actual revenue and expenses + breakdown
-    const [selectedMonthRevenue, selectedMonthExpenses, recurringExpenses, fixedExpensesInMonth] = await Promise.all([
-      // Revenue actually received in selected month
+    const [manualRevenue, bookingRevenue, selectedMonthExpenses, recurringExpenses, fixedExpensesInMonth] = await Promise.all([
+      // Manual revenue entries for selected month
       (prisma as any).revenue.aggregate({
         where: {
           propertyId: params.propertyId,
           date: { gte: monthStart, lte: monthEnd }
         },
         _sum: { amount: true }
+      }),
+      // Revenue from confirmed bookings with payments in selected month
+      (prisma as any).booking.findMany({
+        where: {
+          propertyId: params.propertyId,
+          status: 'confirmed',
+          payments: {
+            some: {
+              status: 'received',
+              receivedAt: { gte: monthStart, lte: monthEnd }
+            }
+          }
+        },
+        include: {
+          payments: {
+            where: {
+              status: 'received',
+              receivedAt: { gte: monthStart, lte: monthEnd }
+            }
+          }
+        }
       }),
       // Expenses actually incurred in selected month
       (prisma as any).expense.aggregate({
@@ -120,7 +141,14 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       })
     ])
 
-    const monthlyRevenue = selectedMonthRevenue._sum?.amount || 0
+    // Calculate total revenue from both manual entries and booking payments
+    const manualRevenueAmount = manualRevenue._sum?.amount || 0
+    const bookingRevenueAmount = bookingRevenue.reduce((sum: number, booking: any) => {
+      return sum + booking.payments.reduce((paySum: number, payment: any) => paySum + (payment.amountCents / 100), 0)
+    }, 0)
+    const monthlyRevenue = manualRevenueAmount + bookingRevenueAmount
+
+    console.log(`💰 Revenue breakdown: Manual €${manualRevenueAmount}, Bookings €${bookingRevenueAmount}, Total €${monthlyRevenue}`)
     const selectedMonthFixedExpenses = fixedExpensesInMonth._sum?.amount || 0
     const selectedMonthRecurring = recurringExpenses._sum?.amount || 0
     const totalMonthlyExpenses = selectedMonthFixedExpenses + selectedMonthRecurring
