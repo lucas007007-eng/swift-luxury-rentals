@@ -20,12 +20,13 @@ export async function POST(req: NextRequest) {
     const type = String(event?.type || '')
     const data = event?.data || {}
 
-    console.log('🔔 Resend webhook received:', { type, emailId: data?.id })
+    console.log('🔔 Resend webhook received:', { type, fullData: data })
 
     try {
       const { PrismaClient } = await import('@prisma/client')
       const prisma = new PrismaClient()
-      const msgId = data?.id || data?.message?.id || data?.email?.id
+      // Try multiple paths to find the email ID
+      const msgId = data?.id || data?.email_id || data?.email?.id || data?.message?.id || event?.id
       if (msgId) {
         const set: any = {}
         const now = new Date()
