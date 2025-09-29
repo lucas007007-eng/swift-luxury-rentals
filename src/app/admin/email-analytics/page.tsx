@@ -252,7 +252,12 @@ export default function EmailAnalyticsPage() {
                   <div className="text-xs text-white">Total emails ever: {data.debug?.totalEverSent || 0}</div>
                   <div className="text-xs text-white">Recent emails: {JSON.stringify(data.debug?.recentEmails || [], null, 2)}</div>
                   <div className="text-xs text-white">Filtering since: {data.debug?.last30Days || 'unknown'}</div>
+                  <div className="text-xs text-emerald-300">Expected rates: Delivery {data.rates?.deliveryRate || 0}%, Open {data.rates?.openRate || 0}%, Click {data.rates?.clickRate || 0}%</div>
                   {data.error && <div className="text-xs text-red-300">Error: {data.error}</div>}
+                  <details className="mt-2">
+                    <summary className="text-xs text-cyan-300 cursor-pointer">Debug Database Check</summary>
+                    <iframe src="/api/admin/analytics/email/debug" className="w-full h-32 bg-gray-900 rounded mt-2"></iframe>
+                  </details>
                   <details className="mt-2">
                     <summary className="text-xs text-cyan-300 cursor-pointer">Full API Response</summary>
                     <pre className="text-xs text-gray-300 mt-1 whitespace-pre-wrap">{JSON.stringify(data, null, 2)}</pre>
