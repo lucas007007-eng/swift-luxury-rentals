@@ -24,6 +24,8 @@ export default function PropertyInvestmentsPage() {
   const [investments, setInvestments] = useState<Investment[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingInvestment, setEditingInvestment] = useState<Investment | null>(null)
   const [filter, setFilter] = useState('all')
   const [property, setProperty] = useState<any>(null)
   const [summary, setSummary] = useState<any>(null)
@@ -119,6 +121,81 @@ export default function PropertyInvestmentsPage() {
     } catch (e) {
       console.error('Add investment error:', e)
       alert('❌ Failed to add investment')
+    }
+  }
+
+  const handleEditInvestment = (investment: Investment) => {
+    setEditingInvestment(investment)
+    setForm({
+      category: investment.category,
+      item: investment.item,
+      amount: investment.amount.toString(),
+      purchaseDate: investment.purchaseDate.split('T')[0],
+      supplier: investment.supplier || '',
+      warrantyExpiry: investment.warrantyExpiry ? investment.warrantyExpiry.split('T')[0] : '',
+      depreciationRate: investment.depreciationRate.toString()
+    })
+    setShowEditModal(true)
+  }
+
+  const handleUpdateInvestment = async () => {
+    if (!form.item || !form.amount || !editingInvestment) {
+      alert('Please fill in item name and amount')
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/admin/finance/properties/${propertyId}/investments/${editingInvestment.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          amount: parseFloat(form.amount),
+          depreciationRate: parseFloat(form.depreciationRate) / 100,
+          warrantyExpiry: form.warrantyExpiry || null
+        })
+      })
+
+      if (res.ok) {
+        setShowEditModal(false)
+        setEditingInvestment(null)
+        setForm({
+          category: 'furniture',
+          item: '',
+          amount: '',
+          purchaseDate: new Date().toISOString().split('T')[0],
+          supplier: '',
+          warrantyExpiry: '',
+          depreciationRate: '20'
+        })
+        loadInvestments()
+        alert('✅ Investment updated successfully!')
+      } else {
+        alert('❌ Failed to update investment')
+      }
+    } catch (e) {
+      console.error('Update investment error:', e)
+      alert('❌ Failed to update investment')
+    }
+  }
+
+  const handleDeleteInvestment = async (investmentId: string) => {
+    if (!confirm('Are you sure you want to delete this investment?')) return
+
+    try {
+      const res = await fetch(`/api/admin/finance/properties/${propertyId}/investments/${investmentId}`, {
+        method: 'DELETE'
+      })
+
+      if (res.ok) {
+        loadInvestments()
+        alert('✅ Investment deleted successfully!')
+      } else {
+        alert('❌ Failed to delete investment')
+      }
+    } catch (e) {
+      console.error('Delete investment error:', e)
+      alert('❌ Failed to delete investment')
     }
   }
 
@@ -293,11 +370,25 @@ export default function PropertyInvestmentsPage() {
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-white/10">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-3">
                     <span className="text-zinc-400 text-xs">Value Lost</span>
                     <span className="text-red-400 font-semibold">
                       €{(investment.amount - investment.currentValue).toLocaleString()}
                     </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleEditInvestment(investment)}
+                      className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-cyan-400/50 transition-all duration-300"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteInvestment(investment.id)}
+                      className="inline-flex items-center px-3 py-1.5 rounded-lg text-white font-semibold text-xs border border-red-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-red-400/50 transition-all duration-300"
+                    >
+                      🗑️ Delete
+                    </button>
                   </div>
                 </div>
               </div>
@@ -423,6 +514,138 @@ export default function PropertyInvestmentsPage() {
               </button>
               <button
                 onClick={() => setShowAddModal(false)}
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Investment Modal */}
+      {showEditModal && editingInvestment && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="luxury-feature-card p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Edit Investment</h2>
+              <button 
+                onClick={() => {
+                  setShowEditModal(false)
+                  setEditingInvestment(null)
+                }}
+                className="text-zinc-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Category *</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {categories.map(cat => (
+                    <button
+                      key={cat.value}
+                      onClick={() => setForm({...form, category: cat.value})}
+                      className={`p-3 rounded-lg border text-center transition-all ${
+                        form.category === cat.value
+                          ? 'border-cyan-400/30 bg-cyan-500/10 text-cyan-300'
+                          : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-zinc-300/40'
+                      }`}
+                    >
+                      <div className="text-2xl mb-1">{cat.icon}</div>
+                      <div className="text-xs font-semibold">{cat.label}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Item Name *</label>
+                <input
+                  type="text"
+                  value={form.item}
+                  onChange={(e) => setForm({...form, item: e.target.value})}
+                  placeholder="e.g., Luxury Sofa Set, Samsung Refrigerator"
+                  className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Purchase Price (€) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={form.amount}
+                    onChange={(e) => setForm({...form, amount: e.target.value})}
+                    placeholder="0.00"
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Purchase Date *</label>
+                  <input
+                    type="date"
+                    value={form.purchaseDate}
+                    onChange={(e) => setForm({...form, purchaseDate: e.target.value})}
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Supplier (Optional)</label>
+                  <input
+                    type="text"
+                    value={form.supplier}
+                    onChange={(e) => setForm({...form, supplier: e.target.value})}
+                    placeholder="IKEA, Samsung, etc."
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Warranty Expiry (Optional)</label>
+                  <input
+                    type="date"
+                    value={form.warrantyExpiry}
+                    onChange={(e) => setForm({...form, warrantyExpiry: e.target.value})}
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Annual Depreciation Rate (%)</label>
+                <select
+                  value={form.depreciationRate}
+                  onChange={(e) => setForm({...form, depreciationRate: e.target.value})}
+                  className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                >
+                  <option value="10">10% (Electronics)</option>
+                  <option value="15">15% (Appliances)</option>
+                  <option value="20">20% (Furniture - Default)</option>
+                  <option value="25">25% (Technology)</option>
+                  <option value="5">5% (Renovation/Construction)</option>
+                  <option value="0">0% (No Depreciation)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 mt-8">
+              <button
+                onClick={handleUpdateInvestment}
+                className="inline-flex items-center px-6 py-3 rounded-lg text-black font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_8px_25px_rgba(16,185,129,0.35)] hover:from-emerald-300 hover:to-cyan-300 hover:scale-105 transition-all duration-300"
+              >
+                💎 Update Investment
+              </button>
+              <button
+                onClick={() => {
+                  setShowEditModal(false)
+                  setEditingInvestment(null)
+                }}
                 className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
               >
                 Cancel
