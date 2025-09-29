@@ -89,25 +89,25 @@ export default function FinancePage() {
       <div className="max-w-[1600px] mx-auto px-6 pb-10">
         {/* Portfolio Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="luxury-feature-card p-6 border border-emerald-400/30">
+          <div className="luxury-feature-card p-6">
             <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Total Investment</div>
             <div className="text-3xl font-bold text-white">
               {loading ? '—' : `€${(portfolioData?.totalInvestment || 0).toLocaleString()}`}
             </div>
           </div>
-          <div className="luxury-feature-card p-6 border border-cyan-400/30">
+          <div className="luxury-feature-card p-6">
             <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Monthly Revenue</div>
             <div className="text-3xl font-bold text-white">
               {loading ? '—' : `€${(portfolioData?.monthlyRevenue || 0).toLocaleString()}`}
             </div>
           </div>
-          <div className="luxury-feature-card p-6 border border-amber-400/30">
+          <div className="luxury-feature-card p-6">
             <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Monthly Expenses</div>
             <div className="text-3xl font-bold text-white">
               {loading ? '—' : `€${(portfolioData?.monthlyExpenses || 0).toLocaleString()}`}
             </div>
           </div>
-          <div className="luxury-feature-card p-6 border border-purple-400/30">
+          <div className="luxury-feature-card p-6">
             <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Net Profit</div>
             <div className="text-3xl font-bold text-white">
               {loading ? '—' : `€${(portfolioData?.netProfit || 0).toLocaleString()}`}
@@ -176,47 +176,52 @@ export default function FinancePage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-zinc-400 text-xs">Monthly Revenue</span>
-                      <span className="text-emerald-300 font-semibold text-sm">€{(property.monthlyRevenue || 0).toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-400 text-xs">Fixed Expenses</span>
-                      <span className="text-orange-300 font-semibold text-sm">€{(property.fixedExpenses || 0).toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-400 text-xs">Recurring Monthly</span>
-                      <span className="text-amber-300 font-semibold text-sm">€{(property.recurringMonthly || 0).toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-400 text-xs">Total Expenses {new Date().toLocaleDateString('en-US', { month: 'long' })}</span>
-                      <span className="text-red-300 font-semibold text-sm">€{((property.fixedExpenses || 0) + (property.recurringMonthly || 0)).toLocaleString()}</span>
-                    </div>
-                    <div className="text-center">
-                      <span className="text-xs text-red-200">Fixed + Monthly Expenses</span>
+                      <span className="text-white font-semibold text-sm">€{(property.monthlyRevenue || 0).toLocaleString()}</span>
                     </div>
                     
-                    {/* Spacer */}
-                    <div className="border-t border-white/10 my-3"></div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-400 text-xs">Investor Fee ({((property.investorFeeRate || 0.75) * 100).toFixed(0)}%)</span>
-                      <span className="text-orange-300 font-semibold text-sm">
-                        €{Math.round(((property.monthlyRevenue || 0) - (property.totalMonthlyExpenses || 0)) * (property.investorFeeRate || 0.75)).toLocaleString()}
-                      </span>
+                    {/* Expense Group */}
+                    <div className="pt-2 border-t border-white/10">
+                      <div className="text-center mb-2">
+                        <span className="text-xs text-zinc-300">Fixed + Monthly Expenses</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-zinc-400 text-xs">Fixed Expenses</span>
+                        <span className="text-white font-semibold text-sm">€{(property.fixedExpenses || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-zinc-400 text-xs">Recurring Monthly</span>
+                        <span className="text-white font-semibold text-sm">€{(property.recurringMonthly || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between font-semibold">
+                        <span className="text-zinc-300 text-xs">Total Expenses {new Date().toLocaleDateString('en-US', { month: 'long' })}</span>
+                        <span className="text-white font-bold text-sm">€{((property.fixedExpenses || 0) + (property.recurringMonthly || 0)).toLocaleString()}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-zinc-400 text-xs">Net Profit (After Fee)</span>
-                      <span className={`font-semibold text-sm ${(() => {
-                        const grossProfit = (property.monthlyRevenue || 0) - (property.totalMonthlyExpenses || 0)
-                        const investorFee = grossProfit * (property.investorFeeRate || 0.75)
-                        const netProfit = grossProfit - investorFee
-                        return netProfit >= 0 ? 'text-emerald-400' : 'text-red-400'
-                      })()}`}>
-                        €{(() => {
-                          const grossProfit = (property.monthlyRevenue || 0) - (property.totalMonthlyExpenses || 0)
+                    
+                    {/* Profit Group */}
+                    <div className="pt-2 border-t border-white/10">
+                      <div className="flex justify-between">
+                        <span className="text-zinc-400 text-xs">Investor Fee ({((property.investorFeeRate || 0.75) * 100).toFixed(0)}%)</span>
+                        <span className="text-white font-semibold text-sm">
+                          €{Math.round(((property.monthlyRevenue || 0) - ((property.fixedExpenses || 0) + (property.recurringMonthly || 0))) * (property.investorFeeRate || 0.75)).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between font-semibold">
+                        <span className="text-zinc-300 text-xs">Your Net Profit</span>
+                        <span className={`font-bold text-sm ${(() => {
+                          const grossProfit = (property.monthlyRevenue || 0) - ((property.fixedExpenses || 0) + (property.recurringMonthly || 0))
                           const investorFee = grossProfit * (property.investorFeeRate || 0.75)
                           const netProfit = grossProfit - investorFee
-                          return Math.round(netProfit).toLocaleString()
-                        })()}
-                      </span>
+                          return netProfit >= 0 ? 'text-emerald-400' : 'text-red-400'
+                        })()}`}>
+                          €{(() => {
+                            const grossProfit = (property.monthlyRevenue || 0) - ((property.fixedExpenses || 0) + (property.recurringMonthly || 0))
+                            const investorFee = grossProfit * (property.investorFeeRate || 0.75)
+                            const netProfit = grossProfit - investorFee
+                            return Math.round(netProfit).toLocaleString()
+                          })()}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   
