@@ -4,6 +4,7 @@ import { emailService } from '@/lib/email-service'
 import { EmailTemplateConfig } from '@/types/email-templates'
 
 export async function POST(request: NextRequest) {
+  console.log('🚀 Test email API called at:', new Date().toISOString())
   try {
     const { 
       template, 
@@ -16,6 +17,8 @@ export async function POST(request: NextRequest) {
       testData?: Record<string, any>
       testType: 'design' | 'deliverability' | 'spam'
     } = await request.json()
+
+    console.log('📧 Test email request:', { templateId: template?.id, testEmail, testType })
 
     if (!template || !testEmail) {
       return NextResponse.json(
