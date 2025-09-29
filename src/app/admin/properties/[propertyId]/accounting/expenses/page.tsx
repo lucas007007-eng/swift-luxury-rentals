@@ -26,13 +26,38 @@ export default function PropertyExpensesPage() {
   const [loading, setLoading] = useState(true)
   const [showAddModal, setShowAddModal] = useState(false)
   const [filter, setFilter] = useState('all')
+  const [property, setProperty] = useState<any>(null)
+
+  // Form state for adding expenses
+  const [form, setForm] = useState({
+    description: '',
+    amount: '',
+    categoryId: '',
+    date: new Date().toISOString().split('T')[0],
+    isRecurring: false,
+    recurringType: 'monthly',
+    status: 'pending'
+  })
 
   useEffect(() => {
     if (propertyId) {
       loadExpenses()
       loadCategories()
+      loadProperty()
     }
   }, [propertyId])
+
+  const loadProperty = async () => {
+    try {
+      const res = await fetch(`/api/admin/finance/properties/${propertyId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setProperty(data.property)
+      }
+    } catch (e) {
+      console.error('Failed to load property:', e)
+    }
+  }
 
   const loadExpenses = async () => {
     try {
@@ -51,6 +76,44 @@ export default function PropertyExpensesPage() {
       if (res.ok) setCategories(await res.json())
     } catch (e) {
       console.error('Failed to load categories:', e)
+    }
+  }
+
+  const handleAddExpense = async () => {
+    if (!form.description || !form.amount || !form.categoryId) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/admin/finance/properties/${propertyId}/expenses`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          amount: parseFloat(form.amount)
+        })
+      })
+
+      if (res.ok) {
+        setShowAddModal(false)
+        setForm({
+          description: '',
+          amount: '',
+          categoryId: '',
+          date: new Date().toISOString().split('T')[0],
+          isRecurring: false,
+          recurringType: 'monthly',
+          status: 'pending'
+        })
+        loadExpenses() // Refresh list
+        alert('✅ Expense added successfully!')
+      } else {
+        alert('❌ Failed to add expense')
+      }
+    } catch (e) {
+      console.error('Add expense error:', e)
+      alert('❌ Failed to add expense')
     }
   }
 
@@ -92,7 +155,7 @@ export default function PropertyExpensesPage() {
           </Link>
           <div className="text-center">
             <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Expenses</div>
-            <h1 className="text-2xl md:text-3xl font-bold heading-sora text-white">Expense Management</h1>
+            <h1 className="text-2xl md:text-3xl font-bold heading-sora text-white">{property?.title || 'Property'} Expenses</h1>
             <p className="text-zinc-300 text-sm">Track & Categorize Property Costs</p>
           </div>
           <div className="flex items-center gap-3">
@@ -207,6 +270,131 @@ export default function PropertyExpensesPage() {
           </div>
         </div>
       </div>
+
+      {/* Add Expense Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="luxury-feature-card p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Add New Expense</h2>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="text-zinc-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Description *</label>
+                <input
+                  type="text"
+                  value={form.description}
+                  onChange={(e) => setForm({...form, description: e.target.value})}
+                  placeholder="e.g., Monthly cleaning service"
+                  className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Amount (€) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={form.amount}
+                    onChange={(e) => setForm({...form, amount: e.target.value})}
+                    placeholder="0.00"
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Date *</label>
+                  <input
+                    type="date"
+                    value={form.date}
+                    onChange={(e) => setForm({...form, date: e.target.value})}
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Category *</label>
+                <select
+                  value={form.categoryId}
+                  onChange={(e) => setForm({...form, categoryId: e.target.value})}
+                  className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                >
+                  <option value="">Select category...</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name} ({cat.type})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Status</label>
+                  <select
+                    value={form.status}
+                    onChange={(e) => setForm({...form, status: e.target.value})}
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="paid">Paid</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-zinc-300 pt-6">
+                    <input
+                      type="checkbox"
+                      checked={form.isRecurring}
+                      onChange={(e) => setForm({...form, isRecurring: e.target.checked})}
+                      className="accent-cyan-400"
+                    />
+                    Recurring expense
+                  </label>
+                </div>
+              </div>
+
+              {form.isRecurring && (
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Recurring Type</label>
+                  <select
+                    value={form.recurringType}
+                    onChange={(e) => setForm({...form, recurringType: e.target.value})}
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                  >
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly">Yearly</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 mt-8">
+              <button
+                onClick={handleAddExpense}
+                className="inline-flex items-center px-6 py-3 rounded-lg text-black font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_8px_25px_rgba(16,185,129,0.35)] hover:from-emerald-300 hover:to-cyan-300 hover:scale-105 transition-all duration-300"
+              >
+                💰 Add Expense
+              </button>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
