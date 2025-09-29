@@ -182,32 +182,26 @@ export default function SupportDashboard() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      {/* Cyberpunk Grid Background */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(168,85,247,0.1)_1px,transparent_1px),linear-gradient(rgba(168,85,247,0.1)_1px,transparent_1px)] bg-[size:50px_50px]" />
+      <div className="luxury-feature-card p-6 md:p-8 mb-8">
+        <div className="flex items-center justify-between">
+          <Link 
+            href="/admin" 
+            className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
+          >
+            ← Return
+          </Link>
+          <div className="text-center">
+            <div className="font-mono uppercase tracking-wider text-sm text-emerald-400 font-sora">Support</div>
+            <h1 className="text-3xl md:text-4xl font-bold heading-sora text-white">Support Command</h1>
+            <p className="text-zinc-300 text-sm md:text-base">Elite Tenant Communications</p>
+          </div>
+          <div className="w-20 flex justify-end">
+            <div className="text-2xl">🎧</div>
+          </div>
+        </div>
       </div>
       
-      <Header forceBackground={true} />
-      <div className="pt-28 pb-20 relative z-10">
-        <div className="max-w-[1600px] mx-auto px-6 py-10">
-          {/* Header */}
-          <div className="mb-8 flex justify-between items-center">
-            <div>
-              <h1 className="text-4xl font-bold text-purple-400 font-mono tracking-wider">
-                &gt;&gt; SUPPORT COMMAND CENTER &lt;&lt;
-              </h1>
-              <p className="text-white/70 mt-2">Manage tenant communications and support requests</p>
-            </div>
-            <Link 
-              href="/admin" 
-              className="inline-flex items-center gap-2 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-400/40 hover:border-red-400/60 rounded-xl text-red-400 hover:text-red-300 font-mono text-sm font-bold transition-all duration-300 shadow-lg hover:shadow-red-400/20"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-              </svg>
-              EXIT SUPPORT
-            </Link>
-          </div>
+      <div className="max-w-[1600px] mx-auto px-6 pb-10">
 
           {/* Filter Bar */}
           <div className="mb-6 flex flex-wrap gap-4 items-center">
@@ -216,10 +210,10 @@ export default function SupportDashboard() {
                 <button
                   key={status}
                   onClick={() => setFilterStatus(status)}
-                  className={`px-4 py-2 rounded-lg font-mono text-sm transition-all ${
+                  className={`inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border transition-all duration-300 ${
                     filterStatus === status
-                      ? 'bg-purple-500/30 text-purple-300 border border-purple-400/40'
-                      : 'bg-black/40 text-white/60 border border-white/20 hover:bg-white/10'
+                      ? 'border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105'
+                      : 'border-zinc-400/30 text-zinc-400 hover:text-white hover:border-zinc-300/40'
                   }`}
                 >
                   {status.replace('_', ' ').toUpperCase()}
@@ -234,7 +228,7 @@ export default function SupportDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Tickets List */}
             <div className="lg:col-span-1 space-y-4">
-              <div className="bg-black/60 border border-purple-400/30 rounded-xl p-4">
+              <div className="luxury-feature-card p-6">
                 <h3 className="text-purple-400 font-mono text-sm uppercase tracking-wider mb-4">ACTIVE TICKETS</h3>
                 <div className="space-y-3 max-h-[600px] overflow-y-auto">
                   {loading ? (
@@ -287,7 +281,7 @@ export default function SupportDashboard() {
             {/* Ticket Details */}
             <div className="lg:col-span-2">
               {selectedTicket ? (
-                <div className="bg-black/60 border border-purple-400/30 rounded-xl p-6">
+                <div className="luxury-feature-card p-6">
                   {/* Ticket Header */}
                   <div className="mb-6 pb-4 border-b border-purple-400/20">
                     <div className="flex items-start justify-between mb-4">
@@ -330,7 +324,7 @@ export default function SupportDashboard() {
                             console.error('Failed to update ticket status:', error)
                           }
                         }}
-                        className="bg-gray-800 border border-purple-400/30 rounded-lg px-3.5 py-2.5 text-white text-sm font-mono"
+                        className="bg-black/40 border border-white/10 rounded-lg px-3.5 py-2.5 text-white text-sm"
                       >
                         <option value="open">OPEN</option>
                         <option value="in_progress">IN PROGRESS</option>
@@ -346,7 +340,7 @@ export default function SupportDashboard() {
                           ))
                           setSelectedTicket(prev => prev ? { ...prev, priority: newPriority } : null)
                         }}
-                        className="bg-gray-800 border border-purple-400/30 rounded-lg px-3.5 py-2.5 text-white text-sm font-mono"
+                        className="bg-black/40 border border-white/10 rounded-lg px-3.5 py-2.5 text-white text-sm"
                       >
                         <option value="low">LOW</option>
                         <option value="medium">MEDIUM</option>
@@ -396,19 +390,19 @@ export default function SupportDashboard() {
                       <button
                         onClick={handleSendMessage}
                         disabled={!newMessage.trim()}
-                        className={`px-6 py-3 rounded-lg font-mono text-sm transition-all ${
+                        className={`inline-flex items-center px-6 py-3 rounded-lg font-extrabold transition-all duration-300 ${
                           newMessage.trim()
-                            ? 'bg-purple-500 hover:bg-purple-600 text-white'
+                            ? 'bg-gradient-to-r from-emerald-400 to-cyan-400 text-black shadow-[0_8px_25px_rgba(16,185,129,0.35)] hover:from-emerald-300 hover:to-cyan-300 hover:scale-105'
                             : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                         }`}
                       >
-                        SEND
+                        SEND REPLY
                       </button>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="bg-black/60 border border-purple-400/30 rounded-xl p-8 text-center">
+                <div className="luxury-feature-card p-8 text-center">
                   <div className="w-24 h-24 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg className="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -422,7 +416,6 @@ export default function SupportDashboard() {
           </div>
         </div>
       </div>
-      <Footer />
     </main>
   )
 }
