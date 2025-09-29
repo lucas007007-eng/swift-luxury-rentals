@@ -36,7 +36,7 @@ export default function FinancePage() {
       console.log('📊 Loading portfolio data...')
       const [portfolioRes, propertiesRes] = await Promise.all([
         fetch('/api/admin/finance/portfolio', { cache: 'no-store' }),
-        fetch('/api/admin/finance/properties', { cache: 'no-store' })https://www.phantomproperties.co/admin/properties/cmfpqgfg90002l504tmjbv1l8/accounting/expenses
+        fetch('/api/admin/finance/properties', { cache: 'no-store' })
       ])
       
       console.log('Portfolio response:', portfolioRes.status)
