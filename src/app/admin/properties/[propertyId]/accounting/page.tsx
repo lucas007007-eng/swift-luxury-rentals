@@ -81,6 +81,32 @@ export default function PropertyAccountingPage() {
                 →
               </button>
             </div>
+            {/* Investor Fee Editor */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-cyan-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)]">
+              <span className="text-cyan-300 text-xs">Investor Fee:</span>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="5"
+                value={((data?.investorFeeRate || 0.75) * 100).toFixed(0)}
+                onChange={async (e) => {
+                  const newRate = parseFloat(e.target.value) / 100
+                  try {
+                    const res = await fetch(`/api/admin/finance/properties/${propertyId}/investor-fee`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ investorFeeRate: newRate })
+                    })
+                    if (res.ok) loadPropertyFinancials()
+                  } catch (err) {
+                    console.error('Failed to update investor fee:', err)
+                  }
+                }}
+                className="w-16 bg-black/40 text-white text-xs text-center border border-cyan-400/30 rounded px-2 py-1 focus:outline-none"
+              />
+              <span className="text-cyan-300 text-xs">%</span>
+            </div>
             <button className="inline-flex items-center px-3 py-2 rounded-lg text-white font-semibold text-xs border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_10px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-emerald-400/50 transition-all duration-300">
               📊 Reports
             </button>
@@ -124,12 +150,24 @@ export default function PropertyAccountingPage() {
             </div>
             <div className="text-xs text-red-300 mt-1">Fixed + Monthly</div>
           </div>
-          <div className="luxury-feature-card p-4 border border-purple-400/30">
-            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Net Profit</div>
+          <div className="luxury-feature-card p-4 border border-orange-400/30">
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Investor Fee</div>
             <div className="text-xl font-bold text-white">
-              {loading ? '—' : `€${((data?.monthlyRevenue || 0) - ((data?.fixedExpenses || 0) + (data?.recurringMonthly || 0))).toLocaleString()}`}
+              {loading ? '—' : `€${Math.round(((data?.monthlyRevenue || 0) - ((data?.fixedExpenses || 0) + (data?.recurringMonthly || 0))) * (data?.investorFeeRate || 0.75)).toLocaleString()}`}
             </div>
-            <div className="text-xs text-purple-300 mt-1">Monthly</div>
+            <div className="text-xs text-orange-300 mt-1">{((data?.investorFeeRate || 0.75) * 100).toFixed(0)}% of profit</div>
+          </div>
+          <div className="luxury-feature-card p-4 border border-purple-400/30">
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Net Profit (After Fee)</div>
+            <div className="text-xl font-bold text-white">
+              {loading ? '—' : (() => {
+                const grossProfit = (data?.monthlyRevenue || 0) - ((data?.fixedExpenses || 0) + (data?.recurringMonthly || 0))
+                const investorFee = grossProfit * (data?.investorFeeRate || 0.75)
+                const netProfit = grossProfit - investorFee
+                return `€${Math.round(netProfit).toLocaleString()}`
+              })()}
+            </div>
+            <div className="text-xs text-purple-300 mt-1">Your share</div>
           </div>
         </div>
 

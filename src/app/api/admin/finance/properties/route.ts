@@ -96,7 +96,10 @@ export async function GET() {
       const recurringMonthly = recurringExpenses._sum?.amount || 0
       const fixedExpensesAmount = fixedExpensesInMonth._sum?.amount || 0
       const totalMonthlyExp = fixedExpensesAmount + recurringMonthly
-      const netProfit = monthlyRevenue - totalMonthlyExp
+      const grossProfit = monthlyRevenue - totalMonthlyExp
+      const investorFeeRate = financials.investorFeeRate || 0.75
+      const investorFee = grossProfit * investorFeeRate
+      const netProfit = grossProfit - investorFee
       const roi = financials.totalInvestment > 0 ? ((netProfit * 12 / financials.totalInvestment) * 100) : 0
 
       return {
@@ -110,6 +113,8 @@ export async function GET() {
         recurringMonthly: Math.round(recurringMonthly),
         currentMonthExpenses: Math.round(currentMonthExpenses._sum?.amount || 0),
         totalMonthlyExpenses: Math.round(totalMonthlyExp),
+        investorFeeRate,
+        investorFee: Math.round(investorFee),
         netProfit: Math.round(netProfit),
         roi: Math.round(roi * 10) / 10
       }

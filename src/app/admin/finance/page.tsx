@@ -194,9 +194,25 @@ export default function FinancePage() {
                       <span className="text-xs text-red-200">Fixed + Monthly</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-400 text-xs">Net Profit</span>
-                      <span className={`font-semibold text-sm ${(property.netProfit || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                        €{(property.netProfit || 0).toLocaleString()}
+                      <span className="text-zinc-400 text-xs">Investor Fee ({((property.investorFeeRate || 0.75) * 100).toFixed(0)}%)</span>
+                      <span className="text-orange-300 font-semibold text-sm">
+                        €{Math.round(((property.monthlyRevenue || 0) - (property.totalMonthlyExpenses || 0)) * (property.investorFeeRate || 0.75)).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400 text-xs">Net Profit (After Fee)</span>
+                      <span className={`font-semibold text-sm ${(() => {
+                        const grossProfit = (property.monthlyRevenue || 0) - (property.totalMonthlyExpenses || 0)
+                        const investorFee = grossProfit * (property.investorFeeRate || 0.75)
+                        const netProfit = grossProfit - investorFee
+                        return netProfit >= 0 ? 'text-emerald-400' : 'text-red-400'
+                      })()}`}>
+                        €{(() => {
+                          const grossProfit = (property.monthlyRevenue || 0) - (property.totalMonthlyExpenses || 0)
+                          const investorFee = grossProfit * (property.investorFeeRate || 0.75)
+                          const netProfit = grossProfit - investorFee
+                          return Math.round(netProfit).toLocaleString()
+                        })()}
                       </span>
                     </div>
                   </div>
