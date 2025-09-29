@@ -289,7 +289,7 @@ export default function EmailTemplatesAdmin() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
           >
             <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl p-6">
               <div className="flex items-center justify-between">
@@ -345,7 +345,7 @@ export default function EmailTemplatesAdmin() {
             transition={{ delay: 0.2 }}
             className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl p-6 mb-8"
           >
-            <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               {/* Search */}
               <div className="flex-1">
                 <input
@@ -358,7 +358,7 @@ export default function EmailTemplatesAdmin() {
               </div>
               
               {/* Category Filter */}
-              <div className="lg:w-64">
+              <div className="sm:w-48">
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
@@ -379,7 +379,7 @@ export default function EmailTemplatesAdmin() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
           >
             {filteredTemplates.map((template, index) => (
               <motion.div
@@ -387,7 +387,7 @@ export default function EmailTemplatesAdmin() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl overflow-hidden hover:border-amber-500/50 transition-colors group"
+                className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl overflow-hidden hover:border-amber-500/50 transition-colors group flex flex-col h-full"
               >
                 {/* Template Header */}
                 <div className="p-6 border-b border-gray-800">
@@ -426,11 +426,11 @@ export default function EmailTemplatesAdmin() {
                 </div>
 
                 {/* Template Content Preview */}
-                <div className="p-6">
+                <div className="p-4 flex-1">
                   <div className="space-y-3">
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Subject Line</p>
-                      <p className="text-sm text-white font-medium">
+                      <p className="text-sm text-white font-medium break-words">
                         {template.subject}
                       </p>
                     </div>
@@ -438,7 +438,7 @@ export default function EmailTemplatesAdmin() {
                     {template.preheader && (
                       <div>
                         <p className="text-xs text-gray-500 mb-1">Preheader</p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-gray-400 break-words">
                           {template.preheader}
                         </p>
                       </div>
@@ -447,14 +447,14 @@ export default function EmailTemplatesAdmin() {
                     <div>
                       <p className="text-xs text-gray-500 mb-1">Variables</p>
                       <div className="flex flex-wrap gap-1">
-                        {template.variables.slice(0, 3).map((variable) => (
-                          <span key={variable.key} className="px-2 py-1 bg-gray-800 text-xs rounded text-gray-300">
+                        {template.variables.slice(0, 2).map((variable) => (
+                          <span key={variable.key} className="px-2 py-1 bg-gray-800 text-xs rounded text-gray-300 truncate">
                             {variable.label}
                           </span>
                         ))}
-                        {template.variables.length > 3 && (
+                        {template.variables.length > 2 && (
                           <span className="px-2 py-1 bg-gray-800 text-xs rounded text-gray-300">
-                            +{template.variables.length - 3} more
+                            +{template.variables.length - 2}
                           </span>
                         )}
                       </div>
@@ -463,56 +463,67 @@ export default function EmailTemplatesAdmin() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="px-6 py-4 bg-gray-900/50 border-t border-gray-800">
-                  <div className="flex items-center gap-2">
+                <div className="px-4 py-3 bg-gray-900/50 border-t border-gray-800">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2">
                     <button
                       onClick={() => handleTestTemplate(template)}
-                      className="flex items-center gap-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
+                      className="flex items-center justify-center gap-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
                     >
                       <EnvelopeIcon className="w-4 h-4" />
-                      Test
+                      <span className="hidden sm:inline">Test</span>
                     </button>
                     
                     <button
                       onClick={() => handlePreviewTemplate(template)}
-                      className="flex items-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
+                      className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors"
                     >
                       <EyeIcon className="w-4 h-4" />
-                      Preview
+                      <span className="hidden sm:inline">Preview</span>
                     </button>
                     
                     <button
                       onClick={() => handleEditTemplate(template)}
-                      className="flex items-center gap-1 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs rounded-lg transition-colors"
+                      className="flex items-center justify-center gap-1 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs rounded-lg transition-colors"
                     >
                       <PencilIcon className="w-4 h-4" />
-                      Edit
+                      <span className="hidden sm:inline">Edit</span>
                     </button>
                     
                     <button
                       onClick={() => handleDuplicateTemplate(template)}
-                      className="flex items-center gap-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
+                      className="flex items-center justify-center gap-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded-lg transition-colors"
                     >
                       <DocumentDuplicateIcon className="w-4 h-4" />
-                      Copy
+                      <span className="hidden sm:inline">Copy</span>
                     </button>
                     
                     <button
                       onClick={() => handleToggleActive(template.id)}
-                      className={`flex items-center gap-1 px-3 py-2 text-xs rounded-lg transition-colors ${
+                      className={`flex items-center justify-center gap-1 px-3 py-2 text-xs rounded-lg transition-colors ${
                         template.isActive 
                           ? 'bg-red-600 hover:bg-red-700 text-white' 
                           : 'bg-green-600 hover:bg-green-700 text-white'
                       }`}
                     >
-                      {template.isActive ? 'Disable' : 'Enable'}
+                      {template.isActive ? (
+                        <>
+                          <XCircleIcon className="w-4 h-4" />
+                          <span className="hidden sm:inline">Disable</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircleIcon className="w-4 h-4" />
+                          <span className="hidden sm:inline">Enable</span>
+                        </>
+                      )}
                     </button>
                     
                     <button
                       onClick={() => handleDeleteTemplate(template.id)}
-                      className="flex items-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg transition-colors ml-auto"
+                      className="flex items-center justify-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg transition-colors"
                     >
                       <TrashIcon className="w-4 h-4" />
+                      <span className="hidden sm:inline">Delete</span>
                     </button>
                   </div>
                 </div>
