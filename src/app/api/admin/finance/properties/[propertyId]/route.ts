@@ -77,8 +77,8 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
     const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
     const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0)
 
-    // Current month's actual revenue and expenses
-    const [currentMonthRevenue, currentMonthExpenses, recurringExpenses] = await Promise.all([
+    // Current month's actual revenue and expenses + fixed vs recurring breakdown
+    const [currentMonthRevenue, currentMonthExpenses, recurringExpenses, fixedExpenses] = await Promise.all([
       (prisma as any).revenue.aggregate({
         where: {
           propertyId: params.propertyId,
@@ -101,6 +101,14 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
           recurringType: 'monthly'
         },
         _sum: { amount: true }
+      }),
+      // Get fixed/one-time expenses (non-recurring)
+      (prisma as any).expense.aggregate({
+        where: {
+          propertyId: params.propertyId,
+          isRecurring: false
+        },
+        _sum: { amount: true }
       })
     ])
 
@@ -115,14 +123,12 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       ...financials,
       monthlyRevenue: Math.round(monthlyRevenue),
       monthlyExpenses: Math.round(monthlyExpenses),
+      fixedExpenses: Math.round(fixedExpenses._sum?.amount || 0),
+      recurringMonthly: Math.round(recurringExpenses._sum?.amount || 0),
+      currentMonthExpenses: Math.round(currentMonthExpenses._sum?.amount || 0),
       roi: Math.round(roi * 10) / 10,
       monthlyData,
-      investmentBreakdown: breakdown,
-      debug: {
-        currentMonthExpenses: currentMonthExpenses._sum?.amount || 0,
-        recurringMonthlyExpenses: recurringExpenses._sum?.amount || 0,
-        totalMonthlyCalculated: monthlyExpenses
-      }
+      investmentBreakdown: breakdown
     })
   } catch (e) {
     console.error('Property financials error:', e)

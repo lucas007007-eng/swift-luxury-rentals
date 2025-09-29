@@ -57,30 +57,46 @@ export default function PropertyAccountingPage() {
 
       <div className="max-w-[1600px] mx-auto px-6 pb-10">
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="luxury-feature-card p-6 border border-cyan-400/30">
-            <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Total Investment</div>
-            <div className="text-2xl font-bold text-white">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
+          <div className="luxury-feature-card p-4 border border-cyan-400/30">
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Total Investment</div>
+            <div className="text-xl font-bold text-white">
               {loading ? '—' : `€${(data?.totalInvestment || 0).toLocaleString()}`}
             </div>
           </div>
-          <div className="luxury-feature-card p-6 border border-emerald-400/30">
-            <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Monthly Revenue</div>
-            <div className="text-2xl font-bold text-white">
+          <div className="luxury-feature-card p-4 border border-emerald-400/30">
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Monthly Revenue</div>
+            <div className="text-xl font-bold text-white">
               {loading ? '—' : `€${(data?.monthlyRevenue || 0).toLocaleString()}`}
             </div>
           </div>
-          <div className="luxury-feature-card p-6 border border-amber-400/30">
-            <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">Monthly Expenses</div>
-            <div className="text-2xl font-bold text-white">
-              {loading ? '—' : `€${(data?.monthlyExpenses || 0).toLocaleString()}`}
+          <div className="luxury-feature-card p-4 border border-orange-400/30">
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Fixed Expenses</div>
+            <div className="text-xl font-bold text-white">
+              {loading ? '—' : `€${(data?.fixedExpenses || 0).toLocaleString()}`}
             </div>
+            <div className="text-xs text-orange-300 mt-1">One-time costs</div>
           </div>
-          <div className="luxury-feature-card p-6 border border-purple-400/30">
-            <div className="text-zinc-300 text-sm font-mono uppercase tracking-wider mb-2">ROI</div>
-            <div className="text-2xl font-bold text-white">
-              {loading ? '—' : `${(data?.roi || 0).toFixed(1)}%`}
+          <div className="luxury-feature-card p-4 border border-amber-400/30">
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Recurring Monthly</div>
+            <div className="text-xl font-bold text-white">
+              {loading ? '—' : `€${(data?.recurringMonthly || 0).toLocaleString()}`}
             </div>
+            <div className="text-xs text-amber-300 mt-1">Per month</div>
+          </div>
+          <div className="luxury-feature-card p-4 border border-red-400/30">
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Total Monthly</div>
+            <div className="text-xl font-bold text-white">
+              {loading ? '—' : `€${((data?.recurringMonthly || 0) + (data?.currentMonthExpenses || 0)).toLocaleString()}`}
+            </div>
+            <div className="text-xs text-red-300 mt-1">This month</div>
+          </div>
+          <div className="luxury-feature-card p-4 border border-purple-400/30">
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Net Profit</div>
+            <div className="text-xl font-bold text-white">
+              {loading ? '—' : `€${((data?.monthlyRevenue || 0) - ((data?.recurringMonthly || 0) + (data?.currentMonthExpenses || 0))).toLocaleString()}`}
+            </div>
+            <div className="text-xs text-purple-300 mt-1">Monthly</div>
           </div>
         </div>
 
