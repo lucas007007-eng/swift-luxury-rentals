@@ -56,6 +56,15 @@ export async function POST(req: NextRequest) {
         }
         
         if (Object.keys(set).length > 0) {
+          console.log(`🔍 Attempting to update records with providerId: ${msgId}`)
+          
+          // Check what records exist first
+          const existingRecords = await (prisma as any).emailSent.findMany({ 
+            where: { provider: 'resend' },
+            select: { id: true, providerId: true, toEmail: true, subject: true }
+          })
+          console.log('📋 Existing email records:', existingRecords)
+          
           // Update inbox messages
           const msgUpdate = await (prisma as any).message.updateMany({ where: { provider: 'resend', providerId: msgId }, data: set })
           // Update email analytics
