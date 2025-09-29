@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
           providerId: emailResult.data?.id || null,
           templateId: template.id,
           toEmail: testEmail,
-          toName: testName || null,
+          toName: defaultTestData.customerName || null,
           fromEmail: fromEmail,
           subject: sanitizedSubject,
           category: 'test',
