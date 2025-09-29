@@ -242,7 +242,7 @@ export default function EmailTemplatesAdmin() {
     <div className="min-h-screen bg-black">
       <Header />
       
-      <div className="pt-20 pb-16">
+      <div className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           {/* Header Section */}
@@ -251,16 +251,13 @@ export default function EmailTemplatesAdmin() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold text-white mb-2">
-                  📧 Email Templates
-                </h1>
-                <p className="text-gray-400">
-                  Design and manage your email templates with spy-tech precision
-                </p>
-              </div>
-              
+            <div className="flex items-center justify-between mb-6">
+              <a
+                href="/admin"
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
+              >
+                ← Return to Admin
+              </a>
               <div className="flex items-center gap-3">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -281,6 +278,14 @@ export default function EmailTemplatesAdmin() {
                   Create New Template
                 </motion.button>
               </div>
+            </div>
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-white mb-2">
+                📧 Email Templates
+              </h1>
+              <p className="text-gray-400">
+                Design and manage your email templates with spy-tech precision
+              </p>
             </div>
           </motion.div>
 
