@@ -73,11 +73,12 @@ export async function POST(request: NextRequest) {
     const fromAddress = `Phantom Properties <${basicFrom}>`
     const replyTo = process.env.RESEND_REPLY_TO || fromAddress
 
+    // Replace placeholder with actual tracking after we get email ID
     const emailResult = await resend.emails.send({
       from: fromAddress,
       to: [testEmail],
       subject: subject,
-      html: testHtml,
+      html: testHtml.replace('EMAIL_ID_PLACEHOLDER', 'temp-' + Date.now()), // Temporary ID for first send
       text: testText,
       replyTo: replyTo,
       headers: {
@@ -204,7 +205,11 @@ function generateTestEmailHtml(
         case 'image':
           return `<div style="text-align:${block.styling?.textAlign||'center'};margin:12px 0"><img src="${block.content?.src||''}" alt="${block.content?.alt||''}" style="width:${block.content?.width||'100%'};height:${block.content?.height||'auto'};border-radius:${block.styling?.borderRadius||'0px'}" /></div>`
         case 'button':
-          return `<div style="text-align:${block.styling?.textAlign||'center'};margin:16px 0"><a href="${block.content?.link||'#'}" style="display:inline-block;background:${block.content?.backgroundColor||template.styling.primaryColor};color:${block.content?.textColor||'#000'};padding:${block.content?.padding||'12px 24px'};border-radius:${block.content?.borderRadius||'6px'};text-decoration:none;font-size:${block.content?.fontSize||'16px'};font-weight:${block.content?.fontWeight||'600'}">${block.content?.text||'Click'}</a></div>`
+          const buttonLink = block.content?.link || '#'
+          const trackedLink = buttonLink.startsWith('http') ? 
+            `https://www.phantomproperties.co/api/track/engagement?id=${emailResult.data?.id || 'unknown'}&action=click&redirect=${encodeURIComponent(buttonLink)}` : 
+            buttonLink
+          return `<div style="text-align:${block.styling?.textAlign||'center'};margin:16px 0"><a href="${trackedLink}" style="display:inline-block;background:${block.content?.backgroundColor||template.styling.primaryColor};color:${block.content?.textColor||'#000'};padding:${block.content?.padding||'12px 24px'};border-radius:${block.content?.borderRadius||'6px'};text-decoration:none;font-size:${block.content?.fontSize||'16px'};font-weight:${block.content?.fontWeight||'600'}">${block.content?.text||'Click'}</a></div>`
         case 'divider':
           return `<hr style="height:${block.content?.height||'2px'};background:${block.content?.color||'#333'};border:none;margin:12px 0" />`
         case 'spacer':
@@ -242,6 +247,8 @@ function generateTestEmailHtml(
           </div>
         </div>
       </div>
+      <!-- Hybrid tracking: pixel + engagement link (ID will be replaced after send) -->
+      <img src="https://www.phantomproperties.co/api/track/engagement?id=EMAIL_ID_PLACEHOLDER&action=view" width="1" height="1" style="display:block" alt="" />
     </body>
     </html>`
     return baseHtmlCustom
