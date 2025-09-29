@@ -27,6 +27,8 @@ export default function PropertyExpensesPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [filter, setFilter] = useState('all')
   const [property, setProperty] = useState<any>(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
 
   // Form state for adding expenses
   const [form, setForm] = useState({
@@ -114,6 +116,80 @@ export default function PropertyExpensesPage() {
     } catch (e) {
       console.error('Add expense error:', e)
       alert('❌ Failed to add expense')
+    }
+  }
+
+  const handleEditExpense = (expense: Expense) => {
+    setEditingExpense(expense)
+    const category = categories.find(c => c.name === expense.categoryName)
+    setForm({
+      description: expense.description,
+      amount: expense.amount.toString(),
+      categoryId: category?.id || '',
+      date: expense.date.split('T')[0],
+      isRecurring: expense.isRecurring,
+      recurringType: 'monthly',
+      status: expense.status
+    })
+    setShowEditModal(true)
+  }
+
+  const handleUpdateExpense = async () => {
+    if (!form.description || !form.amount || !form.categoryId || !editingExpense) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/admin/finance/properties/${propertyId}/expenses/${editingExpense.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          amount: parseFloat(form.amount)
+        })
+      })
+
+      if (res.ok) {
+        setShowEditModal(false)
+        setEditingExpense(null)
+        setForm({
+          description: '',
+          amount: '',
+          categoryId: '',
+          date: new Date().toISOString().split('T')[0],
+          isRecurring: false,
+          recurringType: 'monthly',
+          status: 'pending'
+        })
+        loadExpenses()
+        alert('✅ Expense updated successfully!')
+      } else {
+        alert('❌ Failed to update expense')
+      }
+    } catch (e) {
+      console.error('Update expense error:', e)
+      alert('❌ Failed to update expense')
+    }
+  }
+
+  const handleDeleteExpense = async (expenseId: string) => {
+    if (!confirm('Are you sure you want to delete this expense?')) return
+
+    try {
+      const res = await fetch(`/api/admin/finance/properties/${propertyId}/expenses/${expenseId}`, {
+        method: 'DELETE'
+      })
+
+      if (res.ok) {
+        loadExpenses()
+        alert('✅ Expense deleted successfully!')
+      } else {
+        alert('❌ Failed to delete expense')
+      }
+    } catch (e) {
+      console.error('Delete expense error:', e)
+      alert('❌ Failed to delete expense')
     }
   }
 
@@ -252,8 +328,17 @@ export default function PropertyExpensesPage() {
                       </td>
                       <td className="py-4 px-6 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <button className="inline-flex items-center px-2 py-1 rounded text-xs border border-cyan-400/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition-all">
+                          <button 
+                            onClick={() => handleEditExpense(expense)}
+                            className="inline-flex items-center px-2 py-1 rounded text-xs border border-cyan-400/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition-all"
+                          >
                             Edit
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteExpense(expense.id)}
+                            className="inline-flex items-center px-2 py-1 rounded text-xs border border-red-400/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all"
+                          >
+                            Delete
                           </button>
                           {expense.receiptUrl && (
                             <a href={expense.receiptUrl} target="_blank" className="inline-flex items-center px-2 py-1 rounded text-xs border border-purple-400/30 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 transition-all">
@@ -387,6 +472,137 @@ export default function PropertyExpensesPage() {
               </button>
               <button
                 onClick={() => setShowAddModal(false)}
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Expense Modal */}
+      {showEditModal && editingExpense && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="luxury-feature-card p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">Edit Expense</h2>
+              <button 
+                onClick={() => {
+                  setShowEditModal(false)
+                  setEditingExpense(null)
+                }}
+                className="text-zinc-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Description *</label>
+                <input
+                  type="text"
+                  value={form.description}
+                  onChange={(e) => setForm({...form, description: e.target.value})}
+                  placeholder="e.g., Monthly cleaning service"
+                  className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Amount (€) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={form.amount}
+                    onChange={(e) => setForm({...form, amount: e.target.value})}
+                    placeholder="0.00"
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Date *</label>
+                  <input
+                    type="date"
+                    value={form.date}
+                    onChange={(e) => setForm({...form, date: e.target.value})}
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-zinc-300 mb-2">Category *</label>
+                <select
+                  value={form.categoryId}
+                  onChange={(e) => setForm({...form, categoryId: e.target.value})}
+                  className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                >
+                  <option value="">Select category...</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name} ({cat.type})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Status</label>
+                  <select
+                    value={form.status}
+                    onChange={(e) => setForm({...form, status: e.target.value})}
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="paid">Paid</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-zinc-300 pt-6">
+                    <input
+                      type="checkbox"
+                      checked={form.isRecurring}
+                      onChange={(e) => setForm({...form, isRecurring: e.target.checked})}
+                      className="accent-cyan-400"
+                    />
+                    Recurring expense
+                  </label>
+                </div>
+              </div>
+
+              {form.isRecurring && (
+                <div>
+                  <label className="block text-sm font-medium text-zinc-300 mb-2">Recurring Type</label>
+                  <select
+                    value={form.recurringType}
+                    onChange={(e) => setForm({...form, recurringType: e.target.value})}
+                    className="w-full bg-black/40 text-white border border-white/10 rounded-lg px-4 py-3 focus:outline-none"
+                  >
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly">Yearly</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 mt-8">
+              <button
+                onClick={handleUpdateExpense}
+                className="inline-flex items-center px-6 py-3 rounded-lg text-black font-extrabold bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_8px_25px_rgba(16,185,129,0.35)] hover:from-emerald-300 hover:to-cyan-300 hover:scale-105 transition-all duration-300"
+              >
+                💰 Update Expense
+              </button>
+              <button
+                onClick={() => {
+                  setShowEditModal(false)
+                  setEditingExpense(null)
+                }}
                 className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_6px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.12)] hover:scale-105 hover:border-zinc-300/40 transition-all duration-300"
               >
                 Cancel
