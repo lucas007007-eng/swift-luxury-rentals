@@ -85,16 +85,16 @@ export default function PropertyAccountingPage() {
             <div className="text-xs text-amber-300 mt-1">Per month</div>
           </div>
           <div className="luxury-feature-card p-4 border border-red-400/30">
-            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Total Monthly</div>
+            <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Total Expenses {new Date().toLocaleDateString('en-US', { month: 'long' })}</div>
             <div className="text-xl font-bold text-white">
-              {loading ? '—' : `€${((data?.recurringMonthly || 0) + (data?.currentMonthExpenses || 0)).toLocaleString()}`}
+              {loading ? '—' : `€${((data?.fixedExpenses || 0) + (data?.recurringMonthly || 0)).toLocaleString()}`}
             </div>
-            <div className="text-xs text-red-300 mt-1">This month</div>
+            <div className="text-xs text-red-300 mt-1">Fixed + Monthly</div>
           </div>
           <div className="luxury-feature-card p-4 border border-purple-400/30">
             <div className="text-zinc-300 text-xs font-mono uppercase tracking-wider mb-2">Net Profit</div>
             <div className="text-xl font-bold text-white">
-              {loading ? '—' : `€${((data?.monthlyRevenue || 0) - ((data?.recurringMonthly || 0) + (data?.currentMonthExpenses || 0))).toLocaleString()}`}
+              {loading ? '—' : `€${((data?.monthlyRevenue || 0) - ((data?.fixedExpenses || 0) + (data?.recurringMonthly || 0))).toLocaleString()}`}
             </div>
             <div className="text-xs text-purple-300 mt-1">Monthly</div>
           </div>
