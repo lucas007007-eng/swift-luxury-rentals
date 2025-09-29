@@ -384,7 +384,7 @@ export default function SupportDashboard() {
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type your response to the tenant..."
-                        className="flex-1 bg-gray-900 border border-purple-400/30 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-400 focus:outline-none resize-none"
+                        className="flex-1 bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 resize-none"
                         rows={3}
                       />
                       <button
