@@ -80,8 +80,9 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
     const monthStart = new Date(year, month, 1)
     const monthEnd = new Date(year, month + 1, 0)
 
-    // Current month's actual revenue and expenses + fixed vs recurring breakdown
-    const [currentMonthRevenue, currentMonthExpenses, recurringExpenses, fixedExpenses] = await Promise.all([
+    // Selected month's actual revenue and expenses + breakdown
+    const [selectedMonthRevenue, selectedMonthExpenses, recurringExpenses, fixedExpensesInMonth] = await Promise.all([
+      // Revenue actually received in selected month
       (prisma as any).revenue.aggregate({
         where: {
           propertyId: params.propertyId,
@@ -89,6 +90,7 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
         },
         _sum: { amount: true }
       }),
+      // Expenses actually incurred in selected month
       (prisma as any).expense.aggregate({
         where: {
           propertyId: params.propertyId,
@@ -96,42 +98,50 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
         },
         _sum: { amount: true }
       }),
-      // Get monthly recurring expenses
+      // Monthly recurring expenses (only count if viewing current/future month)
       (prisma as any).expense.aggregate({
         where: {
           propertyId: params.propertyId,
           isRecurring: true,
-          recurringType: 'monthly'
+          recurringType: 'monthly',
+          // Only include if expense was created before the selected month
+          createdAt: { lte: monthEnd }
         },
         _sum: { amount: true }
       }),
-      // Get fixed/one-time expenses (non-recurring)
+      // Fixed/one-time expenses that occurred in selected month only
       (prisma as any).expense.aggregate({
         where: {
           propertyId: params.propertyId,
-          isRecurring: false
+          isRecurring: false,
+          date: { gte: monthStart, lte: monthEnd }
         },
         _sum: { amount: true }
       })
     ])
 
-    const monthlyRevenue = currentMonthRevenue._sum?.amount || 0
-    const monthlyExpenses = (currentMonthExpenses._sum?.amount || 0) + (recurringExpenses._sum?.amount || 0)
-    const annualProfit = (monthlyRevenue - monthlyExpenses) * 12
-    const roi = financials.totalInvestment > 0 ? (annualProfit / financials.totalInvestment) * 100 : 0
+    const monthlyRevenue = selectedMonthRevenue._sum?.amount || 0
+    const selectedMonthFixedExpenses = fixedExpensesInMonth._sum?.amount || 0
+    const selectedMonthRecurring = recurringExpenses._sum?.amount || 0
+    const totalMonthlyExpenses = selectedMonthFixedExpenses + selectedMonthRecurring
+    const netProfit = monthlyRevenue - totalMonthlyExpenses
+    const roi = financials.totalInvestment > 0 ? ((netProfit * 12) / financials.totalInvestment) * 100 : 0
 
     await prisma.$disconnect()
 
     return NextResponse.json({
       ...financials,
       monthlyRevenue: Math.round(monthlyRevenue),
-      monthlyExpenses: Math.round(monthlyExpenses),
-      fixedExpenses: Math.round(fixedExpenses._sum?.amount || 0),
-      recurringMonthly: Math.round(recurringExpenses._sum?.amount || 0),
-      currentMonthExpenses: Math.round(currentMonthExpenses._sum?.amount || 0),
+      fixedExpenses: Math.round(selectedMonthFixedExpenses),
+      recurringMonthly: Math.round(selectedMonthRecurring),
+      currentMonthExpenses: Math.round(selectedMonthExpenses._sum?.amount || 0),
+      totalMonthlyExpenses: Math.round(totalMonthlyExpenses),
+      netProfit: Math.round(netProfit),
       roi: Math.round(roi * 10) / 10,
       monthlyData,
-      investmentBreakdown: breakdown
+      investmentBreakdown: breakdown,
+      selectedMonth: month,
+      selectedYear: year
     })
   } catch (e) {
     console.error('Property financials error:', e)
