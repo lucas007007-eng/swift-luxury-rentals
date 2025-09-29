@@ -5,9 +5,11 @@ export async function GET() {
     const { PrismaClient } = await import('@prisma/client')
     const prisma = new PrismaClient()
 
+    console.log('🏠 Fetching properties for finance...')
+    
     const properties = await (prisma as any).property.findMany({
       include: {
-        PropertyFinancials: {
+        financials: {
           select: {
             totalInvestment: true,
             totalRevenue: true,
@@ -18,8 +20,10 @@ export async function GET() {
       }
     })
 
+    console.log(`📊 Found ${properties.length} properties`)
+
     const enriched = properties.map((p: any) => {
-      const financials = p.PropertyFinancials || {}
+      const financials = p.financials || {}
       const monthlyRevenue = (financials.totalRevenue || 0) / 12 // Simple average
       const monthlyExpenses = (financials.totalExpenses || 0) / 12
       const netProfit = monthlyRevenue - monthlyExpenses
