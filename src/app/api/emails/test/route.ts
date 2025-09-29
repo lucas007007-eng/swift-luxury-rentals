@@ -84,7 +84,12 @@ export async function POST(request: NextRequest) {
         // Include unsubscribe URL for client recognition
         'List-Unsubscribe': '<https://www.phantomproperties.co/unsubscribe>',
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
-      }
+      },
+      // Enable tracking for opens and clicks
+      tags: [
+        { name: 'category', value: 'test' },
+        { name: 'template', value: template.id }
+      ]
     })
 
     // Log test email for tracking and analytics
