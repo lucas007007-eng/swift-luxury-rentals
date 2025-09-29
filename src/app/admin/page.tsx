@@ -230,19 +230,22 @@ export default function AdminDashboard() {
                  }} />
           </div>
           
-          {/* Accounting CTA */}
+          {/* Finance CTA */}
           <div
-            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-indigo-400/30 bg-[linear-gradient(155deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(99,102,241,0.15),inset_0_1px_0_rgba(255,255,255,0.12)] cursor-pointer overflow-hidden group h-[280px] flex flex-col justify-center hover:scale-[1.02] transition-all duration-300"
-            onClick={() => router.push('/admin/accounting')}
+            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-green-400/30 bg-[linear-gradient(155deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(34,197,94,0.15),inset_0_1px_0_rgba(255,255,255,0.12)] cursor-pointer overflow-hidden group h-[280px] flex flex-col justify-center hover:scale-[1.02] transition-all duration-300"
+            onClick={() => router.push('/admin/finance')}
             role="link"
-            aria-label="Click to access accounting dashboard"
+            aria-label="Click to access property finance dashboard"
           >
             <div className="flex items-center justify-between gap-6">
               <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-indigo-400 font-sora">Financial Management</div>
-                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Accounting</div>
-                <div className="text-zinc-300 mt-1 text-sm">Track expenses, profits, and financial reports.</div>
-                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-indigo-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-indigo-400/40 transition-all">Open Accounting →</div>
+                <div className="font-mono uppercase tracking-wider text-sm text-green-400 font-sora">Finance</div>
+                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Property Finance</div>
+                <div className="text-zinc-300 mt-1 text-sm">Portfolio accounting & investment tracking.</div>
+                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-green-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-green-400/40 transition-all">
+                  <span className="mr-2">💎</span>
+                  Open Finance →
+                </div>
               </div>
             </div>
           </div>
@@ -312,8 +315,8 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Bottom row: Inbox + Support Tickets + Email Analytics + Finance */}
-        <div className="mb-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Bottom row: Inbox + Support Tickets + Email Analytics */}
+        <div className="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Support Tickets CTA moved here */}
           <div
             className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-purple-400/30 bg-[linear-gradient(185deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(168,85,247,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
@@ -376,25 +379,6 @@ export default function AdminDashboard() {
             </div>
           </div>
           
-          {/* Finance CTA */}
-          <div
-            className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-green-400/30 bg-[linear-gradient(220deg,#0a0a0a_0%,#171717_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_18px_rgba(34,197,94,0.15),inset_0_1px_0_rgba(255,255,255,0.15)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
-            onClick={() => router.push('/admin/finance')}
-            role="link"
-            aria-label="Click to access property finance"
-          >
-            <div className="flex items-center justify-between gap-6">
-              <div>
-                <div className="font-mono uppercase tracking-wider text-sm text-green-400 font-sora">Finance</div>
-                <div className="text-xl font-extrabold text-white mt-1 heading-sora">Property Finance</div>
-                <div className="text-zinc-300 mt-1 text-sm">Portfolio accounting & investment tracking.</div>
-                <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-green-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-green-400/40 transition-all">
-                  <span className="mr-2">💎</span>
-                  Open Finance →
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
         </div>
       </div>
