@@ -32,7 +32,7 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       }
     })
 
-    // Calculate monthly data for charts (last 12 months) - use same logic as Monthly Revenue tile
+    // Calculate monthly data for charts (last 12 months) - simplified to match Monthly Revenue logic
     const monthlyData: { month: string; revenue: number; expenses: number }[] = []
     for (let i = 11; i >= 0; i--) {
       const date = new Date()
@@ -40,9 +40,9 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       const chartMonthStart = new Date(date.getFullYear(), date.getMonth(), 1)
       const chartMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
 
-      // Use the SAME calculation as Monthly Revenue tile to ensure consistency
-      const [chartManualRevenue, chartBookingRevenue, chartExpenses, chartRecurringExpenses, chartFixedExpenses] = await Promise.all([
-        // Manual revenue entries for this month
+      // Simplified calculation - only count manual revenue entries (not booking payments for historical data)
+      const [chartManualRevenue, chartExpenses] = await Promise.all([
+        // Manual revenue entries for this month only
         (prisma as any).revenue.aggregate({
           where: {
             propertyId: params.propertyId,
@@ -50,72 +50,20 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
           },
           _sum: { amount: true }
         }),
-        // Revenue from confirmed bookings with payments in this month
-        (prisma as any).booking.findMany({
-          where: {
-            propertyId: params.propertyId,
-            status: 'confirmed',
-            payments: {
-              some: {
-                status: 'received',
-                receivedAt: { gte: chartMonthStart, lte: chartMonthEnd }
-              }
-            }
-          },
-          include: {
-            payments: {
-              where: {
-                status: 'received',
-                receivedAt: { gte: chartMonthStart, lte: chartMonthEnd }
-              }
-            }
-          }
-        }),
-        // Expenses actually incurred in this month
+        // All expenses for this month
         (prisma as any).expense.aggregate({
           where: {
             propertyId: params.propertyId,
-            date: { gte: chartMonthStart, lte: chartMonthEnd }
-          },
-          _sum: { amount: true }
-        }),
-        // Monthly recurring expenses (only if created before this month)
-        (prisma as any).expense.aggregate({
-          where: {
-            propertyId: params.propertyId,
-            isRecurring: true,
-            recurringType: 'monthly',
-            createdAt: { lte: chartMonthEnd }
-          },
-          _sum: { amount: true }
-        }),
-        // Fixed/one-time expenses that occurred in this month only
-        (prisma as any).expense.aggregate({
-          where: {
-            propertyId: params.propertyId,
-            isRecurring: false,
             date: { gte: chartMonthStart, lte: chartMonthEnd }
           },
           _sum: { amount: true }
         })
       ])
 
-      // Calculate revenue using EXACT same logic as Monthly Revenue tile
-      const chartManualRevenueAmount = chartManualRevenue._sum?.amount || 0
-      const chartBookingRevenueAmount = chartBookingRevenue.reduce((sum: number, booking: any) => {
-        return sum + booking.payments.reduce((paySum: number, payment: any) => paySum + (payment.amountCents / 100), 0)
-      }, 0)
-      const chartMonthlyRevenue = chartManualRevenueAmount + chartBookingRevenueAmount
-
-      // Calculate expenses using same logic as Monthly Revenue tile
-      const chartFixedExpensesAmount = chartFixedExpenses._sum?.amount || 0
-      const chartRecurringExpensesAmount = chartRecurringExpenses._sum?.amount || 0
-      const chartTotalMonthlyExpenses = chartFixedExpensesAmount + chartRecurringExpensesAmount
-
       monthlyData.push({
         month: date.toLocaleDateString('en-US', { month: 'short' }),
-        revenue: Math.round(chartMonthlyRevenue),
-        expenses: Math.round(chartTotalMonthlyExpenses)
+        revenue: Math.round(chartManualRevenue._sum?.amount || 0),
+        expenses: Math.round(chartExpenses._sum?.amount || 0)
       })
     }
 
