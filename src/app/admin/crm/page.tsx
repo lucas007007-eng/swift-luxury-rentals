@@ -132,7 +132,7 @@ export default function CRMPage() {
               )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {(loading ? Array.from({length:4}).map((_,i)=>(
+              {loading ? Array.from({length:4}).map((_,i)=>(
                 <div key={i} className="rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4 text-white/60">Loading…</div>
               )) : (showAllVIPs ? vips.slice(0,10) : vips.slice(0,3)).map((vip) => (
                 <div key={vip.clientName} className="rounded-xl border border-emerald-400/30 bg-gradient-to-br from-[#0b1a12] to-[#08120d] p-4 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
