@@ -137,7 +137,7 @@ export default function AdminDashboard() {
           {/* CRM Dashboard CTA */}
           <div
             className="relative rounded-2xl p-6 border border-[rgba(192,192,192,0.35)] border-l-2 border-l-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1c1c1c_50%,#0a0a0a_100%)] shadow-[0_8px_25px_rgba(0,0,0,0.8),0_0_15px_rgba(245,158,11,0.15),inset_0_1px_0_rgba(255,255,255,0.14)] cursor-pointer overflow-hidden group hover:scale-[1.02] transition-all duration-300"
-            onClick={() => router.push('/crm')}
+            onClick={() => router.push('/admin/crm')}
             role="link"
             aria-label="Click to access CRM dashboard"
           >
@@ -145,7 +145,7 @@ export default function AdminDashboard() {
               <div>
                 <div className="font-mono uppercase tracking-wider text-sm text-amber-400 font-sora">Customer Relations</div>
                 <div className="text-xl font-extrabold text-white mt-1 heading-sora">CRM Dashboard</div>
-                <div className="text-zinc-300 mt-1 text-sm">Manage customers, VIPs, and lease agreements.</div>
+                <div className="text-zinc-300 mt-1 text-sm">Lead management, pipeline tracking, and renewals.</div>
                 <div className="inline-flex items-center mt-4 px-4 py-2 rounded-lg bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white font-semibold text-sm border border-amber-400/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] hover:border-amber-400/40 transition-all">Open CRM →</div>
               </div>
             </div>
