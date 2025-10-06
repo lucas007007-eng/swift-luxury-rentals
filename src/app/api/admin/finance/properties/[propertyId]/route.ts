@@ -40,13 +40,35 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
 
-      const [monthRevenue, monthExpenses] = await Promise.all([
+      const [monthRevenue, monthBookingRevenue, monthExpenses] = await Promise.all([
+        // Manual revenue entries
         (prisma as any).revenue.aggregate({
           where: {
             propertyId: params.propertyId,
             date: { gte: monthStart, lte: monthEnd }
           },
           _sum: { amount: true }
+        }),
+        // Revenue from booking payments received in this month
+        (prisma as any).booking.findMany({
+          where: {
+            propertyId: params.propertyId,
+            status: 'confirmed',
+            payments: {
+              some: {
+                status: 'received',
+                receivedAt: { gte: monthStart, lte: monthEnd }
+              }
+            }
+          },
+          include: {
+            payments: {
+              where: {
+                status: 'received',
+                receivedAt: { gte: monthStart, lte: monthEnd }
+              }
+            }
+          }
         }),
         (prisma as any).expense.aggregate({
           where: {
@@ -57,9 +79,16 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
         })
       ])
 
+      // Calculate total revenue including booking payments
+      const manualRevenueAmount = monthRevenue._sum?.amount || 0
+      const bookingRevenueAmount = monthBookingRevenue.reduce((sum: number, booking: any) => {
+        return sum + booking.payments.reduce((paySum: number, payment: any) => paySum + (payment.amountCents / 100), 0)
+      }, 0)
+      const totalMonthRevenue = manualRevenueAmount + bookingRevenueAmount
+
       monthlyData.push({
         month: date.toLocaleDateString('en-US', { month: 'short' }),
-        revenue: monthRevenue._sum?.amount || 0,
+        revenue: Math.round(totalMonthRevenue),
         expenses: monthExpenses._sum?.amount || 0
       })
     }
