@@ -1478,8 +1478,10 @@ function InAppBell({ activities, onSnooze, onComplete }: { activities:any[]; onS
   const count = due.length
   return (
     <div className="relative">
-      <button onClick={()=> setOpen(v=> !v)} className="relative px-3 py-2 rounded-lg border border-zinc-400/30 text-white">
-        ≡ƒöö
+      <button onClick={()=> setOpen(v=> !v)} className="relative px-3 py-2 rounded-lg border border-zinc-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] text-white hover:border-zinc-300/40 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM11 19H7a2 2 0 01-2-2V7a2 2 0 012-2h5m4 0v6m0 0l3-3m-3 3l-3-3" />
+        </svg>
         {count>0 && <span className="absolute -top-1 -right-1 text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500 text-black">{count}</span>}
       </button>
       {open && (
