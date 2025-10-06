@@ -33,7 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
     })
 
     // Calculate monthly data for charts (last 12 months) - use same logic as Monthly Revenue tile
-    const monthlyData = []
+    const monthlyData: { month: string; revenue: number; expenses: number }[] = []
     for (let i = 11; i >= 0; i--) {
       const date = new Date()
       date.setMonth(date.getMonth() - i)
