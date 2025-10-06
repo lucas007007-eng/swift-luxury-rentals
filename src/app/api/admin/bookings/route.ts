@@ -116,9 +116,101 @@ export async function POST(req: Request) {
     const updated = await prisma.booking.update({
       where: { id: String(id) },
       data: updateData,
+      include: {
+        user: { select: { name: true, email: true, phone: true } },
+        property: { select: { title: true, extId: true, address: true, city: { select: { name: true } } } },
+        payments: { select: { amountCents: true, purpose: true, status: true } }
+      }
     })
-    // If confirmed, also mark matching CRM row as paid (JSON storage)
+    
+    // If confirmed, create CRM lead and update finance data
     if (String(status) === 'confirmed') {
+      try {
+        // Create CRM lead in "signed" stage
+        const leadData = {
+          name: updated.user?.name || 'Guest',
+          email: updated.user?.email || '',
+          phone: updated.user?.phone || '',
+          city: updated.property?.city?.name || '',
+          stage: 'signed',
+          owner: 'ops@swiftluxury.local', // Default to ops team
+          budgetCents: updated.payments
+            .filter(p => p.status === 'received' || p.status === 'scheduled')
+            .reduce((sum, p) => sum + (p.amountCents || 0), 0)
+        }
+        
+        // Check if lead already exists for this email
+        const existingLead = updated.user?.email ? await prisma.lead.findFirst({
+          where: { email: updated.user.email }
+        }) : null
+        
+        if (!existingLead && updated.user?.email) {
+          await prisma.lead.create({ data: leadData })
+          console.log(`[CRM] Created signed lead for booking ${id}: ${leadData.name}`)
+        } else if (existingLead) {
+          // Update existing lead to "signed" stage
+          await prisma.lead.update({
+            where: { id: existingLead.id },
+            data: { stage: 'signed', budgetCents: leadData.budgetCents }
+          })
+          console.log(`[CRM] Updated existing lead to signed for booking ${id}: ${leadData.name}`)
+        }
+        
+        // Update property financials with booking revenue
+        if (updated.property?.extId) {
+          const totalBookingRevenue = updated.payments
+            .filter(p => p.status === 'received')
+            .reduce((sum, p) => sum + (p.amountCents || 0), 0) / 100
+          
+          if (totalBookingRevenue > 0) {
+            // Ensure PropertyFinancials record exists
+            await prisma.propertyFinancials.upsert({
+              where: { propertyId: updated.propertyId },
+              update: {},
+              create: {
+                propertyId: updated.propertyId,
+                totalInvestment: 0,
+                totalRevenue: 0,
+                totalExpenses: 0,
+                netProfit: 0,
+                investorFeeRate: 0.75
+              }
+            })
+            
+            // Add revenue entry for this booking
+            await prisma.revenue.create({
+              data: {
+                propertyId: updated.propertyId,
+                type: 'rental',
+                amount: totalBookingRevenue,
+                description: `Booking revenue - ${updated.user?.name || 'Guest'}`,
+                date: updated.confirmedAt || new Date(),
+                paymentStatus: 'paid',
+                paymentMethod: 'stripe'
+              }
+            })
+            
+            // Update total revenue in PropertyFinancials
+            const totalRevenue = await prisma.revenue.aggregate({
+              where: { propertyId: updated.propertyId },
+              _sum: { amount: true }
+            })
+            
+            await prisma.propertyFinancials.update({
+              where: { propertyId: updated.propertyId },
+              data: { totalRevenue: totalRevenue._sum?.amount || 0 }
+            })
+            
+            console.log(`[FINANCE] Added €${totalBookingRevenue} revenue for property ${updated.property.title}`)
+          }
+        }
+        
+      } catch (integrationError) {
+        console.error('[INTEGRATION] Failed to create CRM lead or update finance:', integrationError)
+        // Don't fail the booking confirmation if integration fails
+      }
+      
+      // Original CRM JSON storage logic (keep for backward compatibility)
       try {
         const b = await prisma.booking.findUnique({ where: { id: updated.id }, include: { property: true } })
         const dataPath = path.join(process.cwd(), 'src', 'data', 'bookings.json')
