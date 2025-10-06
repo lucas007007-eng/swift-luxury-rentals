@@ -188,8 +188,8 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
               </div>
             </div>
           </div>
-          {/* Mobile card list (sm) */}
-          <div className="block md:hidden px-4 pb-4">
+          {/* Mobile card list (smaller screens) */}
+          <div className="block lg:hidden px-4 pb-4">
             <div className="space-y-3">
               {withDeposit.map((b: any) => {
                 const receivedEuros = Math.round(((b.receivedCents||0)/100))
@@ -272,52 +272,51 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
           </div>
 
           {/* Responsive table layout */}
-          <div className="hidden md:block px-6 md:px-8 relative z-10">
-            <div className="w-full">
-          <table className="w-full divide-y divide-zinc-700/50 table-auto">
+          <div className="hidden lg:block px-2 xl:px-6 relative z-10">
+            <div className="w-full overflow-x-auto">
+          <table className="w-full divide-y divide-zinc-700/50 table-fixed min-w-[1100px]">
             <thead className="bg-black/30 backdrop-blur-sm">
               <tr>
-                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Created</th>
-                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Client</th>
-                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Property</th>
-                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Dates</th>
-                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Payment Received</th>
-                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Scheduled Payments</th>
-                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Overdue Payments</th>
-                <th className="px-3 py-4 text-left text-sm font-semibold uppercase tracking-wider text-white font-sora">Status</th>
+                <th className="w-[80px] xl:w-[90px] px-1 xl:px-2 py-2 xl:py-3 text-left text-[10px] xl:text-xs font-semibold uppercase tracking-wider text-white font-sora">Created</th>
+                <th className="w-[120px] xl:w-[130px] px-1 xl:px-2 py-2 xl:py-3 text-left text-[10px] xl:text-xs font-semibold uppercase tracking-wider text-white font-sora">Client</th>
+                <th className="w-[120px] xl:w-[130px] px-1 xl:px-2 py-2 xl:py-3 text-left text-[10px] xl:text-xs font-semibold uppercase tracking-wider text-white font-sora">Property</th>
+                <th className="w-[90px] xl:w-[100px] px-1 xl:px-2 py-2 xl:py-3 text-left text-[10px] xl:text-xs font-semibold uppercase tracking-wider text-white font-sora">Dates</th>
+                <th className="w-[160px] xl:w-[180px] px-1 xl:px-2 py-2 xl:py-3 text-left text-[10px] xl:text-xs font-semibold uppercase tracking-wider text-white font-sora">Payment Received</th>
+                <th className="w-[160px] xl:w-[180px] px-1 xl:px-2 py-2 xl:py-3 text-left text-[10px] xl:text-xs font-semibold uppercase tracking-wider text-white font-sora">Scheduled Payments</th>
+                <th className="w-[120px] xl:w-[130px] px-1 xl:px-2 py-2 xl:py-3 text-left text-[10px] xl:text-xs font-semibold uppercase tracking-wider text-white font-sora">Overdue Payments</th>
+                <th className="w-[100px] xl:w-[110px] px-1 xl:px-2 py-2 xl:py-3 text-left text-[10px] xl:text-xs font-semibold uppercase tracking-wider text-white font-sora">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-700/30">
               {withDeposit.map((b: any) => (
                 <tr key={b.id} id={b.id} className="hover:bg-zinc-900/20 transition-colors">
-                  <td className="px-3 py-4 text-sm align-top">
-                    <div className="inline-flex items-center justify-center px-3 py-2 rounded-lg border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full h-[60px]">
-                      <div className="text-white font-semibold text-sm font-sora text-center">{new Date(b.createdAt).toLocaleDateString()}</div>
+                  <td className="px-1 xl:px-2 py-2 xl:py-3 text-sm align-top">
+                    <div className="inline-flex items-center justify-center px-1 xl:px-2 py-1 rounded border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_2px_6px_rgba(0,0,0,0.4)] w-full h-[40px] xl:h-[45px]">
+                      <div className="text-white font-semibold text-[10px] xl:text-xs font-sora text-center">{new Date(b.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' })}</div>
                     </div>
                   </td>
-                  <td className="px-3 py-4 text-sm align-top">
-                    <div className="inline-flex flex-col justify-center p-3 rounded-lg border border-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full min-h-[80px]">
-                      <div className="text-white font-bold text-sm font-sora mb-1">{b.user?.name || '—'}</div>
-                      <div className="text-blue-300 text-xs font-sora truncate mb-1">{b.user?.email || '—'}</div>
-                      <div className="text-zinc-400 text-xs font-mono bg-zinc-900/50 px-2 py-0.5 rounded inline-block">{b.userId?.slice?.(0,6) || ''}</div>
+                  <td className="px-1 xl:px-2 py-2 xl:py-3 text-sm align-top">
+                    <div className="inline-flex flex-col justify-center p-1 xl:p-2 rounded border border-amber-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_2px_6px_rgba(0,0,0,0.4)] w-full min-h-[50px] xl:min-h-[55px]">
+                      <div className="text-white font-bold text-[10px] xl:text-xs font-sora mb-1 truncate" title={b.user?.name || '—'}>{b.user?.name || '—'}</div>
+                      <div className="text-blue-300 text-[10px] xl:text-xs font-sora truncate" title={b.user?.email || '—'}>{b.user?.email || '—'}</div>
                     </div>
                   </td>
                   
-                  <td className="px-3 py-4 text-sm align-top">
-                    <a href={`/admin/property/${b.property?.extId || ''}`} className="inline-flex flex-col justify-center p-3 rounded-lg border border-zinc-600/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full min-h-[80px] hover:border-zinc-400/50 hover:scale-[1.02] transition-all duration-200 cursor-pointer">
-                      <div className="text-white font-bold text-sm leading-tight font-sora mb-1">{b.property?.title || '—'}</div>
-                      <div className="text-zinc-400 text-xs leading-relaxed">{b.property?.address || ''}</div>
+                  <td className="px-1 xl:px-2 py-2 xl:py-3 text-sm align-top">
+                    <a href={`/admin/property/${b.property?.extId || ''}`} className="inline-flex flex-col justify-center p-1 xl:p-2 rounded border border-zinc-600/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_2px_6px_rgba(0,0,0,0.4)] w-full min-h-[50px] xl:min-h-[55px] hover:border-zinc-400/50 hover:scale-[1.01] transition-all duration-200 cursor-pointer">
+                      <div className="text-white font-bold text-[10px] xl:text-xs leading-tight font-sora mb-1 truncate" title={b.property?.title || '—'}>{b.property?.title || '—'}</div>
+                      <div className="text-zinc-400 text-[10px] xl:text-xs leading-relaxed truncate" title={b.property?.address || ''}>{b.property?.address || ''}</div>
                     </a>
                   </td>
-                  <td className="px-3 py-4 text-sm align-top">
-                    <div className="inline-flex flex-col justify-center p-3 rounded-lg border border-sky-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] w-full min-h-[80px]">
-                      <div className="text-sky-300 text-sm font-sora mb-1">Check-in</div>
-                      <div className="text-white font-semibold text-sm font-sora mb-2">{new Date(b.checkin).toLocaleDateString()}</div>
-                      <div className="text-sky-300 text-sm font-sora mb-1">Checkout</div>
-                      <div className="text-white font-semibold text-sm font-sora">{new Date(b.checkout).toLocaleDateString()}</div>
+                  <td className="px-1 xl:px-2 py-2 xl:py-3 text-sm align-top">
+                    <div className="inline-flex flex-col justify-center p-1 xl:p-2 rounded border border-sky-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] shadow-[0_2px_6px_rgba(0,0,0,0.4)] w-full min-h-[50px] xl:min-h-[55px]">
+                      <div className="text-sky-300 text-[10px] xl:text-xs font-sora mb-1">Move in</div>
+                      <div className="text-white font-semibold text-[10px] xl:text-xs font-sora mb-1">{new Date(b.checkin).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}</div>
+                      <div className="text-sky-300 text-[10px] xl:text-xs font-sora mb-1">Move out</div>
+                      <div className="text-white font-semibold text-[10px] xl:text-xs font-sora">{new Date(b.checkout).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}</div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm align-top">
+                  <td className="px-1 xl:px-2 py-2 xl:py-3 text-sm align-top">
                     {(() => {
                       const payments = (b.payments || [])
                       const receivedList = payments
@@ -344,7 +343,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                           
                           {/* Payment Received Section */}
                           {receivedTotalEuros > 0 && (
-                            <div className="relative rounded-xl px-0 py-4 overflow-hidden" 
+                            <div className="relative rounded px-0 py-2 overflow-hidden" 
                                  style={{
                                    background: `
                                      linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
@@ -353,26 +352,20 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                    border: '1px solid rgba(16,185,129,0.4)',
                                    backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
                                    boxShadow: `
-                                     0 20px 60px rgba(0,0,0,0.9),
-                                     0 10px 30px rgba(0,0,0,0.7),
-                                     inset 0 2px 0 rgba(255,255,255,0.15),
-                                     inset 0 -1px 0 rgba(255,255,255,0.1),
-                                     0 0 40px rgba(16,185,129,0.12)
+                                     0 8px 20px rgba(0,0,0,0.9),
+                                     0 4px 10px rgba(0,0,0,0.7),
+                                     inset 0 1px 0 rgba(255,255,255,0.15),
+                                     0 0 20px rgba(16,185,129,0.12)
                                    `,
-                                   transform: 'perspective(1000px) rotateX(1deg)',
-                                   transformStyle: 'preserve-3d'
                                  }} aria-label="Payment received">
                               <div className="relative z-10">
-                                <div className="flex items-center gap-2 text-sm text-emerald-300 mb-4 font-sora px-3">
-                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                                  <span className="uppercase tracking-wider font-semibold">Payments Received To Date</span>
+                                <div className="flex items-center gap-1 text-[10px] xl:text-xs text-emerald-300 mb-1 xl:mb-2 font-sora px-1 xl:px-2">
+                                  <svg className="w-2 xl:w-3 h-2 xl:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                  <span className="uppercase tracking-wider font-semibold">Received</span>
                                 </div>
-                                <div className="flex items-center justify-between gap-3 px-3 py-2">
-                                  <div className="flex items-center gap-2">
-                                    <svg className="w-4 h-4 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="M9 12l2 2 4-4"/></svg>
-                                    <span className="uppercase tracking-wider text-sm font-semibold text-emerald-200 font-sora">Total</span>
-                                  </div>
-                                  <span className="font-semibold text-lg text-white font-sora ml-auto text-right">€{receivedTotalEuros.toLocaleString('de-DE')}</span>
+                                <div className="flex items-center justify-between gap-1 xl:gap-2 px-1 xl:px-2 py-1">
+                                  <span className="uppercase tracking-wider text-[9px] xl:text-xs font-semibold text-emerald-200 font-sora">Total</span>
+                                  <span className="font-semibold text-[11px] xl:text-sm text-white font-sora">€{receivedTotalEuros.toLocaleString('de-DE')}</span>
                                 </div>
                               </div>
                             </div>
@@ -382,7 +375,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                             <span className="text-white/40 text-xs">—</span>
                           )}
                           {receivedList.length > 0 && (
-                            <div className="relative rounded-xl px-0 py-4 overflow-hidden"
+                            <div className="relative rounded px-0 py-2 overflow-hidden"
                                  style={{
                                    background: `
                                      linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
@@ -391,23 +384,20 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                    border: '1px solid rgba(16,185,129,0.4)',
                                    backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
                                    boxShadow: `
-                                     0 20px 60px rgba(0,0,0,0.9),
-                                     0 10px 30px rgba(0,0,0,0.7),
-                                     inset 0 2px 0 rgba(255,255,255,0.15),
-                                     inset 0 -1px 0 rgba(255,255,255,0.1),
-                                     0 0 40px rgba(16,185,129,0.12)
+                                     0 8px 20px rgba(0,0,0,0.9),
+                                     0 4px 10px rgba(0,0,0,0.7),
+                                     inset 0 1px 0 rgba(255,255,255,0.15),
+                                     0 0 20px rgba(16,185,129,0.12)
                                    `,
-                                   transform: 'perspective(1000px) rotateX(1deg)',
-                                   transformStyle: 'preserve-3d'
                                  }}>
                               
                               <div className="relative z-10">
-                                <div className="flex items-center gap-2 text-sm text-emerald-300 mb-4 font-sora px-3">
-                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                                  <span className="uppercase tracking-wider font-semibold">Payment History</span>
+                                <div className="flex items-center gap-1 text-[10px] xl:text-xs text-emerald-300 mb-1 xl:mb-2 font-sora px-1 xl:px-2">
+                                  <svg className="w-2 xl:w-3 h-2 xl:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                  <span className="uppercase tracking-wider font-semibold">History</span>
                                 </div>
-                                <div className="space-y-3">
-                                  {receivedList.slice(0,4).map((p:any)=> {
+                                <div className="space-y-1">
+                                  {receivedList.slice(0,2).map((p:any)=> {
                                     const dateStr = formatShortDate(new Date(p.receivedAt||p.createdAt))
                                     let label = 'Payment'
                                     let daysNote: string | null = null
@@ -444,13 +434,12 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                       } catch {}
                                     }
                                     return (
-                                      <div key={p.id} className="flex items-center justify-between gap-3 px-3 py-2">
-                                        <div className="flex items-center gap-2">
-                                          <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{dateStr}</span>
-                                          <span className="text-sm text-zinc-300 whitespace-nowrap font-sora">{label}</span>
-                                          {daysNote && <span className="text-xs text-zinc-400 whitespace-nowrap">{daysNote}</span>}
+                                      <div key={p.id} className="flex items-center justify-between gap-1 px-1 xl:px-2 py-1">
+                                        <div className="flex flex-col">
+                                          <span className="text-[9px] xl:text-xs text-white font-semibold font-sora">{dateStr}</span>
+                                          <span className="text-[9px] xl:text-xs text-zinc-300 font-sora truncate">{label}</span>
                                         </div>
-                                        <span className="text-lg font-bold text-white font-sora ml-auto text-right">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                                        <span className="text-[11px] xl:text-sm font-bold text-white font-sora">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
                                       </div>
                                     )
                                   })}
@@ -498,7 +487,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                         {isRefunded ? 'Deposit Refunded' : 'Deposit Received'}
                                       </span>
                                     </div>
-                                    <span className="text-lg font-semibold text-white font-sora ml-auto text-right">€{amountEuros.toLocaleString('de-DE')}</span>
+                                    <span className="text-[11px] xl:text-sm font-semibold text-white font-sora ml-auto text-right">€{amountEuros.toLocaleString('de-DE')}</span>
                                   </div>
                                   {!isRefunded && finished && (
                                     <form action="/api/admin/bookings/refund?redirect=1" method="post">
@@ -517,14 +506,14 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       )
                     })()}
                   </td>
-                  <td className="px-4 py-3 text-sm align-top">
+                  <td className="px-2 py-3 text-sm align-top">
                     {(() => {
                       const payments = (b.payments || [])
                       const scheduled = payments
                         .filter((p:any)=> p.purpose === 'monthly_rent' && p.status === 'scheduled')
                         .sort((a:any,b:any)=> new Date(a.dueAt||0).getTime() - new Date(b.dueAt||0).getTime())
                       return (
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                           {/* Unpaid Deposit Section moved below Scheduled Payments card */}
                           
                           {(() => {
@@ -557,19 +546,19 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                             const pendingEuros = firstPeriodAmount + moveInFeeAmount
                             if (pendingEuros > 0 && b.status !== 'confirmed') {
                               return (
-                                <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-400/40 bg-amber-500/10 text-amber-300 px-3 py-2">
-                                  <div className="flex items-center gap-3">
-                                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2 4 4 8-8 4 4"/></svg>
-                                    <span className="uppercase tracking-wider text-sm font-semibold font-sora">Payment Pending</span>
+                                <div className="flex items-center justify-between gap-1 xl:gap-2 rounded border border-amber-400/40 bg-amber-500/10 text-amber-300 px-1 xl:px-2 py-1">
+                                  <div className="flex items-center gap-1">
+                                    <svg className="w-2 xl:w-3 h-2 xl:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2 4 4 8-8 4 4"/></svg>
+                                    <span className="uppercase tracking-wider text-[9px] xl:text-xs font-semibold font-sora">Pending</span>
                                   </div>
-                                  <span className="text-lg font-semibold text-white font-sora">€{pendingEuros.toLocaleString('de-DE')}</span>
+                                  <span className="text-[11px] xl:text-sm font-semibold text-white font-sora">€{pendingEuros.toLocaleString('de-DE')}</span>
                                 </div>
                               )
                             }
                             return null
                           })()}
                           {scheduled.length > 0 ? (
-                            <div className="relative rounded-xl px-0 py-4 overflow-hidden"
+                            <div className="relative rounded px-0 py-2 overflow-hidden"
                                  style={{
                                    background: `
                                      linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
@@ -578,21 +567,18 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                    border: '1px solid rgba(245,158,11,0.4)',
                                    backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
                                    boxShadow: `
-                                     0 20px 60px rgba(0,0,0,0.9),
-                                     0 10px 30px rgba(0,0,0,0.7),
-                                     inset 0 2px 0 rgba(255,255,255,0.15),
-                                     inset 0 -1px 0 rgba(255,255,255,0.1),
-                                     0 0 40px rgba(245,158,11,0.12)
+                                     0 8px 20px rgba(0,0,0,0.9),
+                                     0 4px 10px rgba(0,0,0,0.7),
+                                     inset 0 1px 0 rgba(255,255,255,0.15),
+                                     0 0 20px rgba(245,158,11,0.12)
                                    `,
-                                   transform: 'perspective(1000px) rotateX(1deg)',
-                                   transformStyle: 'preserve-3d'
                                  }}>
                               <div className="relative z-10">
-                                <div className="flex items-center gap-2 text-sm text-amber-300 mb-4 font-sora px-3">
-                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                                  <span className="uppercase tracking-wider font-semibold">Scheduled Payments</span>
+                                <div className="flex items-center gap-1 text-[10px] xl:text-xs text-amber-300 mb-1 xl:mb-2 font-sora px-1 xl:px-2">
+                                  <svg className="w-2 xl:w-3 h-2 xl:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                                  <span className="uppercase tracking-wider font-semibold">Scheduled</span>
                                 </div>
-                                <div className="space-y-3">
+                                <div className="space-y-1">
                                   {scheduled.map((p:any, idx:number) => {
                                     const due = new Date(p.dueAt)
                                     const nextMonthStart = new Date(due.getFullYear(), due.getMonth()+1, 1)
@@ -608,27 +594,24 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                       return `${months[d.getMonth()]} ${dd}${sfx}`
                                     }
                                     return (
-                                      <label key={p.id} className="flex items-center justify-between gap-3 cursor-pointer hover:bg-zinc-900/20 px-3 py-2 rounded transition-colors">
-                                        <div className="flex items-center gap-3">
-                                          <input type="checkbox" name="paymentId" value={p.id} form={`receive-${b.id}`} className="w-4 h-4 rounded border-2 border-zinc-400 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] checked:bg-emerald-500 checked:border-emerald-400 focus:ring-2 focus:ring-emerald-400/50 focus:ring-offset-0 accent-emerald-500" />
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{formatShortDate(due)}</span>
-                                            <span className="text-sm text-zinc-300 whitespace-nowrap font-sora">{(() => {
+                                      <label key={p.id} className="flex items-center justify-between gap-1 xl:gap-2 cursor-pointer hover:bg-zinc-900/20 px-1 xl:px-2 py-1 rounded transition-colors">
+                                        <div className="flex items-center gap-1 xl:gap-2">
+                                          <input type="checkbox" name="paymentId" value={p.id} form={`receive-${b.id}`} className="w-2 xl:w-3 h-2 xl:h-3 rounded border border-zinc-400 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] checked:bg-emerald-500 checked:border-emerald-400 focus:ring-1 focus:ring-emerald-400/50 focus:ring-offset-0 accent-emerald-500" />
+                                          <div className="flex flex-col">
+                                            <span className="text-[9px] xl:text-xs text-white font-semibold font-sora">{formatShortDate(due)}</span>
+                                            <span className="text-[9px] xl:text-xs text-zinc-300 font-sora truncate">{(() => {
                                               try {
                                                 const list = (payments || []).filter((x:any)=> x.purpose === 'monthly_rent').sort((a:any,c:any)=> new Date(a.dueAt||0).getTime() - new Date(c.dueAt||0).getTime())
                                                 const myIdx = list.findIndex((x:any)=> x.id === p.id)
                                                 const n = (myIdx >= 0 ? myIdx + 2 : 2)
                                                 const j = n % 10, k = n % 100
                                                 const ord = (k === 11 || k === 12 || k === 13) ? `${n}th` : (j===1?`${n}st`:(j===2?`${n}nd`:(j===3?`${n}rd`:`${n}th`)))
-                                                if (isLast && isPartial) {
-                                                  return `Monthly rent (${fmtShort(due)} - ${fmtShort(endLessOne)})`
-                                                }
-                                                return `Monthly rent (${ord} month rent)`
-                                              } catch { return 'Monthly rent' }
+                                                return `${ord} month`
+                                              } catch { return 'Monthly' }
                                             })()}</span>
                                           </div>
                                         </div>
-                                        <span className="text-lg font-bold text-white font-sora ml-auto text-right">
+                                        <span className="text-[11px] xl:text-sm font-bold text-white font-sora">
                                           €{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}
                                         </span>
                                       </label>
@@ -683,7 +666,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                         </svg>
                                         <span className="uppercase tracking-wider text-sm font-semibold font-sora">Unpaid Deposit</span>
                                       </div>
-                                      <span className="text-lg font-semibold text-white font-sora ml-auto text-right">€{amountEuros.toLocaleString('de-DE')}</span>
+                                      <span className="text-[11px] xl:text-sm font-semibold text-white font-sora ml-auto text-right">€{amountEuros.toLocaleString('de-DE')}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -706,7 +689,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       )
                     })()}
                   </td>
-                  <td className="px-4 py-3 text-sm align-top">
+                  <td className="px-2 py-3 text-sm align-top">
                     {(() => {
                       const now = new Date()
                       const overdueList = (b.payments||[])
@@ -715,7 +698,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       if (overdueList.length === 0) return <span className="text-white/40 text-xs">—</span>
                       const overdueCents = overdueList.reduce((s:number,p:any)=> s + (Number(p.amountCents)||0), 0)
                       return (
-                        <div className="relative rounded-xl px-0 py-4 overflow-hidden"
+                        <div className="relative rounded px-0 py-2 overflow-hidden"
                              style={{
                                background: `
                                  linear-gradient(145deg, rgba(5,5,5,0.98) 0%, rgba(20,20,20,0.99) 30%, rgba(15,15,15,0.98) 70%, rgba(8,8,8,0.97) 100%),
@@ -724,28 +707,25 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                                border: '1px solid rgba(239,68,68,0.4)',
                                backdropFilter: 'blur(25px) saturate(200%) contrast(120%)',
                                boxShadow: `
-                                 0 20px 60px rgba(0,0,0,0.9),
-                                 0 10px 30px rgba(0,0,0,0.7),
-                                 inset 0 2px 0 rgba(255,255,255,0.15),
-                                 inset 0 -1px 0 rgba(255,255,255,0.1),
-                                 0 0 40px rgba(239,68,68,0.12)
+                                 0 8px 20px rgba(0,0,0,0.9),
+                                 0 4px 10px rgba(0,0,0,0.7),
+                                 inset 0 1px 0 rgba(255,255,255,0.15),
+                                 0 0 20px rgba(239,68,68,0.12)
                                `,
-                               transform: 'perspective(1000px) rotateX(1deg)',
-                               transformStyle: 'preserve-3d'
                              }}>
                           <div className="relative z-10">
-                            <div className="flex items-center justify-between mb-4 px-3">
-                              <div className="flex items-center gap-2 text-sm text-red-300 font-sora">
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                <span className="uppercase tracking-wider font-semibold">Overdue Payments</span>
+                            <div className="flex items-center justify-between mb-1 xl:mb-2 px-1 xl:px-2">
+                              <div className="flex items-center gap-1 text-[10px] xl:text-xs text-red-300 font-sora">
+                                <svg className="w-2 xl:w-3 h-2 xl:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                <span className="uppercase tracking-wider font-semibold">Overdue</span>
                               </div>
-                              <span className="font-semibold text-white">€{Math.round(overdueCents/100).toLocaleString('de-DE')}</span>
+                              <span className="font-semibold text-[11px] xl:text-sm text-white">€{Math.round(overdueCents/100).toLocaleString('de-DE')}</span>
                             </div>
-                            <div className="space-y-3">
-                              {overdueList.map((p:any)=> (
-                                <div key={p.id} className="flex items-center justify-between gap-3 px-3 py-2">
-                                  <span className="text-sm text-white font-semibold whitespace-nowrap font-sora">{formatShortDate(new Date(p.dueAt))}</span>
-                                  <span className="text-lg font-bold text-white font-sora ml-auto text-right">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
+                            <div className="space-y-1">
+                              {overdueList.slice(0,2).map((p:any)=> (
+                                <div key={p.id} className="flex items-center justify-between gap-1 xl:gap-2 px-1 xl:px-2 py-1">
+                                  <span className="text-[9px] xl:text-xs text-white font-semibold font-sora">{formatShortDate(new Date(p.dueAt))}</span>
+                                  <span className="text-[11px] xl:text-sm font-bold text-white font-sora">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</span>
                                 </div>
                               ))}
                             </div>
@@ -754,25 +734,25 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
                       )
                     })()}
                   </td>
-                  <td className="px-3 py-4 text-sm">
+                  <td className="px-1 xl:px-2 py-2 xl:py-3 text-sm">
                     {b.status === 'confirmed' ? (
-                      <div className="flex items-center gap-1">
-                        <span className="inline-flex items-center px-2 py-1 rounded text-xs border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 font-semibold font-sora">
+                      <div className="flex flex-col gap-1">
+                        <span className="inline-flex items-center px-1 xl:px-2 py-1 rounded text-[9px] xl:text-xs border border-emerald-400/30 bg-emerald-500/10 text-emerald-300 font-semibold font-sora text-center">
                           Confirmed
                         </span>
                         <DeleteButton id={b.id} />
                       </div>
                     ) : (
                       <div className="flex flex-col gap-1">
-                        <form action="/api/admin/bookings" method="post" className="flex items-center gap-1">
+                        <form action="/api/admin/bookings" method="post" className="flex flex-col gap-1">
                           <input type="hidden" name="id" value={b.id} />
-                          <select name="status" defaultValue={b.status} className="bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-2 py-1 text-xs text-white font-sora">
+                          <select name="status" defaultValue={b.status} className="bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded px-1 py-1 text-[9px] xl:text-xs text-white font-sora w-full">
                             <option value="hold" className="bg-black">Hold</option>
                             <option value="confirmed" className="bg-black">Confirmed</option>
                             <option value="cancelled" className="bg-black">Cancelled</option>
                             <option value="__delete__" className="bg-black">DELETE</option>
                           </select>
-                          <button className="px-2 py-1 text-xs rounded bg-amber-500 hover:bg-amber-600 text-black font-semibold font-sora">Save</button>
+                          <button className="px-1 xl:px-2 py-1 text-[9px] xl:text-xs rounded bg-amber-500 hover:bg-amber-600 text-black font-semibold font-sora w-full">Save</button>
                         </form>
                         <DeleteButton id={b.id} />
                       </div>
