@@ -32,24 +32,25 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       }
     })
 
-    // Calculate monthly data for charts (last 12 months)
+    // Calculate monthly data for charts (last 12 months) - use same logic as Monthly Revenue tile
     const monthlyData = []
     for (let i = 11; i >= 0; i--) {
       const date = new Date()
       date.setMonth(date.getMonth() - i)
-      const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
-      const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
+      const chartMonthStart = new Date(date.getFullYear(), date.getMonth(), 1)
+      const chartMonthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
 
-      const [monthRevenue, monthBookingRevenue, monthExpenses] = await Promise.all([
-        // Manual revenue entries
+      // Use the SAME calculation as Monthly Revenue tile to ensure consistency
+      const [chartManualRevenue, chartBookingRevenue, chartExpenses, chartRecurringExpenses, chartFixedExpenses] = await Promise.all([
+        // Manual revenue entries for this month
         (prisma as any).revenue.aggregate({
           where: {
             propertyId: params.propertyId,
-            date: { gte: monthStart, lte: monthEnd }
+            date: { gte: chartMonthStart, lte: chartMonthEnd }
           },
           _sum: { amount: true }
         }),
-        // Revenue from booking payments received in this month
+        // Revenue from confirmed bookings with payments in this month
         (prisma as any).booking.findMany({
           where: {
             propertyId: params.propertyId,
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
             payments: {
               some: {
                 status: 'received',
-                receivedAt: { gte: monthStart, lte: monthEnd }
+                receivedAt: { gte: chartMonthStart, lte: chartMonthEnd }
               }
             }
           },
@@ -65,31 +66,56 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
             payments: {
               where: {
                 status: 'received',
-                receivedAt: { gte: monthStart, lte: monthEnd }
+                receivedAt: { gte: chartMonthStart, lte: chartMonthEnd }
               }
             }
           }
         }),
+        // Expenses actually incurred in this month
         (prisma as any).expense.aggregate({
           where: {
             propertyId: params.propertyId,
-            date: { gte: monthStart, lte: monthEnd }
+            date: { gte: chartMonthStart, lte: chartMonthEnd }
+          },
+          _sum: { amount: true }
+        }),
+        // Monthly recurring expenses (only if created before this month)
+        (prisma as any).expense.aggregate({
+          where: {
+            propertyId: params.propertyId,
+            isRecurring: true,
+            recurringType: 'monthly',
+            createdAt: { lte: chartMonthEnd }
+          },
+          _sum: { amount: true }
+        }),
+        // Fixed/one-time expenses that occurred in this month only
+        (prisma as any).expense.aggregate({
+          where: {
+            propertyId: params.propertyId,
+            isRecurring: false,
+            date: { gte: chartMonthStart, lte: chartMonthEnd }
           },
           _sum: { amount: true }
         })
       ])
 
-      // Calculate total revenue including booking payments
-      const manualRevenueAmount = monthRevenue._sum?.amount || 0
-      const bookingRevenueAmount = monthBookingRevenue.reduce((sum: number, booking: any) => {
+      // Calculate revenue using EXACT same logic as Monthly Revenue tile
+      const chartManualRevenueAmount = chartManualRevenue._sum?.amount || 0
+      const chartBookingRevenueAmount = chartBookingRevenue.reduce((sum: number, booking: any) => {
         return sum + booking.payments.reduce((paySum: number, payment: any) => paySum + (payment.amountCents / 100), 0)
       }, 0)
-      const totalMonthRevenue = manualRevenueAmount + bookingRevenueAmount
+      const chartMonthlyRevenue = chartManualRevenueAmount + chartBookingRevenueAmount
+
+      // Calculate expenses using same logic as Monthly Revenue tile
+      const chartFixedExpensesAmount = chartFixedExpenses._sum?.amount || 0
+      const chartRecurringExpensesAmount = chartRecurringExpenses._sum?.amount || 0
+      const chartTotalMonthlyExpenses = chartFixedExpensesAmount + chartRecurringExpensesAmount
 
       monthlyData.push({
         month: date.toLocaleDateString('en-US', { month: 'short' }),
-        revenue: Math.round(totalMonthRevenue),
-        expenses: monthExpenses._sum?.amount || 0
+        revenue: Math.round(chartMonthlyRevenue),
+        expenses: Math.round(chartTotalMonthlyExpenses)
       })
     }
 
