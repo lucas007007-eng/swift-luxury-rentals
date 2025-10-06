@@ -210,6 +210,22 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
     const netProfit = monthlyRevenue - totalMonthlyExpenses
     const roi = financials.totalInvestment > 0 ? ((netProfit * 12) / financials.totalInvestment) * 100 : 0
 
+    // Update monthlyData to use the SAME monthlyRevenue value for the selected month
+    const updatedMonthlyData = monthlyData.map(item => {
+      const itemDate = new Date()
+      itemDate.setMonth(itemDate.getMonth() - (11 - monthlyData.indexOf(item)))
+      
+      // If this is the selected month, use the exact Monthly Revenue tile calculation
+      if (itemDate.getMonth() === month && itemDate.getFullYear() === year) {
+        return {
+          ...item,
+          revenue: Math.round(monthlyRevenue), // Use exact same value as Monthly Revenue tile
+          expenses: Math.round(totalMonthlyExpenses) // Use exact same value as expenses calculation
+        }
+      }
+      return item
+    })
+
     await prisma.$disconnect()
 
     return NextResponse.json({
@@ -221,7 +237,7 @@ export async function GET(req: NextRequest, { params }: { params: { propertyId: 
       totalMonthlyExpenses: Math.round(totalMonthlyExpenses),
       netProfit: Math.round(netProfit),
       roi: Math.round(roi * 10) / 10,
-      monthlyData,
+      monthlyData: updatedMonthlyData,
       investmentBreakdown: breakdown,
       selectedMonth: month,
       selectedYear: year
