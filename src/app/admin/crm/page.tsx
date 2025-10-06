@@ -172,19 +172,29 @@ export default function AdminCRMPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/crm2/leads', { cache: 'no-store' })
-        const json = await res.json()
-        if (!json.ok) throw new Error(json.error || 'load-failed')
-        setLeads(json.data || [])
-        const a = await fetch('/api/crm2/activities', { cache: 'no-store' })
-        const aj = await a.json()
-        if (aj.ok) setActivities(aj.data || [])
-        const c = await fetch('/api/crm2/companies', { cache: 'no-store' })
-        const cj = await c.json()
-        if (cj.ok) setCompanies(cj.data || [])
-        const d = await fetch('/api/crm2/deals', { cache: 'no-store' })
-        const dj = await d.json()
-        if (dj.ok) setDeals(dj.data || [])
+        // Load all data in parallel for better performance
+        const [leadsRes, activitiesRes, companiesRes, dealsRes, ownersRes] = await Promise.all([
+          fetch('/api/crm2/leads', { cache: 'no-store' }),
+          fetch('/api/crm2/activities', { cache: 'no-store' }),
+          fetch('/api/crm2/companies', { cache: 'no-store' }),
+          fetch('/api/crm2/deals', { cache: 'no-store' }),
+          fetch('/api/crm2/owners', { cache: 'no-store' })
+        ])
+        
+        const [leadsData, activitiesData, companiesData, dealsData, ownersData] = await Promise.all([
+          leadsRes.json(),
+          activitiesRes.json(),
+          companiesRes.json(),
+          dealsRes.json(),
+          ownersRes.json()
+        ])
+        
+        if (leadsData.ok) setLeads(leadsData.data || [])
+        if (activitiesData.ok) setActivities(activitiesData.data || [])
+        if (companiesData.ok) setCompanies(companiesData.data || [])
+        if (dealsData.ok) setDeals(dealsData.data || [])
+        if (ownersData.ok) setOwners(ownersData.data || [])
+        
       } catch (e: any) {
         setError(e?.message || 'load-failed')
       } finally {
