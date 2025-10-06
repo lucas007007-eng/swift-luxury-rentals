@@ -102,7 +102,7 @@ export default function AdminCRMPage() {
       const dealValueCents = dl ? Number(dl.monthlyRateCents || 0) * Math.max(1, Number(dl.termMonths || 1)) : 0
       const budgetCents = Number(l.budgetCents || 0)
       const valueCents = Math.max(dealValueCents, budgetCents)
-      // Normalize value to 0..60 (e.g., Γé¼0..Γé¼50k scaled)
+      // Normalize value to 0..60 (e.g., €0..€50k scaled)
       const valueScore = Math.max(0, Math.min(60, Math.round((valueCents / 100) / 50000 * 60)))
       // Urgency from SLA consumption -> 0..40
       const slaDays = STAGE_SLA_DAYS[l.stage] ?? 0
@@ -122,7 +122,7 @@ export default function AdminCRMPage() {
       }
       return Math.max(0, Math.min(100, valueScore + urgencyScore))
     } catch {
-      return 0
+    return 0
     }
   }
   const jumpToBreaches = () => {
@@ -521,13 +521,13 @@ export default function AdminCRMPage() {
             await fetch('/api/crm2/activities',{ method:'PATCH', body: JSON.stringify({ id, complete: true }) })
             setActivities(prev=> prev.map(x=> x.id===id ? { ...x, completedAt: new Date().toISOString() } : x))
           }} />
-        </div>
+            </div>
         {error && (
           <div className="mb-4 rounded-lg border border-red-400/40 bg-red-500/10 text-red-300 px-4 py-3 flex items-center justify-between">
             <div className="text-sm">{error}</div>
             <button onClick={()=>setError(null)} className="text-xs px-2 py-1 rounded border border-red-400/40">Dismiss</button>
-          </div>
-        )}
+              </div>
+            )}
         {/* Header Row */}
         <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="luxury-feature-card p-8">
@@ -542,7 +542,7 @@ export default function AdminCRMPage() {
               <div className="luxury-feature-card p-3 text-center">
                 <div className="text-xs text-zinc-300">New (7d)</div>
                 <div className="text-2xl font-bold text-white">{kpis.newWeek}</div>
-              </div>
+          </div>
               <div className="luxury-feature-card p-3 text-center">
                 <div className="text-xs text-zinc-300">Offers Out</div>
                 <div className="text-2xl font-bold text-white">{kpis.offers}</div>
@@ -563,7 +563,7 @@ export default function AdminCRMPage() {
             {/* SLA Legend */}
             <div className="mt-3 flex items-center gap-4 text-xs text-zinc-300">
               <div className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded bg-emerald-400/70"></span><span>On pace (&lt; 80%)</span></div>
-              <div className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded bg-amber-400/70"></span><span>Due (80ΓÇô100%)</span></div>
+              <div className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded bg-amber-400/70"></span><span>Due (80–100%)</span></div>
               <div className="flex items-center gap-1"><span className="inline-block w-3 h-3 rounded bg-red-500/70"></span><span>Breached (&gt; 100%)</span></div>
             </div>
           </div>
@@ -592,7 +592,7 @@ export default function AdminCRMPage() {
               <button onClick={()=>setNewLeadOpen(true)} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all">New Lead</button>
               {selectedIds.length>0 && (
                 <>
-                  <button
+                <button
                     className="px-3 py-2 text-xs rounded border border-zinc-400/30 text-white"
                     onClick={async ()=>{
                       const newOwner = prompt('Assign owner (email) to selected:') || ''
@@ -628,10 +628,10 @@ export default function AdminCRMPage() {
                 <button onClick={jumpToBreaches} className="px-3 py-2 text-xs rounded border border-red-400/40 text-red-300 hover:border-red-300/60">Jump to Breaches</button>
                 <button onClick={jumpToDue} className="px-3 py-2 text-xs rounded border border-amber-400/40 text-amber-300 hover:border-amber-300/60">Jump to Due (24h)</button>
                 <button onClick={generateLeasesForSelected} className="px-3 py-2 text-xs rounded border border-emerald-400/40 text-white hover:border-emerald-300/60">Generate Lease PDFs</button>
-              </div>
             </div>
-          </div>
-        </div>
+                  </div>
+                </div>
+            </div>
 
         {/* Tabs */}
         <div className="mb-4 flex items-center gap-3">
@@ -651,11 +651,11 @@ export default function AdminCRMPage() {
               </select>
             </div>
           )}
-        </div>
+          </div>
 
         {/* Content */}
-        {loading ? (
-          <div className="luxury-feature-card p-8">LoadingΓÇª</div>
+            {loading ? (
+          <div className="luxury-feature-card p-8">Loading…</div>
         ) : error ? (
           <div className="luxury-feature-card p-8 text-red-300">Failed to load: {error}</div>
         ) : activeTab==='board' ? (
@@ -691,7 +691,7 @@ export default function AdminCRMPage() {
                       <div className="mb-2 flex items-center gap-2 text-[11px] text-zinc-300">
                         <input type="checkbox" checked={!!selected[l.id]} onChange={(e)=> setSelected(prev=> ({ ...prev, [l.id]: e.target.checked }))} onClick={(e)=> e.stopPropagation()} />
                         <span>Select</span>
-                      </div>
+                  </div>
                       {stage==='lease' && (
                         <div className="mb-1 flex items-center justify-between gap-2">
                           <label className="flex items-center gap-2 text-[11px] text-zinc-300">
@@ -703,7 +703,7 @@ export default function AdminCRMPage() {
                             onClick={(e)=> { e.stopPropagation(); generateLeaseForLead(l) }}
                             title="Generate lease PDF now"
                           >Generate Lease</button>
-                        </div>
+                  </div>
                       )}
                       {stage==='offer' && (
                         <div className="mb-1 flex items-center justify-end gap-2">
@@ -737,20 +737,20 @@ export default function AdminCRMPage() {
                             }}
                             title="Generate quote PDF"
                           >Quote PDF</button>
-                        </div>
+                    </div>
                       )}
                       <div className="flex items-center justify-between">
                         <div className="text-white font-semibold font-sora truncate">{l.name}</div>
                         <div className="text-xs text-zinc-400 ml-2 flex items-center gap-2">
-                          <span>{l.company || 'ΓÇö'}</span>
+                          <span>{l.company || '—'}</span>
                           <span className="px-1.5 py-0.5 rounded border border-zinc-500/40 text-[10px] text-zinc-300" title="Lead Score">
                             {getLeadScore(l)}
                           </span>
-                        </div>
-                      </div>
-                      <div className="text-xs text-zinc-300 mt-1 truncate">{l.email || 'no-email'}{l.phone ? ` ΓÇó ${l.phone}` : ''}</div>
+                    </div>
+                  </div>
+                      <div className="text-xs text-zinc-300 mt-1 truncate">{l.email || 'no-email'}{l.phone ? ` • ${l.phone}` : ''}</div>
                       <div className="text-xs text-zinc-400 mt-1 flex items-center justify-between">
-                        <span>{l.city || 'ΓÇö'}</span>
+                        <span>{l.city || '—'}</span>
                         <span className="text-white">{(() => {
                           let cents = Number((l as any).budgetCents || 0)
                           if (!cents || cents <= 0) {
@@ -806,18 +806,18 @@ export default function AdminCRMPage() {
                         const slaMs = sla*24*60*60*1000
                         const pct = Math.max(0, Math.min(100, Math.round((ageMs / slaMs) * 100)))
                         const color = ageMs > slaMs ? 'bg-red-500/70' : (pct > 80 ? 'bg-amber-400/70' : 'bg-emerald-400/70')
-                        return (
+                          return (
                           <div className="mt-1 h-1.5 bg-zinc-700/40 rounded" title={`SLA ${pct}% used`}>
                             <div className={`h-full rounded ${color}`} style={{ width: `${pct}%` }} />
-                          </div>
-                        )
+                            </div>
+                          )
                       })()}
                     </button>
                   ))}
-                </div>
-              </div>
+                    </div>
+                        </div>
             ))}
-          </div>
+                    </div>
         ) : (
           <div className="luxury-feature-card p-4">
             <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Renewals in next {renewalDays} days</div>
@@ -858,7 +858,7 @@ export default function AdminCRMPage() {
                       <td className="px-2 py-2"><input type="checkbox" checked={!!r.__sel} onChange={(e)=> setRenewals(prev=> prev.map((x:any)=> x.id===r.id ? { ...x, __sel: e.target.checked } : x))} /></td>
                       <td className="px-2 py-2 text-zinc-200">{r.checkout ? `${new Date(r.checkout).toLocaleDateString()} (${(()=>{ const t=new Date(); t.setHours(0,0,0,0); return Math.ceil((new Date(r.checkout).getTime()-t.getTime())/(24*60*60*1000))})()}d)` : ''}</td>
                       <td className="px-2 py-2 text-zinc-300 flex items-center gap-2">
-                        <span>{r.userName || r.userEmail || 'ΓÇö'}</span>
+                        <span>{r.userName || r.userEmail || '—'}</span>
                         {r.__reminded && <span className="text-emerald-300 text-[11px]">Reminder created</span>}
                         {!r.userEmail && <button className="px-2 py-0.5 text-[10px] rounded border border-emerald-400/30 text-white" onClick={async()=>{
                           const email = prompt('Email for new lead:') || ''
@@ -870,8 +870,8 @@ export default function AdminCRMPage() {
                           } catch { alert('Failed to create lead') }
                         }}>Create + Assign</button>}
                       </td>
-                      <td className="px-2 py-2 text-zinc-300">{r.propertyTitle || 'ΓÇö'}</td>
-                      <td className="px-2 py-2 text-zinc-300">{r.city || 'ΓÇö'}</td>
+                      <td className="px-2 py-2 text-zinc-300">{r.propertyTitle || '—'}</td>
+                      <td className="px-2 py-2 text-zinc-300">{r.city || '—'}</td>
                       <td className="px-2 py-2 text-right">
                         {/* Inline Assign Lead (if lead exists by email) */}
                         {(() => {
@@ -885,7 +885,7 @@ export default function AdminCRMPage() {
                                 {(owners.length? owners: TEAM_OWNERS).map(o=> <option key={o} className="bg-black" value={o}>{o}</option>)}
                               </select>
                               <button className="px-2 py-1 text-[10px] rounded border border-zinc-400/30 text-white" onClick={async()=>{ const sel=(document.getElementById(`assign-${r.id}`) as HTMLSelectElement)?.value||''; try{ await fetch('/api/crm2/leads',{ method:'PATCH', body: JSON.stringify({ id: lead.id, owner: sel }) }); setLeads(prev=> prev.map(x=> x.id===lead.id ? { ...x, owner: sel } : x)); alert('Owner assigned'); }catch{ alert('Failed to assign') } }}>Assign</button>
-                            </span>
+                    </span>
                           )
                         })()}
                         <button className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white" onClick={()=> createRenewalReminder(r)}>Create Reminder</button>
@@ -905,11 +905,11 @@ export default function AdminCRMPage() {
                   for (const r of selected) { await createRenewalReminder(r) }
                   try { const el=document.getElementById('renewal-toast'); if (el) { el.textContent = `Created ${selected.length} reminder${selected.length>1?'s':''}`; el.style.display='inline'; setTimeout(()=>{ if (el) el.style.display='none' }, 2000) } } catch {}
                 }}>Create Reminders for Selected</button>
-              </div>
-            </div>
+                    </div>
+                  </div>
+                </div>
+            )}
           </div>
-        )}
-      </div>
 
       {/* New Lead Modal */}
       {newLeadOpen && (
@@ -928,18 +928,18 @@ export default function AdminCRMPage() {
                   const res = await fetch('/api/crm2/companies', { method:'POST', body: JSON.stringify(newCompany) })
                   const j = await res.json(); if (j.ok) setCompanies(prev=> [j.data, ...prev]); setNewCompany({ name: '' })
                 }} className="px-3 py-2 rounded-lg border border-zinc-400/30 text-white">Add Co</button>
-              </div>
+                          </div>
               <datalist id="crm2-company-datalist">
                 {companies.map(c=> <option key={c.id} value={c.name} />)}
               </datalist>
               <div className="grid grid-cols-2 gap-3">
                 <input placeholder="New company name" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={newCompany.name} onChange={e=>setNewCompany({ ...newCompany, name: e.target.value })} />
                 <input placeholder="domain.com (opt)" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={newCompany.domain||''} onChange={e=>setNewCompany({ ...newCompany, domain: e.target.value })} />
-              </div>
+                        </div>
               <div className="grid grid-cols-2 gap-3">
                 <input placeholder="City" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.city||''} onChange={e=>setForm({...form, city:e.target.value})} />
-                <input placeholder="Budget (Γé¼)" type="number" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.budgetCents? String(Number(form.budgetCents)/100):''} onChange={e=>setForm({...form, budgetCents: Math.round(Number(e.target.value||0)*100)})} />
-              </div>
+                <input placeholder="Budget (€)" type="number" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.budgetCents? String(Number(form.budgetCents)/100):''} onChange={e=>setForm({...form, budgetCents: Math.round(Number(e.target.value||0)*100)})} />
+                          </div>
               <select className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded-lg px-3 py-2 text-sm text-white font-sora" value={form.stage||'new'} onChange={e=>setForm({...form, stage:e.target.value})}>
                 {STAGES.map(s=> <option key={s} value={s} className="bg-black">{s}</option>)}
               </select>
@@ -961,7 +961,7 @@ export default function AdminCRMPage() {
               <div>
                 <div className="font-mono uppercase tracking-wider text-sm text-emerald-400">Lead</div>
                 <div className="text-2xl font-bold heading-sora text-white">{drawerLead.name}</div>
-                <div className="text-zinc-300 text-sm">{drawerLead.company || 'ΓÇö'} ΓÇó {drawerLead.city || 'ΓÇö'}</div>
+                <div className="text-zinc-300 text-sm">{drawerLead.company || '—'} • {drawerLead.city || '—'}</div>
               </div>
               <button onClick={()=>setDrawerLead(null)} className="px-3 py-2 rounded-lg border border-zinc-400/30 text-white">Close</button>
             </div>
@@ -993,7 +993,7 @@ export default function AdminCRMPage() {
               <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.company||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, company: e.target.value } : prev)} placeholder="Company" />
               <div className="grid grid-cols-2 gap-3">
                 <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.city||''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, city: e.target.value } : prev)} placeholder="City" />
-                <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.budgetCents? String(Number(drawerLead.budgetCents)/100):''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, budgetCents: Math.round(Number(e.target.value||0)*100) } : prev)} placeholder="Budget (Γé¼)" />
+                <input className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" value={drawerLead.budgetCents? String(Number(drawerLead.budgetCents)/100):''} onChange={e=> setDrawerLead(prev=> prev ? { ...prev, budgetCents: Math.round(Number(e.target.value||0)*100) } : prev)} placeholder="Budget (€)" />
               </div>
               <div className="flex items-center justify-end">
                 <button className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all" onClick={async ()=>{
@@ -1030,8 +1030,8 @@ export default function AdminCRMPage() {
                 {matches.map((m:any)=> (
                   <a key={m.id} href={`/admin/property/${m.extId||''}`} className="block rounded border border-zinc-600/40 p-2 hover:border-zinc-400/60">
                     <div className="text-white text-sm font-semibold">{m.title}</div>
-                    <div className="text-zinc-400 text-xs">{m.address || 'ΓÇö'}</div>
-                    <div className="text-zinc-300 text-xs">Γé¼{Number(m.priceMonthly||0).toLocaleString('de-DE')}/mo</div>
+                    <div className="text-zinc-400 text-xs">{m.address || '—'}</div>
+                    <div className="text-zinc-300 text-xs">€{Number(m.priceMonthly||0).toLocaleString('de-DE')}/mo</div>
                   </a>
                 ))}
                 {matches.length===0 && (<div className="text-zinc-400 text-sm">No matches yet</div>)}
@@ -1047,7 +1047,7 @@ export default function AdminCRMPage() {
                   const today = new Date(); today.setHours(0,0,0,0)
                   const isOverdue = !!due && due < today.getTime() && !a.completedAt
                   const isToday = !!due && due >= today.getTime() && due < today.getTime()+24*60*60*1000 && !a.completedAt
-                  return (
+                          return (
                     <div key={a.id} className="flex items-center justify-between text-sm">
                       <div className="text-zinc-300 truncate">
                         {a.type}: {a.content}
@@ -1063,8 +1063,8 @@ export default function AdminCRMPage() {
                           </>
                         )}
                       </div>
-                    </div>
-                  )
+                            </div>
+                          )
                 })}
               </div>
               <AddActivity leadId={drawerLead.id} onAdd={(row)=> setActivities(prev=> [row, ...prev])} />
@@ -1149,9 +1149,9 @@ export default function AdminCRMPage() {
                     </>), document.body)}
                 </div>
                 <input id="qb_term" type="number" placeholder="Term (months)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
-                <input id="qb_rate" type="number" placeholder="Monthly rate (Γé¼)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
-                <input id="qb_deposit" type="number" placeholder="Deposit (Γé¼)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
-                <input id="qb_movein" type="number" placeholder="Move-in fee (Γé¼)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input id="qb_rate" type="number" placeholder="Monthly rate (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input id="qb_deposit" type="number" placeholder="Deposit (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
+                <input id="qb_movein" type="number" placeholder="Move-in fee (€)" className="w-full bg-black/40 border border-zinc-600/50 rounded px-3 py-2 text-sm text-white" />
               </div>
               <div className="flex items-center justify-end mt-3">
                 <button
@@ -1175,7 +1175,7 @@ export default function AdminCRMPage() {
                         setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, stage: 'offer' } : x))
                         await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, stage: 'offer' }) })
                         // Activity
-                        await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Sent quote for ${city||'ΓÇö'} ΓÇó Γé¼${(monthlyRateCents/100).toLocaleString('de-DE')}/mo` }) })
+                        await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Sent quote for ${city||'—'} • €${(monthlyRateCents/100).toLocaleString('de-DE')}/mo` }) })
                         alert('Quote created')
                       } else {
                         alert('Failed to create quote')
@@ -1191,7 +1191,7 @@ export default function AdminCRMPage() {
             {/* Latest Quote */}
             <div className="luxury-feature-card p-4 mt-6 mb-6">
               <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Latest Quote</div>
-              {(() => {
+                            {(() => {
                 const list = deals.filter(d=> d.leadId === drawerLead.id)
                   .sort((a,b)=> new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime())
                 const q = list[0]
@@ -1199,15 +1199,15 @@ export default function AdminCRMPage() {
                 const rate = (Number(q.monthlyRateCents||0)/100).toLocaleString('de-DE')
                 const dep = (Number(q.depositCents||0)/100).toLocaleString('de-DE')
                 const mv = (Number(q.moveInFeeCents||0)/100).toLocaleString('de-DE')
-                return (
+                              return (
                   <div className="space-y-2">
-                    <div className="text-white text-sm font-semibold">{q.city || 'ΓÇö'} ΓÇó {q.termMonths||1} mo ΓÇó Γé¼{rate}/mo</div>
-                    <div className="text-zinc-300 text-sm">Deposit Γé¼{dep} ΓÇó Move-in Γé¼{mv} ΓÇó Property {q.propertyExtId}</div>
+                    <div className="text-white text-sm font-semibold">{q.city || '—'} • {q.termMonths||1} mo • €{rate}/mo</div>
+                    <div className="text-zinc-300 text-sm">Deposit €{dep} • Move-in €{mv} • Property {q.propertyExtId}</div>
                     <div className="flex items-center gap-2">
                       <button
                         className="px-3 py-1 text-xs rounded border border-zinc-400/30 text-white"
                         onClick={()=>{
-                          const text = `Quote for ${drawerLead.name}: ${q.city||'ΓÇö'} ΓÇó ${q.termMonths||1} months ΓÇó Γé¼${rate}/mo\nDeposit Γé¼${dep} ΓÇó Move-in Γé¼${mv} ΓÇó Property ${q.propertyExtId}`
+                          const text = `Quote for ${drawerLead.name}: ${q.city||'—'} • ${q.termMonths||1} months • €${rate}/mo\nDeposit €${dep} • Move-in €${mv} • Property ${q.propertyExtId}`
                           navigator.clipboard?.writeText(text)
                         }}>Copy Summary</button>
                       <button
@@ -1216,14 +1216,14 @@ export default function AdminCRMPage() {
                           const term = prompt('Update term (months):', String(q.termMonths||1))
                           if (!term) return
                           const newTerm = Math.max(1, Number(term))
-                          const rateIn = prompt('Update monthly rate (Γé¼):', String(Number(q.monthlyRateCents||0)/100))
+                          const rateIn = prompt('Update monthly rate (€):', String(Number(q.monthlyRateCents||0)/100))
                           if (!rateIn) return
                           const newRateCents = Math.round(Number(rateIn)*100)
                           try {
                             const res = await fetch(`/api/crm2/deals/${q.id}`, { method:'PATCH', body: JSON.stringify({ termMonths: newTerm, monthlyRateCents: newRateCents }) })
                             const j = await res.json(); if (j.ok) {
                               setDeals(prev=> prev.map(d=> d.id===q.id ? { ...d, termMonths:newTerm, monthlyRateCents:newRateCents } : d))
-                              await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Updated quote to ${newTerm} mo ΓÇó Γé¼${(newRateCents/100).toLocaleString('de-DE')}/mo` }) })
+                              await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Updated quote to ${newTerm} mo • €${(newRateCents/100).toLocaleString('de-DE')}/mo` }) })
                               alert('Quote updated')
                             } else alert('Failed to update quote')
                           } catch { alert('Failed to update quote') }
@@ -1279,7 +1279,7 @@ export default function AdminCRMPage() {
                           setLeads(prev=> prev.map(x=> x.id===drawerLead.id ? { ...x, stage: 'signed' } : x))
                           try {
                             await fetch('/api/crm2/leads', { method:'PATCH', body: JSON.stringify({ id: drawerLead.id, stage: 'signed' }) })
-                            await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Client accepted quote ΓÇó property ${q.propertyExtId}` }) })
+                            await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Client accepted quote • property ${q.propertyExtId}` }) })
                           } catch {}
                         }}>Mark Signed</button>
                       <button
@@ -1300,7 +1300,7 @@ export default function AdminCRMPage() {
                             }) })
                             const j = await res.json()
                             if (j.ok) {
-                              await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Created booking from quote ΓÇó property ${q.propertyExtId}` }) })
+                              await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead.id, type:'note', content:`Created booking from quote • property ${q.propertyExtId}` }) })
                               const count = j.data.payments?.length||0
                               const url = j.data.adminUrl || '/admin/bookings'
                               setBookingPreview({ id: j.data.id, payments: j.data.payments || [] })
@@ -1311,10 +1311,10 @@ export default function AdminCRMPage() {
                           } catch (e:any) { setError(e?.message || 'Failed to create booking'); alert('Failed to create booking') }
                         }}>Create Booking</button>
                     </div>
-                  </div>
-                )
-              })()}
-            </div>
+                                </div>
+                              )
+                            })()}
+                          </div>
 
             {/* Scheduled Payments Preview (after booking creation) */}
             {bookingPreview && (
@@ -1322,21 +1322,21 @@ export default function AdminCRMPage() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="font-mono uppercase tracking-wider text-sm text-white">Scheduled Payments</div>
                   <div className="text-zinc-300 text-xs">Booking {bookingPreview.id.slice(0,8)}</div>
-                </div>
-                <div className="space-y-2">
+                          </div>
+                        <div className="space-y-2">
                   {(bookingPreview.payments || []).map((p:any)=> (
                     <div key={p.id || `${p.purpose}-${p.dueAt}`} className="flex items-center justify-between rounded border border-zinc-600/40 bg-black/30 px-3 py-2">
                       <div className="text-sm text-zinc-300 capitalize">{String(p.purpose).replace('_',' ')}</div>
                       <div className="text-xs text-zinc-400">{p.dueAt ? new Date(p.dueAt).toLocaleDateString() : ''}</div>
-                      <div className="text-sm text-white">Γé¼{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</div>
-                    </div>
+                      <div className="text-sm text-white">€{Math.round((Number(p.amountCents)||0)/100).toLocaleString('de-DE')}</div>
+                        </div>
                   ))}
                   {(bookingPreview.payments || []).length === 0 && (
                     <div className="text-zinc-400 text-sm">No payments created</div>
                   )}
                 </div>
                 <div className="flex items-center justify-end gap-2 mt-3">
-                  <button
+                          <button
                     className="px-3 py-1 text-xs rounded border border-emerald-400/30 text-white"
                     onClick={async ()=>{
                       try {
@@ -1345,7 +1345,7 @@ export default function AdminCRMPage() {
                         if (res.ok && j?.url) {
                           await fetch('/api/crm2/activities', { method:'POST', body: JSON.stringify({ leadId: drawerLead!.id, type:'note', content:`Lease PDF generated for booking ${bookingPreview.id}` }) })
                           window.open(j.url, '_blank')
-                        } else {
+                                } else {
                           setError(j?.message || 'Failed to generate lease')
                           alert('Failed to generate lease')
                         }
@@ -1428,7 +1428,7 @@ function AddActivity({ leadId, onAdd }: { leadId: string; onAdd: (row:any)=>void
             className="w-full text-left bg-black/40 border border-zinc-600/50 rounded px-2 py-1 text-xs text-white hover:border-zinc-400/60"
           >
             {dueAt ? new Date(dueAt).toLocaleDateString('en-GB') : 'Due date'}
-          </button>
+                          </button>
           {open && pos && mounted && createPortal((
             <>
               <div className="fixed inset-0 z-[999]" onClick={()=> setOpen(false)} />
@@ -1437,7 +1437,7 @@ function AddActivity({ leadId, onAdd }: { leadId: string; onAdd: (row:any)=>void
                   <button className="px-2 py-0.5 text-[10px] rounded border border-zinc-500/40 text-white" onClick={()=> setCursor(new Date(cursor.getFullYear(), cursor.getMonth()-1, 1))}>{'<'}</button>
                   <div className="text-white text-xs font-semibold">{cursor.toLocaleString('en-US',{ month:'long', year:'numeric'})}</div>
                   <button className="px-2 py-0.5 text-[10px] rounded border border-zinc-500/40 text-white" onClick={()=> setCursor(new Date(cursor.getFullYear(), cursor.getMonth()+1, 1))}>{'>'}</button>
-                </div>
+          </div>
                 <div className="grid grid-cols-7 gap-1 text-[10px] text-zinc-300">
                   {['Mo','Tu','We','Th','Fr','Sa','Su'].map(d=> (<div key={d} className="text-center opacity-70">{d}</div>))}
                   {(() => {
@@ -1455,8 +1455,8 @@ function AddActivity({ leadId, onAdd }: { leadId: string; onAdd: (row:any)=>void
                     }
                     return cells
                   })()}
-                </div>
-              </div>
+        </div>
+      </div>
             </>
           ), document.body)}
         </div>
