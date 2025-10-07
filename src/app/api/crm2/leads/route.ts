@@ -124,4 +124,75 @@ export async function PATCH(req: Request) {
   return NextResponse.json({ ok: false, error: 'not-found' }, { status: 404 })
 }
 
+export async function DELETE(req: Request) {
+  try {
+    const body = await req.json().catch(() => ({}))
+    const id = String(body.id || '').trim()
+    const ids = body.ids || [] // Support bulk deletion
+    
+    if (!id && (!Array.isArray(ids) || ids.length === 0)) {
+      return NextResponse.json({ ok: false, error: 'id-or-ids-required' }, { status: 400 })
+    }
+    
+    const idsToDelete = id ? [id] : ids
+    let deletedCount = 0
+    
+    // Try database first
+    try {
+      const db = (prisma as any)
+      if (db?.lead?.deleteMany) {
+        // Delete leads and related data
+        await Promise.all([
+          // Delete lead stage history
+          db.leadStageHistory.deleteMany({ where: { leadId: { in: idsToDelete } } }),
+          // Delete activities
+          db.activity.deleteMany({ where: { leadId: { in: idsToDelete } } }),
+          // Delete deals
+          db.deal.deleteMany({ where: { leadId: { in: idsToDelete } } })
+        ])
+        
+        // Delete the leads themselves
+        const result = await db.lead.deleteMany({ where: { id: { in: idsToDelete } } })
+        deletedCount = result.count
+        
+        // Publish deletion events
+        idsToDelete.forEach(leadId => {
+          try { publish({ type: 'lead.deleted', data: { id: leadId } }) } catch {}
+        })
+        
+        // Trigger CRM cache invalidation
+        ;(global as any).__crmLastUpdate = Date.now()
+        
+        console.log(`[CRM] Permanently deleted ${deletedCount} leads and related data`)
+        return NextResponse.json({ ok: true, deletedCount })
+      }
+    } catch (dbError) {
+      console.error('Database deletion failed:', dbError)
+    }
+    
+    // Fallback JSON file deletion
+    try {
+      const rows = readFallback()
+      const filteredRows = rows.filter((r: any) => !idsToDelete.includes(r.id))
+      deletedCount = rows.length - filteredRows.length
+      writeFallback(filteredRows)
+      
+      // Publish deletion events
+      idsToDelete.forEach(leadId => {
+        try { publish({ type: 'lead.deleted', data: { id: leadId } }) } catch {}
+      })
+      
+      console.log(`[CRM] Permanently deleted ${deletedCount} leads from JSON fallback`)
+      return NextResponse.json({ ok: true, deletedCount })
+    } catch (fileError) {
+      console.error('JSON file deletion failed:', fileError)
+    }
+    
+    return NextResponse.json({ ok: false, error: 'deletion-failed' }, { status: 500 })
+  } catch (e: any) {
+    console.error('Lead deletion error:', e)
+    return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 })
+  }
+}
+
 

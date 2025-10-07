@@ -756,6 +756,44 @@ export default function AdminCRMPage() {
                       setSelected({})
                     }}
                   >Change Stage</button>
+                  <button
+                    className="px-3 py-2 text-xs rounded border border-red-400/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-all"
+                    onClick={async ()=>{
+                      const confirmed = confirm(`⚠️ PERMANENT DELETE: Are you sure you want to permanently delete ${selectedIds.length} selected leads?\n\nThis will also delete:\n- All lead activities\n- All deals\n- All stage history\n\nThis action CANNOT be undone!`)
+                      if (!confirmed) return
+                      
+                      try {
+                        const res = await fetch('/api/crm2/leads', { 
+                          method: 'DELETE', 
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ ids: selectedIds }) 
+                        })
+                        const result = await res.json()
+                        
+                        if (result.ok) {
+                          // Remove deleted leads from state
+                          setLeads(prev => prev.filter(l => !selectedIds.includes(l.id)))
+                          // Clear booking data for deleted leads
+                          setLeadBookings(prev => {
+                            const filtered = { ...prev }
+                            selectedIds.forEach(id => {
+                              const lead = leads.find(l => l.id === id)
+                              if (lead?.email) delete filtered[lead.email]
+                            })
+                            return filtered
+                          })
+                          setSelected({})
+                          console.log(`✅ Permanently deleted ${result.deletedCount} leads`)
+                          alert(`Successfully deleted ${result.deletedCount} leads permanently`)
+                        } else {
+                          alert('Failed to delete leads: ' + (result.error || 'Unknown error'))
+                        }
+                      } catch (e) {
+                        console.error('Delete leads failed:', e)
+                        alert('Failed to delete leads')
+                      }
+                    }}
+                  >🗑️ Delete Selected</button>
                 </>
               )}
               <div className="ml-3 flex items-center gap-2">
