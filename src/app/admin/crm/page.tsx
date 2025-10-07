@@ -250,16 +250,44 @@ export default function AdminCRMPage() {
           const updateData = await updateRes.json()
           const serverLastUpdate = updateData.lastUpdate || 0
           
-          if (serverLastUpdate > lastKnownUpdate) {
+          if (serverLastUpdate > lastKnownUpdate || true) { // Force refresh every time for debugging
             console.log('🔄 CRM data updated on server (booking change), refreshing leads...')
             lastKnownUpdate = serverLastUpdate
+            
+            // AGGRESSIVE cache busting - clear all state first
+            setLeads([])
+            setActivities([])
+            setDeals([])
+            setLeadBookings({})
+            console.log('🧹 Cleared all CRM state before refresh')
             
             // Reload all CRM data with aggressive cache busting
             const refreshTimestamp = Date.now()
             const [leadsRes, activitiesRes, dealsRes] = await Promise.all([
-              fetch(`/api/crm2/leads?_t=${refreshTimestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
-              fetch(`/api/crm2/activities?_t=${refreshTimestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
-              fetch(`/api/crm2/deals?_t=${refreshTimestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } })
+              fetch(`/api/crm2/leads?_t=${refreshTimestamp}&_cache=${Math.random()}`, { 
+                cache: 'no-store', 
+                headers: { 
+                  'Cache-Control': 'no-cache, no-store, must-revalidate',
+                  'Pragma': 'no-cache',
+                  'Expires': '0'
+                } 
+              }),
+              fetch(`/api/crm2/activities?_t=${refreshTimestamp}&_cache=${Math.random()}`, { 
+                cache: 'no-store', 
+                headers: { 
+                  'Cache-Control': 'no-cache, no-store, must-revalidate',
+                  'Pragma': 'no-cache',
+                  'Expires': '0'
+                } 
+              }),
+              fetch(`/api/crm2/deals?_t=${refreshTimestamp}&_cache=${Math.random()}`, { 
+                cache: 'no-store', 
+                headers: { 
+                  'Cache-Control': 'no-cache, no-store, must-revalidate',
+                  'Pragma': 'no-cache',
+                  'Expires': '0'
+                } 
+              })
             ])
             
             const [leadsData, activitiesData, dealsData] = await Promise.all([
@@ -730,6 +758,119 @@ export default function AdminCRMPage() {
               </div>
             <div className="mt-4 flex items-center justify-end gap-2">
               <button onClick={()=>setNewLeadOpen(true)} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all">New Lead</button>
+              <button 
+                onClick={async () => {
+                  console.log('🔄 FORCE REFRESH: Clearing all CRM cache and reloading...')
+                  setLoading(true)
+                  
+                  // Clear all state immediately
+                  setLeads([])
+                  setActivities([])
+                  setDeals([])
+                  setLeadBookings({})
+                  setCompanies([])
+                  setOwners([])
+                  
+                  try {
+                    // Force reload with maximum cache busting
+                    const timestamp = Date.now()
+                    const random = Math.random()
+                    const [leadsRes, activitiesRes, companiesRes, dealsRes, ownersRes] = await Promise.all([
+                      fetch(`/api/crm2/leads?_t=${timestamp}&_r=${random}&_force=1`, { 
+                        cache: 'no-store', 
+                        headers: { 
+                          'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                          'Pragma': 'no-cache',
+                          'Expires': '0'
+                        } 
+                      }),
+                      fetch(`/api/crm2/activities?_t=${timestamp}&_r=${random}&_force=1`, { 
+                        cache: 'no-store', 
+                        headers: { 
+                          'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                          'Pragma': 'no-cache',
+                          'Expires': '0'
+                        } 
+                      }),
+                      fetch(`/api/crm2/companies?_t=${timestamp}&_r=${random}&_force=1`, { 
+                        cache: 'no-store', 
+                        headers: { 
+                          'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                          'Pragma': 'no-cache',
+                          'Expires': '0'
+                        } 
+                      }),
+                      fetch(`/api/crm2/deals?_t=${timestamp}&_r=${random}&_force=1`, { 
+                        cache: 'no-store', 
+                        headers: { 
+                          'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                          'Pragma': 'no-cache',
+                          'Expires': '0'
+                        } 
+                      }),
+                      fetch(`/api/crm2/owners?_t=${timestamp}&_r=${random}&_force=1`, { 
+                        cache: 'no-store', 
+                        headers: { 
+                          'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                          'Pragma': 'no-cache',
+                          'Expires': '0'
+                        } 
+                      })
+                    ])
+                    
+                    const [leadsData, activitiesData, companiesData, dealsData, ownersData] = await Promise.all([
+                      leadsRes.json(),
+                      activitiesRes.json(),
+                      companiesRes.json(),
+                      dealsRes.json(),
+                      ownersRes.json()
+                    ])
+                    
+                    console.log('📊 Force refresh data loaded:', {
+                      leads: leadsData.data?.length || 0,
+                      activities: activitiesData.data?.length || 0,
+                      deals: dealsData.data?.length || 0
+                    })
+                    
+                    if (leadsData.ok) setLeads(leadsData.data || [])
+                    if (activitiesData.ok) setActivities(activitiesData.data || [])
+                    if (companiesData.ok) setCompanies(companiesData.data || [])
+                    if (dealsData.ok) setDeals(dealsData.data || [])
+                    if (ownersData.ok) setOwners(ownersData.data || [])
+                    
+                    // Reload booking data for signed leads
+                    const signedLeads = (leadsData.data || []).filter((l: any) => l.stage === 'signed' && l.email)
+                    if (signedLeads.length > 0) {
+                      const bookingRes = await fetch('/api/crm2/bookings', { 
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                          emails: signedLeads.map((l: any) => l.email) 
+                        })
+                      })
+                      const bookingData = await bookingRes.json()
+                      if (bookingData.ok) {
+                        const bookingMap: Record<string, any> = {}
+                        bookingData.data.forEach((booking: any) => {
+                          if (booking.user?.email) {
+                            bookingMap[booking.user.email] = booking
+                          }
+                        })
+                        setLeadBookings(bookingMap)
+                      }
+                    }
+                    
+                    console.log('✅ Force refresh completed - CRM should now show only current database data')
+                  } catch (e) {
+                    console.error('Force refresh failed:', e)
+                  } finally {
+                    setLoading(false)
+                  }
+                }}
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-red-400/30 bg-red-500/10 hover:bg-red-500/20 transition-all"
+              >
+                🔄 Force Refresh
+                </button>
               {selectedIds.length>0 && (
                 <>
                 <button
