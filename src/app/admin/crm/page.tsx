@@ -173,13 +173,14 @@ export default function AdminCRMPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        // Load all data in parallel for better performance
+        // Load all data in parallel with aggressive cache busting
+        const timestamp = Date.now()
         const [leadsRes, activitiesRes, companiesRes, dealsRes, ownersRes] = await Promise.all([
-          fetch('/api/crm2/leads', { cache: 'no-store' }),
-          fetch('/api/crm2/activities', { cache: 'no-store' }),
-          fetch('/api/crm2/companies', { cache: 'no-store' }),
-          fetch('/api/crm2/deals', { cache: 'no-store' }),
-          fetch('/api/crm2/owners', { cache: 'no-store' })
+          fetch(`/api/crm2/leads?_t=${timestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
+          fetch(`/api/crm2/activities?_t=${timestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
+          fetch(`/api/crm2/companies?_t=${timestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
+          fetch(`/api/crm2/deals?_t=${timestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
+          fetch(`/api/crm2/owners?_t=${timestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } })
         ])
         
         const [leadsData, activitiesData, companiesData, dealsData, ownersData] = await Promise.all([
@@ -253,11 +254,12 @@ export default function AdminCRMPage() {
             console.log('🔄 CRM data updated on server (booking change), refreshing leads...')
             lastKnownUpdate = serverLastUpdate
             
-            // Reload all CRM data
+            // Reload all CRM data with aggressive cache busting
+            const refreshTimestamp = Date.now()
             const [leadsRes, activitiesRes, dealsRes] = await Promise.all([
-              fetch('/api/crm2/leads', { cache: 'no-store' }),
-              fetch('/api/crm2/activities', { cache: 'no-store' }),
-              fetch('/api/crm2/deals', { cache: 'no-store' })
+              fetch(`/api/crm2/leads?_t=${refreshTimestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
+              fetch(`/api/crm2/activities?_t=${refreshTimestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
+              fetch(`/api/crm2/deals?_t=${refreshTimestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } })
             ])
             
             const [leadsData, activitiesData, dealsData] = await Promise.all([
@@ -269,6 +271,22 @@ export default function AdminCRMPage() {
             if (leadsData.ok) setLeads(leadsData.data || [])
             if (activitiesData.ok) setActivities(activitiesData.data || [])
             if (dealsData.ok) setDeals(dealsData.data || [])
+            
+            // Clear stale booking data for leads that no longer exist
+            const currentSignedEmails = (leadsData.data || [])
+              .filter((l: any) => l.stage === 'signed' && l.email)
+              .map((l: any) => l.email)
+            
+            setLeadBookings(prev => {
+              const filtered: Record<string, any> = {}
+              Object.entries(prev).forEach(([email, booking]) => {
+                if (currentSignedEmails.includes(email)) {
+                  filtered[email] = booking
+                }
+              })
+              console.log('🧹 Cleaned stale booking data, keeping:', Object.keys(filtered))
+              return filtered
+            })
             
             // Reload booking data for signed leads
             const signedLeads = (leadsData.data || []).filter((l: any) => l.stage === 'signed' && l.email)
