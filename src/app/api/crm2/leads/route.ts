@@ -156,7 +156,7 @@ export async function DELETE(req: Request) {
         deletedCount = result.count
         
         // Publish deletion events
-        idsToDelete.forEach(leadId => {
+        idsToDelete.forEach((leadId: string) => {
           try { publish({ type: 'lead.deleted', data: { id: leadId } }) } catch {}
         })
         
@@ -178,7 +178,7 @@ export async function DELETE(req: Request) {
       writeFallback(filteredRows)
       
       // Publish deletion events
-      idsToDelete.forEach(leadId => {
+      idsToDelete.forEach((leadId: string) => {
         try { publish({ type: 'lead.deleted', data: { id: leadId } }) } catch {}
       })
       
