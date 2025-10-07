@@ -30,10 +30,11 @@ export default function SalesAnalyticsPage() {
     async function loadData() {
       try {
         // Load analytics, CRM, and bookings data for projections
+        const timestamp = Date.now()
         const [analyticsRes, crmRes, bookingsRes] = await Promise.all([
-          fetch('/api/admin/analytics', { cache: 'no-store' }),
-          fetch('/api/admin/crm', { cache: 'no-store' }),
-          fetch('/api/admin/bookings', { cache: 'no-store' })
+          fetch(`/api/admin/analytics?_t=${timestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
+          fetch(`/api/admin/crm?_t=${timestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } }),
+          fetch(`/api/admin/bookings?_t=${timestamp}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } })
         ])
         
         const analyticsData = await analyticsRes.json()
@@ -47,7 +48,31 @@ export default function SalesAnalyticsPage() {
         setLoading(false)
       }
     }
+    
     loadData()
+    
+    // Smart auto-refresh: check for updates every 5 seconds, only refresh if data changed
+    let lastKnownUpdate = 0
+    const interval = setInterval(async () => {
+      if (typeof window !== 'undefined' && !document.hidden) {
+        try {
+          // Check if sales analytics data has been updated
+          const updateRes = await fetch('/api/admin/finance/last-update', { cache: 'no-store' })
+          const updateData = await updateRes.json()
+          const serverLastUpdate = updateData.lastUpdate || 0
+          
+          if (serverLastUpdate > lastKnownUpdate) {
+            console.log('🔄 Sales data updated on server, refreshing analytics...')
+            lastKnownUpdate = serverLastUpdate
+            loadData()
+          }
+        } catch (e) {
+          console.error('Failed to check for sales analytics updates:', e)
+        }
+      }
+    }, 5000) // Check every 5 seconds
+    
+    return () => clearInterval(interval)
   }, [])
 
   // Calculate chart data from CRM bookings and payments

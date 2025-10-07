@@ -18,7 +18,8 @@ export async function POST(req: Request) {
         ;(global as any).__bookingsLastUpdate = now
         ;(global as any).__crmLastUpdate = now
         ;(global as any).__financeLastUpdate = now
-        console.log(`[SYNC] Booking change triggered - all systems invalidated`)
+        ;(global as any).__salesLastUpdate = now
+        console.log(`[SYNC] Booking change triggered - all systems invalidated (Bookings, CRM, Finance, Sales Analytics)`)
         break
         
       case 'crm-changed':
@@ -31,12 +32,18 @@ export async function POST(req: Request) {
         console.log(`[SYNC] Finance change triggered`)
         break
         
+      case 'sales-changed':
+        ;(global as any).__salesLastUpdate = now
+        console.log(`[SYNC] Sales Analytics change triggered`)
+        break
+        
       default:
         // Generic update - invalidate all systems
         ;(global as any).__bookingsLastUpdate = now
         ;(global as any).__crmLastUpdate = now
         ;(global as any).__financeLastUpdate = now
-        console.log(`[SYNC] Generic update - all systems invalidated`)
+        ;(global as any).__salesLastUpdate = now
+        console.log(`[SYNC] Generic update - all systems invalidated (Bookings, CRM, Finance, Sales Analytics)`)
     }
     
     return NextResponse.json({ 
