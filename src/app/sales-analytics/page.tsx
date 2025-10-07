@@ -221,18 +221,20 @@ export default function SalesAnalyticsPage() {
     return monthRevenue
   }
   
-  // Ensure selected month is valid (wrap to next year if needed)
-  const adjustedMonth = selectedProjectionMonth > 11 ? selectedProjectionMonth - 12 : selectedProjectionMonth
-  const projectedYear = selectedProjectionMonth > 11 ? currentYear + 1 : currentYear
+  // Calculate year and month for multi-year navigation
+  const yearsAhead = Math.floor(selectedProjectionMonth / 12)
+  const adjustedMonth = selectedProjectionMonth % 12
+  const projectedYear = currentYear + yearsAhead
   const selectedMonthRevenue = calculateProjectedRevenueForMonth(adjustedMonth, projectedYear)
   const selectedMonthName = new Date(projectedYear, adjustedMonth, 1).toLocaleString('default', { month: 'long' })
   
   const nextMonth = () => {
-    setSelectedProjectionMonth(prev => prev >= 11 ? 0 : prev + 1)
+    setSelectedProjectionMonth(prev => prev + 1) // Allow unlimited forward navigation
   }
   
   const prevMonth = () => {
-    setSelectedProjectionMonth(prev => prev <= 0 ? 11 : prev - 1)
+    const currentMonth = new Date().getMonth()
+    setSelectedProjectionMonth(prev => Math.max(currentMonth, prev - 1)) // Don't go before current month
   }
 
   // Calculate upcoming payments within next 30 days
