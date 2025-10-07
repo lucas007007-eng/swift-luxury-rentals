@@ -6,11 +6,32 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
     const email = (searchParams.get('email') || '').toLowerCase()
     if (!email) return NextResponse.json({ ok: false, error: 'email-required' }, { status: 400 })
+    
     const user = await prisma.user.findUnique({ where: { email } }).catch(()=>null)
     if (!user) return NextResponse.json({ ok: false, error: 'user-not-found' }, { status: 404 })
-    const booking = await prisma.booking.findFirst({ where: { userId: user.id }, orderBy: { createdAt: 'desc' } }).catch(()=>null)
+    
+    // Get the most recent confirmed booking (prioritize confirmed over other statuses)
+    const booking = await prisma.booking.findFirst({ 
+      where: { 
+        userId: user.id,
+        deletedAt: null // Exclude soft-deleted bookings
+      }, 
+      orderBy: [
+        { status: 'desc' }, // Confirmed bookings first (alphabetically)
+        { createdAt: 'desc' }
+      ]
+    }).catch(()=>null)
+    
     if (!booking) return NextResponse.json({ ok: false, error: 'booking-not-found' }, { status: 404 })
-    return NextResponse.json({ ok: true, data: { id: booking.id, adminUrl: `/admin/bookings?highlight=${booking.id}` } })
+    
+    console.log(`[CRM] Opening booking ${booking.id} for ${email} - Status: ${booking.status}`)
+    return NextResponse.json({ 
+      ok: true, 
+      data: { 
+        id: booking.id, 
+        adminUrl: `/admin/bookings?highlight=${booking.id}#${booking.id}` // Add hash for better scrolling
+      } 
+    })
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 })
   }

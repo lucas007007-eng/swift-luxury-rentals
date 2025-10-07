@@ -6,7 +6,7 @@ import Footer from '@/components/Footer'
 import TestBookingBar from './TestBookingBar'
 import DeleteButton from './DeleteButton'
 
-export default async function AdminBookingsPage({ searchParams }: { searchParams?: { page?: string; status?: string } }) {
+export default async function AdminBookingsPage({ searchParams }: { searchParams?: { page?: string; status?: string; highlight?: string } }) {
   const formatShortDate = (d: Date) => {
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     const dd = d.getDate()
@@ -92,7 +92,7 @@ export default async function AdminBookingsPage({ searchParams }: { searchParams
   ])
   const totalsGlobal = { all: countAll, hold: countHold, confirmed: countConfirmed, cancelled: countCancelled, overdue: countOverdue }
   const pageRevenue = Math.round(bookings.reduce((s: number, b: any) => s + (Number(b.totalCents || 0) / 100), 0))
-  const highlight = (typeof (global as any)?.window !== 'undefined') ? (new URL((global as any).window.location.href).searchParams.get('highlight') || undefined) : undefined
+  const highlight = searchParams?.highlight || undefined
   return (
     <main className="min-h-screen bg-black text-white">
       {highlight && <Highlighter targetId={highlight} />}
