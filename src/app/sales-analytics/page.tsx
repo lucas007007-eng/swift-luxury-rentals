@@ -44,6 +44,24 @@ export default function SalesAnalyticsPage() {
         setMetrics(analyticsData)
         setCrmData({ ...crmData, bookings: bookingsData.bookings || [] })
         
+        console.log('📊 Sales Analytics Data Loaded:')
+        console.log('- Analytics data:', analyticsData)
+        console.log('- CRM data:', crmData)
+        console.log('- Bookings data:', bookingsData.bookings?.length || 0, 'bookings')
+        
+        // Debug projected revenue calculation
+        if (bookingsData.bookings) {
+          const confirmedBookings = bookingsData.bookings.filter((b: any) => b.status === 'confirmed')
+          const scheduledPayments = confirmedBookings.flatMap((b: any) => 
+            (b.payments || []).filter((p: any) => p.status === 'scheduled' && p.dueAt)
+          )
+          console.log('- Confirmed bookings:', confirmedBookings.length)
+          console.log('- Scheduled payments for projection:', scheduledPayments.length)
+          scheduledPayments.forEach((p: any) => {
+            console.log(`  Payment: €${(p.amountCents || 0) / 100} due ${new Date(p.dueAt).toLocaleDateString()}`)
+          })
+        }
+        
       } finally {
         setLoading(false)
       }
@@ -352,6 +370,12 @@ export default function SalesAnalyticsPage() {
                   </div>
                 )}
                 <div className="text-purple-400 text-sm mt-2">From scheduled payments</div>
+                {!loading && (
+                  <div className="text-purple-300 text-xs mt-1">
+                    Debug: {selectedMonthName} {projectedYear} - €{selectedMonthRevenue} 
+                    (Total scheduled: €{projectedSeries.reduce((sum, val) => sum + val, 0).toLocaleString()})
+                  </div>
+                )}
               </div>
             </div>
           </div>
