@@ -47,19 +47,47 @@ export default function SalesAnalyticsPage() {
         console.log('📊 Sales Analytics Data Loaded:')
         console.log('- Analytics data:', analyticsData)
         console.log('- CRM data:', crmData)
-        console.log('- Bookings data:', bookingsData.bookings?.length || 0, 'bookings')
+        console.log('- Bookings data structure:', {
+          hasBookings: !!bookingsData.bookings,
+          bookingsCount: bookingsData.bookings?.length || 0,
+          bookingsArray: Array.isArray(bookingsData.bookings)
+        })
         
-        // Debug projected revenue calculation
+        // Debug the actual booking data structure
+        if (bookingsData.bookings && bookingsData.bookings.length > 0) {
+          const firstBooking = bookingsData.bookings[0]
+          console.log('- First booking structure:', {
+            status: firstBooking.status,
+            hasPayments: !!firstBooking.payments,
+            paymentsCount: firstBooking.payments?.length || 0,
+            user: firstBooking.user?.name
+          })
+          
+          if (firstBooking.payments) {
+            console.log('- Payment details:')
+            firstBooking.payments.forEach((p: any, idx: number) => {
+              console.log(`  ${idx + 1}. €${(p.amountCents || 0) / 100} - ${p.purpose} - ${p.status}`)
+            })
+          }
+        }
+        
+        // Debug confirmed bookings and deposits
         if (bookingsData.bookings) {
           const confirmedBookings = bookingsData.bookings.filter((b: any) => b.status === 'confirmed')
-          const scheduledPayments = confirmedBookings.flatMap((b: any) => 
-            (b.payments || []).filter((p: any) => p.status === 'scheduled' && p.dueAt)
-          )
-          console.log('- Confirmed bookings:', confirmedBookings.length)
-          console.log('- Scheduled payments for projection:', scheduledPayments.length)
-          scheduledPayments.forEach((p: any) => {
-            console.log(`  Payment: €${(p.amountCents || 0) / 100} due ${new Date(p.dueAt).toLocaleDateString()}`)
+          console.log('- Confirmed bookings for deposits:', confirmedBookings.length)
+          
+          let debugDeposits = 0
+          confirmedBookings.forEach((booking: any) => {
+            if (booking.payments) {
+              booking.payments.forEach((payment: any) => {
+                if (payment.purpose === 'deposit' && payment.status === 'received') {
+                  debugDeposits += (payment.amountCents || 0) / 100
+                  console.log(`  Found deposit: €${(payment.amountCents || 0) / 100} from ${booking.user?.name}`)
+                }
+              })
+            }
           })
+          console.log(`- Total deposits calculated: €${debugDeposits}`)
         }
         
       } finally {
