@@ -25,10 +25,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: 'emails-array-required' }, { status: 400 })
     }
     
-    // Get confirmed bookings for all provided emails
+    // Get confirmed bookings for all provided emails (most recent booking per email)
     const bookings = await prisma.booking.findMany({
       where: {
         status: 'confirmed',
+        deletedAt: null, // Exclude soft-deleted bookings
         user: {
           email: { in: emails.map((e: string) => e.toLowerCase()) }
         }
@@ -56,7 +57,13 @@ export async function POST(req: Request) {
       orderBy: { createdAt: 'desc' }
     })
     
-    return NextResponse.json({ ok: true, data: bookings })
+    // Get the most recent confirmed booking per email
+    const latestBookings = emails.map(email => {
+      const userBookings = bookings.filter(b => b.user?.email?.toLowerCase() === email.toLowerCase())
+      return userBookings.length > 0 ? userBookings[0] : null
+    }).filter(Boolean)
+    
+    return NextResponse.json({ ok: true, data: latestBookings })
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 })
   }
