@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { syncBookingOperation } from '@/lib/syncTrigger'
 
 export async function POST(req: Request) {
   try {
@@ -34,10 +35,8 @@ export async function POST(req: Request) {
 
     console.log(`[PAYMENT] Approved ${ids.length} payments, setting status to 'received'`)
     
-    // Trigger cache invalidation for real-time updates
-    ;(global as any).__crmLastUpdate = Date.now()
-    ;(global as any).__financeLastUpdate = Date.now()
-    console.log('[PAYMENT] Cache invalidated for CRM and Finance')
+    // Trigger simplified sync across all systems
+    await syncBookingOperation('confirmed', { paymentIds: ids, count: ids.length })
 
     // If submitted via form, redirect back to bookings page with cache busting
     if (!contentType || contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {

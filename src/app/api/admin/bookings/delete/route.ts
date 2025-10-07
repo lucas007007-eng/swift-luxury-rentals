@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { syncBookingOperation } from '@/lib/syncTrigger'
 
 export async function POST(req: Request) {
   try {
@@ -114,11 +115,13 @@ export async function POST(req: Request) {
           data: { totalRevenue: Math.round(updatedTotalRevenue) }
         })
 
-        // Set global cache invalidation timestamps
-        ;(global as any).__financeLastUpdate = Date.now()
-        ;(global as any).__crmLastUpdate = Date.now()
-        console.log(`[FINANCE] Removed €${bookingRevenue} revenue from property ${bookingToDelete.property.title}, updated total to €${Math.round(updatedTotalRevenue)}`)
-        console.log(`[CRM] Cache invalidated for booking deletion at ${Date.now()}`)
+        // Trigger simplified sync across all systems
+        await syncBookingOperation('deleted', {
+          id: bookingToDelete.id,
+          propertyTitle: bookingToDelete.property.title,
+          revenueRemoved: bookingRevenue,
+          newTotal: Math.round(updatedTotalRevenue)
+        })
       }
 
     } catch (cleanupError) {

@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { cityProperties } from '@/data/cityProperties'
 import { computeBookingTotals, computeMonthlySchedule } from '@/lib/bookingTotals'
 import { validateBookingDates, validateBookingData } from '@/lib/bookingValidation'
+import { syncBookingOperation } from '@/lib/syncTrigger'
 
 // Admin helper: Create a booking via query params (GET) or JSON (POST)
 // Accepts: propertyId, checkIn (YYYY-MM-DD), checkOut (YYYY-MM-DD), name, email
@@ -128,16 +129,12 @@ export async function GET(req: NextRequest) {
     } catch {}
     } catch {}
 
-    // Update finance and CRM data when booking is created
-    try {
-      // Set global cache invalidation timestamps to trigger page refreshes
-      ;(global as any).__financeLastUpdate = Date.now()
-      ;(global as any).__crmLastUpdate = Date.now()
-      console.log(`[FINANCE] New booking created, cache invalidated for property ${property.title}`)
-      console.log(`[CRM] Cache invalidated for new booking creation`)
-    } catch (financeError) {
-      console.error('[FINANCE] Failed to invalidate cache for new booking:', financeError)
-    }
+    // Trigger simplified sync across all systems
+    await syncBookingOperation('created', {
+      id: booking.id,
+      propertyTitle: property.title,
+      status: booking.status
+    })
 
     return NextResponse.json({ ok: true, booking })
   } catch (e) {
@@ -246,16 +243,12 @@ export async function POST(req: NextRequest) {
       }
     } catch {}
 
-    // Update finance and CRM data when booking is created (POST method)
-    try {
-      // Set global cache invalidation timestamps to trigger page refreshes
-      ;(global as any).__financeLastUpdate = Date.now()
-      ;(global as any).__crmLastUpdate = Date.now()
-      console.log(`[FINANCE] New booking created via POST, cache invalidated for property ${property.title}`)
-      console.log(`[CRM] Cache invalidated for new booking creation via POST`)
-    } catch (financeError) {
-      console.error('[FINANCE] Failed to invalidate cache for new booking:', financeError)
-    }
+    // Trigger simplified sync across all systems
+    await syncBookingOperation('created', {
+      id: booking.id,
+      propertyTitle: property.title,
+      status: booking.status
+    })
 
     return NextResponse.json({ ok: true, booking })
   } catch (e) {
