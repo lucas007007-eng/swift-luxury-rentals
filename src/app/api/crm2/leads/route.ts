@@ -141,7 +141,89 @@ export async function DELETE(req: Request) {
     try {
       const db = (prisma as any)
       if (db?.lead?.deleteMany) {
-        // Delete leads and related data
+        // Get lead data before deletion to find associated bookings
+        const leadsToDelete = await db.lead.findMany({
+          where: { id: { in: idsToDelete } },
+          select: { id: true, email: true, name: true }
+        })
+        
+        // Delete associated bookings for each lead
+        for (const lead of leadsToDelete) {
+          if (lead.email) {
+            // Find and delete bookings for this lead's email
+            const userBookings = await db.booking.findMany({
+              where: { user: { email: lead.email } },
+              include: {
+                payments: { select: { amountCents: true, status: true } },
+                property: { select: { title: true } }
+              }
+            })
+            
+            for (const booking of userBookings) {
+              console.log(`[BOOKING] Deleting booking for lead ${lead.name}: ${booking.property?.title}`)
+              
+              // Calculate revenue that will be removed for finance cleanup
+              const bookingRevenue = booking.payments
+                .filter((p: any) => p.status === 'received')
+                .reduce((sum: number, p: any) => sum + (p.amountCents || 0), 0) / 100
+              
+              // Delete payments first
+              await db.payment.deleteMany({ where: { bookingId: booking.id } })
+              // Delete the booking
+              await db.booking.delete({ where: { id: booking.id } })
+              
+              // Update property financials if there was revenue
+              if (bookingRevenue > 0) {
+                try {
+                  // Remove revenue entry for this booking
+                  await db.revenue.deleteMany({
+                    where: {
+                      propertyId: booking.propertyId,
+                      description: { contains: lead.name },
+                      amount: bookingRevenue
+                    }
+                  })
+                  
+                  // Recalculate total revenue for the property
+                  const [manualRevenue, remainingBookingRevenue] = await Promise.all([
+                    db.revenue.aggregate({
+                      where: { propertyId: booking.propertyId },
+                      _sum: { amount: true }
+                    }),
+                    db.booking.findMany({
+                      where: {
+                        propertyId: booking.propertyId,
+                        status: 'confirmed',
+                        payments: { some: { status: 'received' } }
+                      },
+                      include: {
+                        payments: { where: { status: 'received' } }
+                      }
+                    })
+                  ])
+                  
+                  const manualRevenueTotal = manualRevenue._sum?.amount || 0
+                  const bookingRevenueTotal = remainingBookingRevenue.reduce((sum: number, b: any) => {
+                    return sum + b.payments.reduce((paySum: number, p: any) => paySum + (p.amountCents / 100), 0)
+                  }, 0)
+                  const updatedTotalRevenue = manualRevenueTotal + bookingRevenueTotal
+                  
+                  // Update PropertyFinancials
+                  await db.propertyFinancials.update({
+                    where: { propertyId: booking.propertyId },
+                    data: { totalRevenue: Math.round(updatedTotalRevenue) }
+                  })
+                  
+                  console.log(`[FINANCE] Updated property revenue after lead deletion: €${Math.round(updatedTotalRevenue)}`)
+                } catch (financeError) {
+                  console.error('[FINANCE] Failed to update property financials after booking deletion:', financeError)
+                }
+              }
+            }
+          }
+        }
+        
+        // Delete CRM-related data
         await Promise.all([
           // Delete lead stage history
           db.leadStageHistory.deleteMany({ where: { leadId: { in: idsToDelete } } }),
