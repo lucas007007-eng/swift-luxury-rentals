@@ -128,13 +128,15 @@ export async function GET(req: NextRequest) {
     } catch {}
     } catch {}
 
-    // Update finance data when booking is created
+    // Update finance and CRM data when booking is created
     try {
-      // Set global cache invalidation timestamp to trigger finance page refresh
+      // Set global cache invalidation timestamps to trigger page refreshes
       ;(global as any).__financeLastUpdate = Date.now()
+      ;(global as any).__crmLastUpdate = Date.now()
       console.log(`[FINANCE] New booking created, cache invalidated for property ${property.title}`)
+      console.log(`[CRM] Cache invalidated for new booking creation`)
     } catch (financeError) {
-      console.error('[FINANCE] Failed to invalidate finance cache for new booking:', financeError)
+      console.error('[FINANCE] Failed to invalidate cache for new booking:', financeError)
     }
 
     return NextResponse.json({ ok: true, booking })
@@ -244,13 +246,15 @@ export async function POST(req: NextRequest) {
       }
     } catch {}
 
-    // Update finance data when booking is created (POST method)
+    // Update finance and CRM data when booking is created (POST method)
     try {
-      // Set global cache invalidation timestamp to trigger finance page refresh
+      // Set global cache invalidation timestamps to trigger page refreshes
       ;(global as any).__financeLastUpdate = Date.now()
+      ;(global as any).__crmLastUpdate = Date.now()
       console.log(`[FINANCE] New booking created via POST, cache invalidated for property ${property.title}`)
+      console.log(`[CRM] Cache invalidated for new booking creation via POST`)
     } catch (financeError) {
-      console.error('[FINANCE] Failed to invalidate finance cache for new booking:', financeError)
+      console.error('[FINANCE] Failed to invalidate cache for new booking:', financeError)
     }
 
     return NextResponse.json({ ok: true, booking })

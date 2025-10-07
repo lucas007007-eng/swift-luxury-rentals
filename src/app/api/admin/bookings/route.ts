@@ -222,20 +222,11 @@ export async function POST(req: Request) {
               data: { totalRevenue: Math.round(completeRevenue) }
             })
             
-            // Set global cache invalidation timestamp to trigger finance page refresh
+            // Set global cache invalidation timestamps to trigger page refreshes
             ;(global as any).__financeLastUpdate = Date.now()
+            ;(global as any).__crmLastUpdate = Date.now()
             console.log(`[FINANCE] Updated property ${updated.property.title} total revenue to €${Math.round(completeRevenue)} (Manual: €${manualRevenueTotal}, Bookings: €${Math.round(bookingRevenueTotal)}), cache invalidated`)
-            
-            // Trigger client-side finance page refresh via BroadcastChannel
-            if (typeof globalThis !== 'undefined' && globalThis.BroadcastChannel) {
-              try {
-                const bc = new globalThis.BroadcastChannel('finance-updates')
-                bc.postMessage({ type: 'booking-changed', action: 'confirmed', propertyId: updated.propertyId })
-                bc.close()
-              } catch (e) {
-                console.log('BroadcastChannel not available on server')
-              }
-            }
+            console.log(`[CRM] Cache invalidated for booking confirmation`)
           }
         }
         

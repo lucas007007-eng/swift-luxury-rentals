@@ -231,6 +231,69 @@ export default function AdminCRMPage() {
       }
     }
     load()
+    
+    // Smart auto-refresh: check for updates every 3 seconds, only refresh if data changed
+    let lastKnownUpdate = 0
+    const refreshInterval = setInterval(async () => {
+      if (typeof window !== 'undefined' && !document.hidden) {
+        try {
+          const updateRes = await fetch('/api/crm2/last-update', { cache: 'no-store' })
+          const updateData = await updateRes.json()
+          const serverLastUpdate = updateData.lastUpdate || 0
+          
+          if (serverLastUpdate > lastKnownUpdate) {
+            console.log('🔄 CRM data updated on server (booking change), refreshing leads...')
+            lastKnownUpdate = serverLastUpdate
+            
+            // Reload all CRM data
+            const [leadsRes, activitiesRes, dealsRes] = await Promise.all([
+              fetch('/api/crm2/leads', { cache: 'no-store' }),
+              fetch('/api/crm2/activities', { cache: 'no-store' }),
+              fetch('/api/crm2/deals', { cache: 'no-store' })
+            ])
+            
+            const [leadsData, activitiesData, dealsData] = await Promise.all([
+              leadsRes.json(),
+              activitiesRes.json(),
+              dealsRes.json()
+            ])
+            
+            if (leadsData.ok) setLeads(leadsData.data || [])
+            if (activitiesData.ok) setActivities(activitiesData.data || [])
+            if (dealsData.ok) setDeals(dealsData.data || [])
+            
+            // Reload booking data for signed leads
+            const signedLeads = (leadsData.data || []).filter((l: any) => l.stage === 'signed' && l.email)
+            if (signedLeads.length > 0) {
+              try {
+                const bookingRes = await fetch('/api/crm2/bookings', { 
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                    emails: signedLeads.map((l: any) => l.email) 
+                  })
+                })
+                const bookingData = await bookingRes.json()
+                if (bookingData.ok) {
+                  const bookingMap: Record<string, any> = {}
+                  bookingData.data.forEach((booking: any) => {
+                    if (booking.user?.email) {
+                      bookingMap[booking.user.email] = booking
+                    }
+                  })
+                  setLeadBookings(bookingMap)
+                }
+              } catch (e) {
+                console.error('Failed to reload booking data:', e)
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Failed to check for CRM updates:', e)
+        }
+      }
+    }, 3000) // Check every 3 seconds for faster updates
+    
     // Live updates via SSE
     const es = new EventSource('/api/crm2/events')
     es.onmessage = (ev) => {
@@ -266,7 +329,11 @@ export default function AdminCRMPage() {
         }
       }
     }
-    return () => { try { es.close() } catch {}; try { bcRef.current?.close?.() } catch {} }
+    return () => { 
+      clearInterval(refreshInterval)
+      try { es.close() } catch {}
+      try { bcRef.current?.close?.() } catch {} 
+    }
   }, [])
 
   // Handle saved view filters via URL
@@ -577,7 +644,7 @@ export default function AdminCRMPage() {
               <div className="luxury-feature-card p-3 text-center">
                 <div className="text-xs text-zinc-300">Total Leads</div>
                 <div className="text-2xl font-bold text-white">{kpis.total.toLocaleString('de-DE')}</div>
-              </div>
+            </div>
               <div className="luxury-feature-card p-3 text-center">
                 <div className="text-xs text-zinc-300">New (7d)</div>
                 <div className="text-2xl font-bold text-white">{kpis.newWeek}</div>
@@ -612,7 +679,7 @@ export default function AdminCRMPage() {
               <select value={filterStage} onChange={e=>setFilterStage(e.target.value)} className="w-full bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] border border-zinc-400/30 rounded-lg px-3 py-2 text-sm text-white font-sora">
                 <option className="bg-black" value="all">All Stages</option>
                 {STAGES.map(s=> <option className="bg-black" key={s} value={s}>{s}</option>)}
-              </select>
+                </select>
               <input value={filterCity} onChange={e=>setFilterCity(e.target.value)} placeholder="City" className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora" />
               <select value={filterOwner} onChange={e=>setFilterOwner(e.target.value)} className="w-full bg-black/40 border border-zinc-600/50 rounded-lg px-3 py-2 text-sm text-white font-sora">
                 <option className="bg-black" value="">All Owners</option>
@@ -626,7 +693,7 @@ export default function AdminCRMPage() {
                 <option className="bg-black" value="due">Due (24h)</option>
               </select>
               <label className="flex items-center gap-2 text-sm text-zinc-300"><input type="checkbox" checked={myOnly} onChange={(e)=> setMyOnly(e.target.checked)} /> My leads</label>
-            </div>
+              </div>
             <div className="mt-4 flex items-center justify-end gap-2">
               <button onClick={()=>setNewLeadOpen(true)} className="inline-flex items-center px-4 py-2 rounded-lg text-white font-semibold text-sm border border-emerald-400/30 bg-[linear-gradient(145deg,#0a0a0a_0%,#1a1a1a_50%,#0a0a0a_100%)] hover:scale-105 transition-all">New Lead</button>
               {selectedIds.length>0 && (
@@ -688,8 +755,8 @@ export default function AdminCRMPage() {
                 <option className="bg-black" value="city">City</option>
                 <option className="bg-black" value="days">Days to checkout</option>
               </select>
-            </div>
-          )}
+              </div>
+            )}
           </div>
 
         {/* Content */}
@@ -718,7 +785,7 @@ export default function AdminCRMPage() {
                 <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">{stage}</div>
                 <div className="space-y-3">
                   {(grouped[stage] || []).map(l => (
-                    <button
+                <button
                       key={l.id}
                       onClick={()=>setDrawerLead(l)}
                       draggable
@@ -776,7 +843,7 @@ export default function AdminCRMPage() {
                             }}
                             title="Generate quote PDF"
                           >Quote PDF</button>
-                    </div>
+            </div>
                       )}
                       <div className="flex items-center justify-between">
                         <div className="text-white font-semibold font-sora truncate">{l.name}</div>
@@ -785,8 +852,8 @@ export default function AdminCRMPage() {
                           <span className="px-1.5 py-0.5 rounded border border-zinc-500/40 text-[10px] text-zinc-300" title="Lead Score">
                             {getLeadScore(l)}
                           </span>
-                    </div>
                   </div>
+                </div>
                       <div className="text-xs text-zinc-300 mt-1 truncate">{l.email || 'no-email'}{l.phone ? ` • ${l.phone}` : ''}</div>
                       
                       {/* Enhanced display for signed leads with booking data */}
@@ -811,34 +878,34 @@ export default function AdminCRMPage() {
                               <div className="text-xs text-emerald-300 font-semibold truncate">{booking.property?.title}</div>
                               <div className="text-xs text-emerald-200 mt-1">
                                 {checkin.toLocaleDateString('en-GB')} → {checkout.toLocaleDateString('en-GB')}
-                              </div>
-                            </div>
-                            
+            </div>
+          </div>
+
                             {/* Financial Details */}
                             <div className="grid grid-cols-2 gap-2">
                               <div className="p-2 rounded border border-amber-400/30 bg-amber-500/10">
                                 <div className="text-xs text-amber-300">Monthly</div>
                                 <div className="text-sm font-bold text-white">€{monthlyRevenue.toLocaleString()}</div>
-                              </div>
+                  </div>
                               <div className="p-2 rounded border border-cyan-400/30 bg-cyan-500/10">
                                 <div className="text-xs text-cyan-300">Received</div>
                                 <div className="text-sm font-bold text-white">€{totalRevenue.toLocaleString()}</div>
-                              </div>
-                            </div>
+                  </div>
+                    </div>
                             
                             {/* Lease Duration */}
                             <div className="grid grid-cols-2 gap-2">
                               <div className="p-2 rounded border border-blue-400/30 bg-blue-500/10">
                                 <div className="text-xs text-blue-300">Total Period</div>
                                 <div className="text-sm font-bold text-white">{totalMonths} months</div>
-                              </div>
+                    </div>
                               <div className="p-2 rounded border border-purple-400/30 bg-purple-500/10">
                                 <div className="text-xs text-purple-300">Remaining</div>
                                 <div className="text-sm font-bold text-white">{remainingMonths} months</div>
-                              </div>
+                  </div>
                             </div>
-                          </div>
-                        )
+                            </div>
+                          )
                       })() : (
                         // Standard display for non-signed leads
                         <div className="text-xs text-zinc-400 mt-1 flex items-center justify-between">
@@ -851,7 +918,7 @@ export default function AdminCRMPage() {
                             }
                             return (cents/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'})
                           })()}</span>
-                        </div>
+                    </div>
                       )}
                       <div className="mt-1 flex items-center justify-between gap-2">
                         <span className="text-[10px] text-zinc-400">Owner: {l.owner || 'Unassigned'}</span>
@@ -889,7 +956,7 @@ export default function AdminCRMPage() {
                           if (sla>0 && ageHours>=slaHours-1 && ageHours<slaHours) return <span title={`Changed ${Math.floor(ageHours)}h ago`} className="px-2 py-0.5 text-[10px] rounded border border-amber-400/40 text-amber-300">SLA due</span>
                           return null
                         })()}
-                      </div>
+                        </div>
                       {(() => {
                         const sla = STAGE_SLA_DAYS[l.stage] ?? 0
                         if (!sla) return null
@@ -902,12 +969,12 @@ export default function AdminCRMPage() {
                           return (
                           <div className="mt-1 h-1.5 bg-zinc-700/40 rounded" title={`SLA ${pct}% used`}>
                             <div className={`h-full rounded ${color}`} style={{ width: `${pct}%` }} />
-                            </div>
+                    </div>
                           )
                       })()}
                     </button>
                   ))}
-                    </div>
+                  </div>
                         </div>
             ))}
                     </div>

@@ -114,10 +114,11 @@ export async function POST(req: Request) {
           data: { totalRevenue: Math.round(updatedTotalRevenue) }
         })
 
-        // Set global cache invalidation timestamp
+        // Set global cache invalidation timestamps
         ;(global as any).__financeLastUpdate = Date.now()
+        ;(global as any).__crmLastUpdate = Date.now()
         console.log(`[FINANCE] Removed €${bookingRevenue} revenue from property ${bookingToDelete.property.title}, updated total to €${Math.round(updatedTotalRevenue)}`)
-        console.log(`[FINANCE] Cache invalidated at ${Date.now()} for property ${bookingToDelete.propertyId}`)
+        console.log(`[CRM] Cache invalidated for booking deletion at ${Date.now()}`)
       }
 
     } catch (cleanupError) {
