@@ -13,19 +13,25 @@ export default function FinancePage() {
   useEffect(() => {
     loadPortfolioData()
     
-    // Auto-refresh when investments/expenses are added
-    const interval = setInterval(() => {
+    // Smart auto-refresh: check for updates every 3 seconds, only refresh if data changed
+    let lastKnownUpdate = 0
+    const interval = setInterval(async () => {
       if (typeof window !== 'undefined' && !document.hidden) {
-        const lastUpdate = (global as any).__financeLastUpdate || 0
-        const lastCheck = (window as any).__financeLastCheck || 0
-        
-        if (lastUpdate > lastCheck) {
-          console.log('🔄 Finance data updated, refreshing portfolio...')
-          ;(window as any).__financeLastCheck = lastUpdate
-          loadPortfolioData()
+        try {
+          const updateRes = await fetch('/api/admin/finance/last-update', { cache: 'no-store' })
+          const updateData = await updateRes.json()
+          const serverLastUpdate = updateData.lastUpdate || 0
+          
+          if (serverLastUpdate > lastKnownUpdate) {
+            console.log('🔄 Finance data updated on server, refreshing portfolio...')
+            lastKnownUpdate = serverLastUpdate
+            loadPortfolioData()
+          }
+        } catch (e) {
+          console.error('Failed to check for finance updates:', e)
         }
       }
-    }, 2000) // Check every 2 seconds
+    }, 3000) // Check every 3 seconds for faster updates
     
     return () => clearInterval(interval)
   }, [])

@@ -117,6 +117,7 @@ export async function POST(req: Request) {
         // Set global cache invalidation timestamp
         ;(global as any).__financeLastUpdate = Date.now()
         console.log(`[FINANCE] Removed €${bookingRevenue} revenue from property ${bookingToDelete.property.title}, updated total to €${Math.round(updatedTotalRevenue)}`)
+        console.log(`[FINANCE] Cache invalidated at ${Date.now()} for property ${bookingToDelete.propertyId}`)
       }
 
     } catch (cleanupError) {
