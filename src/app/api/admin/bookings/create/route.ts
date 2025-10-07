@@ -128,6 +128,15 @@ export async function GET(req: NextRequest) {
     } catch {}
     } catch {}
 
+    // Update finance data when booking is created
+    try {
+      // Set global cache invalidation timestamp to trigger finance page refresh
+      ;(global as any).__financeLastUpdate = Date.now()
+      console.log(`[FINANCE] New booking created, cache invalidated for property ${property.title}`)
+    } catch (financeError) {
+      console.error('[FINANCE] Failed to invalidate finance cache for new booking:', financeError)
+    }
+
     return NextResponse.json({ ok: true, booking })
   } catch (e) {
     return NextResponse.json({ message: 'Failed' }, { status: 500 })
@@ -234,6 +243,15 @@ export async function POST(req: NextRequest) {
         await prisma.payment.createMany({ data: schedule.map(it => ({ bookingId: booking.id, provider: 'offline', status: 'scheduled', purpose: 'monthly_rent', amountCents: Math.round((it.amount || 0) * 100), currency: 'EUR', dueAt: new Date(it.dueAt) })) })
       }
     } catch {}
+
+    // Update finance data when booking is created (POST method)
+    try {
+      // Set global cache invalidation timestamp to trigger finance page refresh
+      ;(global as any).__financeLastUpdate = Date.now()
+      console.log(`[FINANCE] New booking created via POST, cache invalidated for property ${property.title}`)
+    } catch (financeError) {
+      console.error('[FINANCE] Failed to invalidate finance cache for new booking:', financeError)
+    }
 
     return NextResponse.json({ ok: true, booking })
   } catch (e) {

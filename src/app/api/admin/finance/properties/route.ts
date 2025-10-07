@@ -92,6 +92,27 @@ export async function GET() {
         return sum + booking.payments.reduce((paySum: number, payment: any) => paySum + (payment.amountCents / 100), 0)
       }, 0)
       const monthlyRevenue = manualRevenueAmount + bookingRevenueAmount
+      
+      // Sync PropertyFinancials with actual calculated revenue (real-time sync)
+      try {
+        const currentFinancials = await (prisma as any).propertyFinancials.findUnique({
+          where: { propertyId: p.id }
+        })
+        
+        if (currentFinancials) {
+          // Update with real-time calculated values
+          await (prisma as any).propertyFinancials.update({
+            where: { propertyId: p.id },
+            data: { 
+              totalRevenue: Math.round(manualRevenueAmount + bookingRevenueAmount),
+              // Also update monthly snapshot for consistency
+              updatedAt: new Date()
+            }
+          })
+        }
+      } catch (syncError) {
+        console.error(`[SYNC] Failed to sync PropertyFinancials for ${p.title}:`, syncError)
+      }
 
       const recurringMonthly = recurringExpenses._sum?.amount || 0
       const fixedExpensesAmount = fixedExpensesInMonth._sum?.amount || 0
