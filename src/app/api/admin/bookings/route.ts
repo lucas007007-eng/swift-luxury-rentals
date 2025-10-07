@@ -142,19 +142,21 @@ export async function POST(req: Request) {
         
         // Check if lead already exists for this email
         const existingLead = updated.user?.email ? await prisma.lead.findFirst({
-          where: { email: updated.user.email }
+          where: { email: updated.user.email.toLowerCase() }
         }) : null
         
         if (!existingLead && updated.user?.email) {
-          await prisma.lead.create({ data: leadData })
-          console.log(`[CRM] Created signed lead for booking ${id}: ${leadData.name}`)
+          const createdLead = await prisma.lead.create({ data: leadData })
+          console.log(`[CRM] ✅ Created signed lead for booking ${id}: ${leadData.name} (Lead ID: ${createdLead.id})`)
         } else if (existingLead) {
           // Update existing lead to "signed" stage
           await prisma.lead.update({
             where: { id: existingLead.id },
             data: { stage: 'signed', budgetCents: leadData.budgetCents }
           })
-          console.log(`[CRM] Updated existing lead to signed for booking ${id}: ${leadData.name}`)
+          console.log(`[CRM] ✅ Updated existing lead to signed for booking ${id}: ${leadData.name} (Lead ID: ${existingLead.id})`)
+        } else {
+          console.log(`[CRM] ⚠️ No email provided for booking ${id}, cannot create CRM lead`)
         }
         
         // Update property financials with booking revenue

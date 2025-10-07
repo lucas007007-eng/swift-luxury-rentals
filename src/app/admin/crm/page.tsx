@@ -326,7 +326,7 @@ export default function AdminCRMPage() {
           console.error('Failed to check for CRM updates:', e)
         }
       }
-    }, 2000) // Check every 2 seconds for faster updates
+    }, 1000) // Check every 1 second for immediate updates
     
     // Live updates via SSE
     const es = new EventSource('/api/crm2/events')
