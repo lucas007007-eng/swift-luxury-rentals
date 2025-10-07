@@ -866,10 +866,59 @@ export default function AdminCRMPage() {
                       id={`lead-${l.id}`}
                       title={`Stage changed ${((l as any).stageHistory?.[0]?.changedAt ? new Date((l as any).stageHistory[0].changedAt) : (l.updatedAt ? new Date(l.updatedAt) : null))?.toLocaleString() || ''}`}
                     >
-                      <div className="mb-2 flex items-center gap-2 text-[11px] text-zinc-300">
-                        <input type="checkbox" checked={!!selected[l.id]} onChange={(e)=> setSelected(prev=> ({ ...prev, [l.id]: e.target.checked }))} onClick={(e)=> e.stopPropagation()} />
-                        <span>Select</span>
-                  </div>
+                      <div className="mb-2 flex items-center justify-between gap-2 text-[11px] text-zinc-300">
+                        <div className="flex items-center gap-2">
+                          <input type="checkbox" checked={!!selected[l.id]} onChange={(e)=> setSelected(prev=> ({ ...prev, [l.id]: e.target.checked }))} onClick={(e)=> e.stopPropagation()} />
+                          <span>Select</span>
+                        </div>
+                        {selected[l.id] && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation()
+                              const confirmed = confirm(`⚠️ PERMANENT DELETE\n\nAre you sure you want to permanently delete "${l.name}"?\n\nThis will delete:\n• Lead record\n• All activities\n• All deals\n• All stage history\n\nThis action CANNOT be undone!`)
+                              if (!confirmed) return
+                              
+                              try {
+                                const res = await fetch('/api/crm2/leads', {
+                                  method: 'DELETE',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ id: l.id })
+                                })
+                                const result = await res.json()
+                                
+                                if (result.ok) {
+                                  // Remove from leads state
+                                  setLeads(prev => prev.filter(lead => lead.id !== l.id))
+                                  // Clear from selected state
+                                  setSelected(prev => {
+                                    const updated = { ...prev }
+                                    delete updated[l.id]
+                                    return updated
+                                  })
+                                  // Clear booking data if it exists
+                                  if (l.email) {
+                                    setLeadBookings(prev => {
+                                      const updated = { ...prev }
+                                      delete updated[l.email]
+                                      return updated
+                                    })
+                                  }
+                                  console.log(`✅ Permanently deleted lead: ${l.name}`)
+                                } else {
+                                  alert('Failed to delete lead: ' + (result.error || 'Unknown error'))
+                                }
+                              } catch (e) {
+                                console.error('Delete lead failed:', e)
+                                alert('Failed to delete lead')
+                              }
+                            }}
+                            className="px-2 py-1 text-xs rounded border border-red-400/40 bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all"
+                            title="Permanently delete this lead"
+                          >
+                            🗑️
+                </button>
+              )}
+            </div>
                       {stage==='lease' && (
                         <div className="mb-1 flex items-center justify-between gap-2">
                           <label className="flex items-center gap-2 text-[11px] text-zinc-300">
@@ -915,7 +964,7 @@ export default function AdminCRMPage() {
                             }}
                             title="Generate quote PDF"
                           >Quote PDF</button>
-            </div>
+                </div>
                       )}
                       <div className="flex items-center justify-between">
                         <div className="text-white font-semibold font-sora truncate">{l.name}</div>
@@ -924,8 +973,8 @@ export default function AdminCRMPage() {
                           <span className="px-1.5 py-0.5 rounded border border-zinc-500/40 text-[10px] text-zinc-300" title="Lead Score">
                             {getLeadScore(l)}
                           </span>
-                  </div>
-                </div>
+            </div>
+          </div>
                       <div className="text-xs text-zinc-300 mt-1 truncate">{l.email || 'no-email'}{l.phone ? ` • ${l.phone}` : ''}</div>
                       
                       {/* Enhanced display for signed leads with booking data */}
@@ -958,33 +1007,33 @@ export default function AdminCRMPage() {
                               <div className="text-xs text-emerald-300 font-semibold truncate">{booking.property?.title}</div>
                               <div className="text-xs text-emerald-200 mt-1">
                                 {checkin.toLocaleDateString('en-GB')} → {checkout.toLocaleDateString('en-GB')}
-            </div>
-          </div>
+                  </div>
+                  </div>
 
                             {/* Financial Details */}
                             <div className="grid grid-cols-2 gap-2">
                               <div className="p-2 rounded border border-amber-400/30 bg-amber-500/10">
                                 <div className="text-xs text-amber-300">Monthly</div>
                                 <div className="text-sm font-bold text-white">€{monthlyRevenue.toLocaleString()}</div>
-                  </div>
+                    </div>
                               <div className="p-2 rounded border border-cyan-400/30 bg-cyan-500/10">
                                 <div className="text-xs text-cyan-300">Received</div>
                                 <div className="text-sm font-bold text-white">€{totalRevenue.toLocaleString()}</div>
-                  </div>
                     </div>
+                  </div>
                             
                             {/* Lease Duration */}
                             <div className="grid grid-cols-2 gap-2">
                               <div className="p-2 rounded border border-blue-400/30 bg-blue-500/10">
                                 <div className="text-xs text-blue-300">Total Period</div>
                                 <div className="text-sm font-bold text-white">{safeTotalMonths} months</div>
-                              </div>
+                            </div>
                               <div className="p-2 rounded border border-purple-400/30 bg-purple-500/10">
                                 <div className="text-xs text-purple-300">Remaining</div>
                                 <div className="text-sm font-bold text-white">{safeRemainingMonths} months</div>
-                              </div>
-                            </div>
-                            </div>
+                    </div>
+                        </div>
+                    </div>
                           )
                       })() : (
                         // Standard display for non-signed leads
@@ -998,7 +1047,7 @@ export default function AdminCRMPage() {
                             }
                             return (cents/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'})
                           })()}</span>
-                    </div>
+                  </div>
                       )}
                       <div className="mt-1 flex items-center justify-between gap-2">
                         <span className="text-[10px] text-zinc-400">Owner: {l.owner || 'Unassigned'}</span>
@@ -1036,7 +1085,7 @@ export default function AdminCRMPage() {
                           if (sla>0 && ageHours>=slaHours-1 && ageHours<slaHours) return <span title={`Changed ${Math.floor(ageHours)}h ago`} className="px-2 py-0.5 text-[10px] rounded border border-amber-400/40 text-amber-300">SLA due</span>
                           return null
                         })()}
-                        </div>
+                    </div>
                       {(() => {
                         const sla = STAGE_SLA_DAYS[l.stage] ?? 0
                         if (!sla) return null
@@ -1049,13 +1098,13 @@ export default function AdminCRMPage() {
                           return (
                           <div className="mt-1 h-1.5 bg-zinc-700/40 rounded" title={`SLA ${pct}% used`}>
                             <div className={`h-full rounded ${color}`} style={{ width: `${pct}%` }} />
-                    </div>
+                  </div>
                           )
                       })()}
                     </button>
                   ))}
-                  </div>
-                        </div>
+                </div>
+          </div>
             ))}
                     </div>
         ) : (
@@ -1063,7 +1112,7 @@ export default function AdminCRMPage() {
             <div className="font-mono uppercase tracking-wider text-sm text-white mb-3">Renewals in next {renewalDays} days</div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead>
+              <thead>
                   <tr className="text-left text-zinc-300">
                     <th className="px-2 py-2"><input type="checkbox" onChange={(e)=>{
                       const checked = e.target.checked
@@ -1074,9 +1123,9 @@ export default function AdminCRMPage() {
                     <th className="px-2 py-2">Property</th>
                     <th className="px-2 py-2">City</th>
                     <th className="px-2 py-2 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+                </tr>
+              </thead>
+              <tbody>
                   {renewals
                     .filter((r:any)=> {
                       const q = renewalSearch.toLowerCase()
@@ -1145,9 +1194,9 @@ export default function AdminCRMPage() {
                   for (const r of selected) { await createRenewalReminder(r) }
                   try { const el=document.getElementById('renewal-toast'); if (el) { el.textContent = `Created ${selected.length} reminder${selected.length>1?'s':''}`; el.style.display='inline'; setTimeout(()=>{ if (el) el.style.display='none' }, 2000) } } catch {}
                 }}>Create Reminders for Selected</button>
-                    </div>
-                  </div>
-                </div>
+                          </div>
+                        </div>
+                          </div>
             )}
           </div>
 
