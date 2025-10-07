@@ -93,20 +93,29 @@ export default function SalesAnalyticsPage() {
     return () => clearInterval(interval)
   }, [])
 
-  // Calculate chart data from CRM bookings and payments
+  // Calculate chart data and metrics from booking data
   const chartData = React.useMemo(() => {
-    if (!crmData?.rows) return {
+    if (!crmData?.bookings) return {
       revenueSeries: Array(12).fill(0),
       bookingsSeries: Array(12).fill(0),
       commissionSeries: Array(12).fill(0),
-      projectedSeries: Array(12).fill(0)
+      projectedSeries: Array(12).fill(0),
+      depositsHeld: 0,
+      monthlyRevenue: 0,
+      annualRevenue: 0
     }
 
     const currentYear = new Date().getFullYear()
+    const currentMonth = new Date().getMonth()
     const revenueSeries = Array(12).fill(0)
     const bookingsSeries = Array(12).fill(0)
     const commissionSeries = Array(12).fill(0)
     const projectedSeries = Array(12).fill(0)
+    
+    // Calculate real-time metrics from booking data
+    let depositsHeld = 0
+    let monthlyRevenue = 0
+    let annualRevenue = 0
 
     // Process each booking
     crmData.rows.forEach((booking: any) => {
@@ -120,27 +129,42 @@ export default function SalesAnalyticsPage() {
       }
     })
 
-    // Process confirmed bookings for payment-based revenue
+    // Process confirmed bookings for payment-based revenue and deposits
     if (crmData.bookings) {
       crmData.bookings
         .filter((booking: any) => booking.status === 'confirmed')
         .forEach((booking: any) => {
           if (booking.payments && Array.isArray(booking.payments)) {
-            booking.payments
-              .filter((payment: any) => payment.status === 'received' && payment.receivedAt)
-              .forEach((payment: any) => {
+            booking.payments.forEach((payment: any) => {
+              const amount = Number(payment.amountCents || 0) / 100
+              
+              // Calculate deposits held (deposit payments that are received but not refunded)
+              if (payment.purpose === 'deposit' && payment.status === 'received') {
+                depositsHeld += amount
+              }
+              
+              // Calculate revenue from received payments
+              if (payment.status === 'received' && payment.receivedAt) {
                 const receivedDate = new Date(payment.receivedAt)
+                
+                // Add to annual revenue
+                annualRevenue += amount
+                
+                // Add to monthly revenue if it's current month
+                if (receivedDate.getMonth() === currentMonth && receivedDate.getFullYear() === currentYear) {
+                  monthlyRevenue += amount
+                }
+                
+                // Add to revenue series by month
                 if (receivedDate.getFullYear() === currentYear) {
                   const month = receivedDate.getMonth()
-                  const amount = Number(payment.amountCents || 0) / 100
-                  
-                  // Add to revenue for the month payment was received
                   revenueSeries[month] += amount
                   
                   // Commission is 20% of the revenue for that month
                   commissionSeries[month] += Math.round(amount * 0.20)
                 }
-              })
+              }
+            })
           }
         })
     }
@@ -182,12 +206,15 @@ export default function SalesAnalyticsPage() {
       revenueSeries,
       bookingsSeries, 
       commissionSeries,
-      projectedSeries
+      projectedSeries,
+      depositsHeld,
+      monthlyRevenue,
+      annualRevenue
     }
   }, [crmData])
 
   const monthLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-  const { revenueSeries, bookingsSeries, commissionSeries, projectedSeries } = chartData
+  const { revenueSeries, bookingsSeries, commissionSeries, projectedSeries, depositsHeld, monthlyRevenue, annualRevenue } = chartData
   const growthSeries = revenueSeries.map((current, idx) => {
     const previous = idx > 0 ? revenueSeries[idx - 1] : 0
     return previous > 0 ? Math.round(((current - previous) / previous) * 100) : 0
@@ -380,8 +407,8 @@ export default function SalesAnalyticsPage() {
 
                 {/* Revenue Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 items-stretch">
-            <MetricCard title={`${currentMonthLabel} Revenue`} value={metrics?.totals?.monthlyRevenue ?? 0} prefix="€" loading={loading} trend className="min-h-[280px]" />
-            <MetricCard title="Annual Revenue" value={metrics?.totals?.annualRevenue ?? 0} prefix="€" loading={loading} trend className="min-h-[280px]" />
+            <MetricCard title={`${currentMonthLabel} Revenue`} value={monthlyRevenue} prefix="€" loading={loading} trend className="min-h-[280px]" />
+            <MetricCard title="Annual Revenue" value={annualRevenue} prefix="€" loading={loading} trend className="min-h-[280px]" />
             <div className="relative rounded-2xl p-6 border border-purple-400/30 bg-gradient-to-br from-[#1a0b1a] to-[#120d12] shadow-[0_0_20px_rgba(139,92,246,0.25)] overflow-hidden min-h-[280px]">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(139,92,246,0.15),transparent_40%),radial-gradient(circle_at_80%_100%,rgba(139,92,246,0.1),transparent_40%)]" style={{ zIndex: 0 }} />
               <div className="relative z-10">
@@ -477,7 +504,7 @@ export default function SalesAnalyticsPage() {
                        textShadow: '0 0 10px rgba(16,185,129,0.4), 0 0 20px rgba(16,185,129,0.2)',
                        animation: 'spy-metric-glow 2s ease-in-out infinite alternate'
                      }}>
-                  €{(typeof window !== 'undefined' ? ((window as any).__depositsHeld||0) : 0).toLocaleString('de-DE')}
+                  €{depositsHeld.toLocaleString('de-DE')}
                 </div>
                 <div className="text-zinc-300 text-sm mt-1">Sum of active deposits (excludes refunded)</div>
               </div>
