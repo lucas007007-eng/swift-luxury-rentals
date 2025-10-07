@@ -896,10 +896,18 @@ export default function AdminCRMPage() {
                         const checkin = new Date(booking.checkin)
                         const checkout = new Date(booking.checkout)
                         const now = new Date()
+                        
+                        // Calculate total lease duration
                         const totalDays = Math.ceil((checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60 * 24))
-                        const totalMonths = Math.ceil(totalDays / 30)
+                        const totalMonths = Math.round(totalDays / 30.44) // More accurate month calculation
+                        
+                        // Calculate remaining time (cannot exceed total)
                         const remainingDays = Math.max(0, Math.ceil((checkout.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
-                        const remainingMonths = Math.ceil(remainingDays / 30)
+                        const remainingMonths = Math.min(totalMonths, Math.round(remainingDays / 30.44)) // Cap at total months
+                        
+                        // Ensure remaining is never greater than total
+                        const safeTotalMonths = Math.max(totalMonths, 1)
+                        const safeRemainingMonths = Math.max(0, Math.min(remainingMonths, safeTotalMonths))
                         const monthlyRevenue = booking.property?.priceMonthly || 0
                         const totalRevenue = booking.payments
                           ?.filter((p: any) => p.status === 'received')
@@ -931,12 +939,12 @@ export default function AdminCRMPage() {
                             <div className="grid grid-cols-2 gap-2">
                               <div className="p-2 rounded border border-blue-400/30 bg-blue-500/10">
                                 <div className="text-xs text-blue-300">Total Period</div>
-                                <div className="text-sm font-bold text-white">{totalMonths} months</div>
-                    </div>
+                                <div className="text-sm font-bold text-white">{safeTotalMonths} months</div>
+                              </div>
                               <div className="p-2 rounded border border-purple-400/30 bg-purple-500/10">
                                 <div className="text-xs text-purple-300">Remaining</div>
-                                <div className="text-sm font-bold text-white">{remainingMonths} months</div>
-                  </div>
+                                <div className="text-sm font-bold text-white">{safeRemainingMonths} months</div>
+                              </div>
                             </div>
                             </div>
                           )
