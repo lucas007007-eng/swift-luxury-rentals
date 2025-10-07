@@ -899,7 +899,7 @@ export default function AdminCRMPage() {
                                   if (l.email) {
                                     setLeadBookings(prev => {
                                       const updated = { ...prev }
-                                      delete updated[l.email]
+                                      delete updated[l.email!] // Non-null assertion since we checked l.email exists
                                       return updated
                                     })
                                   }
