@@ -58,6 +58,7 @@ export default function AdminCRMPage() {
   const [matches, setMatches] = useState<any[]>([])
   const [deals, setDeals] = useState<any[]>([])
   const [bookingPreview, setBookingPreview] = useState<{ id: string; payments?: any[] } | null>(null)
+  const [leadBookings, setLeadBookings] = useState<Record<string, any>>({})
   const [dragId, setDragId] = useState<string | null>(null)
   const [form, setForm] = useState<Partial<Lead>>({ stage: 'new' })
   // Quote builder state (drawer)
@@ -194,6 +195,34 @@ export default function AdminCRMPage() {
         if (companiesData.ok) setCompanies(companiesData.data || [])
         if (dealsData.ok) setDeals(dealsData.data || [])
         if (ownersData.ok) setOwners(ownersData.data || [])
+        
+        // Load booking data for signed leads
+        if (leadsData.ok) {
+          const signedLeads = (leadsData.data || []).filter((l: any) => l.stage === 'signed' && l.email)
+          if (signedLeads.length > 0) {
+            try {
+              const bookingRes = await fetch('/api/crm2/bookings', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                  emails: signedLeads.map((l: any) => l.email) 
+                })
+              })
+              const bookingData = await bookingRes.json()
+              if (bookingData.ok) {
+                const bookingMap: Record<string, any> = {}
+                bookingData.data.forEach((booking: any) => {
+                  if (booking.user?.email) {
+                    bookingMap[booking.user.email] = booking
+                  }
+                })
+                setLeadBookings(bookingMap)
+              }
+            } catch (e) {
+              console.error('Failed to load booking data for signed leads:', e)
+            }
+          }
+        }
         
       } catch (e: any) {
         setError(e?.message || 'load-failed')
@@ -759,17 +788,71 @@ export default function AdminCRMPage() {
                     </div>
                   </div>
                       <div className="text-xs text-zinc-300 mt-1 truncate">{l.email || 'no-email'}{l.phone ? ` • ${l.phone}` : ''}</div>
-                      <div className="text-xs text-zinc-400 mt-1 flex items-center justify-between">
-                        <span>{l.city || '—'}</span>
-                        <span className="text-white">{(() => {
-                          let cents = Number((l as any).budgetCents || 0)
-                          if (!cents || cents <= 0) {
-                            const dl = (deals || []).filter((d:any)=> d.leadId === l.id).sort((a:any,b:any)=> new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime())[0]
-                            if (dl) cents = Number(dl.monthlyRateCents||0) * Number(dl.termMonths||0) + Number(dl.moveInFeeCents||0)
-                          }
-                          return (cents/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'})
-                        })()}</span>
-                      </div>
+                      
+                      {/* Enhanced display for signed leads with booking data */}
+                      {l.stage === 'signed' && leadBookings[l.email || ''] ? (() => {
+                        const booking = leadBookings[l.email || '']
+                        const checkin = new Date(booking.checkin)
+                        const checkout = new Date(booking.checkout)
+                        const now = new Date()
+                        const totalDays = Math.ceil((checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60 * 24))
+                        const totalMonths = Math.ceil(totalDays / 30)
+                        const remainingDays = Math.max(0, Math.ceil((checkout.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+                        const remainingMonths = Math.ceil(remainingDays / 30)
+                        const monthlyRevenue = booking.property?.priceMonthly || 0
+                        const totalRevenue = booking.payments
+                          ?.filter((p: any) => p.status === 'received')
+                          ?.reduce((sum: number, p: any) => sum + (p.amountCents || 0), 0) / 100 || 0
+                        
+                        return (
+                          <div className="mt-2 space-y-2">
+                            {/* Property & Dates */}
+                            <div className="p-2 rounded border border-emerald-400/30 bg-emerald-500/10">
+                              <div className="text-xs text-emerald-300 font-semibold truncate">{booking.property?.title}</div>
+                              <div className="text-xs text-emerald-200 mt-1">
+                                {checkin.toLocaleDateString('en-GB')} → {checkout.toLocaleDateString('en-GB')}
+                              </div>
+                            </div>
+                            
+                            {/* Financial Details */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="p-2 rounded border border-amber-400/30 bg-amber-500/10">
+                                <div className="text-xs text-amber-300">Monthly</div>
+                                <div className="text-sm font-bold text-white">€{monthlyRevenue.toLocaleString()}</div>
+                              </div>
+                              <div className="p-2 rounded border border-cyan-400/30 bg-cyan-500/10">
+                                <div className="text-xs text-cyan-300">Received</div>
+                                <div className="text-sm font-bold text-white">€{totalRevenue.toLocaleString()}</div>
+                              </div>
+                            </div>
+                            
+                            {/* Lease Duration */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="p-2 rounded border border-blue-400/30 bg-blue-500/10">
+                                <div className="text-xs text-blue-300">Total Period</div>
+                                <div className="text-sm font-bold text-white">{totalMonths} months</div>
+                              </div>
+                              <div className="p-2 rounded border border-purple-400/30 bg-purple-500/10">
+                                <div className="text-xs text-purple-300">Remaining</div>
+                                <div className="text-sm font-bold text-white">{remainingMonths} months</div>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })() : (
+                        // Standard display for non-signed leads
+                        <div className="text-xs text-zinc-400 mt-1 flex items-center justify-between">
+                          <span>{l.city || '—'}</span>
+                          <span className="text-white">{(() => {
+                            let cents = Number((l as any).budgetCents || 0)
+                            if (!cents || cents <= 0) {
+                              const dl = (deals || []).filter((d:any)=> d.leadId === l.id).sort((a:any,b:any)=> new Date(b.createdAt||0).getTime() - new Date(a.createdAt||0).getTime())[0]
+                              if (dl) cents = Number(dl.monthlyRateCents||0) * Number(dl.termMonths||0) + Number(dl.moveInFeeCents||0)
+                            }
+                            return (cents/100).toLocaleString('de-DE',{style:'currency',currency:'EUR'})
+                          })()}</span>
+                        </div>
+                      )}
                       <div className="mt-1 flex items-center justify-between gap-2">
                         <span className="text-[10px] text-zinc-400">Owner: {l.owner || 'Unassigned'}</span>
                         {l.stage==='offer' && (()=>{
