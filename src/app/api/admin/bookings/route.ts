@@ -190,18 +190,41 @@ export async function POST(req: Request) {
               }
             })
             
-            // Update total revenue in PropertyFinancials
-            const totalRevenue = await prisma.revenue.aggregate({
-              where: { propertyId: updated.propertyId },
-              _sum: { amount: true }
-            })
+            // Update PropertyFinancials with complete revenue calculation (manual + all booking payments)
+            const [manualRevenue, allBookingRevenue] = await Promise.all([
+              // All manual revenue entries for this property
+              prisma.revenue.aggregate({
+                where: { propertyId: updated.propertyId },
+                _sum: { amount: true }
+              }),
+              // All confirmed bookings with received payments for this property
+              prisma.booking.findMany({
+                where: {
+                  propertyId: updated.propertyId,
+                  status: 'confirmed',
+                  payments: { some: { status: 'received' } }
+                },
+                include: {
+                  payments: { where: { status: 'received' } }
+                }
+              })
+            ])
+            
+            // Calculate total revenue from all sources
+            const manualRevenueTotal = manualRevenue._sum?.amount || 0
+            const bookingRevenueTotal = allBookingRevenue.reduce((sum: number, booking: any) => {
+              return sum + booking.payments.reduce((paySum: number, payment: any) => paySum + (payment.amountCents / 100), 0)
+            }, 0)
+            const completeRevenue = manualRevenueTotal + bookingRevenueTotal
             
             await prisma.propertyFinancials.update({
               where: { propertyId: updated.propertyId },
-              data: { totalRevenue: totalRevenue._sum?.amount || 0 }
+              data: { totalRevenue: Math.round(completeRevenue) }
             })
             
-            console.log(`[FINANCE] Added €${totalBookingRevenue} revenue for property ${updated.property.title}`)
+            // Set global cache invalidation timestamp to trigger finance page refresh
+            ;(global as any).__financeLastUpdate = Date.now()
+            console.log(`[FINANCE] Updated property ${updated.property.title} total revenue to €${Math.round(completeRevenue)} (Manual: €${manualRevenueTotal}, Bookings: €${Math.round(bookingRevenueTotal)}), cache invalidated`)
           }
         }
         
