@@ -146,6 +146,7 @@ export default function SalesAnalyticsPage() {
     }
 
     // Calculate projected revenue from scheduled payments (confirmed bookings only)
+    // Include current year and next year for comprehensive projections
     if (crmData.bookings) {
       crmData.bookings
         .filter((booking: any) => booking.status === 'confirmed')
@@ -155,11 +156,23 @@ export default function SalesAnalyticsPage() {
               .filter((payment: any) => payment.status === 'scheduled' && payment.dueAt)
               .forEach((payment: any) => {
                 const dueDate = new Date(payment.dueAt)
-                if (dueDate.getFullYear() === currentYear) {
+                const paymentYear = dueDate.getFullYear()
+                const amount = Number(payment.amountCents || 0) / 100
+                
+                // Include payments from current year and next year
+                if (paymentYear === currentYear) {
                   const month = dueDate.getMonth()
-                  const amount = Number(payment.amountCents || 0) / 100
                   projectedSeries[month] += amount
+                } else if (paymentYear === currentYear + 1) {
+                  // For next year payments, add to December (or create a separate next year tracking)
+                  // For now, let's show them in the current year's December as "Next Year Revenue"
+                  const month = dueDate.getMonth()
+                  if (month < 12) {
+                    projectedSeries[month] += amount
+                  }
                 }
+                
+                console.log(`📅 Scheduled payment: €${amount} due ${dueDate.toLocaleDateString()} (Year: ${paymentYear})`)
               })
           }
         })
@@ -180,14 +193,38 @@ export default function SalesAnalyticsPage() {
     return previous > 0 ? Math.round(((current - previous) / previous) * 100) : 0
   })
   
-  // Calculate projected revenue for selected month
+  // Calculate projected revenue for selected month (including multi-year)
   const currentMonth = new Date().getMonth()
   const currentYear = new Date().getFullYear()
+  
+  // Calculate projected revenue for any future month (including next year)
+  const calculateProjectedRevenueForMonth = (targetMonth: number, targetYear: number) => {
+    if (!crmData?.bookings) return 0
+    
+    let monthRevenue = 0
+    crmData.bookings
+      .filter((booking: any) => booking.status === 'confirmed')
+      .forEach((booking: any) => {
+        if (booking.payments && Array.isArray(booking.payments)) {
+          booking.payments
+            .filter((payment: any) => payment.status === 'scheduled' && payment.dueAt)
+            .forEach((payment: any) => {
+              const dueDate = new Date(payment.dueAt)
+              if (dueDate.getFullYear() === targetYear && dueDate.getMonth() === targetMonth) {
+                const amount = Number(payment.amountCents || 0) / 100
+                monthRevenue += amount
+              }
+            })
+        }
+      })
+    
+    return monthRevenue
+  }
   
   // Ensure selected month is valid (wrap to next year if needed)
   const adjustedMonth = selectedProjectionMonth > 11 ? selectedProjectionMonth - 12 : selectedProjectionMonth
   const projectedYear = selectedProjectionMonth > 11 ? currentYear + 1 : currentYear
-  const selectedMonthRevenue = projectedSeries[adjustedMonth] || 0
+  const selectedMonthRevenue = calculateProjectedRevenueForMonth(adjustedMonth, projectedYear)
   const selectedMonthName = new Date(projectedYear, adjustedMonth, 1).toLocaleString('default', { month: 'long' })
   
   const nextMonth = () => {
