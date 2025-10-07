@@ -31,7 +31,7 @@ export default function FinancePage() {
           console.error('Failed to check for finance updates:', e)
         }
       }
-    }, 1000) // Check every 1 second for immediate updates
+    }, 3000) // Check every 3 seconds for balanced performance
     
     return () => clearInterval(interval)
   }, [])

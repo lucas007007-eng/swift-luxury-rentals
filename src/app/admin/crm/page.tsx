@@ -250,7 +250,7 @@ export default function AdminCRMPage() {
           const updateData = await updateRes.json()
           const serverLastUpdate = updateData.lastUpdate || 0
           
-          if (serverLastUpdate > lastKnownUpdate || true) { // Force refresh every time for debugging
+          if (serverLastUpdate > lastKnownUpdate) { // Only refresh when data actually changes
             console.log('🔄 CRM data updated on server (booking change), refreshing leads...')
             lastKnownUpdate = serverLastUpdate
             
@@ -354,7 +354,7 @@ export default function AdminCRMPage() {
           console.error('Failed to check for CRM updates:', e)
         }
       }
-    }, 1000) // Check every 1 second for immediate updates
+    }, 2000) // Check every 2 seconds for fast updates without overwhelming
     
     // Live updates via SSE
     const es = new EventSource('/api/crm2/events')

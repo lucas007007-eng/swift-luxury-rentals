@@ -88,7 +88,7 @@ export default function SalesAnalyticsPage() {
           console.error('Failed to check for sales analytics updates:', e)
         }
       }
-    }, 1000) // Check every 1 second for immediate updates
+    }, 5000) // Check every 5 seconds for balanced performance
     
     return () => clearInterval(interval)
   }, [])
