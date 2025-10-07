@@ -208,16 +208,24 @@ export default function AdminCRMPage() {
                   emails: signedLeads.map((l: any) => l.email) 
                 })
               })
-              const bookingData = await bookingRes.json()
-              if (bookingData.ok) {
-                const bookingMap: Record<string, any> = {}
-                bookingData.data.forEach((booking: any) => {
-                  if (booking.user?.email) {
-                    bookingMap[booking.user.email] = booking
-                  }
-                })
-                setLeadBookings(bookingMap)
-              }
+                const bookingData = await bookingRes.json()
+                console.log('📊 Initial booking data response:', bookingData)
+                if (bookingData.ok) {
+                  const bookingMap: Record<string, any> = {}
+                  bookingData.data.forEach((booking: any) => {
+                    if (booking.user?.email) {
+                      bookingMap[booking.user.email] = booking
+                      console.log(`📋 Initial mapped booking for ${booking.user.email}:`, {
+                        property: booking.property?.title,
+                        monthly: booking.property?.priceMonthly,
+                        checkin: booking.checkin,
+                        checkout: booking.checkout
+                      })
+                    }
+                  })
+                  setLeadBookings(bookingMap)
+                  console.log('📊 Initial lead bookings set:', Object.keys(bookingMap))
+                }
             } catch (e) {
               console.error('Failed to load booking data for signed leads:', e)
             }
@@ -274,14 +282,22 @@ export default function AdminCRMPage() {
                   })
                 })
                 const bookingData = await bookingRes.json()
+                console.log('📊 Booking data response:', bookingData)
                 if (bookingData.ok) {
                   const bookingMap: Record<string, any> = {}
                   bookingData.data.forEach((booking: any) => {
                     if (booking.user?.email) {
                       bookingMap[booking.user.email] = booking
+                      console.log(`📋 Mapped booking for ${booking.user.email}:`, {
+                        property: booking.property?.title,
+                        monthly: booking.property?.priceMonthly,
+                        checkin: booking.checkin,
+                        checkout: booking.checkout
+                      })
                     }
                   })
                   setLeadBookings(bookingMap)
+                  console.log('📊 Lead bookings updated:', Object.keys(bookingMap))
                 }
               } catch (e) {
                 console.error('Failed to reload booking data:', e)
