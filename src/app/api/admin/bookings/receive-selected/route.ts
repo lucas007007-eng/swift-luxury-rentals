@@ -32,9 +32,18 @@ export async function POST(req: Request) {
       })
     }
 
-    // If submitted via form, redirect back to bookings page
+    console.log(`[PAYMENT] Approved ${ids.length} payments, setting status to 'received'`)
+    
+    // Trigger cache invalidation for real-time updates
+    ;(global as any).__crmLastUpdate = Date.now()
+    ;(global as any).__financeLastUpdate = Date.now()
+    console.log('[PAYMENT] Cache invalidated for CRM and Finance')
+
+    // If submitted via form, redirect back to bookings page with cache busting
     if (!contentType || contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
-      return NextResponse.redirect(new URL('/admin/bookings', req.url))
+      const redirectUrl = new URL('/admin/bookings', req.url)
+      redirectUrl.searchParams.set('_refresh', Date.now().toString()) // Cache busting
+      return NextResponse.redirect(redirectUrl)
     }
     return NextResponse.json({ ok: true, count: ids.length })
   } catch (e: any) {

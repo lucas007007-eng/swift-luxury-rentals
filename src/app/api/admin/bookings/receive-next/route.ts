@@ -37,10 +37,19 @@ export async function POST(req: Request) {
         receivedAt: next.dueAt || new Date() 
       } 
     })
+    
+    console.log(`[PAYMENT] Approved next payment ${next.id}, setting status to 'received'`)
+    
+    // Trigger cache invalidation for real-time updates
+    ;(global as any).__crmLastUpdate = Date.now()
+    ;(global as any).__financeLastUpdate = Date.now()
+    console.log('[PAYMENT] Cache invalidated for CRM and Finance')
+    
     // If form-submitted from the bookings page, redirect back for a fresh view
     if (!contentType || contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
-      // We don't have the full URL here, but if called from the browser this will work
-      return NextResponse.redirect(new URL('/admin/bookings', req.url))
+      const redirectUrl = new URL('/admin/bookings', req.url)
+      redirectUrl.searchParams.set('_refresh', Date.now().toString()) // Cache busting
+      return NextResponse.redirect(redirectUrl)
     }
     return NextResponse.json({ ok: true })
   } catch (e: any) {
